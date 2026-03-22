@@ -15,4 +15,4 @@ MonoBehaviour:
   entityName: Enemy
   maxHealth: 10
   moveSpeed: 1
-  attackPower: 0
+  attackPower: 10

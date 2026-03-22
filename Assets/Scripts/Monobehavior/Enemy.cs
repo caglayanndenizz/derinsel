@@ -115,26 +115,33 @@ public class Enemy : BaseEntity
             else
             {
                 // Reached the player, start attacking
-                Debug.Log(gameObject.name + " is attacking the player!");
             }
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
-{
-    // Eğer bana çarpan şeyin etiketi "Player" ise
-    if (collision.gameObject.CompareTag("Player"))
     {
-        // Kendimi yok et
-        Destroy(gameObject);
-        if(player != null)
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            Player playerScript = collision.gameObject.GetComponent<Player>();
+        
+            if (playerScript != null)
             {
-                Instantiate(goldPrefab, transform.position, Quaternion.identity);
-                Instantiate(experiencePrefab, transform.position + new Vector3(0.5f ,0,0), Quaternion.identity);
-
+                TakeDamage(playerScript.stats.attackPower);
             }
+        }
     }
-}
+
+    protected override void Die() 
+    {
+    Debug.Log(gameObject.name + " ganimet birakarak öldü.");
+
+    Instantiate(goldPrefab, transform.position, Quaternion.identity);
+    Instantiate(experiencePrefab, transform.position + new Vector3(0.5f, 0, 0), Quaternion.identity);
+
+    
+    Destroy(gameObject);
+    }
 
     private void OnDrawGizmos()
     {

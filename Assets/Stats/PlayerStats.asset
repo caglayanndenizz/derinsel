@@ -15,4 +15,4 @@ MonoBehaviour:
   entityName: Player
   maxHealth: 100
   moveSpeed: 5
-  attackPower: 0
+  attackPower: 5
