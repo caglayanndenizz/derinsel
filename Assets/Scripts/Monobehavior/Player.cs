@@ -25,7 +25,6 @@ public class Player : BaseEntity
         float moveX = Input.GetAxis("Horizontal"); 
 		float moveY = Input.GetAxis("Vertical");   
 
-		// 2D'de yukarı/aşağı hareketi Y eksenidir, Z değil!
 		Vector3 direction = new Vector3(moveX, moveY, 0).normalized;
 
 		transform.Translate(direction * stats.moveSpeed * Time.deltaTime);
@@ -36,12 +35,14 @@ public class Player : BaseEntity
 
     private void UpdateAnimations(float x, float y)
     {
-        // Animator'daki parametreleri hareket yönüne göre set ediyoruz
         animator.SetBool("Moveleft", x < 0);
         animator.SetBool("MoveRight", x > 0);
         animator.SetBool("MoveUp", y > 0);
+
+        //buraya movedown adinda bir parametre ekleyip y<0 yaz.
+        //sprite hala otomatik saga donuyor sola giderken de. Onu da yapmayi unutma. 
+        //Yon tusunu birakmama ragmen hala yurume animasyonu gerceklestiriyor
         
-        // Bonus: Eğer hiçbir yere basılmıyorsa hepsi false olur ve Idle'a döner
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

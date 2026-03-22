@@ -12,8 +12,8 @@ public class Enemy : BaseEntity
 
      [Header("State Settings")]
     public State currentState = State.Patrol;
-    public float detectionRange = 3f; // This will be the initial detection range
-    public float expandedDetectionRange = 12f; // The range it expands to
+    public float detectionRange = 3f; 
+    public float expandedDetectionRange = 12f; 
     public float attackRange = 1f;
 
     [Header("Patrol Settings")]
@@ -93,10 +93,10 @@ public class Enemy : BaseEntity
 
         if (currentState == State.Patrol)
         {
-            // Move horizontally back and forth
+            
             transform.Translate(Vector3.right * patrolDirection * currentSpeed * Time.deltaTime);
 
-            // Reverse direction if we moved too far from the start positions
+            
             if (Vector3.Distance(startPosition, transform.position) >= patrolDistance)
             {
                 patrolDirection *= -1;
@@ -114,7 +114,7 @@ public class Enemy : BaseEntity
             }
             else
             {
-                // Reached the player, start attacking
+                // oyuncuya yetisildi, attaga baslama vakti. 
             }
         }
     }
@@ -145,11 +145,11 @@ public class Enemy : BaseEntity
 
     private void OnDrawGizmos()
     {
-        // Draw the current detection range in yellow (will be 3f or 15f)
+        
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
 
-        // Draw the attack range in red
+        
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
