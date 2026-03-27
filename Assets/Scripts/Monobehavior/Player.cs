@@ -44,7 +44,7 @@ public class Player : BaseEntity
 
         //buraya movedown adinda bir parametre ekleyip y<0 yaz.
         //sprite hala otomatik saga donuyor sola giderken de. Onu da yapmayi unutma. 
-        //Yon tusunu birakmama ragmen hala yurume animasyonu gerceklestiriyor
+        //Yon tusunu birakmama ragmen hala yurume animasyonu gerceklestiriyor 
         
     }
 
