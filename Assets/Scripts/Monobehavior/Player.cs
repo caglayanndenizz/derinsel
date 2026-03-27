@@ -38,6 +38,9 @@ public class Player : BaseEntity
         animator.SetBool("Moveleft", x < 0);
         animator.SetBool("MoveRight", x > 0);
         animator.SetBool("MoveUp", y > 0);
+        animator.SetBool("MoveDown", x >= 0 && y < 0);
+        animator.SetBool("MoveDown1", x <= 0 && y < 0);
+
 
         //buraya movedown adinda bir parametre ekleyip y<0 yaz.
         //sprite hala otomatik saga donuyor sola giderken de. Onu da yapmayi unutma. 
