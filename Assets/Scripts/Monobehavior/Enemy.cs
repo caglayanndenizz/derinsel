@@ -142,13 +142,15 @@ public class Enemy : BaseEntity
 
     protected override void Die() 
     {
-    Debug.Log(gameObject.name + " ganimet birakarak öldü.");
+        base.Die();
 
-    Instantiate(goldPrefab, transform.position, Quaternion.identity);
-    Instantiate(experiencePrefab, transform.position + new Vector3(0.5f, 0, 0), Quaternion.identity);
+        Debug.Log(gameObject.name + " ganimet birakarak öldü.");
+
+        Instantiate(goldPrefab, transform.position, Quaternion.identity);
+        Instantiate(experiencePrefab, transform.position + new Vector3(0.5f, 0, 0), Quaternion.identity);
 
     
-    Destroy(gameObject);
+        Destroy(gameObject);
     }
 
     private void OnDrawGizmos()

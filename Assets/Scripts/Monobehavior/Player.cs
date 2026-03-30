@@ -28,7 +28,6 @@ public class Player : BaseEntity
 
 		transform.Translate(direction * stats.moveSpeed * Time.deltaTime);
 
-
     }
 
 
@@ -43,10 +42,14 @@ public class Player : BaseEntity
                 TakeDamage(enemyScript.stats.attackPower);
             }
         }
+
+                //buradaki collision mantigi attack function gelince silinecek.
+
     }
 
     protected override void Die()
     {
+        base.Die();
         Destroy(gameObject);
     }
 

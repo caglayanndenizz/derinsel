@@ -1,11 +1,14 @@
+using System;
 using UnityEngine;
 
-public abstract class BaseEntity : MonoBehaviour 
+public abstract class BaseEntity : MonoBehaviour , IDamageable
 {
     [Header("Data Reference")]
     public EntityStats stats; // Yarattığımız SO'yu buraya bağlayacağız
 
     protected float currentHealth;
+
+    public static Action<BaseEntity> OnAnyEntityDie { get; internal set; }
 
     protected virtual void Awake() 
     {
