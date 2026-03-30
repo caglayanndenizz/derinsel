@@ -1,68 +1,70 @@
 fileFormatVersion: 2
-guid: 0b5262a6696fdd4479d0e186f7021230
-AssetOrigin:
-  serializedVersion: 1
-  productId: 206693
-  packageName: MINIFANTASY - Dungeon
-  packageVersion: 1.1.1
-  assetPath: Assets/KrishnaPalacio/MINIFANTASY - Dungeon/Sprites/Animations/Human/HumanBaseChargedAttack.png
-  uploadId: 556302
+guid: 9213b35a31a68a1449faec0d3dbef9fd
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6697902666702919034
-    second: HumanBaseChargedAttack_0
+      213: -3786115476455808955
+    second: Dungeon_Tileset_0
   - first:
-      213: 250013475056114728
-    second: HumanBaseChargedAttack_1
+      213: -3590207636862898149
+    second: Dungeon_Tileset_1
   - first:
-      213: -7550104269825149931
-    second: HumanBaseChargedAttack_2
+      213: -6941422852762540485
+    second: Dungeon_Tileset_2
   - first:
-      213: 895578487396185397
-    second: HumanBaseChargedAttack_3
+      213: -6419999111262848172
+    second: Dungeon_Tileset_3
   - first:
-      213: 6051795538545383472
-    second: HumanBaseChargedAttack_4
+      213: 5094737752361063794
+    second: Dungeon_Tileset_4
   - first:
-      213: 1119567584827617091
-    second: HumanBaseChargedAttack_5
+      213: 4023018930920339469
+    second: Dungeon_Tileset_5
   - first:
-      213: -1185719808220275160
-    second: HumanBaseChargedAttack_6
+      213: -8120323925528636241
+    second: Dungeon_Tileset_6
   - first:
-      213: -7499219010098043209
-    second: HumanBaseChargedAttack_7
+      213: 8938356945095094423
+    second: Dungeon_Tileset_7
   - first:
-      213: 6550034743685958758
-    second: HumanBaseChargedAttack_8
+      213: 2818063909598327431
+    second: Dungeon_Tileset_8
   - first:
-      213: 8396394777339624401
-    second: HumanBaseChargedAttack_9
+      213: -778764822399169897
+    second: Dungeon_Tileset_9
   - first:
-      213: 186788252125519705
-    second: HumanBaseChargedAttack_10
+      213: -8474740879727053552
+    second: Dungeon_Tileset_10
   - first:
-      213: 8925980180959427885
-    second: HumanBaseChargedAttack_11
+      213: 4521207776522067839
+    second: Dungeon_Tileset_11
   - first:
-      213: -3451560941822829332
-    second: HumanBaseChargedAttack_12
+      213: 1558959487191823921
+    second: Dungeon_Tileset_12
   - first:
-      213: -1414145346099601372
-    second: HumanBaseChargedAttack_13
+      213: 595508747133529673
+    second: Dungeon_Tileset_13
   - first:
-      213: -7479840962646363343
-    second: HumanBaseChargedAttack_14
+      213: -1474506998622769691
+    second: Dungeon_Tileset_14
   - first:
-      213: 2137327054385911780
-    second: HumanBaseChargedAttack_15
+      213: -3624728776038038798
+    second: Dungeon_Tileset_15
   - first:
-      213: 484028457924205237
-    second: HumanBaseChargedAttack_16
+      213: -7606234629451901924
+    second: Dungeon_Tileset_16
   - first:
-      213: 9124189539695567969
-    second: HumanBaseChargedAttack_17
+      213: -7657094741939605724
+    second: Dungeon_Tileset_17
+  - first:
+      213: -9000362276992120081
+    second: Dungeon_Tileset_18
+  - first:
+      213: -3317108722525156635
+    second: Dungeon_Tileset_19
+  - first:
+      213: -8355083117788888566
+    second: Dungeon_Tileset_20
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -95,7 +97,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -109,7 +111,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 8
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -126,14 +128,14 @@ TextureImporter:
   ignorePngGamma: 0
   applyGammaDecoding: 0
   swizzle: 50462976
-  cookieLightType: 1
+  cookieLightType: 0
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -146,20 +148,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -171,397 +160,463 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_0
+      name: Dungeon_Tileset_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 64
-        width: 32
-        height: 32
+        y: 31
+        width: 160
+        height: 129
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: a7518f40dfab3fc50800000000000000
-      internalID: 6697902666702919034
+      spriteID: 5402e3ba804057bc0800000000000000
+      internalID: -3786115476455808955
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_1
+      name: Dungeon_Tileset_1
       rect:
         serializedVersion: 2
-        x: 32
-        y: 64
-        width: 32
-        height: 32
+        x: 33
+        y: 17
+        width: 14
+        height: 14
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 82cd7c15ee9387300800000000000000
-      internalID: 250013475056114728
+      spriteID: b1074ee0d250d2ec0800000000000000
+      internalID: -3590207636862898149
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_2
+      name: Dungeon_Tileset_2
       rect:
         serializedVersion: 2
-        x: 64
-        y: 64
-        width: 32
-        height: 32
+        x: 49
+        y: 17
+        width: 14
+        height: 14
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 51479e33b24a83790800000000000000
-      internalID: -7550104269825149931
+      spriteID: b366f4151bc1baf90800000000000000
+      internalID: -6941422852762540485
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_3
-      rect:
-        serializedVersion: 2
-        x: 96
-        y: 64
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5353bb9a3ebbd6c00800000000000000
-      internalID: 895578487396185397
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: HumanBaseChargedAttack_4
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 64
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0389a408afb4cf350800000000000000
-      internalID: 6051795538545383472
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: HumanBaseChargedAttack_5
-      rect:
-        serializedVersion: 2
-        x: 160
-        y: 64
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 34f21b369c0898f00800000000000000
-      internalID: 1119567584827617091
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: HumanBaseChargedAttack_6
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 32
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 82ed2ebdd1a7b8fe0800000000000000
-      internalID: -1185719808220275160
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: HumanBaseChargedAttack_7
-      rect:
-        serializedVersion: 2
-        x: 32
-        y: 32
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 7b6ef3afa0c6de790800000000000000
-      internalID: -7499219010098043209
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: HumanBaseChargedAttack_8
+      name: Dungeon_Tileset_3
       rect:
         serializedVersion: 2
         x: 64
-        y: 32
-        width: 32
-        height: 32
+        y: 17
+        width: 16
+        height: 14
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 66c4ed355e566ea50800000000000000
-      internalID: 6550034743685958758
+      spriteID: 45bbadaa2d497e6a0800000000000000
+      internalID: -6419999111262848172
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_9
+      name: Dungeon_Tileset_4
       rect:
         serializedVersion: 2
-        x: 96
-        y: 32
-        width: 32
-        height: 32
+        x: 2
+        y: 17
+        width: 12
+        height: 12
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 1dbf541609cf58470800000000000000
-      internalID: 8396394777339624401
+      spriteID: 275d0412ef424b640800000000000000
+      internalID: 5094737752361063794
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_10
+      name: Dungeon_Tileset_5
       rect:
         serializedVersion: 2
-        x: 128
-        y: 32
-        width: 32
-        height: 32
+        x: 18
+        y: 17
+        width: 12
+        height: 12
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 95f5828fcea979200800000000000000
-      internalID: 186788252125519705
+      spriteID: d08bd2e1762a4d730800000000000000
+      internalID: 4023018930920339469
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_11
+      name: Dungeon_Tileset_6
       rect:
         serializedVersion: 2
-        x: 160
-        y: 32
-        width: 32
-        height: 32
+        x: 82
+        y: 17
+        width: 12
+        height: 12
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: d2d7346cea37fdb70800000000000000
-      internalID: 8925980180959427885
+      spriteID: fa492cdb960de4f80800000000000000
+      internalID: -8120323925528636241
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_12
+      name: Dungeon_Tileset_7
       rect:
         serializedVersion: 2
-        x: 0
+        x: 98
+        y: 17
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 790f90cb84c6b0c70800000000000000
+      internalID: 8938356945095094423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Tileset_8
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 17
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 782f4fde136cb1720800000000000000
+      internalID: 2818063909598327431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Tileset_9
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 18
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79ac35525854135f0800000000000000
+      internalID: -778764822399169897
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Tileset_10
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 17
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 015336c221ca36a80800000000000000
+      internalID: -8474740879727053552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Tileset_11
+      rect:
+        serializedVersion: 2
+        x: 3
         y: 0
-        width: 32
-        height: 32
+        width: 10
+        height: 15
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: cec990e4c979910d0800000000000000
-      internalID: -3451560941822829332
+      spriteID: f7fd453b48e8ebe30800000000000000
+      internalID: 4521207776522067839
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_13
+      name: Dungeon_Tileset_12
       rect:
         serializedVersion: 2
-        x: 32
+        x: 15
         y: 0
-        width: 32
-        height: 32
+        width: 8
+        height: 15
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 42026f8dc42ff5ce0800000000000000
-      internalID: -1414145346099601372
+      spriteID: 1363b45d46982a510800000000000000
+      internalID: 1558959487191823921
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_14
+      name: Dungeon_Tileset_13
       rect:
         serializedVersion: 2
-        x: 64
+        x: 35
         y: 0
-        width: 32
-        height: 32
+        width: 10
+        height: 10
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 1333c0d3644423890800000000000000
-      internalID: -7479840962646363343
+      spriteID: 94e2885ec0ca34800800000000000000
+      internalID: 595508747133529673
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_15
+      name: Dungeon_Tileset_14
       rect:
         serializedVersion: 2
-        x: 96
+        x: 51
         y: 0
-        width: 32
-        height: 32
+        width: 11
+        height: 17
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 4e71185c1af49ad10800000000000000
-      internalID: 2137327054385911780
+      spriteID: 5ed234072bf798be0800000000000000
+      internalID: -1474506998622769691
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_16
+      name: Dungeon_Tileset_15
       rect:
         serializedVersion: 2
-        x: 128
+        x: 67
         y: 0
-        width: 32
-        height: 32
+        width: 11
+        height: 11
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 5ba90c7615d97b600800000000000000
-      internalID: 484028457924205237
+      spriteID: 2f2cd11026062bdc0800000000000000
+      internalID: -3624728776038038798
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseChargedAttack_17
+      name: Dungeon_Tileset_16
       rect:
         serializedVersion: 2
-        x: 160
+        x: 83
         y: 0
-        width: 32
-        height: 32
+        width: 11
+        height: 15
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 164a3e85b02af9e70800000000000000
-      internalID: 9124189539695567969
+      spriteID: c149e3177e9317690800000000000000
+      internalID: -7606234629451901924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Tileset_17
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 0
+        width: 11
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42fad27b6e88cb590800000000000000
+      internalID: -7657094741939605724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Tileset_18
+      rect:
+        serializedVersion: 2
+        x: 114
+        y: 1
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fea0f0ee13a481380800000000000000
+      internalID: -9000362276992120081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Tileset_19
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 1
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5eac980113347f1d0800000000000000
+      internalID: -3317108722525156635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Tileset_20
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 2
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a028457eb28cc0c80800000000000000
+      internalID: -8355083117788888566
       vertices: []
       indices: 
       edges: []
@@ -570,7 +625,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -580,24 +635,27 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      HumanBaseChargedAttack_0: 6697902666702919034
-      HumanBaseChargedAttack_1: 250013475056114728
-      HumanBaseChargedAttack_10: 186788252125519705
-      HumanBaseChargedAttack_11: 8925980180959427885
-      HumanBaseChargedAttack_12: -3451560941822829332
-      HumanBaseChargedAttack_13: -1414145346099601372
-      HumanBaseChargedAttack_14: -7479840962646363343
-      HumanBaseChargedAttack_15: 2137327054385911780
-      HumanBaseChargedAttack_16: 484028457924205237
-      HumanBaseChargedAttack_17: 9124189539695567969
-      HumanBaseChargedAttack_2: -7550104269825149931
-      HumanBaseChargedAttack_3: 895578487396185397
-      HumanBaseChargedAttack_4: 6051795538545383472
-      HumanBaseChargedAttack_5: 1119567584827617091
-      HumanBaseChargedAttack_6: -1185719808220275160
-      HumanBaseChargedAttack_7: -7499219010098043209
-      HumanBaseChargedAttack_8: 6550034743685958758
-      HumanBaseChargedAttack_9: 8396394777339624401
+      Dungeon_Tileset_0: -3786115476455808955
+      Dungeon_Tileset_1: -3590207636862898149
+      Dungeon_Tileset_10: -8474740879727053552
+      Dungeon_Tileset_11: 4521207776522067839
+      Dungeon_Tileset_12: 1558959487191823921
+      Dungeon_Tileset_13: 595508747133529673
+      Dungeon_Tileset_14: -1474506998622769691
+      Dungeon_Tileset_15: -3624728776038038798
+      Dungeon_Tileset_16: -7606234629451901924
+      Dungeon_Tileset_17: -7657094741939605724
+      Dungeon_Tileset_18: -9000362276992120081
+      Dungeon_Tileset_19: -3317108722525156635
+      Dungeon_Tileset_2: -6941422852762540485
+      Dungeon_Tileset_20: -8355083117788888566
+      Dungeon_Tileset_3: -6419999111262848172
+      Dungeon_Tileset_4: 5094737752361063794
+      Dungeon_Tileset_5: 4023018930920339469
+      Dungeon_Tileset_6: -8120323925528636241
+      Dungeon_Tileset_7: 8938356945095094423
+      Dungeon_Tileset_8: 2818063909598327431
+      Dungeon_Tileset_9: -778764822399169897
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: EnemyStats
   m_EditorClassIdentifier: Assembly-CSharp::EntityStats
   entityName: Enemy
-  maxHealth: 10
+  maxHealth: 100
   moveSpeed: 1
   attackPower: 10

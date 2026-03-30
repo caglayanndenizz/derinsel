@@ -7,12 +7,11 @@ public class Player : BaseEntity
     public float goldCount = 0;
     public float experienceCount = 0;
 
-    public Animator animator;
 
     protected override void Awake()
     {
         base.Awake();
-        animator = GetComponent<Animator>();
+        
     }
 
     void Update()
@@ -29,24 +28,9 @@ public class Player : BaseEntity
 
 		transform.Translate(direction * stats.moveSpeed * Time.deltaTime);
 
-        UpdateAnimations(moveX, moveY);
 
     }
 
-    private void UpdateAnimations(float x, float y)
-    {
-        animator.SetBool("Moveleft", x < 0);
-        animator.SetBool("MoveRight", x > 0);
-        animator.SetBool("MoveUp", y > 0);
-        animator.SetBool("MoveDown", x >= 0 && y < 0);
-        animator.SetBool("MoveDown1", x <= 0 && y < 0);
-
-
-        //buraya movedown adinda bir parametre ekleyip y<0 yaz.
-        //sprite hala otomatik saga donuyor sola giderken de. Onu da yapmayi unutma. 
-        //Yon tusunu birakmama ragmen hala yurume animasyonu gerceklestiriyor 
-        
-    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {

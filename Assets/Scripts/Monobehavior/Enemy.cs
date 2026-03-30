@@ -53,13 +53,19 @@ public class Enemy : BaseEntity
         // If the player is dead or destroyed, revert to patrol
         if (player == null)
         {
-            currentState = State.Patrol;
-            startPosition = transform.position; // Reset patrol center
-            detectionRange = originalDetectionRange; // Reset detection range to its original value
-            return;
+            // Try to find the player again in case it spawned after the enemy
+            player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null)
+            {
+                currentState = State.Patrol;
+                startPosition = transform.position; // Reset patrol center
+                detectionRange = originalDetectionRange; // Reset detection range to its original value
+                return;
+            }
         }
 
-        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        // Use Vector2 to prevent Z-axis differences from breaking distance logic in 2D
+        float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
 
         if (currentState == State.Patrol)
         {
@@ -97,20 +103,20 @@ public class Enemy : BaseEntity
             transform.Translate(Vector3.right * patrolDirection * currentSpeed * Time.deltaTime);
 
             
-            if (Vector3.Distance(startPosition, transform.position) >= patrolDistance)
+            if (Vector2.Distance(startPosition, transform.position) >= patrolDistance)
             {
                 patrolDirection *= -1;
             }
         }
         else if (currentState == State.Chase)
         {
-            float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+            float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
 
             if (distanceToPlayer > attackRange)
             {
                 // Move towards the player
                 Vector3 direction = (player.transform.position - transform.position).normalized;
-                transform.Translate(direction * currentSpeed * Time.deltaTime);
+                transform.Translate(direction * currentSpeed * Time.deltaTime, Space.World);
             }
             else
             {
@@ -130,6 +136,8 @@ public class Enemy : BaseEntity
                 TakeDamage(playerScript.stats.attackPower);
             }
         }
+
+        //buradaki collision mantigi attack function gelince silinecek.
     }
 
     protected override void Die() 

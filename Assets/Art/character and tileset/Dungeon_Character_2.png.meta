@@ -1,50 +1,46 @@
 fileFormatVersion: 2
-guid: 2d3d46406c325684aa3a1f6358ae67fb
-AssetOrigin:
-  serializedVersion: 1
-  productId: 206693
-  packageName: MINIFANTASY - Dungeon
-  packageVersion: 1.1.1
-  assetPath: Assets/KrishnaPalacio/MINIFANTASY - Dungeon/Sprites/Animations/Human/HumanBaseSpinDie.png
-  uploadId: 556302
+guid: 1501d01d4fb79964fa7c80b2570ddebb
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -9123045988654663704
-    second: HumanBaseSpinDie_0
+      213: -5501054352798569629
+    second: Dungeon_Character_2_0
   - first:
-      213: 2264957443381591308
-    second: HumanBaseSpinDie_1
+      213: 3598024242438813033
+    second: Dungeon_Character_2_1
   - first:
-      213: 3304459083662050357
-    second: HumanBaseSpinDie_2
+      213: 423828613696989058
+    second: Dungeon_Character_2_2
   - first:
-      213: 3536524729851286482
-    second: HumanBaseSpinDie_3
+      213: 7007010545437925719
+    second: Dungeon_Character_2_3
   - first:
-      213: 4209020810932609902
-    second: HumanBaseSpinDie_4
+      213: -7269266456686481269
+    second: Dungeon_Character_2_4
   - first:
-      213: -7698133230386193858
-    second: HumanBaseSpinDie_5
+      213: 6471500516762935339
+    second: Dungeon_Character_2_5
   - first:
-      213: -4606763988200290081
-    second: HumanBaseSpinDie_6
+      213: 6199791883379630216
+    second: Dungeon_Character_2_6
   - first:
-      213: 5650159241510613029
-    second: HumanBaseSpinDie_7
+      213: -8267076635104238795
+    second: Dungeon_Character_2_7
   - first:
-      213: 4460017540616150817
-    second: HumanBaseSpinDie_8
+      213: -2851127834306816864
+    second: Dungeon_Character_2_8
   - first:
-      213: -2575360243832399752
-    second: HumanBaseSpinDie_9
+      213: -3655150236505813497
+    second: Dungeon_Character_2_9
   - first:
-      213: 639567803849488912
-    second: HumanBaseSpinDie_10
+      213: -4787544169540912965
+    second: Dungeon_Character_2_10
   - first:
-      213: 8704715779118974026
-    second: HumanBaseSpinDie_11
+      213: -262721789967192588
+    second: Dungeon_Character_2_11
+  - first:
+      213: 5876570029868465104
+    second: Dungeon_Character_2_12
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -77,7 +73,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -91,7 +87,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 8
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -108,14 +104,14 @@ TextureImporter:
   ignorePngGamma: 0
   applyGammaDecoding: 0
   swizzle: 50462976
-  cookieLightType: 1
+  cookieLightType: 0
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -128,20 +124,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -153,265 +136,287 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: HumanBaseSpinDie_0
+      name: Dungeon_Character_2_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 32
-        height: 32
+        y: 16
+        width: 17
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 8e7bfa0620e646180800000000000000
-      internalID: -9123045988654663704
+      spriteID: 36b2353463458a3b0800000000000000
+      internalID: -5501054352798569629
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseSpinDie_1
+      name: Dungeon_Character_2_1
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 1
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9653fcf3cffbee130800000000000000
+      internalID: 3598024242438813033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Character_2_2
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 16
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2872e0de0edb1e500800000000000000
+      internalID: 423828613696989058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Character_2_3
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7516e3267f6ed3160800000000000000
+      internalID: 7007010545437925719
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Character_2_4
       rect:
         serializedVersion: 2
         x: 32
         y: 0
-        width: 32
-        height: 32
+        width: 15
+        height: 17
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: c0df2246bcebe6f10800000000000000
-      internalID: 2264957443381591308
+      spriteID: b803a8ffba06e1b90800000000000000
+      internalID: -7269266456686481269
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseSpinDie_2
+      name: Dungeon_Character_2_5
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 16
+        width: 34
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b206969be636fc950800000000000000
+      internalID: 6471500516762935339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Character_2_6
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 0
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 880613abed51a0650800000000000000
+      internalID: 6199791883379630216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dungeon_Character_2_7
       rect:
         serializedVersion: 2
         x: 64
         y: 0
-        width: 32
-        height: 32
+        width: 17
+        height: 17
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 5344d70670ccbdd20800000000000000
-      internalID: 3304459083662050357
+      spriteID: 5332ea9e991754d80800000000000000
+      internalID: -8267076635104238795
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseSpinDie_3
+      name: Dungeon_Character_2_8
       rect:
         serializedVersion: 2
-        x: 96
-        y: 0
-        width: 32
-        height: 32
+        x: 79
+        y: 16
+        width: 18
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 2d39b262182441130800000000000000
-      internalID: 3536524729851286482
+      spriteID: 0a4d9e23752ce68d0800000000000000
+      internalID: -2851127834306816864
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseSpinDie_4
+      name: Dungeon_Character_2_9
       rect:
         serializedVersion: 2
-        x: 128
+        x: 80
         y: 0
-        width: 32
-        height: 32
+        width: 17
+        height: 17
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: e636ddf8022796a30800000000000000
-      internalID: 4209020810932609902
+      spriteID: 70ec268c93c464dc0800000000000000
+      internalID: -3655150236505813497
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseSpinDie_5
+      name: Dungeon_Character_2_10
       rect:
         serializedVersion: 2
-        x: 160
+        x: 95
         y: 0
-        width: 32
-        height: 32
+        width: 17
+        height: 17
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: e3a53390d9cba2590800000000000000
-      internalID: -7698133230386193858
+      spriteID: bb8750c71f93f8db0800000000000000
+      internalID: -4787544169540912965
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseSpinDie_6
+      name: Dungeon_Character_2_11
       rect:
         serializedVersion: 2
-        x: 192
-        y: 0
-        width: 32
-        height: 32
+        x: 97
+        y: 16
+        width: 15
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: fd882477f8c7110c0800000000000000
-      internalID: -4606763988200290081
+      spriteID: 4fd204a8cef9a5cf0800000000000000
+      internalID: -262721789967192588
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: HumanBaseSpinDie_7
+      name: Dungeon_Character_2_12
       rect:
         serializedVersion: 2
-        x: 224
-        y: 0
-        width: 32
-        height: 32
+        x: 2
+        y: 2
+        width: 11
+        height: 13
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 52071a2f4e5696e40800000000000000
-      internalID: 5650159241510613029
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: HumanBaseSpinDie_8
-      rect:
-        serializedVersion: 2
-        x: 256
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 12fdf60b25a25ed30800000000000000
-      internalID: 4460017540616150817
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: HumanBaseSpinDie_9
-      rect:
-        serializedVersion: 2
-        x: 288
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 878d4b9c08b724cd0800000000000000
-      internalID: -2575360243832399752
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: HumanBaseSpinDie_10
-      rect:
-        serializedVersion: 2
-        x: 320
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 01ab93e678330e800800000000000000
-      internalID: 639567803849488912
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: HumanBaseSpinDie_11
-      rect:
-        serializedVersion: 2
-        x: 352
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a44cf1da1ec5dc870800000000000000
-      internalID: 8704715779118974026
+      spriteID: 0db34088e45cd8150800000000000000
+      internalID: 5876570029868465104
       vertices: []
       indices: 
       edges: []
@@ -420,7 +425,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -430,18 +435,19 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      HumanBaseSpinDie_0: -9123045988654663704
-      HumanBaseSpinDie_1: 2264957443381591308
-      HumanBaseSpinDie_10: 639567803849488912
-      HumanBaseSpinDie_11: 8704715779118974026
-      HumanBaseSpinDie_2: 3304459083662050357
-      HumanBaseSpinDie_3: 3536524729851286482
-      HumanBaseSpinDie_4: 4209020810932609902
-      HumanBaseSpinDie_5: -7698133230386193858
-      HumanBaseSpinDie_6: -4606763988200290081
-      HumanBaseSpinDie_7: 5650159241510613029
-      HumanBaseSpinDie_8: 4460017540616150817
-      HumanBaseSpinDie_9: -2575360243832399752
+      Dungeon_Character_2_0: -5501054352798569629
+      Dungeon_Character_2_1: 3598024242438813033
+      Dungeon_Character_2_10: -4787544169540912965
+      Dungeon_Character_2_11: -262721789967192588
+      Dungeon_Character_2_12: 5876570029868465104
+      Dungeon_Character_2_2: 423828613696989058
+      Dungeon_Character_2_3: 7007010545437925719
+      Dungeon_Character_2_4: -7269266456686481269
+      Dungeon_Character_2_5: 6471500516762935339
+      Dungeon_Character_2_6: 6199791883379630216
+      Dungeon_Character_2_7: -8267076635104238795
+      Dungeon_Character_2_8: -2851127834306816864
+      Dungeon_Character_2_9: -3655150236505813497
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
