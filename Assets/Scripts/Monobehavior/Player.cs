@@ -1,14 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-using Unity.Mathematics;
+
 
 
 public class Player : BaseEntity
 {
 
     [Header("Hammer Settings")]
-    public float maxChargeTime = 2f;
+    public float maxChargeTime = 0.5f;
     public float hammerAOE = 2.5f;
     public float hammerDamageMultiplier = 2f;
 
@@ -56,34 +55,46 @@ public class Player : BaseEntity
 
 
     private void HandleHammerCharge()
+{
+    if (Input.GetButton("Fire1"))
     {
-        if(Input.GetButton("Fire1"))
-        {
-            
-            _isCharging = true;
-            meterCanvas.SetActive(true);
+        _isCharging = true;
+        meterCanvas.SetActive(true);
 
-            _currentCharge += Time.deltaTime;
-            _currentCharge = Mathf.Clamp(_currentCharge, 0f, maxChargeTime);
-            chargeMeter.value = _currentCharge / maxChargeTime;
-            hammerPivot.localRotation = Quaternion.Euler(0, 0, (_currentCharge / maxChargeTime) * 45f);
-        }
+        // 1. ADIM: Zamanı biriktir (Asla maxChargeTime'ı geçemez)
+        _currentCharge += Time.deltaTime;
+        _currentCharge = Mathf.Clamp(_currentCharge, 0f, maxChargeTime);
 
-        if(Input.GetButtonUp("Fire1"))
-        {
-            if(_currentCharge >= maxChargeTime)
-            {
-                
-                HammerSlam();
-            
-            }
-            ResetCharge();
-        
-        }
+        // 2. ADIM: ORAN (Bütün sihir burada. 0 ile 1 arası tertemiz bir sayı)
+        // Şarj başladığında 0, bittiğinde tam 1 olur.
+        float progress = _currentCharge / maxChargeTime;
 
+        // 3. ADIM: AYNI ANDA ÇALIŞTIR
+        // Slider 1'den (Dolu) 0'a (Boş) düşerken...
+        chargeMeter.value = 1f - progress; 
 
+        // Çekiç 0 dereceden (Dik) 90 dereceye (Yatık) aynı oranda gelir.
+        hammerPivot.localRotation = Quaternion.Euler(0, 0, progress * 90f);
     }
 
+    if (Input.GetButtonUp("Fire1"))
+    {
+        // Şarj TAMAMLANDI MI? (progress tam 1 oldu mu?)
+        if (_currentCharge >= maxChargeTime)
+        {
+            // Bıraktığın an çekiç ışınlanarak dikey (0) olur ve vurur
+            hammerPivot.localRotation = Quaternion.identity;
+            HammerSlam(); 
+        }
+        else
+        {
+            // Şarj bitmediyse her şeyi eski haline çek
+            hammerPivot.localRotation = Quaternion.identity;
+        }
+
+        ResetCharge();
+    }
+}
     private void HammerSlam()
     {
         
