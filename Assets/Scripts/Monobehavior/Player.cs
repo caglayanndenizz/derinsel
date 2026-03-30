@@ -123,7 +123,7 @@ public class Player : BaseEntity
         _isCharging = false;
         _currentCharge = 0f;
         chargeMeter.value = 0f;
-        meterCanvas.SetActive(false); // Barı gizles
+        meterCanvas.SetActive(false);
     }
 
     
