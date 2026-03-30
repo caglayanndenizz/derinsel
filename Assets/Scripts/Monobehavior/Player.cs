@@ -1,9 +1,31 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+using Unity.Mathematics;
 
 
 public class Player : BaseEntity
 {
 
+    [Header("Hammer Settings")]
+    public float maxChargeTime = 2f;
+    public float hammerAOE = 2.5f;
+    public float hammerDamageMultiplier = 2f;
+
+    public Transform hammerPivot;
+
+    public Transform attackPoint;
+    public LayerMask enemyLayers;
+
+
+    [Header("UI Reference")]
+    public Slider chargeMeter;
+    public GameObject meterCanvas;
+
+    private float _currentCharge = 0f;
+    private bool _isCharging = false;
+
+    [Header("Loot Settings")]
     public float goldCount = 0;
     public float experienceCount = 0;
 
@@ -17,6 +39,7 @@ public class Player : BaseEntity
     void Update()
     {
         Move();
+        HandleHammerCharge();
     }
 
     protected override void Move()
@@ -25,13 +48,78 @@ public class Player : BaseEntity
 		float moveY = Input.GetAxis("Vertical");   
 
 		Vector3 direction = new Vector3(moveX, moveY, 0).normalized;
-
+        float currentSpeed = _isCharging ? stats.moveSpeed * 0.3f : stats.moveSpeed;
 		transform.Translate(direction * stats.moveSpeed * Time.deltaTime);
 
     }
 
 
-    private void OnCollisionEnter2D(Collision2D collision)
+
+    private void HandleHammerCharge()
+    {
+        if(Input.GetButton("Fire1"))
+        {
+            
+            _isCharging = true;
+            meterCanvas.SetActive(true);
+
+            _currentCharge += Time.deltaTime;
+            _currentCharge = Mathf.Clamp(_currentCharge, 0f, maxChargeTime);
+            chargeMeter.value = _currentCharge / maxChargeTime;
+            hammerPivot.localRotation = Quaternion.Euler(0, 0, (_currentCharge / maxChargeTime) * 45f);
+        }
+
+        if(Input.GetButtonUp("Fire1"))
+        {
+            if(_currentCharge >= maxChargeTime)
+            {
+                
+                HammerSlam();
+            
+            }
+            ResetCharge();
+        
+        }
+
+
+    }
+
+    private void HammerSlam()
+    {
+        
+        Debug.Log("ÇEKİÇ YERE VURULDU!");
+
+        // Alan hasarı ve Knockback
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
+
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            IDamageable target = enemy.GetComponent<IDamageable>();
+            if (target != null)
+            {
+                // Normal atağın 2 katı hasar ver
+                target.TakeDamage(stats.attackPower * hammerDamageMultiplier);
+            }
+        }
+
+        // Juicing: Ekranı salla ve anlık yavaşlat (Opsiyonel)
+        // StartCoroutine(CombatJuice.HitStop(0.1f));
+    }
+
+
+    private void ResetCharge()
+    {
+        _isCharging = false;
+        _currentCharge = 0f;
+        chargeMeter.value = 0f;
+        meterCanvas.SetActive(false); // Barı gizles
+    }
+
+    
+
+
+
+    /*private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
@@ -46,6 +134,7 @@ public class Player : BaseEntity
                 //buradaki collision mantigi attack function gelince silinecek.
 
     }
+    */
 
     protected override void Die()
     {

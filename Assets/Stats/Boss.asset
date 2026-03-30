@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74bfcabb2800cd246a747c82c293d0df, type: 3}
+  m_Name: Boss
+  m_EditorClassIdentifier: Assembly-CSharp::RoomData
+  roomName: Boss
+  type: 0
+  minEnemyCount: 2
+  maxEnemyCount: 5
+  enemyPrefabs:
+  - {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}

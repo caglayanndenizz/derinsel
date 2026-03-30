@@ -1,5 +1,3 @@
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Enemy : BaseEntity
@@ -14,7 +12,9 @@ public class Enemy : BaseEntity
     public State currentState = State.Patrol;
     public float detectionRange = 3f; 
     public float expandedDetectionRange = 12f; 
-    public float attackRange = 1f;
+    public float attackRange;
+    
+    public CircleCollider2D cd;
 
     [Header("Patrol Settings")]
     public float patrolDistance = 2f;
@@ -41,6 +41,7 @@ public class Enemy : BaseEntity
         startPosition = transform.position;
         patrolSpeed = stats.moveSpeed;
         originalDetectionRange = detectionRange;
+        attackRange = cd.radius;
     }
     void Update()
     {
@@ -161,6 +162,8 @@ public class Enemy : BaseEntity
 
         
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
+        Gizmos.DrawWireSphere(transform.position, cd.radius + 0.1f);
+
+        //daha iyi gorebilmek icin 0.1 ekledim saldiri range ine.
     }
 }

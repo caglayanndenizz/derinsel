@@ -36,24 +36,35 @@ public class RoomManager : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            // Rastgele bir doğuş noktası seç
             Transform sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
-            
-            // Havuzdaki rastgele bir düşman prefabını seç
-            GameObject prefab = data.enemyPrefabs[Random.Range(0, data.enemyPrefabs.Length)];
-
-            // Düşmanı yarat
-            GameObject enemyObj = Instantiate(prefab, sp.position, Quaternion.identity);
-            
-            // Takip listesine ekle
-            BaseEntity enemyScript = enemyObj.GetComponent<BaseEntity>();
-            if (enemyScript != null)
-            {
-                activeEnemies.Add(enemyScript);
-            }
-        }
         
-        Debug.Log(data.roomName + " odası hazır! Düşman sayısı: " + activeEnemies.Count);
+            // --- BURASI YENİ: Küçük bir rastgele sapma ekliyoruz ---
+            Vector3 randomOffset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+            Vector3 finalSpawnPos = sp.position + randomOffset;
+
+            GameObject prefab = data.enemyPrefabs[Random.Range(0, data.enemyPrefabs.Length)];
+            GameObject enemyObj = Instantiate(prefab, finalSpawnPos, Quaternion.identity);
+        
+            BaseEntity enemyScript = enemyObj.GetComponent<BaseEntity>();
+                if (enemyScript != null)
+                {
+                    activeEnemies.Add(enemyScript);
+
+                    if (enemyScript is Enemy enemy) 
+                    {
+                        if (data.type == EnemyType.Swarm)
+                        {
+                            enemy.currentState = Enemy.State.Chase; //
+                            enemy.detectionRange = enemy.expandedDetectionRange;
+                        }
+                        else
+                        {
+                            enemy.currentState = Enemy.State.Patrol; //
+                        }
+                    }
+                }
+        
+        }
     }
 
     private void HandleEnemyDeath(BaseEntity victim)
