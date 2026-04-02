@@ -16,3 +16,5 @@ MonoBehaviour:
   maxHealth: 100
   moveSpeed: 5
   attackPower: 5
+  lightAttackDamage: 10
+  heavyAttackDamage: 20

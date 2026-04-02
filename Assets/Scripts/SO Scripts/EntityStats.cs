@@ -7,4 +7,6 @@ public class EntityStats : ScriptableObject
     public float maxHealth;
     public float moveSpeed;
     public float attackPower;
+    public float lightAttackDamage;
+    public float heavyAttackDamage;
 }

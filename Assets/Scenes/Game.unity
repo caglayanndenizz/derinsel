@@ -2942,7 +2942,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &663529443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3473,16 +3473,18 @@ MonoBehaviour:
   stats: {fileID: 11400000, guid: 51a62771fc2e9484a9150bcbc472472f, type: 2}
   maxChargeTime: 0.5
   hammerAOE: 2.5
-  hammerDamageMultiplier: 2
+  lightAttackRate: 0.2
+  lightAttackRange: 1.5
+  lightAttackDuration: 0.1
   hammerPivot: {fileID: 405214496}
   attackPoint: {fileID: 473991612}
   enemyLayers:
     serializedVersion: 2
-    m_Bits: 0
-  chargeMeter: {fileID: 1928738635}
-  meterCanvas: {fileID: 132921027}
+    m_Bits: 64
   goldCount: 0
   experienceCount: 0
+  chargeMeter: {fileID: 1928738635}
+  meterCanvas: {fileID: 132921027}
 --- !u!212 &1700128190
 SpriteRenderer:
   m_ObjectHideFlags: 0

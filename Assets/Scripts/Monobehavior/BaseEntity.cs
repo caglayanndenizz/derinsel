@@ -6,7 +6,7 @@ public abstract class BaseEntity : MonoBehaviour , IDamageable
     [Header("Data Reference")]
     public EntityStats stats; // Yarattığımız SO'yu buraya bağlayacağız
 
-    protected float currentHealth;
+    protected float _currentHealth;
 
     public static Action<BaseEntity> OnAnyEntityDie { get; internal set; }
 
@@ -14,15 +14,15 @@ public abstract class BaseEntity : MonoBehaviour , IDamageable
     {
         // Oyun başladığında canı SO'daki veriden çekiyoruz
         if (stats != null)
-            currentHealth = stats.maxHealth;
+            _currentHealth = stats.maxHealth;
     }
 
-    public virtual void TakeDamage(float amount) 
+    public virtual void TakeDamage(float amount, bool isHeavy)
     {
-        currentHealth -= amount;
-        Debug.Log(gameObject.name + " hasar aldi! Kalan can: " + currentHealth);
+        _currentHealth -= amount;
+        Debug.Log(gameObject.name + " hasar aldi! Kalan can: " + _currentHealth);
 
-        if (currentHealth <= 0) Die();
+        if (_currentHealth <= 0) Die();
     }
 
     protected virtual void Die() 
@@ -32,5 +32,6 @@ public abstract class BaseEntity : MonoBehaviour , IDamageable
     }
 
     // Hareket her varlıkta farklı olacağı için gövdesini boş bırakıyoruz
-    protected abstract void Move(); 
+    protected abstract void Move();
+
 }

@@ -1,20 +1,21 @@
 using UnityEngine;
+using System.Collections;
 
 public class Enemy : BaseEntity
 {
-    public enum State
-    {
-        Patrol,
-        Chase
-    }
+    public enum State { Patrol, Chase }
 
-     [Header("State Settings")]
+    [Header("State Settings")]
     public State currentState = State.Patrol;
     public float detectionRange = 3f; 
     public float expandedDetectionRange = 12f; 
     public float attackRange;
-    
     public CircleCollider2D cd;
+
+    [Header("Knockback Settings")]
+    public float knockbackDuration = 0.2f;
+    private bool _isKnockedBack = false;
+    private Rigidbody2D _rb;
 
     [Header("Patrol Settings")]
     public float patrolDistance = 2f;
@@ -26,144 +27,146 @@ public class Enemy : BaseEntity
     private float originalDetectionRange;
 
     [Header("Loot")]
-
     public GameObject goldPrefab;
     public GameObject experiencePrefab;
 
-
+    [Header("Visual Effects")]
+    public Color flashColor = Color.white;
+    private SpriteRenderer _spriteRenderer;
+    private Color _originalColor;
 
     protected GameObject player;
 
-     protected override void Awake()
+    protected override void Awake()
     {
         base.Awake();
+        _rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
+        _spriteRenderer = GetComponent<SpriteRenderer>();
         startPosition = transform.position;
         patrolSpeed = stats.moveSpeed;
         originalDetectionRange = detectionRange;
         attackRange = cd.radius;
+        _originalColor = _spriteRenderer.color;
     }
+
     void Update()
     {
+        // Eğer savruluyorsa (Knockback), AI ve hareket devre dışı
+        if (_isKnockedBack) return;
+
         CheckState();
         Move();
     }
 
-      private void CheckState()
+    // --- PLAYER SALDIRISIYLA TETİKLENEN HASAR ---
+    public override void TakeDamage(float amount, bool isHeavy)
     {
-        // If the player is dead or destroyed, revert to patrol
-        if (player == null)
-        {
-            // Try to find the player again in case it spawned after the enemy
-            player = GameObject.FindGameObjectWithTag("Player");
-            if (player == null)
-            {
-                currentState = State.Patrol;
-                startPosition = transform.position; // Reset patrol center
-                detectionRange = originalDetectionRange; // Reset detection range to its original value
-                return;
-            }
-        }
+        base.TakeDamage(amount, isHeavy);
 
-        // Use Vector2 to prevent Z-axis differences from breaking distance logic in 2D
-        float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
-
-        if (currentState == State.Patrol)
+        if (_currentHealth > 0)
         {
-            if (distanceToPlayer <= detectionRange) // Using the current detectionRange (initially originalDetectionRange)
-            {
-                currentState = State.Chase;
-                detectionRange = expandedDetectionRange; // Expand detection range
-            }
-        }
-        else if (currentState == State.Chase)
-        {
-            // If player leaves the expanded detection range, revert to Patrol
-            if (distanceToPlayer > detectionRange)
-            {
-                currentState = State.Patrol;
-                startPosition = transform.position; // Reset patrol center
-                detectionRange = originalDetectionRange; // Reset detection range
-            }
-            // If player is still within the expanded detection range, remain in Chase state.
-            // The detectionRange variable already holds the expanded value.
+            StartCoroutine(HitFlashRoutine());
+            // Ağır saldırı (Fire2) 15 birim, Hafif (Fire1) 5 birim savurur
+            float force = isHeavy ? 15f : 5f;
+            StartCoroutine(KnockbackRoutine(force));
         }
     }
 
-    
+    private IEnumerator HitFlashRoutine()
+    {
+    // 1. Sprite'ı belirlediğimiz renge (Flash Color) boya
+        _spriteRenderer.color = flashColor;
+
+    // 2. Çok kısa bir süre bekle (Gözün algılayacağı kadar: 0.1 saniye)
+        yield return new WaitForSeconds(0.2f);
+
+    // 3. Rengi eski haline döndür
+        _spriteRenderer.color = _originalColor;
+    }
+
+      private IEnumerator KnockbackRoutine(float force)
+    {
+        _isKnockedBack = true;
+
+        if (player != null)
+        {
+            Vector2 knockbackDirection = (transform.position - player.transform.position).normalized;
+            _rb.linearVelocity = Vector2.zero; 
+            _rb.AddForce(knockbackDirection * force, ForceMode2D.Impulse);
+        }
+
+        yield return new WaitForSeconds(knockbackDuration);
+
+        _rb.linearVelocity = Vector2.zero;
+        _isKnockedBack = false;
+    }
 
     protected override void Move() 
     {
-         if (player == null) return;
+        if (player == null) return;
 
         float currentSpeed = (currentState == State.Patrol) ? patrolSpeed : stats.moveSpeed * 1.75f;
 
         if (currentState == State.Patrol)
         {
-            
             transform.Translate(Vector3.right * patrolDirection * currentSpeed * Time.deltaTime);
-
-            
             if (Vector2.Distance(startPosition, transform.position) >= patrolDistance)
-            {
                 patrolDirection *= -1;
-            }
         }
         else if (currentState == State.Chase)
         {
             float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
-
             if (distanceToPlayer > attackRange)
             {
-                // Move towards the player
                 Vector3 direction = (player.transform.position - transform.position).normalized;
                 transform.Translate(direction * currentSpeed * Time.deltaTime, Space.World);
             }
-            else
-            {
-                // oyuncuya yetisildi, attaga baslama vakti. 
-            }
         }
+
+        // --- 4x4 FLIP ---
+        if (player.transform.position.x > transform.position.x)
+            transform.localScale = new Vector3(4f, 4f, 1f);
+        else
+            transform.localScale = new Vector3(-4f, 4f, 1f);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void CheckState()
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (player == null)
         {
-            Player playerScript = collision.gameObject.GetComponent<Player>();
-        
-            if (playerScript != null)
-            {
-                TakeDamage(playerScript.stats.attackPower);
-            }
+            player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null) return;
         }
 
-        //buradaki collision mantigi attack function gelince silinecek.
+        float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
+
+        if (currentState == State.Patrol && distanceToPlayer <= detectionRange)
+        {
+            currentState = State.Chase;
+            detectionRange = expandedDetectionRange;
+        }
+        else if (currentState == State.Chase && distanceToPlayer > detectionRange)
+        {
+            currentState = State.Patrol;
+            startPosition = transform.position;
+            detectionRange = originalDetectionRange;
+        }
     }
 
     protected override void Die() 
     {
         base.Die();
-
-        Debug.Log(gameObject.name + " ganimet birakarak öldü.");
-
         Instantiate(goldPrefab, transform.position, Quaternion.identity);
         Instantiate(experiencePrefab, transform.position + new Vector3(0.5f, 0, 0), Quaternion.identity);
-
-    
         Destroy(gameObject);
     }
 
     private void OnDrawGizmos()
     {
-        
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
-
-        
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, cd.radius + 0.1f);
-
-        //daha iyi gorebilmek icin 0.1 ekledim saldiri range ine.
+        if(cd != null) Gizmos.DrawWireSphere(transform.position, cd.radius + 0.1f);
     }
 }

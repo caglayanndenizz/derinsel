@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3297539337289784264}
   - component: {fileID: 4578505465515028023}
   - component: {fileID: 3924341414968054820}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -174,6 +174,8 @@ MonoBehaviour:
   expandedDetectionRange: 12
   attackRange: 1
   cd: {fileID: 3297539337289784264}
+  knockbackDuration: 0.2
   patrolDistance: 2
   goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
   experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}

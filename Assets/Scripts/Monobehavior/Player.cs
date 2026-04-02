@@ -1,20 +1,31 @@
 using UnityEngine;
 using UnityEngine.UI;
-
-
+using System.Collections;
 
 public class Player : BaseEntity
 {
+    
+    
 
-    [Header("Hammer Settings")]
+    
+    
+    [Header("Hammer Settings (Heavy)")]
     public float maxChargeTime = 0.5f;
     public float hammerAOE = 2.5f;
-    public float hammerDamageMultiplier = 2f;
+    
 
+    [Header("Light Attack Settings (Spammable)")]
+    public float lightAttackRate = 0.2f; // Vuruşlar arası bekleme (Spam hızı)
+    public float lightAttackRange = 1.5f; // Hafif vuruşun menzili biraz daha dar
+    public float lightAttackDuration = 0.1f; // 1/5 oranındaki animasyon hızı
+    private float _nextAttackTime = 0f;
+
+    [Header("References")]
     public Transform hammerPivot;
-
     public Transform attackPoint;
     public LayerMask enemyLayers;
+    public float goldCount;
+    public float experienceCount;
 
 
     [Header("UI Reference")]
@@ -24,99 +35,129 @@ public class Player : BaseEntity
     private float _currentCharge = 0f;
     private bool _isCharging = false;
 
-    [Header("Loot Settings")]
-    public float goldCount = 0;
-    public float experienceCount = 0;
-
-
-    protected override void Awake()
-    {
-        base.Awake();
-        
-    }
+    // ... Loot Settings ...
 
     void Update()
     {
         Move();
-        HandleHammerCharge();
+        HandleHammerCharge(); // Sağ Tık (Fire2)
+        HandleLightAttack();  // Sol Tık (Fire1)
     }
 
     protected override void Move()
     {
         float moveX = Input.GetAxis("Horizontal"); 
-		float moveY = Input.GetAxis("Vertical");   
+        float moveY = Input.GetAxis("Vertical");   
 
-		Vector3 direction = new Vector3(moveX, moveY, 0).normalized;
-        float currentSpeed = _isCharging ? stats.moveSpeed * 0.3f : stats.moveSpeed;
-		transform.Translate(direction * stats.moveSpeed * Time.deltaTime);
-
-    }
-
-
-
-    private void HandleHammerCharge()
-{
-    if (Input.GetButton("Fire1"))
-    {
-        _isCharging = true;
-        meterCanvas.SetActive(true);
-
-        // 1. ADIM: Zamanı biriktir (Asla maxChargeTime'ı geçemez)
-        _currentCharge += Time.deltaTime;
-        _currentCharge = Mathf.Clamp(_currentCharge, 0f, maxChargeTime);
-
-        // 2. ADIM: ORAN (Bütün sihir burada. 0 ile 1 arası tertemiz bir sayı)
-        // Şarj başladığında 0, bittiğinde tam 1 olur.
-        float progress = _currentCharge / maxChargeTime;
-
-        // 3. ADIM: AYNI ANDA ÇALIŞTIR
-        // Slider 1'den (Dolu) 0'a (Boş) düşerken...
-        chargeMeter.value = 1f - progress; 
-
-        // Çekiç 0 dereceden (Dik) 90 dereceye (Yatık) aynı oranda gelir.
-        hammerPivot.localRotation = Quaternion.Euler(0, 0, progress * 90f);
-    }
-
-    if (Input.GetButtonUp("Fire1"))
-    {
-        // Şarj TAMAMLANDI MI? (progress tam 1 oldu mu?)
-        if (_currentCharge >= maxChargeTime)
-        {
-            // Bıraktığın an çekiç ışınlanarak dikey (0) olur ve vurur
-            hammerPivot.localRotation = Quaternion.identity;
-            HammerSlam(); 
-        }
-        else
-        {
-            // Şarj bitmediyse her şeyi eski haline çek
-            hammerPivot.localRotation = Quaternion.identity;
-        }
-
-        ResetCharge();
-    }
-}
-    private void HammerSlam()
-    {
+        Vector3 direction = new Vector3(moveX, moveY, 0).normalized;
         
-        Debug.Log("ÇEKİÇ YERE VURULDU!");
+        // Şarj olurken yavaşla, normalde tam hız git
+        float currentSpeed = _isCharging ? stats.moveSpeed * 0.3f : stats.moveSpeed;
+        transform.Translate(direction * currentSpeed * Time.deltaTime);
 
-        // Alan hasarı ve Knockback
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
+        if (moveX > 0)
+        {
+        // Sağa gidiyorsa ölçeği normale çevir
+        transform.localScale = new Vector3(3f, 3f, 1f);
+        }
+        else if (moveX < 0)
+        {
+        // Sola gidiyorsa X ekseninde aynala
+        transform.localScale = new Vector3(-3f, 3f, 1f);
+        }
+    }
+
+    // --- SOL TIK: HAFİF SALDIRI ---
+    private void HandleLightAttack()
+    {
+        // Eğer ağır saldırı şarj ediyorsak hafif vuruş yapma
+        if (_isCharging) return;
+
+        if (Input.GetButtonDown("Fire1") && Time.time >= _nextAttackTime)
+        {
+            LightAttack();
+            _nextAttackTime = Time.time + lightAttackRate;
+        }
+    }
+
+    private void LightAttack()
+    {
+        // Görsel savurma
+        StartCoroutine(LightSwingRoutine());
+
+        // Hasar kontrolü
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, lightAttackRange, enemyLayers);
 
         foreach (Collider2D enemy in hitEnemies)
         {
             IDamageable target = enemy.GetComponent<IDamageable>();
             if (target != null)
             {
-                // Normal atağın 2 katı hasar ver
-                target.TakeDamage(stats.attackPower * hammerDamageMultiplier);
+                // Normal hasar ver (Çarpan yok)
+                target.TakeDamage(stats.lightAttackDamage, false);
+                
+                // Hafif vuruş için minimalist bir Hit-Stop (Çok kısa)
+                // StartCoroutine(HitStop(0.03f)); 
             }
         }
-
-        // Juicing: Ekranı salla ve anlık yavaşlat (Opsiyonel)
-        // StartCoroutine(CombatJuice.HitStop(0.1f));
     }
 
+    private IEnumerator LightSwingRoutine()
+    {
+        // Çekici hızlıca ileri savur (45 derece yeterli hafif vuruş için)
+        hammerPivot.localRotation = Quaternion.Euler(0, 0, -45f);
+        
+        // 0.1 saniye bekle (Senin istediğin 1/5 süre)
+        yield return new WaitForSeconds(lightAttackDuration);
+
+        // Eski haline getir
+        hammerPivot.localRotation = Quaternion.identity;
+    }
+
+    // --- SAĞ TIK: AĞIR SALDIRI (KODUNUN AYNI HALİ) ---
+    private void HandleHammerCharge()
+    {
+        if (Input.GetButton("Fire2"))
+        {
+            _isCharging = true;
+            meterCanvas.SetActive(true);
+
+            _currentCharge += Time.deltaTime;
+            _currentCharge = Mathf.Clamp(_currentCharge, 0f, maxChargeTime);
+
+            float progress = _currentCharge / maxChargeTime;
+            chargeMeter.value = 1f - progress; 
+
+            hammerPivot.localRotation = Quaternion.Euler(0, 0, progress * 90f);
+        }
+
+        if (Input.GetButtonUp("Fire2"))
+        {
+            if (_currentCharge >= maxChargeTime)
+            {
+                hammerPivot.localRotation = Quaternion.identity;
+                HammerSlam(); 
+            }
+            else
+            {
+                hammerPivot.localRotation = Quaternion.identity;
+            }
+
+            ResetCharge();
+        }
+    }
+
+    private void HammerSlam()
+    {
+        Debug.Log("AĞIR ÇEKİÇ VURULDU!");
+        // Mevcut alan hasarı kodun...
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            IDamageable target = enemy.GetComponent<IDamageable>();
+            if (target != null) target.TakeDamage(stats.heavyAttackDamage, true);
+        }
+    }
 
     private void ResetCharge()
     {
@@ -125,32 +166,4 @@ public class Player : BaseEntity
         chargeMeter.value = 0f;
         meterCanvas.SetActive(false);
     }
-
-    
-
-
-
-    /*private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Enemy"))
-        {
-            Enemy enemyScript = collision.gameObject.GetComponent<Enemy>();
-        
-            if (enemyScript != null)
-            {
-                TakeDamage(enemyScript.stats.attackPower);
-            }
-        }
-
-                //buradaki collision mantigi attack function gelince silinecek.
-
-    }
-    */
-
-    protected override void Die()
-    {
-        base.Die();
-        Destroy(gameObject);
-    }
-
 }
