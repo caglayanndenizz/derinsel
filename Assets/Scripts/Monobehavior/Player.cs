@@ -126,7 +126,7 @@ public class Player : BaseEntity
             _currentCharge = Mathf.Clamp(_currentCharge, 0f, maxChargeTime);
 
             float progress = _currentCharge / maxChargeTime;
-            chargeMeter.value = 1f - progress; 
+            chargeMeter.value = progress; 
 
             hammerPivot.localRotation = Quaternion.Euler(0, 0, progress * 90f);
         }
