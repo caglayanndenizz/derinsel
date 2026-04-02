@@ -58,12 +58,12 @@ public class Player : BaseEntity
         if (moveX > 0)
         {
         // Sağa gidiyorsa ölçeği normale çevir
-        transform.localScale = new Vector3(3f, 3f, 1f);
+        transform.localScale = new Vector3(1f, 1f, 1f);
         }
         else if (moveX < 0)
         {
         // Sola gidiyorsa X ekseninde aynala
-        transform.localScale = new Vector3(-3f, 3f, 1f);
+        transform.localScale = new Vector3(-1f, 1f, 1f);
         }
     }
 
