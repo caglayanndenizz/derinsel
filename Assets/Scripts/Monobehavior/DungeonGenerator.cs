@@ -11,120 +11,182 @@ public class DungeonGenerator : MonoBehaviour
     public TileBase floorTile;
     public TileBase wallTile;
 
+    [Header("Ana Dunya Ayarlari")]
+    public GameObject dungeonEntrance;
+
+    [Header("UI Ayarlari")]
+    public GameObject exitUI;
+
     [Header("Zindan Ayarlari")]
-    public int totalSteps = 1500; // Madencinin kaç adım atacağı
-    public int mapWidth = 50;    // Sınırlandırma için genişlik
-    public int mapHeight = 50;   // Sınırlandırma için yükseklik
+    public int minSteps = 1500; 
+    public int maxSteps = 2500;
 
     [Header("Spawn Ayarlari")]
-    public GameObject player;       // Sahnede hazır duran oyuncu
-    public GameObject enemyPrefab;  // Düşman prefab'ı
-    public int enemyCount = 5;      // Kaç düşman doğsun?
+    public GameObject player;       
+    public GameObject enemyPrefab;  
+    public GameObject exitPrefab; 
+    public int enemyCount = 10;      
 
     private HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
+    private GameObject currentExitInstance; 
 
-    void Start()
+    public void GenerateDungeon()
     {
-        GenerateDungeon();
-    }
+        // --- DEĞİŞİKLİK: Zindana girildiğinde giriş kapısını gizle ---
+        if (dungeonEntrance != null)
+            dungeonEntrance.SetActive(false);
 
-    void GenerateDungeon()
-    {
-        // 1. Temizlik yap
+        if (currentExitInstance != null) Destroy(currentExitInstance);
+        
         floorTilemap.ClearAllTiles();
         wallTilemap.ClearAllTiles();
         floorPositions.Clear();
 
-        // 2. Rastgele Yürüyüşü Başlat
-        RandomWalk();
+        int randomTotalSteps = Random.Range(minSteps, maxSteps + 1);
 
-        // 3. Tile'ları Yerleştir
+        CreateStartingRoom();
+        RandomWalk(randomTotalSteps);
+        CleanUpWalls();
+
         VisualiseDungeon();
         PlaceEntities();
     }
-    void PlaceEntities()
+
+    void CreateStartingRoom()
     {
-        // HashSet'i kolayca rastgele eleman seçebileceğimiz bir listeye çeviriyoruz
-        List<Vector2Int> availableFloors = floorPositions.ToList();
-
-        if (availableFloors.Count == 0) return;
-
-        // --- 1. OYUNCUYU YERLEŞTİR ---
-        // Madencinin başladığı ilk noktayı (0,0) oyuncu başlangıcı yapalım (en güvenli yer)
-        player.transform.position = new Vector3(0.5f, 0.5f, 0); 
-
-        // --- 2. DÜŞMANLARI YERLEŞTİR ---
-        for (int i = 0; i < enemyCount; i++)
+        for (int x = -1; x <= 1; x++)
         {
-            // Rastgele bir yer karosu seç
-            int randomIndex = Random.Range(0, availableFloors.Count);
-            Vector2Int spawnPos = availableFloors[randomIndex];
-
-            // Oyuncunun dibinde doğmasınlar (Opsiyonel: 3 birim mesafe kontrolü)
-            if (Vector2.Distance(Vector2.zero, spawnPos) < 3f)
+            for (int y = -1; y <= 1; y++)
             {
-                i--; // Mesafe çok yakınsa bu turu pas geç ve tekrar dene
-                continue;
+                floorPositions.Add(new Vector2Int(x, y));
             }
-
-            // Dünyadaki gerçek koordinata çevir (Tile'ın ortasına gelmesi için 0.5 ekliyoruz)
-            Vector3 worldPos = new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0);
-            
-            Instantiate(enemyPrefab, worldPos, Quaternion.identity);
-            
-            // Aynı yere iki düşman gelmemesi için bu pozisyonu listeden çıkarabiliriz
-            availableFloors.RemoveAt(randomIndex);
         }
     }
 
-    void RandomWalk()
+    void RandomWalk(int steps)
     {
         Vector2Int currentPos = new Vector2Int(0, 0);
-        floorPositions.Add(currentPos);
-
-        for (int i = 0; i < totalSteps; i++)
+        for (int i = 0; i < steps; i++)
         {
-            // Rastgele bir yön seç (Yukarı, Aşağı, Sol, Sağ)
             Vector2Int direction = GetRandomDirection();
             currentPos += direction;
+            for (int xOffset = 0; xOffset < 2; xOffset++)
+            {
+                for (int yOffset = 0; yOffset < 2; yOffset++)
+                {
+                    floorPositions.Add(new Vector2Int(currentPos.x + xOffset, currentPos.y + yOffset));
+                }
+            }
+        }
+    }
 
-            // Pozisyonu kaydet (HashSet olduğu için aynı yere tekrar basarsa eklemez)
-            floorPositions.Add(currentPos);
+    void CleanUpWalls()
+    {
+        HashSet<Vector2Int> tilesToConvert = new HashSet<Vector2Int>();
+        foreach (var pos in floorPositions)
+        {
+            Vector2Int[] neighbors = { pos + Vector2Int.up, pos + Vector2Int.down, pos + Vector2Int.left, pos + Vector2Int.right };
+            foreach (var n in neighbors)
+            {
+                if (!floorPositions.Contains(n) && CountFloorNeighbors(n) >= 2) tilesToConvert.Add(n);
+            }
+        }
+        foreach (var pos in tilesToConvert) floorPositions.Add(pos);
+    }
+
+    int CountFloorNeighbors(Vector2Int pos)
+    {
+        int count = 0;
+        if (floorPositions.Contains(pos + Vector2Int.up)) count++;
+        if (floorPositions.Contains(pos + Vector2Int.down)) count++;
+        if (floorPositions.Contains(pos + Vector2Int.left)) count++;
+        if (floorPositions.Contains(pos + Vector2Int.right)) count++;
+        return count;
+    }
+
+    void VisualiseDungeon()
+    {
+        foreach (var pos in floorPositions) floorTilemap.SetTile((Vector3Int)pos, floorTile);
+
+        int minX = floorPositions.Min(p => p.x) - 10;
+        int maxX = floorPositions.Max(p => p.x) + 10;
+        int minY = floorPositions.Min(p => p.y) - 10;
+        int maxY = floorPositions.Max(p => p.y) + 10;
+
+        for (int x = minX; x <= maxX; x++)
+        {
+            for (int y = minY; y <= maxY; y++)
+            {
+                if (!floorPositions.Contains(new Vector2Int(x, y)))
+                    wallTilemap.SetTile(new Vector3Int(x, y, 0), wallTile);
+            }
+        }
+    }
+
+    void PlaceEntities()
+    {
+        List<Vector2Int> availableFloors = floorPositions.ToList();
+        player.transform.position = new Vector3(0.5f, 0.5f, 0); 
+
+        Vector2Int exitPos = availableFloors.OrderByDescending(p => Vector2.Distance(Vector2.zero, p)).First();
+        currentExitInstance = Instantiate(exitPrefab, new Vector3(exitPos.x + 0.5f, exitPos.y + 0.5f, 0), Quaternion.identity);
+
+        DungeonExit exitScript = currentExitInstance.GetComponent<DungeonExit>();
+        if(exitScript != null) 
+        {
+            exitScript.Setup(exitUI); 
+        }
+
+        int enemiesPlaced = 0;
+        while (enemiesPlaced < enemyCount)
+        {
+            int randomIndex = Random.Range(0, availableFloors.Count);
+            Vector2Int spawnPos = availableFloors[randomIndex];
+
+            if (Vector2.Distance(Vector2.zero, spawnPos) < 6f || Vector2.Distance(exitPos, spawnPos) < 3f)
+                continue;
+
+            Instantiate(enemyPrefab, new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0), Quaternion.identity);
+            availableFloors.RemoveAt(randomIndex);
+            enemiesPlaced++;
         }
     }
 
     Vector2Int GetRandomDirection()
     {
         int rand = Random.Range(0, 4);
-        switch (rand)
-        {
-            case 0: return Vector2Int.up;
-            case 1: return Vector2Int.down;
-            case 2: return Vector2Int.left;
-            case 3: return Vector2Int.right;
-            default: return Vector2Int.zero;
-        }
+        switch (rand) { case 0: return Vector2Int.up; case 1: return Vector2Int.down; case 2: return Vector2Int.left; case 3: return Vector2Int.right; default: return Vector2Int.zero; }
     }
 
-    void VisualiseDungeon()
+    public void MoveToNextFloor()
     {
-        // Önce yerleri çiz
-        foreach (var pos in floorPositions)
-        {
-            floorTilemap.SetTile((Vector3Int)pos, floorTile);
-        }
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject e in enemies) Destroy(e);
 
-        // Yerlerin etrafını duvarla doldur (Basit bir çevreleme mantığı)
-        for (int x = -mapWidth; x < mapWidth; x++)
+        GenerateDungeon();
+        
+        if (exitUI != null) exitUI.SetActive(false);
+    }
+
+    public void ExitDungeon()
+    {
+        floorTilemap.ClearAllTiles();
+        wallTilemap.ClearAllTiles();
+        floorPositions.Clear();
+
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject e in enemies) Destroy(e);
+        
+        if (currentExitInstance != null) Destroy(currentExitInstance);
+
+        if (exitUI != null) exitUI.SetActive(false);
+
+        // --- DEĞİŞİKLİK: Zindandan çıkıldığında giriş kapısını tekrar aç ---
+        if (dungeonEntrance != null)
         {
-            for (int y = -mapHeight; y < mapHeight; y++)
-            {
-                Vector2Int checkPos = new Vector2Int(x, y);
-                if (!floorPositions.Contains(checkPos))
-                {
-                    wallTilemap.SetTile((Vector3Int)checkPos, wallTile);
-                }
-            }
+            dungeonEntrance.SetActive(true);
+            // Oyuncuyu ana dünyadaki kapının önüne ışınla
+            player.transform.position = dungeonEntrance.transform.position + new Vector3(0, -1.5f, 0); 
         }
     }
 }
