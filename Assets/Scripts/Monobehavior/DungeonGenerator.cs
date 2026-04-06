@@ -36,7 +36,7 @@ public class DungeonGenerator : MonoBehaviour
 
     public void GenerateDungeon()
     {
-        // --- DEĞİŞİKLİK: Zindana girildiğinde giriş kapısını gizle ---
+        
         if (dungeonEntrance != null)
             dungeonEntrance.SetActive(false);
 
@@ -109,7 +109,7 @@ public class DungeonGenerator : MonoBehaviour
     }
     public void BreakWallsInArea(Vector3 worldPosition, float radius)
     {
-    // Çekicin AOE alanı içindeki tüm koordinatları tara
+    
         for (float x = -radius; x <= radius; x += 0.5f)
         {
             for (float y = -radius; y <= radius; y += 0.5f)
@@ -117,22 +117,18 @@ public class DungeonGenerator : MonoBehaviour
                 Vector3 offsetPos = worldPosition + new Vector3(x, y, 0);
                 Vector3Int cellPos = wallTilemap.WorldToCell(offsetPos);
 
-                // Eğer vurduğumuz yerde Tile varsa (null değilse)
+                
                 if (wallTilemap.GetTile(cellPos) != null)
                 {
-                    // Rengini kontrol et
+                    
                     Color tileColor = wallTilemap.GetColor(cellPos);
 
-                    // *** KRİTİK DEĞİŞİKLİK ***
-                    // Eğer rengi normal gri (Varsayılan Color.white tint'siz doku rengi) değilse kırıyoruz.
-                    // Not: UnityEngine.Color.white varsayılan tint'siz renk değeridir. Dokunun kendisi gri olsa bile
-                    // tint rengi Color.white (1,1,1,1) olur. Biz Color.white'tan farklı bir şey arıyoruz.
-                    // Buradaki '0.85f' değeri VisualiseDungeon'daki ile aynı olmalıdır.
-                    if (tileColor.r < 1.0f) // Renk tint uygulanmışsa kırılabilir demektir.
+                    
+                    if (tileColor.r < 1.0f)
                     {
-                        wallTilemap.SetTile(cellPos, null); // Duvarı sil
-                        floorTilemap.SetTile(cellPos, floorTile); // Yerine zemin koy
-                        // İsteğe bağlı: Instantiate(particleEffect, offsetPos, Quaternion.identity);
+                        wallTilemap.SetTile(cellPos, null); 
+                        floorTilemap.SetTile(cellPos, floorTile); 
+                        
                     }
                 }
             }
