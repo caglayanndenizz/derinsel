@@ -8,7 +8,7 @@ public class Lootable : MonoBehaviour
     public bool isGold = true;
     
     [Header("Magnet Settings")]
-    public float detectionRange = 1f; // Oyuncuya çekilme mesafesi (x kadar uzaklık)
+    public float detectionRange = 10f; // Oyuncuya çekilme mesafesi (x kadar uzaklık)
     public float moveSpeed = 6f;     // Oyuncuya uçma hızı
     
     private bool isCollected = false;
