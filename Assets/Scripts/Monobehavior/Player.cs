@@ -4,9 +4,8 @@ using System.Collections;
 
 public class Player : BaseEntity
 {
-    
-    
-
+    [Header("External References")]
+    public DungeonGenerator generator;
     
     
     [Header("Hammer Settings (Heavy)")]
@@ -148,16 +147,24 @@ public class Player : BaseEntity
     }
 
     private void HammerSlam()
+{
+    Debug.Log("AĞIR ÇEKİÇ VURULDU!");
+
+    // --- YENİ: Duvarları Kırma Komutu ---
+    // attackPoint merkezli ve hammerAOE genişliğindeki duvarları patlat
+    if (generator != null)
     {
-        Debug.Log("AĞIR ÇEKİÇ VURULDU!");
-        // Mevcut alan hasarı kodun...
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
-        foreach (Collider2D enemy in hitEnemies)
-        {
-            IDamageable target = enemy.GetComponent<IDamageable>();
-            if (target != null) target.TakeDamage(stats.heavyAttackDamage, true);
-        }
+        generator.BreakWallsInArea(attackPoint.position, hammerAOE);
     }
+
+    // Mevcut düşman hasarı kodun devam ediyor...
+    Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
+    foreach (Collider2D enemy in hitEnemies)
+    {
+        IDamageable target = enemy.GetComponent<IDamageable>();
+        if (target != null) target.TakeDamage(stats.heavyAttackDamage, true);
+    }
+}
 
     private void ResetCharge()
     {

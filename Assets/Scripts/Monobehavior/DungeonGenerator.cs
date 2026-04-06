@@ -18,14 +18,18 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject exitUI;
 
     [Header("Zindan Ayarlari")]
-    public int minSteps = 1500; 
-    public int maxSteps = 2500;
+    public int minSteps = 1000; 
+    public int maxSteps = 2000;
 
     [Header("Spawn Ayarlari")]
     public GameObject player;       
     public GameObject enemyPrefab;  
     public GameObject exitPrefab; 
-    public int enemyCount = 10;      
+    public int enemyCount = 10;
+
+    [Header("Yeni Mekanik: Kirilabilir Duvar")]
+    public TileBase destructableWallTile; // Kırılabilir duvar görseli
+    [Range(0, 1)] public float destructableChance = 0.15f; // Çıkma şansı 
 
     private HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
     private GameObject currentExitInstance; 
@@ -103,26 +107,90 @@ public class DungeonGenerator : MonoBehaviour
         if (floorPositions.Contains(pos + Vector2Int.right)) count++;
         return count;
     }
+    public void BreakWallsInArea(Vector3 worldPosition, float radius)
+    {
+    // Çekicin AOE alanı içindeki tüm koordinatları tara
+        for (float x = -radius; x <= radius; x += 0.5f)
+        {
+            for (float y = -radius; y <= radius; y += 0.5f)
+            {
+                Vector3 offsetPos = worldPosition + new Vector3(x, y, 0);
+                Vector3Int cellPos = wallTilemap.WorldToCell(offsetPos);
 
+                // Eğer vurduğumuz yerde Tile varsa (null değilse)
+                if (wallTilemap.GetTile(cellPos) != null)
+                {
+                    // Rengini kontrol et
+                    Color tileColor = wallTilemap.GetColor(cellPos);
+
+                    // *** KRİTİK DEĞİŞİKLİK ***
+                    // Eğer rengi normal gri (Varsayılan Color.white tint'siz doku rengi) değilse kırıyoruz.
+                    // Not: UnityEngine.Color.white varsayılan tint'siz renk değeridir. Dokunun kendisi gri olsa bile
+                    // tint rengi Color.white (1,1,1,1) olur. Biz Color.white'tan farklı bir şey arıyoruz.
+                    // Buradaki '0.85f' değeri VisualiseDungeon'daki ile aynı olmalıdır.
+                    if (tileColor.r < 1.0f) // Renk tint uygulanmışsa kırılabilir demektir.
+                    {
+                        wallTilemap.SetTile(cellPos, null); // Duvarı sil
+                        floorTilemap.SetTile(cellPos, floorTile); // Yerine zemin koy
+                        // İsteğe bağlı: Instantiate(particleEffect, offsetPos, Quaternion.identity);
+                    }
+                }
+            }
+        }
+    }
+
+    bool IsNearFloor(Vector2Int pos, int radius)
+    {
+        for (int x = -radius; x <= radius; x++)
+        {
+            for (int y = -radius; y <= radius; y++)
+            {
+                if (floorPositions.Contains(new Vector2Int(pos.x + x, pos.y + y)))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     void VisualiseDungeon()
     {
-        foreach (var pos in floorPositions) floorTilemap.SetTile((Vector3Int)pos, floorTile);
+        // 1. Zeminleri yerleştir
+        foreach (var pos in floorPositions) 
+        {
+            floorTilemap.SetTile((Vector3Int)pos, floorTile);
+        }
 
+        // 2. Sınırları hesapla
         int minX = floorPositions.Min(p => p.x) - 10;
         int maxX = floorPositions.Max(p => p.x) + 10;
         int minY = floorPositions.Min(p => p.y) - 10;
         int maxY = floorPositions.Max(p => p.y) + 10;
 
+        // 3. Duvarları yerleştir
         for (int x = minX; x <= maxX; x++)
         {
             for (int y = minY; y <= maxY; y++)
             {
-                if (!floorPositions.Contains(new Vector2Int(x, y)))
-                    wallTilemap.SetTile(new Vector3Int(x, y, 0), wallTile);
+                Vector2Int currentTile = new Vector2Int(x, y);
+                Vector3Int cellPos = new Vector3Int(x, y, 0);
+
+                if (!floorPositions.Contains(currentTile))
+                {
+                    wallTilemap.SetTile(cellPos, wallTile);
+
+                    // --- GÜNCELLEME: Mesafe kontrolünü 2 yaptık ---
+                    // Eğer bu duvar 2 birimlik alanda bir zemine komşuysa ve şans tutarsa
+                    if (IsNearFloor(currentTile, 2) && Random.value < destructableChance)
+                    {
+                        wallTilemap.SetTileFlags(cellPos, TileFlags.None);
+                        // Rengi yine 2 ton açıyoruz (0.85f)
+                        wallTilemap.SetColor(cellPos, new Color(0.85f, 0.85f, 0.85f, 1.0f)); 
+                    }
+                }
             }
         }
     }
-
     void PlaceEntities()
     {
         List<Vector2Int> availableFloors = floorPositions.ToList();

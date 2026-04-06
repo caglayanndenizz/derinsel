@@ -7,8 +7,8 @@ public class Enemy : BaseEntity
 
     [Header("State Settings")]
     public State currentState = State.Patrol;
-    public float detectionRange = 3f; 
-    public float expandedDetectionRange = 12f; 
+    public float detectionRange = 4f; 
+    public float expandedDetectionRange = 15f; 
     public float attackRange;
     public CircleCollider2D cd;
 
