@@ -2,6 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Linq;
+using Unity.Cinemachine;
+using System.Collections;
+
+
 
 public class DungeonGenerator : MonoBehaviour
 {
@@ -27,21 +31,106 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject exitPrefab; 
     public int enemyCount = 10;
 
+    [Header("Transition Ayarlari")]
+    public Animator fadeAnimator; // FadeImage üzerindeki Animator
+    public CinemachineCamera vcam; // Sahnedeki sanal kamera
+    public float transitionDuration;
+    
+
+
+
+
     [Header("Yeni Mekanik: Kirilabilir Duvar")]
     public TileBase destructableWallTile; // Kırılabilir duvar görseli
     [Range(0, 1)] public float destructableChance = 0.15f; // Çıkma şansı 
 
+
+
     private HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
-    private GameObject currentExitInstance; 
+    private GameObject currentExitInstance;
+
+
+    public void StartDungeonTransition()
+    { 
+        if (dungeonEntrance != null) dungeonEntrance.SetActive(false);
+        StartCoroutine(DungeonTransitionRoutine());
+
+    }
+
+    private IEnumerator DungeonTransitionRoutine()
+    {
+        // 1. Ekranı Karart
+        fadeAnimator.SetTrigger("StartFade");
+
+        // 2. Animasyonun tamamlanmasını bekle (0.5 saniye demiştik)
+        yield return new WaitForSeconds(transitionDuration);
+
+        // 3. Zindanı kur ve oyuncuyu ışınla
+        GenerateDungeon();
+
+        // 4. KRİTİK NOKTA: Kamerayı şak diye oyuncuya sabitle (Kayma bitti!)
+        vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
+
+        // 5. Ekranı Geri Aç
+        fadeAnimator.SetTrigger("EndFade");
+    }
+    public void StartNextFloorTransition()
+    {
+        // BUTONA BASILDIĞI AN: Çıkış panelini hemen gizle
+        if (exitUI != null) exitUI.SetActive(false); 
+
+        StartCoroutine(NextFloorTransitionRoutine());
+    }
+
+    private IEnumerator NextFloorTransitionRoutine()
+    {
+        // 1. Ekranı karartmaya başla
+        fadeAnimator.SetTrigger("StartFade");
+
+        // 2. Animasyonun kararması için belirlediğin süre kadar bekle
+        // Eğer değişken tanımlamadıysan direkt 0.5f veya 1.0f yazabilirsin
+        yield return new WaitForSeconds(transitionDuration); 
+
+        // 3. Zindanı bir üst kat için yeniden oluştur (Eski fonksiyonun)
+        MoveToNextFloor();
+
+        // 4. Kamerayı yeni doğuş noktasına (0,0) şak diye ışınla
+        // Oyuncu MoveToNextFloor içinde zaten ışınlandığı için kamera onu burada yakalar
+        vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
+
+        // 5. Ekranı geri aç
+        fadeAnimator.SetTrigger("EndFade");
+    }
+        
+    // Zindandan çıkarken de aynısını kullanabilirsin
+    public void StartExitTransition()
+    {
+        if (exitUI != null) exitUI.SetActive(false);
+        StartCoroutine(ExitTransitionRoutine());
+    }
+
+    private IEnumerator ExitTransitionRoutine()
+    {
+        fadeAnimator.SetTrigger("StartFade");
+        yield return new WaitForSeconds(transitionDuration);
+
+        ExitDungeon(); // Senin mevcut çıkış fonksiyonun
+
+        vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
+
+        fadeAnimator.SetTrigger("EndFade");
+    }
+
+
 
     public void GenerateDungeon()
     {
-        
+
         if (dungeonEntrance != null)
             dungeonEntrance.SetActive(false);
 
         if (currentExitInstance != null) Destroy(currentExitInstance);
-        
+
         floorTilemap.ClearAllTiles();
         wallTilemap.ClearAllTiles();
         floorPositions.Clear();

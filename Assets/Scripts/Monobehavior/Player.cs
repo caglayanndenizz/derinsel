@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Unity.Cinemachine;
 
 public class Player : BaseEntity
 {
@@ -33,8 +34,12 @@ public class Player : BaseEntity
 
     private float _currentCharge = 0f;
     private bool _isCharging = false;
+    
 
-    // ... Loot Settings ...
+    void Start()
+    {
+    }
+
 
     void Update()
     {
@@ -149,13 +154,24 @@ public class Player : BaseEntity
     private void HammerSlam()
 {
     Debug.Log("AĞIR ÇEKİÇ VURULDU!");
-
-    // --- YENİ: Duvarları Kırma Komutu ---
-    // attackPoint merkezli ve hammerAOE genişliğindeki duvarları patlat
-    if (generator != null)
+    
+   CinemachineImpulseSource source = GetComponent<CinemachineImpulseSource>();
+    
+    if (source != null)
     {
-        generator.BreakWallsInArea(attackPoint.position, hammerAOE);
+        source.GenerateImpulse(); 
+        //Debug.Log("Sarsıntı sinyali gönderildi!");
     }
+    else 
+    {
+        Debug.LogError("HATA: Player üzerinde CinemachineImpulseSource bulunamadı!");
+    }
+
+    
+    if (generator != null)
+        {
+            generator.BreakWallsInArea(attackPoint.position, hammerAOE);
+        }
 
     // Mevcut düşman hasarı kodun devam ediyor...
     Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
