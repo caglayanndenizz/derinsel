@@ -36,10 +36,7 @@ public class DungeonGenerator : MonoBehaviour
     public CinemachineCamera vcam; // Sahnedeki sanal kamera
     public float transitionDuration;
     
-
-
-
-
+    
     [Header("Yeni Mekanik: Kirilabilir Duvar")]
     public TileBase destructableWallTile; // Kırılabilir duvar görseli
     [Range(0, 1)] public float destructableChance = 0.15f; // Çıkma şansı 
