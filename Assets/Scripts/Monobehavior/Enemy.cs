@@ -3,30 +3,31 @@ using System.Collections;
 
 public class Enemy : BaseEntity
 {
-    public enum State { Patrol, Chase }
+    public enum State { Patrol, Chase, Dead }
 
     [Header("State Settings")]
     public State currentState = State.Patrol;
-    public float detectionRange = 4f; 
-    public float expandedDetectionRange = 15f; 
+    public float detectionRange = 8f; 
+    public float expandedDetectionRange = 20f; 
     public float attackRange;
     public CircleCollider2D cd;
 
-    [Header("Knockback Settings")]
+    [Header("Knockback Settings (Adjust for 3-4 units)")]
+    public float lightKnockbackForce = 4f;  // Hafif vuruş için (Fire1)
+    public float heavyKnockbackForce = 10f; // Ağır vuruş için (Fire2)
     public float knockbackDuration = 0.2f;
     private bool _isKnockedBack = false;
     private Rigidbody2D _rb;
 
     [Header("Patrol Settings")]
-    public float patrolDistance = 2f;
+    public float patrolDistance = 4f;
     private Vector3 startPosition;
     private int patrolDirection = 1;
 
     [Header("Movement Speed")]
     private float patrolSpeed;
-    private float originalDetectionRange;
 
-    [Header("Loot")]
+    [Header("Loot Prefabs")]
     public GameObject goldPrefab;
     public GameObject experiencePrefab;
 
@@ -36,6 +37,7 @@ public class Enemy : BaseEntity
     private Color _originalColor;
 
     protected GameObject player;
+    private bool _isDead = false;
 
     protected override void Awake()
     {
@@ -43,49 +45,72 @@ public class Enemy : BaseEntity
         _rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        
         startPosition = transform.position;
         patrolSpeed = stats.moveSpeed;
-        originalDetectionRange = detectionRange;
-        attackRange = cd.radius;
+        
+        // Collider varsa radius'u al, yoksa default 1f
+        attackRange = (cd != null) ? cd.radius : 1f;
         _originalColor = _spriteRenderer.color;
     }
 
     void Update()
     {
-        // Eğer savruluyorsa (Knockback), AI ve hareket devre dışı
-        if (_isKnockedBack) return;
+        // Eğer savruluyorsa veya ölüyse hareket/AI çalışmasın
+        if (_isDead || _isKnockedBack) return;
 
         CheckState();
         Move();
     }
 
-    // --- PLAYER SALDIRISIYLA TETİKLENEN HASAR ---
+    // --- HASAR SİSTEMİ (ÖLÜMDE SAVRULMA DAHİL) ---
     public override void TakeDamage(float amount, bool isHeavy)
     {
-        base.TakeDamage(amount, isHeavy);
+        _currentHealth -= amount;
 
-        if (_currentHealth > 0)
+        // Görsel flash efekti
+        StartCoroutine(HitFlashRoutine());
+
+        // Fiziksel savrulma
+        float force = isHeavy ? heavyKnockbackForce : lightKnockbackForce;
+        StartCoroutine(KnockbackRoutine(force));
+
+        if (_currentHealth <= 0 && !_isDead)
         {
-            StartCoroutine(HitFlashRoutine());
-            // Ağır saldırı (Fire2) 15 birim, Hafif (Fire1) 5 birim savurur
-            float force = isHeavy ? 15f : 5f;
-            StartCoroutine(KnockbackRoutine(force));
+            PrepareToDie();
         }
+    }
+
+    private void PrepareToDie()
+    {
+        _isDead = true;
+        currentState = State.Dead;
+
+        // Savrulurken takılmaması için collider'ı kapat
+        if (cd != null) cd.enabled = false;
+
+        // Obje yok edilmeden önce savrulmanın bitmesini bekle
+        Invoke("Die", knockbackDuration + 0.05f);
+    }
+
+    protected override void Die() 
+    {
+        // Loot saçılımı
+        Instantiate(goldPrefab, transform.position, Quaternion.identity);
+        Instantiate(experiencePrefab, transform.position + new Vector3(0.3f, 0, 0), Quaternion.identity);
+        
+        base.Die(); 
+        Destroy(gameObject);
     }
 
     private IEnumerator HitFlashRoutine()
     {
-    // 1. Sprite'ı belirlediğimiz renge (Flash Color) boya
         _spriteRenderer.color = flashColor;
-
-    // 2. Çok kısa bir süre bekle (Gözün algılayacağı kadar: 0.1 saniye)
-        yield return new WaitForSeconds(0.2f);
-
-    // 3. Rengi eski haline döndür
+        yield return new WaitForSeconds(0.15f);
         _spriteRenderer.color = _originalColor;
     }
 
-      private IEnumerator KnockbackRoutine(float force)
+    private IEnumerator KnockbackRoutine(float force)
     {
         _isKnockedBack = true;
 
@@ -98,75 +123,87 @@ public class Enemy : BaseEntity
 
         yield return new WaitForSeconds(knockbackDuration);
 
-        _rb.linearVelocity = Vector2.zero;
-        _isKnockedBack = false;
+        if (!_isDead)
+        {
+            _rb.linearVelocity = Vector2.zero;
+            _isKnockedBack = false;
+        }
     }
 
     protected override void Move() 
     {
-        if (player == null) return;
+        if (player == null || _isDead) return;
 
-        float currentSpeed = (currentState == State.Patrol) ? patrolSpeed : stats.moveSpeed * 1.75f;
+        float currentSpeed = (currentState == State.Patrol) ? patrolSpeed : stats.moveSpeed * 1.6f;
+        Vector2 targetVelocity = _rb.linearVelocity;
 
         if (currentState == State.Patrol)
         {
-            transform.Translate(Vector3.right * patrolDirection * currentSpeed * Time.deltaTime);
+            targetVelocity = new Vector2(patrolDirection * currentSpeed, _rb.linearVelocity.y);
+            
             if (Vector2.Distance(startPosition, transform.position) >= patrolDistance)
+            {
                 patrolDirection *= -1;
+                startPosition = transform.position; 
+            }
         }
         else if (currentState == State.Chase)
         {
+            Vector2 direction = (player.transform.position - transform.position).normalized;
             float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
+
             if (distanceToPlayer > attackRange)
             {
-                Vector3 direction = (player.transform.position - transform.position).normalized;
-                transform.Translate(direction * currentSpeed * Time.deltaTime, Space.World);
+                targetVelocity = direction * currentSpeed;
+            }
+            else
+            {
+                targetVelocity = Vector2.zero;
             }
         }
 
-        // --- 4x4 FLIP ---
-        if (player.transform.position.x > transform.position.x)
-            transform.localScale = new Vector3(4f, 4f, 1f);
+        _rb.linearVelocity = targetVelocity;
+
+        // --- GÖRSEL YÖN (FLIP) ---
+        if (currentState == State.Chase)
+        {
+            if (player.transform.position.x > transform.position.x)
+                transform.localScale = new Vector3(4f, 4f, 1f);
+            else
+                transform.localScale = new Vector3(-4f, 4f, 1f);
+        }
         else
-            transform.localScale = new Vector3(-4f, 4f, 1f);
+        {
+            if (patrolDirection > 0)
+                transform.localScale = new Vector3(4f, 4f, 1f);
+            else
+                transform.localScale = new Vector3(-4f, 4f, 1f);
+        }
     }
 
     private void CheckState()
     {
-        if (player == null)
-        {
-            player = GameObject.FindGameObjectWithTag("Player");
-            if (player == null) return;
-        }
+        if (player == null) return;
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
 
         if (currentState == State.Patrol && distanceToPlayer <= detectionRange)
         {
             currentState = State.Chase;
-            detectionRange = expandedDetectionRange;
         }
-        else if (currentState == State.Chase && distanceToPlayer > detectionRange)
+        else if (currentState == State.Chase && distanceToPlayer > expandedDetectionRange)
         {
             currentState = State.Patrol;
             startPosition = transform.position;
-            detectionRange = originalDetectionRange;
         }
-    }
-
-    protected override void Die() 
-    {
-        base.Die();
-        Instantiate(goldPrefab, transform.position, Quaternion.identity);
-        Instantiate(experiencePrefab, transform.position + new Vector3(0.5f, 0, 0), Quaternion.identity);
-        Destroy(gameObject);
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
+        
         Gizmos.color = Color.red;
-        if(cd != null) Gizmos.DrawWireSphere(transform.position, cd.radius + 0.1f);
+        if(cd != null) Gizmos.DrawWireSphere(transform.position, cd.radius);
     }
 }
