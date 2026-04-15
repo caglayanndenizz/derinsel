@@ -142,7 +142,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDamping: 0
+  m_LinearDamping: 2
   m_AngularDamping: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
@@ -170,12 +170,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   stats: {fileID: 11400000, guid: cbf15654484a16c4c9c0e6ffb7a85e6c, type: 2}
   currentState: 0
-  detectionRange: 3
-  expandedDetectionRange: 12
+  detectionRange: 10
+  expandedDetectionRange: 20
   attackRange: 1
   cd: {fileID: 3297539337289784264}
+  lightKnockbackForce: 4
+  heavyKnockbackForce: 10
   knockbackDuration: 0.2
   patrolDistance: 2
+  lookAheadDistance: 4
+  avoidSensitivity: 1
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
   goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
   experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
   flashColor: {r: 1, g: 0, b: 0, a: 1}
