@@ -3270,7 +3270,7 @@ MonoBehaviour:
   vcam: {fileID: 1626974882}
   transitionDuration: 1.1
   destructableWallTile: {fileID: 11400000, guid: 291ed0377b0ae0043bc543a711ad8d26, type: 2}
-  destructableChance: 1
+  destructableChance: 0.902
 --- !u!4 &465123768
 Transform:
   m_ObjectHideFlags: 0

@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections;
-using System.Collections.Generic;
 
 public class Enemy : BaseEntity
 {
@@ -31,19 +30,7 @@ public class Enemy : BaseEntity
     [Tooltip("Layers with Collider2D that block movement and LOS. Exclude Enemy; Player is ignored in code.")]
     public LayerMask blockingEnvironmentMask = Physics2D.DefaultRaycastLayers;
 
-    [Header("Pathfinding (chase)")]
-    [Tooltip("How often to recompute A* to the player on the floor/wall tile grid.")]
-    public float pathRecalcInterval = 0.2f;
-    [Tooltip("Safety cap so one search cannot freeze the game on huge maps.")]
-    public int maxPathSearchExpansions = 5000;
-    public float waypointReachDistance = 0.22f;
-
     private DungeonGenerator _generator;
-    private readonly List<Vector2> _chasePathWorld = new List<Vector2>();
-    private int _chasePathWaypointIndex;
-    private float _nextPathRecalcTime;
-    private Vector3Int _lastPathGoalCell;
-    private bool _hasLastPathGoal;
 
     [Header("Loot Prefabs")]
     public GameObject goldPrefab;
@@ -81,8 +68,6 @@ public class Enemy : BaseEntity
     {
         if (_isDead || _isKnockedBack || _generator == null) return;
         CheckState();
-        if (currentState == State.Chase)
-            TryRecalculateChasePath(false);
     }
 
     void FixedUpdate()
@@ -122,8 +107,6 @@ public class Enemy : BaseEntity
 
             if (dist <= attackRange && HasLineOfSight())
                 velocity = Vector2.zero;
-            else if (TryGetVelocityFromPath(currentSpeed, out Vector2 pathVel))
-                velocity = pathVel;
             else
                 velocity = GetAvoidanceDirection(targetDir) * currentSpeed;
         }
@@ -153,70 +136,6 @@ public class Enemy : BaseEntity
         return true;
     }
 
-    private void TryRecalculateChasePath(bool ignoreCooldown)
-    {
-        if (player == null) return;
-        Tilemap floor = _generator.floorTilemap;
-        Tilemap wall = _generator.wallTilemap;
-        if (floor == null) return;
-        if (!ignoreCooldown && Time.time < _nextPathRecalcTime) return;
-        _nextPathRecalcTime = Time.time + pathRecalcInterval;
-
-        Vector2 origin = _rb != null ? _rb.position : (Vector2)transform.position;
-        Vector3Int startCell = TileGridPathfinder.WorldToCell(floor, origin);
-        Vector3Int goalCell = TileGridPathfinder.WorldToCell(floor, player.transform.position);
-
-        Vector3Int? startWalk = TileGridPathfinder.FindNearestWalkable(floor, wall, startCell, 3);
-        Vector3Int? goalWalk = TileGridPathfinder.FindNearestWalkable(floor, wall, goalCell, 3);
-        if (startWalk == null || goalWalk == null)
-        {
-            _chasePathWorld.Clear();
-            return;
-        }
-
-        bool goalUnchanged = _hasLastPathGoal && goalWalk.Value == _lastPathGoalCell;
-        bool shouldRebuild = ignoreCooldown || !goalUnchanged || _chasePathWorld.Count == 0;
-        if (!shouldRebuild) return;
-
-        if (TileGridPathfinder.TryFindPath(floor, wall, startWalk.Value, goalWalk.Value, maxPathSearchExpansions, _chasePathWorld))
-        {
-            // First waypoint is usually the current cell center; skip it to prevent side-to-side jitter.
-            _chasePathWaypointIndex = _chasePathWorld.Count > 1 ? 1 : 0;
-            AdvancePathWaypointIndex();
-            _lastPathGoalCell = goalWalk.Value;
-            _hasLastPathGoal = true;
-        }
-        else
-        {
-            _chasePathWorld.Clear();
-            _hasLastPathGoal = false;
-        }
-    }
-
-    private void AdvancePathWaypointIndex()
-    {
-        if (_chasePathWorld.Count == 0) return;
-        Vector2 pos = _rb != null ? _rb.position : (Vector2)transform.position;
-        while (_chasePathWaypointIndex < _chasePathWorld.Count - 1 &&
-               Vector2.Distance(pos, _chasePathWorld[_chasePathWaypointIndex]) < waypointReachDistance)
-            _chasePathWaypointIndex++;
-    }
-
-    private bool TryGetVelocityFromPath(float speed, out Vector2 velocity)
-    {
-        velocity = Vector2.zero;
-        if (_chasePathWorld.Count == 0) return false;
-
-        AdvancePathWaypointIndex();
-        Vector2 pos = _rb != null ? _rb.position : (Vector2)transform.position;
-        if (_chasePathWaypointIndex >= _chasePathWorld.Count) return false;
-
-        Vector2 to = _chasePathWorld[_chasePathWaypointIndex] - pos;
-        if (to.sqrMagnitude < 0.0001f) return false;
-        velocity = to.normalized * speed;
-        return true;
-    }
-
     private Vector2 GetAvoidanceDirection(Vector2 currentDir)
     {
         Vector2 origin = _rb != null ? _rb.position : (Vector2)transform.position;
@@ -242,17 +161,14 @@ public class Enemy : BaseEntity
             if (dist <= detectionRange && HasLineOfSight())
             {
                 currentState = State.Chase;
-                TryRecalculateChasePath(true);
             }
         }
         else if (currentState == State.Chase)
         {
             if (dist > expandedDetectionRange)
-            {
+            {   
                 currentState = State.Patrol;
                 _startPosition = transform.position;
-                _chasePathWorld.Clear();
-                _hasLastPathGoal = false;
             }
         }
     }
