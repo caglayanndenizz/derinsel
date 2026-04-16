@@ -178,11 +178,10 @@ MonoBehaviour:
   heavyKnockbackForce: 10
   knockbackDuration: 0.2
   patrolDistance: 2
-  lookAheadDistance: 4
-  avoidSensitivity: 1
-  obstacleLayer:
+  sensorLength: 3
+  blockingEnvironmentMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 243
   goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
   experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
   flashColor: {r: 1, g: 0, b: 0, a: 1}

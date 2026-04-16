@@ -1,6 +1,7 @@
 using UnityEngine;
-using UnityEngine.Tilemaps; // Tilemap kontrolü için şart
+using UnityEngine.Tilemaps;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Enemy : BaseEntity
 {
@@ -25,9 +26,24 @@ public class Enemy : BaseEntity
     private Vector3 _startPosition;
     private int _patrolDirection = 1;
 
-    [Header("Navigation (Tilemap Based)")]
-    public float sensorLength = 1.5f; 
-    private DungeonGenerator _generator; 
+    [Header("Navigation (Tilemap + Colliders)")]
+    public float sensorLength = 1.5f;
+    [Tooltip("Layers with Collider2D that block movement and LOS. Exclude Enemy; Player is ignored in code.")]
+    public LayerMask blockingEnvironmentMask = Physics2D.DefaultRaycastLayers;
+
+    [Header("Pathfinding (chase)")]
+    [Tooltip("How often to recompute A* to the player on the floor/wall tile grid.")]
+    public float pathRecalcInterval = 0.2f;
+    [Tooltip("Safety cap so one search cannot freeze the game on huge maps.")]
+    public int maxPathSearchExpansions = 5000;
+    public float waypointReachDistance = 0.22f;
+
+    private DungeonGenerator _generator;
+    private readonly List<Vector2> _chasePathWorld = new List<Vector2>();
+    private int _chasePathWaypointIndex;
+    private float _nextPathRecalcTime;
+    private Vector3Int _lastPathGoalCell;
+    private bool _hasLastPathGoal;
 
     [Header("Loot Prefabs")]
     public GameObject goldPrefab;
@@ -65,6 +81,8 @@ public class Enemy : BaseEntity
     {
         if (_isDead || _isKnockedBack || _generator == null) return;
         CheckState();
+        if (currentState == State.Chase)
+            TryRecalculateChasePath(false);
     }
 
     void FixedUpdate()
@@ -85,7 +103,8 @@ public class Enemy : BaseEntity
             velocity = new Vector2(_patrolDirection * currentSpeed, 0);
             
             // Önünde duvar varsa geri dön
-            if (CheckWallAtPosition(transform.position + (Vector3)velocity.normalized * 1f))
+            Vector2 patrolOrigin = _rb != null ? _rb.position : (Vector2)transform.position;
+            if (IsNavigationBlockedAt(patrolOrigin + velocity.normalized * 1f))
             {
                 _patrolDirection *= -1;
             }
@@ -101,12 +120,12 @@ public class Enemy : BaseEntity
             Vector2 targetDir = (player.transform.position - transform.position).normalized;
             float dist = Vector2.Distance(transform.position, player.transform.position);
 
-            if (dist > attackRange)
-            {
-                Vector2 avoidanceDir = GetAvoidanceDirection(targetDir);
-                velocity = avoidanceDir * currentSpeed;
-            }
-            else velocity = Vector2.zero;
+            if (dist <= attackRange && HasLineOfSight())
+                velocity = Vector2.zero;
+            else if (TryGetVelocityFromPath(currentSpeed, out Vector2 pathVel))
+                velocity = pathVel;
+            else
+                velocity = GetAvoidanceDirection(targetDir) * currentSpeed;
         }
 
         // UNITY 6: linearVelocity kullanıyoruz
@@ -116,22 +135,99 @@ public class Enemy : BaseEntity
         transform.localScale = new Vector3(player.transform.position.x > transform.position.x ? 4f : -4f, 4f, 1f);
     }
 
-    private bool CheckWallAtPosition(Vector3 worldPos)
+    private bool IsNavigationBlockedAt(Vector2 worldPos)
     {
-        if (_generator == null || _generator.wallTilemap == null) return false;
-        Vector3Int cellPos = _generator.wallTilemap.WorldToCell(worldPos);
-        return _generator.wallTilemap.HasTile(cellPos);
+        if (_generator != null && _generator.wallTilemap != null)
+        {
+            Vector3Int cellPos = _generator.wallTilemap.WorldToCell(worldPos);
+            if (_generator.wallTilemap.HasTile(cellPos)) return true;
+        }
+
+        const float probeRadius = 0.12f;
+        Collider2D hit = Physics2D.OverlapCircle(worldPos, probeRadius, blockingEnvironmentMask);
+        if (hit == null) return false;
+        if (hit.isTrigger) return false;
+        if (_rb != null && hit.attachedRigidbody == _rb) return false;
+        if (hit.gameObject == gameObject || hit.transform.IsChildOf(transform)) return false;
+        if (hit.CompareTag("Player")) return false;
+        return true;
+    }
+
+    private void TryRecalculateChasePath(bool ignoreCooldown)
+    {
+        if (player == null) return;
+        Tilemap floor = _generator.floorTilemap;
+        Tilemap wall = _generator.wallTilemap;
+        if (floor == null) return;
+        if (!ignoreCooldown && Time.time < _nextPathRecalcTime) return;
+        _nextPathRecalcTime = Time.time + pathRecalcInterval;
+
+        Vector2 origin = _rb != null ? _rb.position : (Vector2)transform.position;
+        Vector3Int startCell = TileGridPathfinder.WorldToCell(floor, origin);
+        Vector3Int goalCell = TileGridPathfinder.WorldToCell(floor, player.transform.position);
+
+        Vector3Int? startWalk = TileGridPathfinder.FindNearestWalkable(floor, wall, startCell, 3);
+        Vector3Int? goalWalk = TileGridPathfinder.FindNearestWalkable(floor, wall, goalCell, 3);
+        if (startWalk == null || goalWalk == null)
+        {
+            _chasePathWorld.Clear();
+            return;
+        }
+
+        bool goalUnchanged = _hasLastPathGoal && goalWalk.Value == _lastPathGoalCell;
+        bool shouldRebuild = ignoreCooldown || !goalUnchanged || _chasePathWorld.Count == 0;
+        if (!shouldRebuild) return;
+
+        if (TileGridPathfinder.TryFindPath(floor, wall, startWalk.Value, goalWalk.Value, maxPathSearchExpansions, _chasePathWorld))
+        {
+            // First waypoint is usually the current cell center; skip it to prevent side-to-side jitter.
+            _chasePathWaypointIndex = _chasePathWorld.Count > 1 ? 1 : 0;
+            AdvancePathWaypointIndex();
+            _lastPathGoalCell = goalWalk.Value;
+            _hasLastPathGoal = true;
+        }
+        else
+        {
+            _chasePathWorld.Clear();
+            _hasLastPathGoal = false;
+        }
+    }
+
+    private void AdvancePathWaypointIndex()
+    {
+        if (_chasePathWorld.Count == 0) return;
+        Vector2 pos = _rb != null ? _rb.position : (Vector2)transform.position;
+        while (_chasePathWaypointIndex < _chasePathWorld.Count - 1 &&
+               Vector2.Distance(pos, _chasePathWorld[_chasePathWaypointIndex]) < waypointReachDistance)
+            _chasePathWaypointIndex++;
+    }
+
+    private bool TryGetVelocityFromPath(float speed, out Vector2 velocity)
+    {
+        velocity = Vector2.zero;
+        if (_chasePathWorld.Count == 0) return false;
+
+        AdvancePathWaypointIndex();
+        Vector2 pos = _rb != null ? _rb.position : (Vector2)transform.position;
+        if (_chasePathWaypointIndex >= _chasePathWorld.Count) return false;
+
+        Vector2 to = _chasePathWorld[_chasePathWaypointIndex] - pos;
+        if (to.sqrMagnitude < 0.0001f) return false;
+        velocity = to.normalized * speed;
+        return true;
     }
 
     private Vector2 GetAvoidanceDirection(Vector2 currentDir)
     {
-        if (CheckWallAtPosition(transform.position + (Vector3)currentDir * sensorLength))
+        Vector2 origin = _rb != null ? _rb.position : (Vector2)transform.position;
+        if (IsNavigationBlockedAt(origin + currentDir * sensorLength))
         {
             Vector2 leftDir = RotateVector(currentDir, 45f);
             Vector2 rightDir = RotateVector(currentDir, -45f);
 
-            if (!CheckWallAtPosition(transform.position + (Vector3)leftDir * sensorLength)) return leftDir;
-            return rightDir;
+            if (!IsNavigationBlockedAt(origin + leftDir * sensorLength)) return leftDir;
+            if (!IsNavigationBlockedAt(origin + rightDir * sensorLength)) return rightDir;
+            return RotateVector(currentDir, 90f);
         }
         return currentDir;
     }
@@ -144,7 +240,10 @@ public class Enemy : BaseEntity
         if (currentState == State.Patrol)
         {
             if (dist <= detectionRange && HasLineOfSight())
+            {
                 currentState = State.Chase;
+                TryRecalculateChasePath(true);
+            }
         }
         else if (currentState == State.Chase)
         {
@@ -152,20 +251,36 @@ public class Enemy : BaseEntity
             {
                 currentState = State.Patrol;
                 _startPosition = transform.position;
+                _chasePathWorld.Clear();
+                _hasLastPathGoal = false;
             }
         }
     }
 
     private bool HasLineOfSight()
     {
-        Vector2 dir = (player.transform.position - transform.position).normalized;
-        float dist = Vector2.Distance(transform.position, player.transform.position);
+        Vector2 start = _rb != null ? _rb.position : (Vector2)transform.position;
+        Vector2 end = player.transform.position;
+        float dist = Vector2.Distance(start, end);
+        Vector2 dir = (end - start).normalized;
 
-        for (float i = 0.5f; i < dist; i += 1f)
+        for (float i = 0.25f; i < dist; i += 0.5f)
         {
-            Vector3 checkPoint = transform.position + (Vector3)(dir * i);
-            if (CheckWallAtPosition(checkPoint)) return false;
+            if (IsNavigationBlockedAt(start + dir * i)) return false;
         }
+
+        RaycastHit2D[] hits = Physics2D.LinecastAll(start, end, blockingEnvironmentMask);
+        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        foreach (var hit in hits)
+        {
+            if (hit.collider == null) continue;
+            if (hit.collider.isTrigger) continue;
+            if (_rb != null && hit.collider.attachedRigidbody == _rb) continue;
+            if (hit.collider.gameObject == gameObject || hit.collider.transform.IsChildOf(transform)) continue;
+            if (hit.collider.CompareTag("Player")) return true;
+            return false;
+        }
+
         return true;
     }
 
