@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &585141838696357743
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5968996605710377698}
+  m_Layer: 0
+  m_Name: projectilePivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5968996605710377698
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585141838696357743}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.053, y: 0, z: 0}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6112114193915375248}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4020198177656319069
 GameObject:
   m_ObjectHideFlags: 0
@@ -32,7 +63,8 @@ Transform:
   m_LocalPosition: {x: -5.71, y: 0.94, z: 0}
   m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5968996605710377698}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4124395845664247061
@@ -172,16 +204,22 @@ MonoBehaviour:
   currentState: 0
   detectionRange: 10
   expandedDetectionRange: 20
-  attackRange: 1
   cd: {fileID: 3297539337289784264}
   lightKnockbackForce: 4
   heavyKnockbackForce: 10
   knockbackDuration: 0.2
-  patrolDistance: 2
-  sensorLength: 3
   blockingEnvironmentMask:
     serializedVersion: 2
     m_Bits: 243
+  projectilePrefab: {fileID: 6304853734587583923, guid: 85829922e17f94981a185366d6919300, type: 3}
+  rangedFireInterval: 4
+  projectileSpeed: 10
+  useAttackPowerForProjectile: 1
+  projectileDamageOverride: 5
+  projectileMaxLifetime: 12
+  attackCloseMaxDistance: 10
+  projectileSpawnPoint: {fileID: 0}
+  projectileSpawnOffset: {x: 0, y: 0, z: 0}
   goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
   experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
   flashColor: {r: 1, g: 0, b: 0, a: 1}

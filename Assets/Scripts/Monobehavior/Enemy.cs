@@ -4,13 +4,12 @@ using System.Collections;
 
 public class Enemy : BaseEntity
 {
-    public enum State { Patrol, Chase, Dead }
+    public enum State { Patrol, Chase, Attack, Dead }
 
     [Header("State Settings")]
     public State currentState = State.Patrol;
     public float detectionRange = 10f; 
     public float expandedDetectionRange = 22f; 
-    public float attackRange;
     public CircleCollider2D cd;
 
     [Header("Knockback Settings")]
@@ -20,17 +19,43 @@ public class Enemy : BaseEntity
     private bool _isKnockedBack = false;
     private Rigidbody2D _rb;
 
-    [Header("Patrol Settings")]
-    public float patrolDistance = 5f;
-    private Vector3 _startPosition;
-    private int _patrolDirection = 1;
-
     [Header("Navigation (Tilemap + Colliders)")]
     public float sensorLength = 1.5f;
-    [Tooltip("Layers with Collider2D that block movement and LOS. Exclude Enemy; Player is ignored in code.")]
+    [Tooltip("Layers with Collider2D that block LOS. Exclude Enemy; Player is ignored in code.")]
     public LayerMask blockingEnvironmentMask = Physics2D.DefaultRaycastLayers;
 
+    [Header("Patrol Route (spawn tabanlı)")]
+    [Tooltip("Spawn noktasından sola (world -X).")]
+    public float patrolLegLeft = 2f;
+    [Tooltip("İkinci bacak: ileri yön (varsayılan world +Y).")]
+    public float patrolLegForward = 2f;
+    [Tooltip("Üçüncü bacak: sağa (world +X).")]
+    public float patrolLegRight = 4f;
+    public Vector2 patrolForwardWorld = Vector2.up;
+    public float patrolWaypointReachDistance = 0.22f;
+
     private DungeonGenerator _generator;
+    private Vector2 _patrolAnchor;
+    private int _patrolLegIndex;
+
+    [Header("Ranged Attack")]
+    [Tooltip("Bu prefab üzerinde EnemyProjectile scripti olmalı.")]
+    public GameObject projectilePrefab;
+    [Tooltip("Attack state iken iki projectile arası süre (saniye).")]
+    public float rangedFireInterval = 4f;
+    public float projectileSpeed = 10f;
+    [Tooltip("EntityStats.attackPower ile aynı anlamda kullanılır.")]
+    public bool useAttackPowerForProjectile = true;
+    public float projectileDamageOverride = 5f;
+    public float projectileMaxLifetime = 12f;
+    [Tooltip("Player bu kadar yakınsa (birim) Chase → Attack; daha uzaktaysa Attack → Chase.")]
+    public float attackCloseMaxDistance = 5f;
+    [Tooltip("Projectile bu child empty'den çıkar (boşsa child adı projectilePivot aranır).")]
+    public Transform projectilePivot;
+    public Transform projectileSpawnPoint;
+    public Vector3 projectileSpawnOffset = Vector3.zero;
+    [Tooltip("Chase sırasında player'a yaklaşırken hız çarpanı.")]
+    public float chaseApproachSpeedMultiplier = 1.6f;
 
     [Header("Loot Prefabs")]
     public GameObject goldPrefab;
@@ -43,6 +68,9 @@ public class Enemy : BaseEntity
 
     protected GameObject player;
     private bool _isDead = false;
+    private Vector2 _lastKnownPlayerWorld;
+    private bool _hasLastKnownPlayerWorld;
+    private float _nextRangedFireTime;
 
     protected override void Awake()
     {
@@ -52,8 +80,6 @@ public class Enemy : BaseEntity
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _generator = Object.FindAnyObjectByType<DungeonGenerator>(); // Unity 6 için güncel arama
         
-        _startPosition = transform.position;
-        attackRange = (cd != null) ? cd.radius : 1f;
         _originalColor = _spriteRenderer.color;
 
         // Fizik Ayarları
@@ -62,60 +88,102 @@ public class Enemy : BaseEntity
             _rb.gravityScale = 0f;
             _rb.freezeRotation = true;
         }
+
+        if (projectilePivot == null)
+            projectilePivot = transform.Find("projectilePivot");
+
+        _patrolAnchor = GetEnemyReferencePosition();
+        _patrolLegIndex = 0;
+
+        _nextRangedFireTime = Time.time + rangedFireInterval;
     }
 
     void Update()
     {
-        if (_isDead || _isKnockedBack || _generator == null) return;
+        if (_isDead || _isKnockedBack) return;
         CheckState();
+        UpdateLastKnownPlayerPosition();
+        TryFireRangedProjectile();
     }
 
     void FixedUpdate()
     {
-        if (_isDead || _isKnockedBack || _generator == null) return;
+        if (_isDead || _isKnockedBack) return;
         Move();
+    }
+
+    private Vector2 GetEnemyReferencePosition()
+    {
+        return _rb != null ? _rb.position : (Vector2)transform.position;
+    }
+
+    private Vector2 GetPatrolWaypointWorld(int leg)
+    {
+        Vector2 left = Vector2.left * patrolLegLeft;
+        Vector2 fwd = patrolForwardWorld.sqrMagnitude > 0.0001f
+            ? patrolForwardWorld.normalized * patrolLegForward
+            : Vector2.up * patrolLegForward;
+        Vector2 right = Vector2.right * patrolLegRight;
+        switch (leg)
+        {
+            case 0: return _patrolAnchor + left;
+            case 1: return _patrolAnchor + left + fwd;
+            case 2: return _patrolAnchor + left + fwd + right;
+            case 3: return _patrolAnchor;
+            default: return _patrolAnchor;
+        }
+    }
+
+    private void AdvancePatrolLegIfReached(Vector2 pos)
+    {
+        Vector2 wp = GetPatrolWaypointWorld(_patrolLegIndex);
+        if (Vector2.Distance(pos, wp) < patrolWaypointReachDistance)
+            _patrolLegIndex = (_patrolLegIndex + 1) % 4;
+    }
+
+    private void ResetPatrolRoute()
+    {
+        _patrolLegIndex = 0;
     }
 
     protected override void Move() 
     {
-        if (player == null || _isDead) return;
+        if (_isDead || _rb == null) return;
 
-        float currentSpeed = (currentState == State.Patrol) ? stats.moveSpeed : stats.moveSpeed * 1.6f;
-        Vector2 velocity;
+        Vector2 velocity = Vector2.zero;
+        float baseSpeed = stats != null ? stats.moveSpeed : 4f;
+        Vector2 origin = GetEnemyReferencePosition();
 
         if (currentState == State.Patrol)
         {
-            velocity = new Vector2(_patrolDirection * currentSpeed, 0);
-            
-            // Önünde duvar varsa geri dön
-            Vector2 patrolOrigin = _rb != null ? _rb.position : (Vector2)transform.position;
-            if (IsNavigationBlockedAt(patrolOrigin + velocity.normalized * 1f))
+            AdvancePatrolLegIfReached(origin);
+            Vector2 targetWp = GetPatrolWaypointWorld(_patrolLegIndex);
+            Vector2 toWp = targetWp - origin;
+            if (toWp.sqrMagnitude > 0.0001f)
             {
-                _patrolDirection *= -1;
-            }
-            
-            if (Vector2.Distance(_startPosition, transform.position) >= patrolDistance)
-            {
-                _patrolDirection *= -1;
-                _startPosition = transform.position; 
+                Vector2 dir = toWp.normalized;
+                velocity = GetAvoidanceDirection(dir) * baseSpeed;
             }
         }
-        else // CHASE STATE
+        else if (player != null && currentState == State.Chase)
         {
-            Vector2 targetDir = (player.transform.position - transform.position).normalized;
-            float dist = Vector2.Distance(transform.position, player.transform.position);
-
-            if (dist <= attackRange && HasLineOfSight())
-                velocity = Vector2.zero;
-            else
-                velocity = GetAvoidanceDirection(targetDir) * currentSpeed;
+            float dist = Vector2.Distance(origin, player.transform.position);
+            if (dist > attackCloseMaxDistance)
+            {
+                Vector2 targetDir = ((Vector2)player.transform.position - origin).normalized;
+                velocity = GetAvoidanceDirection(targetDir) * baseSpeed * chaseApproachSpeedMultiplier;
+            }
         }
 
-        // UNITY 6: linearVelocity kullanıyoruz
         _rb.linearVelocity = velocity;
 
-        // Görsel Yön
-        transform.localScale = new Vector3(player.transform.position.x > transform.position.x ? 4f : -4f, 4f, 1f);
+        if (currentState == State.Patrol)
+        {
+            if (velocity.sqrMagnitude > 0.0001f)
+                transform.localScale = new Vector3(velocity.x >= 0f ? 4f : -4f, 4f, 1f);
+        }
+        else if (player != null)
+            transform.localScale = new Vector3(player.transform.position.x > transform.position.x ? 4f : -4f, 4f, 1f);
     }
 
     private bool IsNavigationBlockedAt(Vector2 worldPos)
@@ -151,36 +219,86 @@ public class Enemy : BaseEntity
         return currentDir;
     }
 
+    private static Vector2 RotateVector(Vector2 v, float deg)
+    {
+        float s = Mathf.Sin(deg * Mathf.Deg2Rad);
+        float c = Mathf.Cos(deg * Mathf.Deg2Rad);
+        return new Vector2((c * v.x) - (s * v.y), (s * v.x) + (c * v.y));
+    }
+
+    private Vector3 GetProjectileSpawnPosition()
+    {
+        if (projectilePivot != null) return projectilePivot.position;
+        if (projectileSpawnPoint != null) return projectileSpawnPoint.position;
+        return transform.position + projectileSpawnOffset;
+    }
+
     private void CheckState()
     {
         if (player == null) return;
-        float dist = Vector2.Distance(transform.position, player.transform.position);
+        float dist = Vector2.Distance(GetEnemyReferencePosition(), player.transform.position);
 
         if (currentState == State.Patrol)
         {
             if (dist <= detectionRange && HasLineOfSight())
             {
                 currentState = State.Chase;
+                _nextRangedFireTime = Time.time + rangedFireInterval;
             }
         }
         else if (currentState == State.Chase)
         {
             if (dist > expandedDetectionRange)
-            {   
+            {
                 currentState = State.Patrol;
-                _startPosition = transform.position;
+                _hasLastKnownPlayerWorld = false;
+                _nextRangedFireTime = Time.time + rangedFireInterval;
+                ResetPatrolRoute();
+            }
+            else if (dist <= attackCloseMaxDistance)
+            {
+                currentState = State.Attack;
+                _nextRangedFireTime = Time.time + rangedFireInterval;
+            }
+        }
+        else if (currentState == State.Attack)
+        {
+            if (dist > expandedDetectionRange)
+            {
+                currentState = State.Patrol;
+                _hasLastKnownPlayerWorld = false;
+                _nextRangedFireTime = Time.time + rangedFireInterval;
+                ResetPatrolRoute();
+            }
+            else if (dist > attackCloseMaxDistance)
+            {
+                currentState = State.Chase;
+                _nextRangedFireTime = Time.time + rangedFireInterval;
             }
         }
     }
 
+    private float GetLineOfSightMaxDistance()
+    {
+        if (currentState == State.Patrol) return detectionRange;
+        return expandedDetectionRange;
+    }
+
     private bool HasLineOfSight()
     {
-        Vector2 start = _rb != null ? _rb.position : (Vector2)transform.position;
-        Vector2 end = player.transform.position;
-        float dist = Vector2.Distance(start, end);
-        Vector2 dir = (end - start).normalized;
+        Vector2 start = GetEnemyReferencePosition();
+        Vector2 toPlayer = (Vector2)player.transform.position - start;
+        float fullDist = toPlayer.magnitude;
+        if (fullDist < 0.0001f) return true;
 
-        for (float i = 0.25f; i < dist; i += 0.5f)
+        Vector2 dir = toPlayer / fullDist;
+        float maxRay = GetLineOfSightMaxDistance();
+        if (fullDist > maxRay + 0.001f) return false;
+
+        float checkDist = Mathf.Min(fullDist, maxRay);
+        Vector2 end = start + dir * checkDist;
+
+        for (float i = 0.25f; i < checkDist; i += 0.5f)
         {
             if (IsNavigationBlockedAt(start + dir * i)) return false;
         }
@@ -198,6 +316,35 @@ public class Enemy : BaseEntity
         }
 
         return true;
+    }
+
+    private void UpdateLastKnownPlayerPosition()
+    {
+        if (player == null) return;
+        if (HasLineOfSight())
+        {
+            _lastKnownPlayerWorld = player.transform.position;
+            _hasLastKnownPlayerWorld = true;
+        }
+    }
+
+    private void TryFireRangedProjectile()
+    {
+        if (currentState != State.Attack || player == null || projectilePrefab == null) return;
+        if (!HasLineOfSight()) return;
+        if (Time.time < _nextRangedFireTime) return;
+
+        Vector2 aim = _hasLastKnownPlayerWorld ? _lastKnownPlayerWorld : (Vector2)player.transform.position;
+        Vector3 spawnPos = GetProjectileSpawnPosition();
+
+        GameObject proj = Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
+        var mover = proj.GetComponent<EnemyProjectile>();
+        float dmg = projectileDamageOverride;
+        if (useAttackPowerForProjectile && stats != null) dmg = stats.attackPower;
+        if (mover != null)
+            mover.Initialize(aim, projectileSpeed, dmg, projectileMaxLifetime);
+
+        _nextRangedFireTime = Time.time + rangedFireInterval;
     }
 
     public override void TakeDamage(float amount, bool isHeavy)
@@ -235,14 +382,16 @@ public class Enemy : BaseEntity
         if (!_isDead) { _rb.linearVelocity = Vector2.zero; _isKnockedBack = false; }
     }
 
-    private Vector2 RotateVector(Vector2 v, float deg) {
-        float s = Mathf.Sin(deg * Mathf.Deg2Rad); float c = Mathf.Cos(deg * Mathf.Deg2Rad);
-        return new Vector2((c * v.x) - (s * v.y), (s * v.x) + (c * v.y));
-    }
-
     private void OnDrawGizmos() {
         if (player == null) return;
+        Vector2 start = GetEnemyReferencePosition();
+        Vector2 toP = (Vector2)player.transform.position - start;
+        float full = toP.magnitude;
+        if (full < 0.0001f) return;
+        Vector2 dir = toP / full;
+        float maxRay = GetLineOfSightMaxDistance();
+        Vector2 gizmoEnd = start + dir * Mathf.Min(full, maxRay);
         Gizmos.color = HasLineOfSight() ? Color.green : Color.red;
-        Gizmos.DrawLine(transform.position, player.transform.position);
+        Gizmos.DrawLine(start, gizmoEnd);
     }
-}
+}   

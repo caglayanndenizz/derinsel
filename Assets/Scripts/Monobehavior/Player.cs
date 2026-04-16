@@ -33,8 +33,9 @@ public class Player : BaseEntity
     private bool _isCharging = false;
     private Rigidbody2D _rb; // FİZİK İÇİN ŞART
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         // Rigidbody referansını al ve ayarla
         _rb = GetComponent<Rigidbody2D>();
         _rb.gravityScale = 0f; // 2D Top-down olduğu için yerçekimini kapat

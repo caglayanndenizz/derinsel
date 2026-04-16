@@ -34,4 +34,5 @@ public abstract class BaseEntity : MonoBehaviour , IDamageable
     // Hareket her varlıkta farklı olacağı için gövdesini boş bırakıyoruz
     protected abstract void Move();
 
+
 }
