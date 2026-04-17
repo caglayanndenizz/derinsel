@@ -13,6 +13,7 @@ public class EnemyProjectilePooler : MonoBehaviour
 
     private readonly Queue<GameObject> _availableProjectiles = new Queue<GameObject>();
     private readonly HashSet<GameObject> _trackedProjectiles = new HashSet<GameObject>();
+    private readonly HashSet<GameObject> _queuedProjectiles = new HashSet<GameObject>();
 
     private void Awake()
     {
@@ -65,6 +66,7 @@ public class EnemyProjectilePooler : MonoBehaviour
         }
 
         GameObject projectile = _availableProjectiles.Dequeue();
+        _queuedProjectiles.Remove(projectile);
         projectile.transform.SetPositionAndRotation(worldPosition, rotation);
         projectile.SetActive(true);
         return projectile;
@@ -80,7 +82,7 @@ public class EnemyProjectilePooler : MonoBehaviour
         projectile.SetActive(false);
         projectile.transform.SetParent(poolParent != null ? poolParent : transform);
 
-        if (!_availableProjectiles.Contains(projectile))
+        if (_queuedProjectiles.Add(projectile))
             _availableProjectiles.Enqueue(projectile);
     }
 }

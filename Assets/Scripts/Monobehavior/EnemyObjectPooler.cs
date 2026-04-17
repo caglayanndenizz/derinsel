@@ -13,6 +13,7 @@ public class EnemyObjectPooler : MonoBehaviour
 
     private readonly Queue<GameObject> _availableEnemies = new Queue<GameObject>();
     private readonly HashSet<GameObject> _trackedEnemies = new HashSet<GameObject>();
+    private readonly HashSet<GameObject> _queuedEnemies = new HashSet<GameObject>();
 
     private void Awake()
     {
@@ -65,6 +66,7 @@ public class EnemyObjectPooler : MonoBehaviour
         }
 
         GameObject enemy = _availableEnemies.Dequeue();
+        _queuedEnemies.Remove(enemy);
         enemy.transform.SetPositionAndRotation(worldPosition, rotation);
         enemy.SetActive(true);
         return enemy;
@@ -82,7 +84,7 @@ public class EnemyObjectPooler : MonoBehaviour
         enemy.SetActive(false);
         enemy.transform.SetParent(poolParent != null ? poolParent : transform);
 
-        if (!_availableEnemies.Contains(enemy))
+        if (_queuedEnemies.Add(enemy))
         {
             _availableEnemies.Enqueue(enemy);
         }

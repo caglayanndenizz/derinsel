@@ -22,8 +22,8 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject exitUI;
 
     [Header("Zindan Ayarlari")]
-    public int minSteps = 1000; 
-    public int maxSteps = 2000;
+    public int minSteps = 100; 
+    public int maxSteps = 250;
 
     [Header("Spawn Ayarlari")]
     public GameObject player;       
@@ -46,11 +46,44 @@ public class DungeonGenerator : MonoBehaviour
 
     private HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
     private GameObject currentExitInstance;
+    private int _currentDungeonFloor = 1;
+
+    private void Awake()
+    {
+        if (!ValidateConfiguration())
+            enabled = false;
+    }
+
+    private bool ValidateConfiguration()
+    {
+        bool hasError = false;
+
+        if (floorTilemap == null) { Debug.LogError("DungeonGenerator: floorTilemap atanmamis."); hasError = true; }
+        if (wallTilemap == null) { Debug.LogError("DungeonGenerator: wallTilemap atanmamis."); hasError = true; }
+        if (floorTile == null) { Debug.LogError("DungeonGenerator: floorTile atanmamis."); hasError = true; }
+        if (wallTile == null) { Debug.LogError("DungeonGenerator: wallTile atanmamis."); hasError = true; }
+        if (player == null) { Debug.LogError("DungeonGenerator: player referansi atanmamis."); hasError = true; }
+        if (exitPrefab == null) { Debug.LogError("DungeonGenerator: exitPrefab atanmamis."); hasError = true; }
+        if (fadeAnimator == null) { Debug.LogError("DungeonGenerator: fadeAnimator atanmamis."); hasError = true; }
+        if (vcam == null) { Debug.LogError("DungeonGenerator: vcam atanmamis."); hasError = true; }
+
+        if (enemyPooler == null)
+            enemyPooler = EnemyObjectPooler.Instance;
+
+        if (enemyPooler == null)
+        {
+            Debug.LogError("DungeonGenerator: enemyPooler atanmamis ve sahnede EnemyObjectPooler.Instance bulunamadi.");
+            hasError = true;
+        }
+
+        return !hasError;
+    }
 
 
     public void StartDungeonTransition()
     { 
         if (dungeonEntrance != null) dungeonEntrance.SetActive(false);
+        _currentDungeonFloor = 1;
         StartCoroutine(DungeonTransitionRoutine());
 
     }
@@ -133,7 +166,14 @@ public class DungeonGenerator : MonoBehaviour
         wallTilemap.ClearAllTiles();
         floorPositions.Clear();
 
-        int randomTotalSteps = Random.Range(minSteps, maxSteps + 1);
+        if (_currentDungeonFloor < 1) _currentDungeonFloor = 1;
+
+        float floorMultiplier = GetFloorSizeMultiplier(_currentDungeonFloor);
+        int scaledMinSteps = Mathf.FloorToInt(minSteps * floorMultiplier);
+        int scaledMaxSteps = Mathf.FloorToInt(maxSteps * floorMultiplier);
+        if (scaledMaxSteps < scaledMinSteps) scaledMaxSteps = scaledMinSteps;
+
+        int randomTotalSteps = Random.Range(scaledMinSteps, scaledMaxSteps + 1);
 
         CreateStartingRoom();
         RandomWalk(randomTotalSteps);
@@ -154,11 +194,15 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
-    void RandomWalk(int steps)
+    void RandomWalk(int targetFloorCount)
     {
         Vector2Int currentPos = new Vector2Int(0, 0);
-        for (int i = 0; i < steps; i++)
+        int maxAttempts = Mathf.Max(targetFloorCount * 30, 500);
+        int attempts = 0;
+
+        while (floorPositions.Count < targetFloorCount && attempts < maxAttempts)
         {
+            attempts++;
             Vector2Int direction = GetRandomDirection();
             currentPos += direction;
             for (int xOffset = 0; xOffset < 2; xOffset++)
@@ -168,6 +212,11 @@ public class DungeonGenerator : MonoBehaviour
                     floorPositions.Add(new Vector2Int(currentPos.x + xOffset, currentPos.y + yOffset));
                 }
             }
+        }
+
+        if (floorPositions.Count < targetFloorCount)
+        {
+            Debug.LogWarning($"DungeonGenerator: Hedef floor sayisina ulasilamadi. Hedef={targetFloorCount}, Uretilen={floorPositions.Count}, Deneme={attempts}/{maxAttempts}");
         }
     }
 
@@ -279,6 +328,12 @@ public class DungeonGenerator : MonoBehaviour
         if (enemyPooler == null)
             enemyPooler = EnemyObjectPooler.Instance;
 
+        if (enemyPooler == null)
+        {
+            Debug.LogError("DungeonGenerator: PlaceEntities cagrildi ama enemyPooler null.");
+            return;
+        }
+
         List<Vector2Int> availableFloors = floorPositions.ToList();
         player.transform.position = new Vector3(0.5f, 0.5f, 0); 
 
@@ -292,24 +347,34 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         int enemiesPlaced = 0;
-        while (enemiesPlaced < enemyCount)
+        int attempts = 0;
+        int maxAttempts = Mathf.Max(enemyCount * 20, availableFloors.Count * 3);
+        while (enemiesPlaced < enemyCount && availableFloors.Count > 0 && attempts < maxAttempts)
         {
+            attempts++;
             int randomIndex = Random.Range(0, availableFloors.Count);
             Vector2Int spawnPos = availableFloors[randomIndex];
 
             if (Vector2.Distance(Vector2.zero, spawnPos) < 6f || Vector2.Distance(exitPos, spawnPos) < 3f)
+            {
+                availableFloors.RemoveAt(randomIndex);
                 continue;
+            }
 
-            if (enemyPooler != null)
+            GameObject enemy = enemyPooler.GetEnemy(new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0), Quaternion.identity);
+            if (enemy == null)
             {
-                enemyPooler.GetEnemy(new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0), Quaternion.identity);
+                Debug.LogWarning("DungeonGenerator: Enemy pool bos ve genisleme kapali oldugu icin spawn atlandi.");
+                break;
             }
-            else
-            {
-                Instantiate(enemyPrefab, new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0), Quaternion.identity);
-            }
+
             availableFloors.RemoveAt(randomIndex);
             enemiesPlaced++;
+        }
+
+        if (enemiesPlaced < enemyCount)
+        {
+            Debug.LogWarning($"DungeonGenerator: Istek {enemyCount}, olusturulan {enemiesPlaced}. Uygun tile veya havuz kapasitesi yetersiz olabilir.");
         }
     }
 
@@ -317,6 +382,13 @@ public class DungeonGenerator : MonoBehaviour
     {
         int rand = Random.Range(0, 4);
         switch (rand) { case 0: return Vector2Int.up; case 1: return Vector2Int.down; case 2: return Vector2Int.left; case 3: return Vector2Int.right; default: return Vector2Int.zero; }
+    }
+
+    private float GetFloorSizeMultiplier(int floorNumber)
+    {
+        // Her 5 katta bir +0.25x artar: 1-5 => 1.00x, 6-10 => 1.25x, 11-15 => 1.50x ...
+        int tier = Mathf.FloorToInt((Mathf.Max(1, floorNumber) - 1) / 5f);
+        return 1f + (tier * 0.2f);
     }
 
     public void MoveToNextFloor()
@@ -331,6 +403,7 @@ public class DungeonGenerator : MonoBehaviour
             else Destroy(e);
         }
 
+        _currentDungeonFloor++;
         GenerateDungeon();
         
         if (exitUI != null) exitUI.SetActive(false);
@@ -363,5 +436,7 @@ public class DungeonGenerator : MonoBehaviour
             // Oyuncuyu ana dünyadaki kapının önüne ışınla
             player.transform.position = dungeonEntrance.transform.position + new Vector3(0, -1.5f, 0); 
         }
+
+        _currentDungeonFloor = 1;
     }
 }

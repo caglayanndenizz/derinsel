@@ -3291,8 +3291,8 @@ MonoBehaviour:
   wallTile: {fileID: 11400000, guid: 291ed0377b0ae0043bc543a711ad8d26, type: 2}
   dungeonEntrance: {fileID: 1575127065}
   exitUI: {fileID: 1267362878}
-  minSteps: 1500
-  maxSteps: 2500
+  minSteps: 150
+  maxSteps: 250
   player: {fileID: 1700128186}
   enemyPrefab: {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}
   exitPrefab: {fileID: 1031347285994503552, guid: e8e1f7b624480ad4bb4d5f1810e05f5a, type: 3}
@@ -3598,7 +3598,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 00000000
+  m_ApplyToSortingLayers: 00000000ffdadb84f7a4fdcf
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -4805,7 +4805,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1342775741
@@ -5695,7 +5695,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyObjectPooler
   enemyPrefab: {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}
-  initialPoolSize: 100
+  initialPoolSize: 175
   canExpandPool: 1
   poolParent: {fileID: 273267496}
 --- !u!4 &1679956770
@@ -6012,8 +6012,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -2065966337
+  m_SortingLayer: 2
   m_SortingOrder: 1
   m_Sprite: {fileID: 252663796, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -6127,7 +6127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyProjectilePooler
   projectilePrefab: {fileID: 6304853734587583923, guid: 85829922e17f94981a185366d6919300, type: 3}
-  initialPoolSize: 100
+  initialPoolSize: 175
   canExpandPool: 1
   poolParent: {fileID: 273267496}
 --- !u!4 &1730437412
