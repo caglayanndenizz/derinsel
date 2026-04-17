@@ -16,6 +16,8 @@ public class EnemyProjectile : MonoBehaviour
     float _spawnTime;
     bool _initialized;
 
+    private EnemyProjectilePooler _pooler;
+
     void Awake()
     {
         ConfigureNoPushThroughPlayer();
@@ -53,7 +55,7 @@ public class EnemyProjectile : MonoBehaviour
         Vector2 to = targetWorldPosition - origin;
         if (to.sqrMagnitude < 0.0001f)
         {
-            Destroy(gameObject);
+            ReturnToPool();
             return;
         }
 
@@ -71,7 +73,7 @@ public class EnemyProjectile : MonoBehaviour
 
         if (Time.time - _spawnTime >= _maxLifetime)
         {
-            Destroy(gameObject);
+            ReturnToPool();
             return;
         }
     }
@@ -86,6 +88,35 @@ public class EnemyProjectile : MonoBehaviour
         IDamageable dmg = other.GetComponent<IDamageable>() ?? other.GetComponentInParent<IDamageable>();
         if (dmg != null) dmg.TakeDamage(_damage, false);
 
-        Destroy(gameObject);
+        ReturnToPool();
+    }
+
+    void OnEnable()
+    {
+        if (_pooler == null) _pooler = EnemyProjectilePooler.Instance;
+
+        _initialized = false;
+        _speed = 0f;
+        _damage = 0f;
+        _target = Vector2.zero;
+        _direction = Vector2.zero;
+        _maxLifetime = defaultMaxLifetime;
+        _spawnTime = Time.time;
+
+        transform.rotation = Quaternion.identity;
+        ConfigureNoPushThroughPlayer();
+    }
+
+    private void ReturnToPool()
+    {
+        if (_pooler == null) _pooler = EnemyProjectilePooler.Instance;
+
+        if (_pooler != null)
+        {
+            _pooler.ReturnProjectile(gameObject);
+            return;
+        }
+
+        gameObject.SetActive(false);
     }
 }

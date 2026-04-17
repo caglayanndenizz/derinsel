@@ -30,6 +30,7 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject enemyPrefab;  
     public GameObject exitPrefab; 
     public int enemyCount = 10;
+    public EnemyObjectPooler enemyPooler;
 
     [Header("Transition Ayarlari")]
     public Animator fadeAnimator; // FadeImage üzerindeki Animator
@@ -275,6 +276,9 @@ public class DungeonGenerator : MonoBehaviour
     }
     void PlaceEntities()
     {
+        if (enemyPooler == null)
+            enemyPooler = EnemyObjectPooler.Instance;
+
         List<Vector2Int> availableFloors = floorPositions.ToList();
         player.transform.position = new Vector3(0.5f, 0.5f, 0); 
 
@@ -296,7 +300,14 @@ public class DungeonGenerator : MonoBehaviour
             if (Vector2.Distance(Vector2.zero, spawnPos) < 6f || Vector2.Distance(exitPos, spawnPos) < 3f)
                 continue;
 
-            Instantiate(enemyPrefab, new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0), Quaternion.identity);
+            if (enemyPooler != null)
+            {
+                enemyPooler.GetEnemy(new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0), Quaternion.identity);
+            }
+            else
+            {
+                Instantiate(enemyPrefab, new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0), Quaternion.identity);
+            }
             availableFloors.RemoveAt(randomIndex);
             enemiesPlaced++;
         }
@@ -311,7 +322,14 @@ public class DungeonGenerator : MonoBehaviour
     public void MoveToNextFloor()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        foreach (GameObject e in enemies) Destroy(e);
+        if (enemyPooler == null)
+            enemyPooler = EnemyObjectPooler.Instance;
+
+        foreach (GameObject e in enemies)
+        {
+            if (enemyPooler != null) enemyPooler.ReturnEnemy(e);
+            else Destroy(e);
+        }
 
         GenerateDungeon();
         
@@ -325,7 +343,14 @@ public class DungeonGenerator : MonoBehaviour
         floorPositions.Clear();
 
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        foreach (GameObject e in enemies) Destroy(e);
+        if (enemyPooler == null)
+            enemyPooler = EnemyObjectPooler.Instance;
+
+        foreach (GameObject e in enemies)
+        {
+            if (enemyPooler != null) enemyPooler.ReturnEnemy(e);
+            else Destroy(e);
+        }
         
         if (currentExitInstance != null) Destroy(currentExitInstance);
 

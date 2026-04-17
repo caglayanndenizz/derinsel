@@ -54,8 +54,11 @@ public class Enemy : BaseEntity
     public Transform projectilePivot;
     public Transform projectileSpawnPoint;
     public Vector3 projectileSpawnOffset = Vector3.zero;
+    public EnemyProjectilePooler projectilePooler;
     [Tooltip("Chase sırasında player'a yaklaşırken hız çarpanı.")]
     public float chaseApproachSpeedMultiplier = 1.6f;
+    [Tooltip("Projectile atış hız çarpanı. 1.5 => %50 daha hızlı atış.")]
+    public float projectileFireRateMultiplier = 1.5f;
 
     [Header("Loot Prefabs")]
     public GameObject goldPrefab;
@@ -71,6 +74,7 @@ public class Enemy : BaseEntity
     private Vector2 _lastKnownPlayerWorld;
     private bool _hasLastKnownPlayerWorld;
     private float _nextRangedFireTime;
+    private float AdjustedRangedFireInterval => rangedFireInterval / Mathf.Max(0.01f, projectileFireRateMultiplier);
 
     protected override void Awake()
     {
@@ -95,7 +99,7 @@ public class Enemy : BaseEntity
         _patrolAnchor = GetEnemyReferencePosition();
         _patrolLegIndex = 0;
 
-        _nextRangedFireTime = Time.time + rangedFireInterval;
+        _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
     }
 
     void Update()
@@ -243,7 +247,7 @@ public class Enemy : BaseEntity
             if (dist <= detectionRange && HasLineOfSight())
             {
                 currentState = State.Chase;
-                _nextRangedFireTime = Time.time + rangedFireInterval;
+                _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
             }
         }
         else if (currentState == State.Chase)
@@ -252,13 +256,13 @@ public class Enemy : BaseEntity
             {
                 currentState = State.Patrol;
                 _hasLastKnownPlayerWorld = false;
-                _nextRangedFireTime = Time.time + rangedFireInterval;
+                _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
                 ResetPatrolRoute();
             }
             else if (dist <= attackCloseMaxDistance)
             {
                 currentState = State.Attack;
-                _nextRangedFireTime = Time.time + rangedFireInterval;
+                _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
             }
         }
         else if (currentState == State.Attack)
@@ -267,13 +271,13 @@ public class Enemy : BaseEntity
             {
                 currentState = State.Patrol;
                 _hasLastKnownPlayerWorld = false;
-                _nextRangedFireTime = Time.time + rangedFireInterval;
+                _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
                 ResetPatrolRoute();
             }
             else if (dist > attackCloseMaxDistance)
             {
                 currentState = State.Chase;
-                _nextRangedFireTime = Time.time + rangedFireInterval;
+                _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
             }
         }
     }
@@ -337,14 +341,26 @@ public class Enemy : BaseEntity
         Vector2 aim = _hasLastKnownPlayerWorld ? _lastKnownPlayerWorld : (Vector2)player.transform.position;
         Vector3 spawnPos = GetProjectileSpawnPosition();
 
-        GameObject proj = Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
+        if (projectilePooler == null)
+            projectilePooler = EnemyProjectilePooler.Instance;
+
+        GameObject proj = projectilePooler != null
+            ? projectilePooler.GetProjectile(spawnPos, Quaternion.identity)
+            : Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
+
+        if (proj == null)
+        {
+            _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+            return;
+        }
+
         var mover = proj.GetComponent<EnemyProjectile>();
         float dmg = projectileDamageOverride;
         if (useAttackPowerForProjectile && stats != null) dmg = stats.attackPower;
         if (mover != null)
             mover.Initialize(aim, projectileSpeed, dmg, projectileMaxLifetime);
 
-        _nextRangedFireTime = Time.time + rangedFireInterval;
+        _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
     }
 
     public override void TakeDamage(float amount, bool isHeavy)
@@ -362,7 +378,12 @@ public class Enemy : BaseEntity
         Instantiate(goldPrefab, transform.position, Quaternion.identity); 
         Instantiate(experiencePrefab, transform.position + new Vector3(0.3f, 0, 0), Quaternion.identity); 
         base.Die(); 
-        Destroy(gameObject); 
+        if (EnemyObjectPooler.Instance != null)
+        {
+            EnemyObjectPooler.Instance.ReturnEnemy(gameObject);
+            return;
+        }
+        gameObject.SetActive(false);
     }
 
     private IEnumerator HitFlashRoutine() { 
@@ -393,5 +414,19 @@ public class Enemy : BaseEntity
         Vector2 gizmoEnd = start + dir * Mathf.Min(full, maxRay);
         Gizmos.color = HasLineOfSight() ? Color.green : Color.red;
         Gizmos.DrawLine(start, gizmoEnd);
+    }
+
+    private void OnEnable()
+    {
+        _isDead = false;
+        _isKnockedBack = false;
+        if (cd != null) cd.enabled = true;
+        if (_rb != null) _rb.linearVelocity = Vector2.zero;
+        if (stats != null) _currentHealth = stats.maxHealth;
+        _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+        currentState = State.Patrol;
+        _hasLastKnownPlayerWorld = false;
+        _patrolAnchor = GetEnemyReferencePosition();
+        ResetPatrolRoute();
     }
 }   
