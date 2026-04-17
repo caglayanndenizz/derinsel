@@ -14,9 +14,24 @@ public class Lootable : MonoBehaviour
     private bool isCollected = false;
     private Transform playerTransform;
 
-    void Start()
+    private void Awake()
     {
-        // Sahnedeki oyuncuyu "Player" tag'i ile buluyoruz
+        ResolvePlayerTransform();
+    }
+
+    private void OnEnable()
+    {
+        isCollected = false;
+        ResolvePlayerTransform();
+    }
+
+    private void OnDisable()
+    {
+        CancelInvoke(nameof(ReturnToPool));
+    }
+
+    private void ResolvePlayerTransform()
+    {
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
         {
@@ -72,7 +87,25 @@ public class Lootable : MonoBehaviour
             else player.experienceCount += value;
         }
 
-        // Obje silinmeden önce lifetime süresi kadar bekler
-        Destroy(gameObject, lifetime);
+        // Kısa gecikmeden sonra havuza iade edilir
+        Invoke(nameof(ReturnToPool), lifetime);
+    }
+
+    private void ReturnToPool()
+    {
+        if (isGold && GoldLootPooler.Instance != null)
+        {
+            GoldLootPooler.Instance.ReturnGold(gameObject);
+            return;
+        }
+
+        if (!isGold && ExperienceLootPooler.Instance != null)
+        {
+            ExperienceLootPooler.Instance.ReturnExperience(gameObject);
+            return;
+        }
+
+        // Pooler bulunamazsa güvenli fallback
+        Destroy(gameObject);
     }
 }

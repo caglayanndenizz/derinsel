@@ -29,7 +29,7 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject player;       
     public GameObject enemyPrefab;  
     public GameObject exitPrefab; 
-    public int enemyCount = 10;
+    private int enemyCount = 10;
     public EnemyObjectPooler enemyPooler;
 
     [Header("Transition Ayarlari")]
@@ -45,13 +45,24 @@ public class DungeonGenerator : MonoBehaviour
 
 
     private HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
-    private GameObject currentExitInstance;
+    private readonly List<GameObject> currentExitInstances = new List<GameObject>();
+    private bool _exitDoorsSpawnedForCurrentFloor;
+    private float _nextRoomClearCheckTime;
+    private const float RoomClearCheckInterval = 0.35f;
+    private const float TargetDoorSpawnDistanceFromPlayer = 2f;
+    private static readonly Color ExitDoorTint = new Color(0.6f, 0.6f, 0.6f, 1f);
     private int _currentDungeonFloor = 1;
 
     private void Awake()
     {
         if (!ValidateConfiguration())
             enabled = false;
+    }
+
+    private void OnValidate()
+    {
+        if (enemyPooler != null)
+            SyncEnemyCountWithPoolSize();
     }
 
     private bool ValidateConfiguration()
@@ -74,6 +85,10 @@ public class DungeonGenerator : MonoBehaviour
         {
             Debug.LogError("DungeonGenerator: enemyPooler atanmamis ve sahnede EnemyObjectPooler.Instance bulunamadi.");
             hasError = true;
+        }
+        else
+        {
+            SyncEnemyCountWithPoolSize();
         }
 
         return !hasError;
@@ -160,7 +175,7 @@ public class DungeonGenerator : MonoBehaviour
         if (dungeonEntrance != null)
             dungeonEntrance.SetActive(false);
 
-        if (currentExitInstance != null) Destroy(currentExitInstance);
+        ClearCurrentExits();
 
         floorTilemap.ClearAllTiles();
         wallTilemap.ClearAllTiles();
@@ -334,17 +349,11 @@ public class DungeonGenerator : MonoBehaviour
             return;
         }
 
+        SyncEnemyCountWithPoolSize();
+
         List<Vector2Int> availableFloors = floorPositions.ToList();
         player.transform.position = new Vector3(0.5f, 0.5f, 0); 
-
-        Vector2Int exitPos = availableFloors.OrderByDescending(p => Vector2.Distance(Vector2.zero, p)).First();
-        currentExitInstance = Instantiate(exitPrefab, new Vector3(exitPos.x + 0.5f, exitPos.y + 0.5f, 0), Quaternion.identity);
-
-        DungeonExit exitScript = currentExitInstance.GetComponent<DungeonExit>();
-        if(exitScript != null) 
-        {
-            exitScript.Setup(exitUI); 
-        }
+        _exitDoorsSpawnedForCurrentFloor = false;
 
         int enemiesPlaced = 0;
         int attempts = 0;
@@ -355,7 +364,7 @@ public class DungeonGenerator : MonoBehaviour
             int randomIndex = Random.Range(0, availableFloors.Count);
             Vector2Int spawnPos = availableFloors[randomIndex];
 
-            if (Vector2.Distance(Vector2.zero, spawnPos) < 6f || Vector2.Distance(exitPos, spawnPos) < 3f)
+            if (Vector2.Distance(Vector2.zero, spawnPos) < 6f)
             {
                 availableFloors.RemoveAt(randomIndex);
                 continue;
@@ -376,6 +385,8 @@ public class DungeonGenerator : MonoBehaviour
         {
             Debug.LogWarning($"DungeonGenerator: Istek {enemyCount}, olusturulan {enemiesPlaced}. Uygun tile veya havuz kapasitesi yetersiz olabilir.");
         }
+
+        TrySpawnExitDoorsIfRoomCleared();
     }
 
     Vector2Int GetRandomDirection()
@@ -425,7 +436,7 @@ public class DungeonGenerator : MonoBehaviour
             else Destroy(e);
         }
         
-        if (currentExitInstance != null) Destroy(currentExitInstance);
+        ClearCurrentExits();
 
         if (exitUI != null) exitUI.SetActive(false);
 
@@ -438,5 +449,158 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         _currentDungeonFloor = 1;
+    }
+
+    private void Update()
+    {
+        if (Time.time < _nextRoomClearCheckTime) return;
+        _nextRoomClearCheckTime = Time.time + RoomClearCheckInterval;
+        TrySpawnExitDoorsIfRoomCleared();
+    }
+
+    private void TrySpawnExitDoorsIfRoomCleared()
+    {
+        if (_exitDoorsSpawnedForCurrentFloor || exitPrefab == null || floorPositions.Count < 2) return;
+
+        GameObject[] aliveEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+        if (aliveEnemies.Length > 0) return;
+
+        SpawnDualExitDoors();
+    }
+
+    private void SpawnDualExitDoors()
+    {
+        Vector2Int firstDoorPos;
+        Vector2Int secondDoorPos;
+        GetSideBySideDoorPositions(out firstDoorPos, out secondDoorPos);
+
+        bool isExitFloor = _currentDungeonFloor % 3 == 0;
+        if (isExitFloor)
+        {
+            // Exit katında 1 NextFloor + 1 Exit (toplam yine 2 kapı)
+            CreateExitDoor(firstDoorPos, DungeonExit.ExitAction.NextFloor);
+            CreateExitDoor(secondDoorPos, DungeonExit.ExitAction.ExitDungeon);
+        }
+        else
+        {
+            // Normal katlarda 2 adet NextFloor kapısı
+            CreateExitDoor(firstDoorPos, DungeonExit.ExitAction.NextFloor);
+            CreateExitDoor(secondDoorPos, DungeonExit.ExitAction.NextFloor);
+        }
+
+        _exitDoorsSpawnedForCurrentFloor = true;
+    }
+
+    private void CreateExitDoor(Vector2Int tilePos, DungeonExit.ExitAction action)
+    {
+        GameObject instance = Instantiate(exitPrefab, new Vector3(tilePos.x + 0.5f, tilePos.y + 0.5f, 0f), Quaternion.identity);
+        currentExitInstances.Add(instance);
+
+        DungeonExit exitScript = instance.GetComponent<DungeonExit>();
+        if (exitScript != null)
+            exitScript.Setup(exitUI, this, action);
+
+        if (action == DungeonExit.ExitAction.ExitDungeon)
+        {
+            SpriteRenderer spriteRenderer = instance.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = ExitDoorTint;
+            }
+        }
+    }
+
+    private void GetSideBySideDoorPositions(out Vector2Int firstDoorPos, out Vector2Int secondDoorPos)
+    {
+        Vector2Int[] neighborOffsets = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down };
+        float targetDistance = TargetDoorSpawnDistanceFromPlayer;
+        Vector2 playerPos = player != null ? (Vector2)player.transform.position : Vector2.zero;
+        Vector2 playerForward = GetPlayerForwardDirection();
+        Vector2 targetPoint = playerPos + (playerForward * targetDistance);
+        Vector2Int? bestFirst = null;
+        Vector2Int? bestSecond = null;
+        float bestScore = float.MaxValue;
+
+        foreach (Vector2Int floor in floorPositions)
+        {
+            Vector2 floorWorld = new Vector2(floor.x + 0.5f, floor.y + 0.5f);
+
+            foreach (Vector2Int offset in neighborOffsets)
+            {
+                Vector2Int candidate = floor + offset;
+                if (!floorPositions.Contains(candidate)) continue;
+
+                Vector2 candidateWorld = new Vector2(candidate.x + 0.5f, candidate.y + 0.5f);
+                float floorTargetDistance = Vector2.Distance(floorWorld, targetPoint);
+                float candidateTargetDistance = Vector2.Distance(candidateWorld, targetPoint);
+                float averageTargetDistance = (floorTargetDistance + candidateTargetDistance) * 0.5f;
+                float pairCenterToPlayer = Vector2.Distance((floorWorld + candidateWorld) * 0.5f, playerPos);
+                float score = averageTargetDistance + Mathf.Abs(pairCenterToPlayer - targetDistance) * 0.35f;
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    bestFirst = floor;
+                    bestSecond = candidate;
+                }
+            }
+        }
+
+        if (bestFirst.HasValue && bestSecond.HasValue)
+        {
+            firstDoorPos = bestFirst.Value;
+            secondDoorPos = bestSecond.Value;
+            return;
+        }
+
+        // Güvenli fallback (teorik olarak floorPositions.Count >= 2 iken buraya düşmemeli)
+        using (var enumerator = floorPositions.GetEnumerator())
+        {
+            if (!enumerator.MoveNext())
+            {
+                firstDoorPos = Vector2Int.zero;
+                secondDoorPos = Vector2Int.right;
+                return;
+            }
+
+            firstDoorPos = enumerator.Current;
+            if (enumerator.MoveNext())
+            {
+                secondDoorPos = enumerator.Current;
+                return;
+            }
+        }
+
+        secondDoorPos = firstDoorPos + Vector2Int.right;
+    }
+
+    private Vector2 GetPlayerForwardDirection()
+    {
+        if (player == null) return Vector2.right;
+
+        // Rotasyonu baz al; sprite X flip kullanıyorsa yönü ters çevir.
+        Vector2 forward = player.transform.right;
+        if (player.transform.localScale.x < 0f)
+            forward = -forward;
+
+        if (forward.sqrMagnitude < 0.0001f)
+            return Vector2.right;
+
+        return forward.normalized;
+    }
+
+    private void SyncEnemyCountWithPoolSize()
+    {
+        if (enemyPooler == null) return;
+        enemyCount = Mathf.Max(0, enemyPooler.initialPoolSize);
+    }
+
+    private void ClearCurrentExits()
+    {
+        for (int i = 0; i < currentExitInstances.Count; i++)
+        {
+            if (currentExitInstances[i] != null) Destroy(currentExitInstances[i]);
+        }
+        currentExitInstances.Clear();
+        _exitDoorsSpawnedForCurrentFloor = false;
     }
 }

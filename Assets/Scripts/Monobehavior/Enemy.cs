@@ -55,6 +55,8 @@ public class Enemy : BaseEntity
     public Transform projectileSpawnPoint;
     public Vector3 projectileSpawnOffset = Vector3.zero;
     public EnemyProjectilePooler projectilePooler;
+    public GoldLootPooler goldPooler;
+    public ExperienceLootPooler experiencePooler;
     [Tooltip("Chase sırasında player'a yaklaşırken hız çarpanı.")]
     public float chaseApproachSpeedMultiplier = 1.6f;
     [Tooltip("Projectile atış hız çarpanı. 1.5 => %50 daha hızlı atış.")]
@@ -83,6 +85,8 @@ public class Enemy : BaseEntity
         player = GameObject.FindGameObjectWithTag("Player");
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _generator = Object.FindAnyObjectByType<DungeonGenerator>(); // Unity 6 için güncel arama
+        if (goldPooler == null) goldPooler = GoldLootPooler.Instance;
+        if (experiencePooler == null) experiencePooler = ExperienceLootPooler.Instance;
         
         _originalColor = _spriteRenderer.color;
 
@@ -375,8 +379,19 @@ public class Enemy : BaseEntity
     private void PrepareToDie() { _isDead = true; if (cd != null) cd.enabled = false; Invoke("Die", knockbackDuration + 0.05f); }
     
     protected override void Die() { 
-        Instantiate(goldPrefab, transform.position, Quaternion.identity); 
-        Instantiate(experiencePrefab, transform.position + new Vector3(0.3f, 0, 0), Quaternion.identity); 
+        if (goldPooler == null) goldPooler = GoldLootPooler.Instance;
+        if (experiencePooler == null) experiencePooler = ExperienceLootPooler.Instance;
+
+        if (goldPooler != null)
+            goldPooler.GetGold(transform.position, Quaternion.identity);
+        else if (goldPrefab != null)
+            Instantiate(goldPrefab, transform.position, Quaternion.identity);
+
+        if (experiencePooler != null)
+            experiencePooler.GetExperience(transform.position + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
+        else if (experiencePrefab != null)
+            Instantiate(experiencePrefab, transform.position + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
+
         base.Die(); 
         if (EnemyObjectPooler.Instance != null)
         {
