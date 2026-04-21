@@ -3,16 +3,16 @@ using UnityEngine;
 public class Lootable : MonoBehaviour
 {
     [Header("Basic Settings")]
-    public float lifetime = 0.4f;
     public int value = 1;
     public bool isGold = true;
     
     [Header("Magnet Settings")]
-    public float detectionRange = 10f; // Oyuncuya çekilme mesafesi (x kadar uzaklık)
-    public float moveSpeed = 6f;     // Oyuncuya uçma hızı
+    public float moveSpeed = 6f;
+    public float goldHomingDelay = 5f;
     
     private bool isCollected = false;
     private Transform playerTransform;
+    private bool goldHomingUnlocked;
 
     private void Awake()
     {
@@ -22,12 +22,22 @@ public class Lootable : MonoBehaviour
     private void OnEnable()
     {
         isCollected = false;
+        goldHomingUnlocked = !isGold;
         ResolvePlayerTransform();
+        CancelInvoke(nameof(EnableGoldHoming));
+
+        if (isGold)
+            Invoke(nameof(EnableGoldHoming), Mathf.Max(0f, goldHomingDelay));
     }
 
     private void OnDisable()
     {
-        CancelInvoke(nameof(ReturnToPool));
+        CancelInvoke(nameof(EnableGoldHoming));
+    }
+
+    private void EnableGoldHoming()
+    {
+        goldHomingUnlocked = true;
     }
 
     private void ResolvePlayerTransform()
@@ -41,28 +51,17 @@ public class Lootable : MonoBehaviour
 
     void Update()
     {
-       /* if (isCollected)
-        {
-            // Toplandıktan sonra hafifçe yukarı yükselme efekti (eski kodun)
-            transform.Translate(Vector2.up * Time.deltaTime * 1f);
-            return;
-        }
-        */
-        // --- MIKNATIS MEKANİĞİ ---
-        if (playerTransform != null)
-        {
-            float distance = Vector2.Distance(transform.position, playerTransform.position);
+        if (isCollected) return;
 
-            // Eğer oyuncu x (detectionRange) kadar yakınsa
-            if (distance <= detectionRange)
-            {
-                // Obje oyuncuya doğru hızla hareket eder
-                transform.position = Vector2.MoveTowards(transform.position, playerTransform.position, moveSpeed * Time.deltaTime);
-                
-                // Hızın gitgide artmasını istersen şunu kullanabilirsin:
-                // moveSpeed += Time.deltaTime * 5f;
-            }
+        if (playerTransform == null)
+        {
+            ResolvePlayerTransform();
         }
+
+        if (playerTransform == null) return;
+
+        if (isGold && !goldHomingUnlocked) return;
+        transform.position = Vector2.MoveTowards(transform.position, playerTransform.position, moveSpeed * Time.deltaTime);
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -75,7 +74,6 @@ public class Lootable : MonoBehaviour
         }
     }
 
-    // Toplama mantığını ayrı bir fonksiyona aldık ki kod daha temiz olsun
     private void Collect(GameObject playerObj)
     {
         isCollected = true;
@@ -87,8 +85,7 @@ public class Lootable : MonoBehaviour
             else player.experienceCount += value;
         }
 
-        // Kısa gecikmeden sonra havuza iade edilir
-        Invoke(nameof(ReturnToPool), lifetime);
+        ReturnToPool();
     }
 
     private void ReturnToPool()

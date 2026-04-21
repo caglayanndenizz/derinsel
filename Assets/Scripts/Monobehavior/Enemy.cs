@@ -65,6 +65,7 @@ public class Enemy : BaseEntity
     [Header("Loot Prefabs")]
     public GameObject goldPrefab;
     public GameObject experiencePrefab;
+    [Range(0f, 1f)] public float goldDropChance = 0.15f;
 
     [Header("Visual Effects")]
     public Color flashColor = Color.white;
@@ -76,6 +77,7 @@ public class Enemy : BaseEntity
     private Vector2 _lastKnownPlayerWorld;
     private bool _hasLastKnownPlayerWorld;
     private float _nextRangedFireTime;
+    private Vector2 _lastSafeWorldPosition;
     private float AdjustedRangedFireInterval => rangedFireInterval / Mathf.Max(0.01f, projectileFireRateMultiplier);
 
     protected override void Awake()
@@ -104,6 +106,7 @@ public class Enemy : BaseEntity
         _patrolLegIndex = 0;
 
         _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+        _lastSafeWorldPosition = GetEnemyReferencePosition();
     }
 
     void Update()
@@ -117,12 +120,20 @@ public class Enemy : BaseEntity
     void FixedUpdate()
     {
         if (_isDead || _isKnockedBack) return;
+        TrackLastSafePosition();
         Move();
     }
 
     private Vector2 GetEnemyReferencePosition()
     {
         return _rb != null ? _rb.position : (Vector2)transform.position;
+    }
+
+    private void TrackLastSafePosition()
+    {
+        Vector2 currentPos = GetEnemyReferencePosition();
+        if (!IsNavigationBlockedAt(currentPos))
+            _lastSafeWorldPosition = currentPos;
     }
 
     private Vector2 GetPatrolWaypointWorld(int leg)
@@ -210,6 +221,34 @@ public class Enemy : BaseEntity
         if (hit.gameObject == gameObject || hit.transform.IsChildOf(transform)) return false;
         if (hit.CompareTag("Player")) return false;
         return true;
+    }
+
+    private Vector2 GetValidGoldSpawnPosition(Vector2 desiredPosition)
+    {
+        if (_generator == null || _generator.floorTilemap == null) return desiredPosition;
+
+        Tilemap floorTilemap = _generator.floorTilemap;
+        Vector3Int centerCell = floorTilemap.WorldToCell(desiredPosition);
+
+        if (floorTilemap.HasTile(centerCell))
+            return floorTilemap.GetCellCenterWorld(centerCell);
+
+        const int maxRadius = 2;
+        for (int radius = 1; radius <= maxRadius; radius++)
+        {
+            for (int x = -radius; x <= radius; x++)
+            {
+                for (int y = -radius; y <= radius; y++)
+                {
+                    if (Mathf.Abs(x) != radius && Mathf.Abs(y) != radius) continue;
+                    Vector3Int candidateCell = centerCell + new Vector3Int(x, y, 0);
+                    if (floorTilemap.HasTile(candidateCell))
+                        return floorTilemap.GetCellCenterWorld(candidateCell);
+                }
+            }
+        }
+
+        return _lastSafeWorldPosition;
     }
 
     private Vector2 GetAvoidanceDirection(Vector2 currentDir)
@@ -381,16 +420,21 @@ public class Enemy : BaseEntity
     protected override void Die() { 
         if (goldPooler == null) goldPooler = GoldLootPooler.Instance;
         if (experiencePooler == null) experiencePooler = ExperienceLootPooler.Instance;
+        Vector2 deathPosition = GetEnemyReferencePosition();
 
-        if (goldPooler != null)
-            goldPooler.GetGold(transform.position, Quaternion.identity);
-        else if (goldPrefab != null)
-            Instantiate(goldPrefab, transform.position, Quaternion.identity);
+        if (Random.value <= goldDropChance)
+        {
+            Vector2 goldSpawnPosition = GetValidGoldSpawnPosition(deathPosition);
+            if (goldPooler != null)
+                goldPooler.GetGold(goldSpawnPosition, Quaternion.identity);
+            else if (goldPrefab != null)
+                Instantiate(goldPrefab, goldSpawnPosition, Quaternion.identity);
+        }
 
         if (experiencePooler != null)
-            experiencePooler.GetExperience(transform.position + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
+            experiencePooler.GetExperience((Vector3)deathPosition + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
         else if (experiencePrefab != null)
-            Instantiate(experiencePrefab, transform.position + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
+            Instantiate(experiencePrefab, (Vector3)deathPosition + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
 
         base.Die(); 
         if (EnemyObjectPooler.Instance != null)
@@ -414,7 +458,32 @@ public class Enemy : BaseEntity
             _rb.linearVelocity = Vector2.zero; 
             _rb.AddForce(dir * force, ForceMode2D.Impulse);
         }
-        yield return new WaitForSeconds(knockbackDuration);
+
+        float elapsed = 0f;
+        while (elapsed < knockbackDuration)
+        {
+            yield return new WaitForFixedUpdate();
+            elapsed += Time.fixedDeltaTime;
+
+            Vector2 currentPos = GetEnemyReferencePosition();
+            if (IsNavigationBlockedAt(currentPos))
+            {
+                if (_rb != null)
+                {
+                    _rb.position = _lastSafeWorldPosition;
+                    _rb.linearVelocity = Vector2.zero;
+                }
+                else
+                {
+                    transform.position = _lastSafeWorldPosition;
+                }
+            }
+            else
+            {
+                _lastSafeWorldPosition = currentPos;
+            }
+        }
+
         if (!_isDead) { _rb.linearVelocity = Vector2.zero; _isKnockedBack = false; }
     }
 
@@ -442,6 +511,7 @@ public class Enemy : BaseEntity
         currentState = State.Patrol;
         _hasLastKnownPlayerWorld = false;
         _patrolAnchor = GetEnemyReferencePosition();
+        _lastSafeWorldPosition = _patrolAnchor;
         ResetPatrolRoute();
     }
 }   

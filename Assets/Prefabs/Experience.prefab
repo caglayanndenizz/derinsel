@@ -79,7 +79,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -805460745
-  m_SortingLayer: 2
+  m_SortingLayer: 1
   m_SortingOrder: 1
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 0, g: 0.67825866, b: 1, a: 1}
@@ -140,7 +140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 272834e43cde57f4b9347381a9dfd5f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Lootable
-  lifetime: 0.4
+  lifetime: 0.3
   value: 1
   isGold: 1
   detectionRange: 10

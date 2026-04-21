@@ -84,6 +84,8 @@ public class ExperienceLootPooler : MonoBehaviour
         GameObject exp = _availableExperience.Dequeue();
         _queuedExperience.Remove(exp);
         exp.transform.SetPositionAndRotation(worldPosition, rotation);
+        Lootable lootable = exp.GetComponent<Lootable>();
+        if (lootable != null) lootable.isGold = false;
         exp.SetActive(true);
         return exp;
     }

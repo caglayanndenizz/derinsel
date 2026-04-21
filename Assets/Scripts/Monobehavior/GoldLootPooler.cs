@@ -84,6 +84,8 @@ public class GoldLootPooler : MonoBehaviour
         GameObject gold = _availableGold.Dequeue();
         _queuedGold.Remove(gold);
         gold.transform.SetPositionAndRotation(worldPosition, rotation);
+        Lootable lootable = gold.GetComponent<Lootable>();
+        if (lootable != null) lootable.isGold = true;
         gold.SetActive(true);
         return gold;
     }
