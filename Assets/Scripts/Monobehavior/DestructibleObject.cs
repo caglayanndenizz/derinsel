@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class DestructibleObject : MonoBehaviour, IDamageable
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     public float health = 10f;
 
     public void TakeDamage(float amount, bool isHeavy)

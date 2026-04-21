@@ -10,7 +10,6 @@ public class EnemyProjectile : MonoBehaviour
 
     float _speed;
     float _damage;
-    Vector2 _target;
     Vector2 _direction;
     float _maxLifetime;
     float _spawnTime;
@@ -45,7 +44,6 @@ public class EnemyProjectile : MonoBehaviour
     {
         ConfigureNoPushThroughPlayer();
 
-        _target = targetWorldPosition;
         _speed = speed;
         _damage = damage;
         _maxLifetime = maxLifetime > 0f ? maxLifetime : defaultMaxLifetime;
@@ -98,7 +96,6 @@ public class EnemyProjectile : MonoBehaviour
         _initialized = false;
         _speed = 0f;
         _damage = 0f;
-        _target = Vector2.zero;
         _direction = Vector2.zero;
         _maxLifetime = defaultMaxLifetime;
         _spawnTime = Time.time;

@@ -11,9 +11,16 @@ public class EnemyObjectPooler : MonoBehaviour
     public bool canExpandPool = true;
     public Transform poolParent;
 
+    [Header("Baglantili pooler'lar")]
+    [Tooltip("Bos birakilirsa Gold / Experience / Projectile pooler sahne icinde (kapali dahil) aranir.")]
+    [SerializeField] private GoldLootPooler linkedGoldLootPooler;
+    [SerializeField] private ExperienceLootPooler linkedExperienceLootPooler;
+    [SerializeField] private EnemyProjectilePooler linkedProjectilePooler;
+
     private readonly Queue<GameObject> _availableEnemies = new Queue<GameObject>();
     private readonly HashSet<GameObject> _trackedEnemies = new HashSet<GameObject>();
     private readonly HashSet<GameObject> _queuedEnemies = new HashSet<GameObject>();
+    private int _leasedActiveEnemyCount;
 
     private void Awake()
     {
@@ -25,6 +32,32 @@ public class EnemyObjectPooler : MonoBehaviour
 
         Instance = this;
         WarmupPool();
+    }
+
+    private void Start()
+    {
+        ResolveLinkedPoolersIfNeeded();
+        SetLinkedPoolersActive(_leasedActiveEnemyCount > 0);
+    }
+
+    private void ResolveLinkedPoolersIfNeeded()
+    {
+        if (linkedGoldLootPooler == null)
+            linkedGoldLootPooler = FindFirstObjectByType<GoldLootPooler>(FindObjectsInactive.Include);
+        if (linkedExperienceLootPooler == null)
+            linkedExperienceLootPooler = FindFirstObjectByType<ExperienceLootPooler>(FindObjectsInactive.Include);
+        if (linkedProjectilePooler == null)
+            linkedProjectilePooler = FindFirstObjectByType<EnemyProjectilePooler>(FindObjectsInactive.Include);
+    }
+
+    private void SetLinkedPoolersActive(bool active)
+    {
+        if (linkedGoldLootPooler != null)
+            linkedGoldLootPooler.gameObject.SetActive(active);
+        if (linkedExperienceLootPooler != null)
+            linkedExperienceLootPooler.gameObject.SetActive(active);
+        if (linkedProjectilePooler != null)
+            linkedProjectilePooler.gameObject.SetActive(active);
     }
 
     private void WarmupPool()
@@ -68,6 +101,8 @@ public class EnemyObjectPooler : MonoBehaviour
         GameObject enemy = _availableEnemies.Dequeue();
         _queuedEnemies.Remove(enemy);
         enemy.transform.SetPositionAndRotation(worldPosition, rotation);
+        SetLinkedPoolersActive(true);
+        _leasedActiveEnemyCount++;
         enemy.SetActive(true);
         return enemy;
     }
@@ -75,6 +110,8 @@ public class EnemyObjectPooler : MonoBehaviour
     public void ReturnEnemy(GameObject enemy)
     {
         if (enemy == null) return;
+
+        bool wasActiveInWorld = enemy.activeSelf;
 
         if (!_trackedEnemies.Contains(enemy))
         {
@@ -87,6 +124,11 @@ public class EnemyObjectPooler : MonoBehaviour
         if (_queuedEnemies.Add(enemy))
         {
             _availableEnemies.Enqueue(enemy);
+            if (wasActiveInWorld)
+                _leasedActiveEnemyCount = Mathf.Max(0, _leasedActiveEnemyCount - 1);
         }
+
+        if (_leasedActiveEnemyCount == 0)
+            SetLinkedPoolersActive(false);
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public abstract class BaseEntity : MonoBehaviour , IDamageable
@@ -7,8 +6,6 @@ public abstract class BaseEntity : MonoBehaviour , IDamageable
     public EntityStats stats; // Yarattığımız SO'yu buraya bağlayacağız
 
     protected float _currentHealth;
-
-    public static Action<BaseEntity> OnAnyEntityDie { get; internal set; }
 
     protected virtual void Awake() 
     {

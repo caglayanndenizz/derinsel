@@ -15,6 +15,7 @@ public class GoldLootPooler : MonoBehaviour
     private readonly Queue<GameObject> _availableGold = new Queue<GameObject>();
     private readonly HashSet<GameObject> _trackedGold = new HashSet<GameObject>();
     private readonly HashSet<GameObject> _queuedGold = new HashSet<GameObject>();
+    private bool _warmupCompleted;
 
     private void Awake()
     {
@@ -26,7 +27,14 @@ public class GoldLootPooler : MonoBehaviour
 
         Instance = this;
         SyncPoolSizeWithEnemyPooler();
+    }
+
+    private void OnEnable()
+    {
+        if (_warmupCompleted || goldPrefab == null)
+            return;
         WarmupPool();
+        _warmupCompleted = true;
     }
 
     private void OnValidate()

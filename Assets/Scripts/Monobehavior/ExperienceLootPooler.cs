@@ -15,6 +15,7 @@ public class ExperienceLootPooler : MonoBehaviour
     private readonly Queue<GameObject> _availableExperience = new Queue<GameObject>();
     private readonly HashSet<GameObject> _trackedExperience = new HashSet<GameObject>();
     private readonly HashSet<GameObject> _queuedExperience = new HashSet<GameObject>();
+    private bool _warmupCompleted;
 
     private void Awake()
     {
@@ -26,7 +27,14 @@ public class ExperienceLootPooler : MonoBehaviour
 
         Instance = this;
         SyncPoolSizeWithEnemyPooler();
+    }
+
+    private void OnEnable()
+    {
+        if (_warmupCompleted || experiencePrefab == null)
+            return;
         WarmupPool();
+        _warmupCompleted = true;
     }
 
     private void OnValidate()

@@ -10,10 +10,12 @@ public class EnemyProjectilePooler : MonoBehaviour
     public int initialPoolSize = 100;
     public bool canExpandPool = true;
     public Transform poolParent;
+    public EnemyObjectPooler enemyPoolerSource;
 
     private readonly Queue<GameObject> _availableProjectiles = new Queue<GameObject>();
     private readonly HashSet<GameObject> _trackedProjectiles = new HashSet<GameObject>();
     private readonly HashSet<GameObject> _queuedProjectiles = new HashSet<GameObject>();
+    private bool _warmupCompleted;
 
     private void Awake()
     {
@@ -24,7 +26,29 @@ public class EnemyProjectilePooler : MonoBehaviour
         }
 
         Instance = this;
+        SyncPoolSizeWithEnemyPooler();
+    }
+
+    private void OnValidate()
+    {
+        SyncPoolSizeWithEnemyPooler();
+    }
+
+    private void SyncPoolSizeWithEnemyPooler()
+    {
+        if (enemyPoolerSource == null)
+            enemyPoolerSource = EnemyObjectPooler.Instance;
+
+        if (enemyPoolerSource != null)
+            initialPoolSize = Mathf.Max(0, enemyPoolerSource.initialPoolSize);
+    }
+
+    private void OnEnable()
+    {
+        if (_warmupCompleted || projectilePrefab == null)
+            return;
         WarmupPool();
+        _warmupCompleted = true;
     }
 
     private void WarmupPool()

@@ -5,8 +5,6 @@ using System.Linq;
 using Unity.Cinemachine;
 using System.Collections;
 
-
-
 public class DungeonGenerator : MonoBehaviour
 {
     [Header("Tile Ayarlari")]
@@ -36,13 +34,10 @@ public class DungeonGenerator : MonoBehaviour
     public Animator fadeAnimator; // FadeImage üzerindeki Animator
     public CinemachineCamera vcam; // Sahnedeki sanal kamera
     public float transitionDuration;
-    
-    
+
     [Header("Yeni Mekanik: Kirilabilir Duvar")]
     public TileBase destructableWallTile; // Kırılabilir duvar görseli
-    [Range(0, 1)] public float destructableChance = 0.15f; // Çıkma şansı 
-
-
+    [Range(0, 1)] public float destructableChance = 0.15f; // Çıkma şansı
 
     private HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
     private readonly List<GameObject> currentExitInstances = new List<GameObject>();
@@ -96,11 +91,10 @@ public class DungeonGenerator : MonoBehaviour
 
 
     public void StartDungeonTransition()
-    { 
+    {
         if (dungeonEntrance != null) dungeonEntrance.SetActive(false);
         _currentDungeonFloor = 1;
         StartCoroutine(DungeonTransitionRoutine());
-
     }
 
     private IEnumerator DungeonTransitionRoutine()
@@ -160,18 +154,15 @@ public class DungeonGenerator : MonoBehaviour
         fadeAnimator.SetTrigger("StartFade");
         yield return new WaitForSeconds(transitionDuration);
 
-        ExitDungeon(); // Senin mevcut çıkış fonksiyonun
+        ExitDungeon();
 
         vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
 
         fadeAnimator.SetTrigger("EndFade");
     }
 
-
-
     public void GenerateDungeon()
     {
-
         if (dungeonEntrance != null)
             dungeonEntrance.SetActive(false);
 
@@ -260,7 +251,6 @@ public class DungeonGenerator : MonoBehaviour
     }
     public void BreakWallsInArea(Vector3 worldPosition, float radius)
     {
-    
         for (float x = -radius; x <= radius; x += 0.5f)
         {
             for (float y = -radius; y <= radius; y += 0.5f)
@@ -268,18 +258,14 @@ public class DungeonGenerator : MonoBehaviour
                 Vector3 offsetPos = worldPosition + new Vector3(x, y, 0);
                 Vector3Int cellPos = wallTilemap.WorldToCell(offsetPos);
 
-                
                 if (wallTilemap.GetTile(cellPos) != null)
                 {
-                    
                     Color tileColor = wallTilemap.GetColor(cellPos);
 
-                    
                     if (tileColor.r < 1.0f)
                     {
-                        wallTilemap.SetTile(cellPos, null); 
-                        floorTilemap.SetTile(cellPos, floorTile); 
-                        
+                        wallTilemap.SetTile(cellPos, null);
+                        floorTilemap.SetTile(cellPos, floorTile);
                     }
                 }
             }
@@ -475,39 +461,53 @@ public class DungeonGenerator : MonoBehaviour
         GetSideBySideDoorPositions(out firstDoorPos, out secondDoorPos);
 
         bool isExitFloor = _currentDungeonFloor % 3 == 0;
+        DungeonExit.ExitAction firstAction;
+        DungeonExit.ExitAction secondAction;
         if (isExitFloor)
         {
             // Exit katında 1 NextFloor + 1 Exit (toplam yine 2 kapı)
-            CreateExitDoor(firstDoorPos, DungeonExit.ExitAction.NextFloor);
-            CreateExitDoor(secondDoorPos, DungeonExit.ExitAction.ExitDungeon);
+            firstAction = DungeonExit.ExitAction.NextFloor;
+            secondAction = DungeonExit.ExitAction.ExitDungeon;
         }
         else
         {
             // Normal katlarda 2 adet NextFloor kapısı
-            CreateExitDoor(firstDoorPos, DungeonExit.ExitAction.NextFloor);
-            CreateExitDoor(secondDoorPos, DungeonExit.ExitAction.NextFloor);
+            firstAction = DungeonExit.ExitAction.NextFloor;
+            secondAction = DungeonExit.ExitAction.NextFloor;
         }
+
+        GameObject doorA = CreateExitDoorInstance(firstDoorPos, firstAction);
+        GameObject doorB = CreateExitDoorInstance(secondDoorPos, secondAction);
+        LinkExitDoorPair(doorA, doorB, firstAction, secondAction);
 
         _exitDoorsSpawnedForCurrentFloor = true;
     }
 
-    private void CreateExitDoor(Vector2Int tilePos, DungeonExit.ExitAction action)
+    private GameObject CreateExitDoorInstance(Vector2Int tilePos, DungeonExit.ExitAction action)
     {
         GameObject instance = Instantiate(exitPrefab, new Vector3(tilePos.x + 0.5f, tilePos.y + 0.5f, 0f), Quaternion.identity);
         currentExitInstances.Add(instance);
-
-        DungeonExit exitScript = instance.GetComponent<DungeonExit>();
-        if (exitScript != null)
-            exitScript.Setup(exitUI, this, action);
 
         if (action == DungeonExit.ExitAction.ExitDungeon)
         {
             SpriteRenderer spriteRenderer = instance.GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
-            {
                 spriteRenderer.color = ExitDoorTint;
-            }
         }
+
+        return instance;
+    }
+
+    private void LinkExitDoorPair(GameObject doorA, GameObject doorB, DungeonExit.ExitAction actionA, DungeonExit.ExitAction actionB)
+    {
+        if (doorA == null || doorB == null) return;
+
+        DungeonExit exitA = doorA.GetComponent<DungeonExit>();
+        DungeonExit exitB = doorB.GetComponent<DungeonExit>();
+        if (exitA != null)
+            exitA.Setup(exitUI, this, actionA, doorB);
+        if (exitB != null)
+            exitB.Setup(exitUI, this, actionB, doorA);
     }
 
     private void GetSideBySideDoorPositions(out Vector2Int firstDoorPos, out Vector2Int secondDoorPos)
