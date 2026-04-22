@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class EnemyObjectPooler : MonoBehaviour
 {
     public static EnemyObjectPooler Instance { get; private set; }
 
     [Header("Pool Settings")]
-    public GameObject enemyPrefab;
+    [FormerlySerializedAs("enemyPrefab")]
+    public List<GameObject> enemyPrefabs = new List<GameObject>();
     public int initialPoolSize = 50;
     public bool canExpandPool = true;
     public Transform poolParent;
@@ -32,6 +34,12 @@ public class EnemyObjectPooler : MonoBehaviour
 
         Instance = this;
         WarmupPool();
+    }
+
+    private void OnValidate()
+    {
+        if (enemyPrefabs == null)
+            enemyPrefabs = new List<GameObject>();
     }
 
     private void Start()
@@ -62,9 +70,9 @@ public class EnemyObjectPooler : MonoBehaviour
 
     private void WarmupPool()
     {
-        if (enemyPrefab == null)
+        if (!HasAnyValidEnemyPrefab())
         {
-            Debug.LogWarning("EnemyObjectPooler: enemyPrefab atanmamis.");
+            Debug.LogWarning("EnemyObjectPooler: enemyPrefabs listesinde gecerli prefab yok.");
             return;
         }
 
@@ -77,8 +85,15 @@ public class EnemyObjectPooler : MonoBehaviour
 
     private GameObject CreateNewEnemy()
     {
+        GameObject prefab = GetRandomEnemyPrefab();
+        if (prefab == null)
+        {
+            Debug.LogWarning("EnemyObjectPooler: Enemy olusturulamadi, gecerli prefab bulunamadi.");
+            return null;
+        }
+
         Transform parent = poolParent != null ? poolParent : transform;
-        GameObject enemy = Instantiate(enemyPrefab, parent);
+        GameObject enemy = Instantiate(prefab, parent);
         enemy.SetActive(false);
         _trackedEnemies.Add(enemy);
         return enemy;
@@ -95,6 +110,7 @@ public class EnemyObjectPooler : MonoBehaviour
             }
 
             GameObject expandedEnemy = CreateNewEnemy();
+            if (expandedEnemy == null) return null;
             _availableEnemies.Enqueue(expandedEnemy);
         }
 
@@ -130,5 +146,39 @@ public class EnemyObjectPooler : MonoBehaviour
 
         if (_leasedActiveEnemyCount == 0)
             SetLinkedPoolersActive(false);
+    }
+
+    private bool HasAnyValidEnemyPrefab()
+    {
+        if (enemyPrefabs == null || enemyPrefabs.Count == 0) return false;
+        for (int i = 0; i < enemyPrefabs.Count; i++)
+        {
+            if (enemyPrefabs[i] != null) return true;
+        }
+        return false;
+    }
+
+    private GameObject GetRandomEnemyPrefab()
+    {
+        if (!HasAnyValidEnemyPrefab()) return null;
+
+        int validCount = 0;
+        for (int i = 0; i < enemyPrefabs.Count; i++)
+        {
+            if (enemyPrefabs[i] != null) validCount++;
+        }
+
+        if (validCount == 0) return null;
+
+        int target = Random.Range(0, validCount);
+        int seen = 0;
+        for (int i = 0; i < enemyPrefabs.Count; i++)
+        {
+            if (enemyPrefabs[i] == null) continue;
+            if (seen == target) return enemyPrefabs[i];
+            seen++;
+        }
+
+        return null;
     }
 }

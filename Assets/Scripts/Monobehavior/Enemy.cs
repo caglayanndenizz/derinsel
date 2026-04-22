@@ -5,9 +5,11 @@ using System.Collections;
 public class Enemy : BaseEntity
 {
     public enum State { Patrol, Chase, Attack, Dead }
+    public enum EnemyType { Mage, Tanky, Warrior }
 
     [Header("State Settings")]
     public State currentState = State.Patrol;
+    public EnemyType enemyType = EnemyType.Mage;
     public float detectionRange = 10f; 
     public float expandedDetectionRange = 22f; 
     public CircleCollider2D cd;
@@ -38,29 +40,32 @@ public class Enemy : BaseEntity
     private Vector2 _patrolAnchor;
     private int _patrolLegIndex;
 
-    [Header("Ranged Attack")]
+    [Header("Mage Ranged Attack")]
     [Tooltip("Bu prefab üzerinde EnemyProjectile scripti olmalı.")]
-    public GameObject projectilePrefab;
+    public GameObject mageProjectilePrefab;
     [Tooltip("Attack state iken iki projectile arası süre (saniye).")]
-    public float rangedFireInterval = 4f;
-    public float projectileSpeed = 10f;
+    public float mageRangedFireInterval = 4f;
+    public float mageProjectileSpeed = 10f;
     [Tooltip("EntityStats.attackPower ile aynı anlamda kullanılır.")]
-    public bool useAttackPowerForProjectile = true;
-    public float projectileDamageOverride = 5f;
-    public float projectileMaxLifetime = 12f;
+    public bool mageUseAttackPowerForProjectile = true;
+    public float mageProjectileDamageOverride = 5f;
+    public float mageProjectileMaxLifetime = 12f;
     [Tooltip("Player bu kadar yakınsa (birim) Chase → Attack; daha uzaktaysa Attack → Chase.")]
     public float attackCloseMaxDistance = 5f;
     [Tooltip("Projectile bu child empty'den çıkar (boşsa child adı projectilePivot aranır).")]
-    public Transform projectilePivot;
-    public Transform projectileSpawnPoint;
-    public Vector3 projectileSpawnOffset = Vector3.zero;
-    public EnemyProjectilePooler projectilePooler;
+    public Transform mageProjectilePivot;
+    public Transform mageProjectileSpawnPoint;
+    public Vector3 mageProjectileSpawnOffset = Vector3.zero;
+    public EnemyProjectilePooler mageProjectilePooler;
     public GoldLootPooler goldPooler;
     public ExperienceLootPooler experiencePooler;
     [Tooltip("Chase sırasında player'a yaklaşırken hız çarpanı.")]
     public float chaseApproachSpeedMultiplier = 1.6f;
     [Tooltip("Projectile atış hız çarpanı. 1.5 => %50 daha hızlı atış.")]
-    public float projectileFireRateMultiplier = 1.5f;
+    public float mageProjectileFireRateMultiplier = 1.5f;
+    
+    [Header("Melee Attack")]
+    public float meleeAttackInterval = 2f;
 
     [Header("Loot Prefabs")]
     public GameObject goldPrefab;
@@ -77,8 +82,9 @@ public class Enemy : BaseEntity
     private Vector2 _lastKnownPlayerWorld;
     private bool _hasLastKnownPlayerWorld;
     private float _nextRangedFireTime;
+    private float _nextTypeAttackTime;
     private Vector2 _lastSafeWorldPosition;
-    private float AdjustedRangedFireInterval => rangedFireInterval / Mathf.Max(0.01f, projectileFireRateMultiplier);
+    private float AdjustedMageRangedFireInterval => mageRangedFireInterval / Mathf.Max(0.01f, mageProjectileFireRateMultiplier);
 
     protected override void Awake()
     {
@@ -99,13 +105,16 @@ public class Enemy : BaseEntity
             _rb.freezeRotation = true;
         }
 
-        if (projectilePivot == null)
-            projectilePivot = transform.Find("projectilePivot");
+        if (enemyType == EnemyType.Mage && mageProjectilePivot == null)
+            mageProjectilePivot = transform.Find("projectilePivot");
 
         _patrolAnchor = GetEnemyReferencePosition();
         _patrolLegIndex = 0;
 
-        _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+        _nextRangedFireTime = enemyType == EnemyType.Mage
+            ? Time.time + AdjustedMageRangedFireInterval
+            : 0f;
+        _nextTypeAttackTime = Time.time;
         _lastSafeWorldPosition = GetEnemyReferencePosition();
     }
 
@@ -114,7 +123,7 @@ public class Enemy : BaseEntity
         if (_isDead || _isKnockedBack) return;
         CheckState();
         UpdateLastKnownPlayerPosition();
-        TryFireRangedProjectile();
+        ExecuteTypeAttack();
     }
 
     void FixedUpdate()
@@ -126,6 +135,8 @@ public class Enemy : BaseEntity
 
     private Vector2 GetEnemyReferencePosition()
     {
+        if (enemyType != EnemyType.Mage)
+            return transform.position;
         return _rb != null ? _rb.position : (Vector2)transform.position;
     }
 
@@ -167,7 +178,15 @@ public class Enemy : BaseEntity
 
     protected override void Move() 
     {
-        if (_isDead || _rb == null) return;
+        if (_isDead) return;
+
+        if (enemyType != EnemyType.Mage)
+        {
+            MoveMeleeTypeWithTranslate();
+            return;
+        }
+
+        if (_rb == null) return;
 
         Vector2 velocity = Vector2.zero;
         float baseSpeed = stats != null ? stats.moveSpeed : 4f;
@@ -199,10 +218,40 @@ public class Enemy : BaseEntity
         if (currentState == State.Patrol)
         {
             if (velocity.sqrMagnitude > 0.0001f)
-                transform.localScale = new Vector3(velocity.x >= 0f ? 4f : -4f, 4f, 1f);
+                FaceByHorizontal(velocity.x);
         }
         else if (player != null)
-            transform.localScale = new Vector3(player.transform.position.x > transform.position.x ? 4f : -4f, 4f, 1f);
+            FaceByHorizontal(player.transform.position.x - transform.position.x);
+    }
+
+    private void MoveMeleeTypeWithTranslate()
+    {
+        if (player == null) return;
+        if (currentState == State.Patrol) return;
+
+        if (_rb != null)
+            _rb.linearVelocity = Vector2.zero;
+
+        Vector3 toPlayer = player.transform.position - transform.position;
+        toPlayer.z = 0f;
+        if (toPlayer.sqrMagnitude < 0.0001f) return;
+
+        float speed = stats != null ? stats.moveSpeed : 4f;
+        Vector3 dir = toPlayer.normalized;
+        transform.Translate(dir * speed * Time.fixedDeltaTime, Space.World);
+        FaceByHorizontal(dir.x);
+    }
+
+    private void FaceByHorizontal(float horizontal)
+    {
+        if (Mathf.Abs(horizontal) < 0.0001f) return;
+
+        Vector3 currentScale = transform.localScale;
+        float xMagnitude = Mathf.Abs(currentScale.x);
+        if (xMagnitude < 0.0001f) xMagnitude = 1f;
+
+        currentScale.x = horizontal >= 0f ? xMagnitude : -xMagnitude;
+        transform.localScale = currentScale;
     }
 
     private bool IsNavigationBlockedAt(Vector2 worldPos)
@@ -275,22 +324,25 @@ public class Enemy : BaseEntity
 
     private Vector3 GetProjectileSpawnPosition()
     {
-        if (projectilePivot != null) return projectilePivot.position;
-        if (projectileSpawnPoint != null) return projectileSpawnPoint.position;
-        return transform.position + projectileSpawnOffset;
+        if (enemyType != EnemyType.Mage) return transform.position;
+        if (mageProjectilePivot != null) return mageProjectilePivot.position;
+        if (mageProjectileSpawnPoint != null) return mageProjectileSpawnPoint.position;
+        return transform.position + mageProjectileSpawnOffset;
     }
 
     private void CheckState()
     {
         if (player == null) return;
         float dist = Vector2.Distance(GetEnemyReferencePosition(), player.transform.position);
+        float attackDistance = attackCloseMaxDistance;
 
         if (currentState == State.Patrol)
         {
             if (dist <= detectionRange && HasLineOfSight())
             {
                 currentState = State.Chase;
-                _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+                if (enemyType == EnemyType.Mage)
+                    _nextRangedFireTime = Time.time + AdjustedMageRangedFireInterval;
             }
         }
         else if (currentState == State.Chase)
@@ -299,13 +351,15 @@ public class Enemy : BaseEntity
             {
                 currentState = State.Patrol;
                 _hasLastKnownPlayerWorld = false;
-                _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+                if (enemyType == EnemyType.Mage)
+                    _nextRangedFireTime = Time.time + AdjustedMageRangedFireInterval;
                 ResetPatrolRoute();
             }
-            else if (dist <= attackCloseMaxDistance)
+            else if (dist <= attackDistance)
             {
                 currentState = State.Attack;
-                _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+                if (enemyType == EnemyType.Mage)
+                    _nextRangedFireTime = Time.time + AdjustedMageRangedFireInterval;
             }
         }
         else if (currentState == State.Attack)
@@ -314,15 +368,68 @@ public class Enemy : BaseEntity
             {
                 currentState = State.Patrol;
                 _hasLastKnownPlayerWorld = false;
-                _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+                if (enemyType == EnemyType.Mage)
+                    _nextRangedFireTime = Time.time + AdjustedMageRangedFireInterval;
                 ResetPatrolRoute();
             }
-            else if (dist > attackCloseMaxDistance)
+            else if (dist > attackDistance)
             {
                 currentState = State.Chase;
-                _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+                if (enemyType == EnemyType.Mage)
+                    _nextRangedFireTime = Time.time + AdjustedMageRangedFireInterval;
             }
         }
+    }
+
+    private void ExecuteTypeAttack()
+    {
+        switch (enemyType)
+        {
+            case EnemyType.Mage:
+                TryMageAttack();
+                break;
+            case EnemyType.Tanky:
+                TryTankyAttack();
+                break;
+            case EnemyType.Warrior:
+                TryWarriorAttack();
+                break;
+        }
+    }
+
+    private void TryMageAttack()
+    {
+        TryFireRangedProjectile();
+    }
+
+    private void TryTankyAttack()
+    {
+        if (currentState != State.Attack || player == null) return;
+        if (Time.time < _nextTypeAttackTime) return;
+
+        float dist = Vector2.Distance(GetEnemyReferencePosition(), player.transform.position);
+        if (dist > attackCloseMaxDistance) return;
+
+        IDamageable target = player.GetComponent<IDamageable>();
+        if (target != null)
+            target.TakeDamage(stats != null ? stats.attackPower : 0f, false);
+
+        _nextTypeAttackTime = Time.time + meleeAttackInterval;
+    }
+
+    private void TryWarriorAttack()
+    {
+        if (currentState != State.Attack || player == null) return;
+        if (Time.time < _nextTypeAttackTime) return;
+
+        float dist = Vector2.Distance(GetEnemyReferencePosition(), player.transform.position);
+        if (dist > attackCloseMaxDistance) return;
+
+        IDamageable target = player.GetComponent<IDamageable>();
+        if (target != null)
+            target.TakeDamage(stats != null ? stats.attackPower : 0f, false);
+
+        _nextTypeAttackTime = Time.time + meleeAttackInterval;
     }
 
     private float GetLineOfSightMaxDistance()
@@ -377,33 +484,34 @@ public class Enemy : BaseEntity
 
     private void TryFireRangedProjectile()
     {
-        if (currentState != State.Attack || player == null || projectilePrefab == null) return;
+        if (enemyType != EnemyType.Mage) return;
+        if (currentState != State.Attack || player == null || mageProjectilePrefab == null) return;
         if (!HasLineOfSight()) return;
         if (Time.time < _nextRangedFireTime) return;
 
         Vector2 aim = _hasLastKnownPlayerWorld ? _lastKnownPlayerWorld : (Vector2)player.transform.position;
         Vector3 spawnPos = GetProjectileSpawnPosition();
 
-        if (projectilePooler == null)
-            projectilePooler = EnemyProjectilePooler.Instance;
+        if (mageProjectilePooler == null)
+            mageProjectilePooler = EnemyProjectilePooler.Instance;
 
-        GameObject proj = projectilePooler != null
-            ? projectilePooler.GetProjectile(spawnPos, Quaternion.identity)
-            : Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
+        GameObject proj = mageProjectilePooler != null
+            ? mageProjectilePooler.GetProjectile(spawnPos, Quaternion.identity)
+            : Instantiate(mageProjectilePrefab, spawnPos, Quaternion.identity);
 
         if (proj == null)
         {
-            _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+            _nextRangedFireTime = Time.time + AdjustedMageRangedFireInterval;
             return;
         }
 
         var mover = proj.GetComponent<EnemyProjectile>();
-        float dmg = projectileDamageOverride;
-        if (useAttackPowerForProjectile && stats != null) dmg = stats.attackPower;
+        float dmg = mageProjectileDamageOverride;
+        if (mageUseAttackPowerForProjectile && stats != null) dmg = stats.attackPower;
         if (mover != null)
-            mover.Initialize(aim, projectileSpeed, dmg, projectileMaxLifetime);
+            mover.Initialize(aim, mageProjectileSpeed, dmg, mageProjectileMaxLifetime);
 
-        _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+        _nextRangedFireTime = Time.time + AdjustedMageRangedFireInterval;
     }
 
     public override void TakeDamage(float amount, bool isHeavy)
@@ -507,7 +615,10 @@ public class Enemy : BaseEntity
         if (cd != null) cd.enabled = true;
         if (_rb != null) _rb.linearVelocity = Vector2.zero;
         if (stats != null) _currentHealth = stats.maxHealth;
-        _nextRangedFireTime = Time.time + AdjustedRangedFireInterval;
+        _nextRangedFireTime = enemyType == EnemyType.Mage
+            ? Time.time + AdjustedMageRangedFireInterval
+            : 0f;
+        _nextTypeAttackTime = Time.time;
         currentState = State.Patrol;
         _hasLastKnownPlayerWorld = false;
         _patrolAnchor = GetEnemyReferencePosition();

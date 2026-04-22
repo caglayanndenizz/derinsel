@@ -430,10 +430,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1592173276}
   - {fileID: 1679956770}
   - {fileID: 1730437412}
   - {fileID: 562320327}
-  - {fileID: 1592173276}
   m_Father: {fileID: 1295312150}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &286397888
@@ -3263,7 +3263,10 @@ MonoBehaviour:
   minSteps: 150
   maxSteps: 250
   player: {fileID: 1700128186}
-  enemyPrefab: {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}
+  enemyPrefabs:
+  - {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}
+  - {fileID: 4369630054169769414, guid: 6af5b04e133e80f448d9a8dd9c90f4c1, type: 3}
+  - {fileID: 9054262178047731215, guid: f63ecbfb4afa04446aa4013cbf460301, type: 3}
   exitPrefab: {fileID: 1031347285994503552, guid: e8e1f7b624480ad4bb4d5f1810e05f5a, type: 3}
   enemyPooler: {fileID: 1679956769}
   fadeAnimator: {fileID: 1342775741}
@@ -3422,7 +3425,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GoldLootPooler
   goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
-  initialPoolSize: 5
+  initialPoolSize: 100
   canExpandPool: 1
   poolParent: {fileID: 273267496}
   enemyPoolerSource: {fileID: 1679956769}
@@ -5668,7 +5671,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExperienceLootPooler
   experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
-  initialPoolSize: 5
+  initialPoolSize: 100
   canExpandPool: 1
   poolParent: {fileID: 273267496}
   enemyPoolerSource: {fileID: 1679956769}
@@ -5861,13 +5864,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6177813e4574a4e06a98fc0e9f1a2f0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyObjectPooler
-  enemyPrefab: {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}
-  initialPoolSize: 5
+  enemyPrefabs:
+  - {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}
+  - {fileID: 4369630054169769414, guid: 6af5b04e133e80f448d9a8dd9c90f4c1, type: 3}
+  - {fileID: 9054262178047731215, guid: f63ecbfb4afa04446aa4013cbf460301, type: 3}
+  initialPoolSize: 100
   canExpandPool: 1
   poolParent: {fileID: 273267496}
-  linkedGoldLootPooler: {fileID: 0}
-  linkedExperienceLootPooler: {fileID: 0}
-  linkedProjectilePooler: {fileID: 0}
+  linkedGoldLootPooler: {fileID: 562320326}
+  linkedExperienceLootPooler: {fileID: 1592173275}
+  linkedProjectilePooler: {fileID: 1730437411}
 --- !u!4 &1679956770
 Transform:
   m_ObjectHideFlags: 0
@@ -6297,7 +6303,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyProjectilePooler
   projectilePrefab: {fileID: 6304853734587583923, guid: 85829922e17f94981a185366d6919300, type: 3}
-  initialPoolSize: 5
+  initialPoolSize: 100
   canExpandPool: 1
   poolParent: {fileID: 273267496}
   enemyPoolerSource: {fileID: 1679956769}

@@ -4,6 +4,7 @@ using UnityEngine.Tilemaps;
 using System.Linq;
 using Unity.Cinemachine;
 using System.Collections;
+using UnityEngine.Serialization;
 
 public class DungeonGenerator : MonoBehaviour
 {
@@ -25,7 +26,8 @@ public class DungeonGenerator : MonoBehaviour
 
     [Header("Spawn Ayarlari")]
     public GameObject player;       
-    public GameObject enemyPrefab;  
+    [FormerlySerializedAs("enemyPrefab")]
+    public List<GameObject> enemyPrefabs = new List<GameObject>();
     public GameObject exitPrefab; 
     private int enemyCount = 10;
     public EnemyObjectPooler enemyPooler;
@@ -56,6 +58,9 @@ public class DungeonGenerator : MonoBehaviour
 
     private void OnValidate()
     {
+        if (enemyPrefabs == null)
+            enemyPrefabs = new List<GameObject>();
+
         if (enemyPooler != null)
             SyncEnemyCountWithPoolSize();
     }
@@ -69,6 +74,7 @@ public class DungeonGenerator : MonoBehaviour
         if (floorTile == null) { Debug.LogError("DungeonGenerator: floorTile atanmamis."); hasError = true; }
         if (wallTile == null) { Debug.LogError("DungeonGenerator: wallTile atanmamis."); hasError = true; }
         if (player == null) { Debug.LogError("DungeonGenerator: player referansi atanmamis."); hasError = true; }
+        if (enemyPrefabs == null || enemyPrefabs.Count == 0) { Debug.LogError("DungeonGenerator: enemyPrefabs listesi bos."); hasError = true; }
         if (exitPrefab == null) { Debug.LogError("DungeonGenerator: exitPrefab atanmamis."); hasError = true; }
         if (fadeAnimator == null) { Debug.LogError("DungeonGenerator: fadeAnimator atanmamis."); hasError = true; }
         if (vcam == null) { Debug.LogError("DungeonGenerator: vcam atanmamis."); hasError = true; }
@@ -76,14 +82,13 @@ public class DungeonGenerator : MonoBehaviour
         if (enemyPooler == null)
             enemyPooler = EnemyObjectPooler.Instance;
 
-        if (enemyPooler == null)
+        if (enemyPooler != null)
         {
-            Debug.LogError("DungeonGenerator: enemyPooler atanmamis ve sahnede EnemyObjectPooler.Instance bulunamadi.");
-            hasError = true;
+            SyncEnemyCountWithPoolSize();
         }
         else
         {
-            SyncEnemyCountWithPoolSize();
+            Debug.LogWarning("DungeonGenerator: enemyPooler bulunamadi. Enemy spawn'lari enemyPrefabs listesinden Instantiate ile yapilacak.");
         }
 
         return !hasError;
@@ -329,13 +334,8 @@ public class DungeonGenerator : MonoBehaviour
         if (enemyPooler == null)
             enemyPooler = EnemyObjectPooler.Instance;
 
-        if (enemyPooler == null)
-        {
-            Debug.LogError("DungeonGenerator: PlaceEntities cagrildi ama enemyPooler null.");
-            return;
-        }
-
-        SyncEnemyCountWithPoolSize();
+        if (enemyPooler != null)
+            SyncEnemyCountWithPoolSize();
 
         List<Vector2Int> availableFloors = floorPositions.ToList();
         player.transform.position = new Vector3(0.5f, 0.5f, 0); 
@@ -356,10 +356,13 @@ public class DungeonGenerator : MonoBehaviour
                 continue;
             }
 
-            GameObject enemy = enemyPooler.GetEnemy(new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0), Quaternion.identity);
+            Vector3 spawnWorld = new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0f);
+            GameObject enemy = enemyPooler != null
+                ? enemyPooler.GetEnemy(spawnWorld, Quaternion.identity)
+                : SpawnEnemyFromPrefabList(spawnWorld, Quaternion.identity);
             if (enemy == null)
             {
-                Debug.LogWarning("DungeonGenerator: Enemy pool bos ve genisleme kapali oldugu icin spawn atlandi.");
+                Debug.LogWarning("DungeonGenerator: Enemy spawn basarisiz (pool bos olabilir veya enemyPrefabs listesi gecersiz).");
                 break;
             }
 
@@ -386,6 +389,25 @@ public class DungeonGenerator : MonoBehaviour
         // Her 5 katta bir +0.25x artar: 1-5 => 1.00x, 6-10 => 1.25x, 11-15 => 1.50x ...
         int tier = Mathf.FloorToInt((Mathf.Max(1, floorNumber) - 1) / 5f);
         return 1f + (tier * 0.2f);
+    }
+
+    private GameObject SpawnEnemyFromPrefabList(Vector3 worldPosition, Quaternion rotation)
+    {
+        GameObject prefab = GetRandomEnemyPrefab();
+        if (prefab == null) return null;
+        return Instantiate(prefab, worldPosition, rotation);
+    }
+
+    private GameObject GetRandomEnemyPrefab()
+    {
+        if (enemyPrefabs == null || enemyPrefabs.Count == 0)
+            return null;
+
+        List<GameObject> validPrefabs = enemyPrefabs.Where(p => p != null).ToList();
+        if (validPrefabs.Count == 0)
+            return null;
+
+        return validPrefabs[Random.Range(0, validPrefabs.Count)];
     }
 
     public void MoveToNextFloor()
