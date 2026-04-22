@@ -5868,7 +5868,7 @@ MonoBehaviour:
   - {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}
   - {fileID: 4369630054169769414, guid: 6af5b04e133e80f448d9a8dd9c90f4c1, type: 3}
   - {fileID: 9054262178047731215, guid: f63ecbfb4afa04446aa4013cbf460301, type: 3}
-  initialPoolSize: 100
+  initialPoolSize: 40
   canExpandPool: 1
   poolParent: {fileID: 273267496}
   linkedGoldLootPooler: {fileID: 562320326}
@@ -6144,6 +6144,18 @@ MonoBehaviour:
   experienceCount: 0
   chargeMeter: {fileID: 1928738635}
   meterCanvas: {fileID: 132921027}
+  hitStopManager: {fileID: 0}
+  lightHitStopTimeScale: 0.06
+  lightHitStopDuration: 0.035
+  heavyHitStopTimeScale: 0.02
+  heavyHitStopDuration: 0.08
+  lightHitImpulse: {fileID: 0}
+  hitVfxPrefab: {fileID: 0}
+  hitAudioSource: {fileID: 0}
+  lightHitSfx: {fileID: 0}
+  heavyHitSfx: {fileID: 0}
+  lightHitPitch: 0.92
+  heavyHitPitch: 0.82
 --- !u!212 &1700128190
 SpriteRenderer:
   m_ObjectHideFlags: 0

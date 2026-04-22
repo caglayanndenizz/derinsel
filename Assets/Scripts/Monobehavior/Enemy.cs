@@ -518,7 +518,7 @@ public class Enemy : BaseEntity
     {
         _currentHealth -= amount;
         StartCoroutine(HitFlashRoutine());
-        float force = isHeavy ? heavyKnockbackForce : lightKnockbackForce;
+        float force = (isHeavy ? heavyKnockbackForce : lightKnockbackForce) * 0.5f;
         StartCoroutine(KnockbackRoutine(force));
         if (_currentHealth <= 0 && !_isDead) PrepareToDie();
     }

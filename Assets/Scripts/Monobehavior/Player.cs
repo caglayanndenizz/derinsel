@@ -29,9 +29,26 @@ public class Player : BaseEntity
     public Slider chargeMeter;
     public GameObject meterCanvas;
 
+    [Header("Hit Stop")]
+    public HitStopManager hitStopManager;
+    [Range(0.01f, 1f)] public float lightHitStopTimeScale = 0.14f;
+    public float lightHitStopDuration = 0.02f;
+    [Range(0.01f, 1f)] public float heavyHitStopTimeScale = 0.08f;
+    public float heavyHitStopDuration = 0.045f;
+
+    [Header("Impact Feedback")]
+    public CinemachineImpulseSource lightHitImpulse;
+    public GameObject hitVfxPrefab;
+    public AudioSource hitAudioSource;
+    public AudioClip lightHitSfx;
+    public AudioClip heavyHitSfx;
+    [Range(0.5f, 1f)] public float lightHitPitch = 0.92f;
+    [Range(0.5f, 1f)] public float heavyHitPitch = 0.82f;
+
     private float _currentCharge = 0f;
     private bool _isCharging = false;
     private Rigidbody2D _rb; // FİZİK İÇİN ŞART
+    private CinemachineImpulseSource _defaultImpulseSource;
 
     protected override void Awake()
     {
@@ -41,6 +58,10 @@ public class Player : BaseEntity
         _rb.gravityScale = 0f; // 2D Top-down olduğu için yerçekimini kapat
         _rb.freezeRotation = true; // Karakterin devrilmesini engelle
         _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // Duvar delmeyi engeller
+        _defaultImpulseSource = GetComponent<CinemachineImpulseSource>();
+
+        if (hitStopManager == null)
+            hitStopManager = HitStopManager.Instance;
     }
 
     void Update()
@@ -87,10 +108,22 @@ public class Player : BaseEntity
     {
         StartCoroutine(LightSwingRoutine());
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, lightAttackRange, enemyLayers);
+        int successfulHits = 0;
+        Vector3 firstHitPosition = attackPoint.position;
         foreach (Collider2D enemy in hitEnemies)
         {
             IDamageable target = enemy.GetComponent<IDamageable>();
-            if (target != null) target.TakeDamage(stats.lightAttackDamage, false);
+            if (target == null) continue;
+            target.TakeDamage(stats.lightAttackDamage, false);
+            if (successfulHits == 0)
+                firstHitPosition = enemy.ClosestPoint(attackPoint.position);
+            successfulHits++;
+        }
+
+        if (successfulHits > 0)
+        {
+            SpawnHitVfx(firstHitPosition);
+            PlayImpactFeedback(false);
         }
     }
 
@@ -126,17 +159,78 @@ public class Player : BaseEntity
 
     private void HammerSlam()
     {
-        CinemachineImpulseSource source = GetComponent<CinemachineImpulseSource>();
+        CinemachineImpulseSource source = _defaultImpulseSource;
         if (source != null) source.GenerateImpulse(); 
         
         if (generator != null) generator.BreakWallsInArea(attackPoint.position, hammerAOE);
 
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
+        int successfulHits = 0;
+        Vector3 firstHitPosition = attackPoint.position;
         foreach (Collider2D enemy in hitEnemies)
         {
             IDamageable target = enemy.GetComponent<IDamageable>();
-            if (target != null) target.TakeDamage(stats.heavyAttackDamage, true);
+            if (target == null) continue;
+            target.TakeDamage(stats.heavyAttackDamage, true);
+            if (successfulHits == 0)
+                firstHitPosition = enemy.ClosestPoint(attackPoint.position);
+            successfulHits++;
         }
+
+        if (successfulHits > 0)
+        {
+            SpawnHitVfx(firstHitPosition);
+            PlayImpactFeedback(true);
+        }
+    }
+
+    private void PlayImpactFeedback(bool isHeavy)
+    {
+        if (hitStopManager == null)
+            hitStopManager = HitStopManager.Instance != null
+                ? HitStopManager.Instance
+                : Object.FindAnyObjectByType<HitStopManager>();
+
+        if (hitStopManager == null)
+        {
+            GameObject managerObject = new GameObject("HitStopManager");
+            hitStopManager = managerObject.AddComponent<HitStopManager>();
+        }
+
+        if (hitStopManager != null)
+        {
+            float timeScale = isHeavy ? heavyHitStopTimeScale : lightHitStopTimeScale;
+            float duration = isHeavy ? heavyHitStopDuration : lightHitStopDuration;
+            hitStopManager.TriggerHitStop(timeScale, duration);
+        }
+
+        if (!isHeavy)
+        {
+            CinemachineImpulseSource lightImpulseSource = lightHitImpulse != null ? lightHitImpulse : _defaultImpulseSource;
+            if (lightImpulseSource != null)
+                lightImpulseSource.GenerateImpulse();
+        }
+
+        PlayHitSfx(isHeavy);
+    }
+
+    private void PlayHitSfx(bool isHeavy)
+    {
+        if (hitAudioSource == null) return;
+
+        AudioClip clip = isHeavy ? heavyHitSfx : lightHitSfx;
+        if (clip == null) return;
+
+        float previousPitch = hitAudioSource.pitch;
+        hitAudioSource.pitch = isHeavy ? heavyHitPitch : lightHitPitch;
+        hitAudioSource.PlayOneShot(clip);
+        hitAudioSource.pitch = previousPitch;
+    }
+
+    private void SpawnHitVfx(Vector3 worldPos)
+    {
+        if (hitVfxPrefab == null) return;
+        Instantiate(hitVfxPrefab, worldPos, Quaternion.identity);
     }
 
     private void ResetCharge()
