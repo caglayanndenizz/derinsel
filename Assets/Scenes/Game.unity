@@ -3425,7 +3425,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GoldLootPooler
   goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
-  initialPoolSize: 100
+  initialPoolSize: 40
   canExpandPool: 1
   poolParent: {fileID: 273267496}
   enemyPoolerSource: {fileID: 1679956769}
@@ -5671,7 +5671,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExperienceLootPooler
   experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
-  initialPoolSize: 100
+  initialPoolSize: 40
   canExpandPool: 1
   poolParent: {fileID: 273267496}
   enemyPoolerSource: {fileID: 1679956769}
@@ -6135,6 +6135,7 @@ MonoBehaviour:
   lightAttackRate: 0.2
   lightAttackRange: 1.5
   lightAttackDuration: 0.1
+  dungeonEntryBaseSpeedMultiplier: 1.25
   hammerPivot: {fileID: 405214496}
   attackPoint: {fileID: 473991612}
   enemyLayers:
@@ -6315,7 +6316,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyProjectilePooler
   projectilePrefab: {fileID: 6304853734587583923, guid: 85829922e17f94981a185366d6919300, type: 3}
-  initialPoolSize: 100
+  initialPoolSize: 40
   canExpandPool: 1
   poolParent: {fileID: 273267496}
   enemyPoolerSource: {fileID: 1679956769}
