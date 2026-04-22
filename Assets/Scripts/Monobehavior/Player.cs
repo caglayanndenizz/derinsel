@@ -18,6 +18,9 @@ public class Player : BaseEntity
     public float lightAttackDuration = 0.1f; 
     private float _nextAttackTime = 0f;
 
+    [Header("Movement Modifiers")]
+    [SerializeField] private float dungeonEntryBaseSpeedMultiplier = 1.25f;
+
     [Header("References")]
     public Transform hammerPivot;
     public Transform attackPoint;
@@ -49,6 +52,8 @@ public class Player : BaseEntity
     private bool _isCharging = false;
     private Rigidbody2D _rb; // FİZİK İÇİN ŞART
     private CinemachineImpulseSource _defaultImpulseSource;
+    private float _baseSpeedMultiplier = 1f;
+    private bool _hasAppliedDungeonEntryBoost = false;
 
     protected override void Awake()
     {
@@ -83,8 +88,9 @@ public class Player : BaseEntity
 
         Vector2 direction = new Vector2(moveX, moveY).normalized;
         
-        // Şarj olurken yavaşla, normalde tam hız git
-        float currentSpeed = _isCharging ? stats.moveSpeed * 0.3f : stats.moveSpeed;
+        // Tüm hız modifiyerleri dungeon girişindeki baz çarpanın üstüne uygulanır.
+        float chargeMultiplier = _isCharging ? 0.3f : 1f;
+        float currentSpeed = stats.moveSpeed * _baseSpeedMultiplier * chargeMultiplier;
         
         // KRİTİK DÜZELTME: transform.Translate SİLİNDİ, Rigidbody Velocity GELDİ!
         _rb.linearVelocity = direction * currentSpeed;
@@ -92,6 +98,13 @@ public class Player : BaseEntity
         // --- FLIP MANTIĞI ---
         if (moveX > 0) transform.localScale = new Vector3(1f, 1f, 1f);
         else if (moveX < 0) transform.localScale = new Vector3(-1f, 1f, 1f);
+    }
+
+    public void ApplyDungeonEntrySpeedBoost()
+    {
+        if (_hasAppliedDungeonEntryBoost) return;
+        _baseSpeedMultiplier *= Mathf.Max(1f, dungeonEntryBaseSpeedMultiplier);
+        _hasAppliedDungeonEntryBoost = true;
     }
 
     private void HandleLightAttack()
@@ -199,8 +212,14 @@ public class Player : BaseEntity
 
         if (hitStopManager != null)
         {
-            float timeScale = isHeavy ? heavyHitStopTimeScale : lightHitStopTimeScale;
-            float duration = isHeavy ? heavyHitStopDuration : lightHitStopDuration;
+            float rawTimeScale = isHeavy ? heavyHitStopTimeScale : lightHitStopTimeScale;
+            float rawDuration = isHeavy ? heavyHitStopDuration : lightHitStopDuration;
+
+            // Inspector'da agresif değer kalsa bile hissi "kasma"ya çevirmemek için güvenli aralık.
+            float minimumSmoothScale = isHeavy ? 0.08f : 0.14f;
+            float maximumSmoothDuration = isHeavy ? 0.045f : 0.02f;
+            float timeScale = Mathf.Clamp(rawTimeScale, minimumSmoothScale, 1f);
+            float duration = Mathf.Clamp(rawDuration, 0f, maximumSmoothDuration);
             hitStopManager.TriggerHitStop(timeScale, duration);
         }
 

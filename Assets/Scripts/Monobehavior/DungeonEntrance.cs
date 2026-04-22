@@ -43,6 +43,10 @@ public class DungeonEntrance : MonoBehaviour
             // 2. Zindanı oluştur
             generator.GenerateDungeon(); 
 
+            Player player = Object.FindAnyObjectByType<Player>();
+            if (player != null)
+                player.ApplyDungeonEntrySpeedBoost();
+
             // 3. Giriş Sprite'ını (bu objeyi) devre dışı bırak
             // Artık zindanın içindesin, kapı görünmez olacak.
             gameObject.SetActive(false); 
