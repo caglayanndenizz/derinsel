@@ -94,7 +94,7 @@ public class Enemy : BaseEntity
         _rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        _generator = Object.FindAnyObjectByType<DungeonGenerator>(); // Unity 6 için güncel arama
+        _generator = UnityEngine.Object.FindAnyObjectByType<DungeonGenerator>(); // Unity 6 için güncel arama
         if (goldPooler == null) goldPooler = GoldLootPooler.Instance;
         if (experiencePooler == null) experiencePooler = ExperienceLootPooler.Instance;
         
@@ -511,8 +511,18 @@ public class Enemy : BaseEntity
         if (mageProjectilePooler == null)
             mageProjectilePooler = EnemyProjectilePooler.Instance;
 
+        float dmg = mageProjectileDamageOverride;
+        if (mageUseAttackPowerForProjectile && stats != null)
+            dmg = stats.attackPower;
+        if (dmg <= 0f)
+            dmg = Mathf.Max(0.0001f, mageProjectileDamageOverride);
+
         GameObject proj = mageProjectilePooler != null
-            ? mageProjectilePooler.GetProjectile(spawnPos, Quaternion.identity)
+            ? mageProjectilePooler.GetProjectile(spawnPos, Quaternion.identity, mover =>
+            {
+                if (mover != null)
+                    mover.Initialize(aim, mageProjectileSpeed, dmg, mageProjectileMaxLifetime);
+            })
             : Instantiate(mageProjectilePrefab, spawnPos, Quaternion.identity);
 
         if (proj == null)
@@ -521,11 +531,12 @@ public class Enemy : BaseEntity
             return;
         }
 
-        var mover = proj.GetComponent<EnemyProjectile>();
-        float dmg = mageProjectileDamageOverride;
-        if (mageUseAttackPowerForProjectile && stats != null) dmg = stats.attackPower;
-        if (mover != null)
-            mover.Initialize(aim, mageProjectileSpeed, dmg, mageProjectileMaxLifetime);
+        if (mageProjectilePooler == null)
+        {
+            var mover = proj.GetComponent<EnemyProjectile>();
+            if (mover != null)
+                mover.Initialize(aim, mageProjectileSpeed, dmg, mageProjectileMaxLifetime);
+        }
 
         _nextRangedFireTime = Time.time + AdjustedMageRangedFireInterval;
     }
@@ -546,7 +557,7 @@ public class Enemy : BaseEntity
         if (experiencePooler == null) experiencePooler = ExperienceLootPooler.Instance;
         Vector2 deathPosition = GetEnemyReferencePosition();
 
-        if (Random.value <= goldDropChance)
+        if (UnityEngine.Random.value <= goldDropChance)
         {
             Vector2 goldSpawnPosition = GetValidGoldSpawnPosition(deathPosition);
             if (goldPooler != null)

@@ -92,16 +92,19 @@ public class EnemyProjectile : MonoBehaviour
     void OnEnable()
     {
         if (_pooler == null) _pooler = EnemyProjectilePooler.Instance;
+        // Kritik: _damage / _initialized burada sifirlanmamali — SetActive(true) sonrasi
+        // fizik ayni karede OnTriggerEnter2D calisabilir; Initialize() bundan sonra gelirse hasar 0 gider.
+        transform.rotation = Quaternion.identity;
+        ConfigureNoPushThroughPlayer();
+    }
 
+    void OnDisable()
+    {
         _initialized = false;
         _speed = 0f;
         _damage = 0f;
         _direction = Vector2.zero;
         _maxLifetime = defaultMaxLifetime;
-        _spawnTime = Time.time;
-
-        transform.rotation = Quaternion.identity;
-        ConfigureNoPushThroughPlayer();
     }
 
     private void ReturnToPool()

@@ -1,0 +1,1339 @@
+fileFormatVersion: 2
+guid: cf2a0874d53717747889c57a26521c37
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -219742340364353706
+    second: player sprite sheet no weapon_0
+  - first:
+      213: 5216520359188573729
+    second: player sprite sheet no weapon_1
+  - first:
+      213: -7974806488749057664
+    second: player sprite sheet no weapon_2
+  - first:
+      213: -3818443126556344009
+    second: player sprite sheet no weapon_3
+  - first:
+      213: -6485931361634086615
+    second: player sprite sheet no weapon_4
+  - first:
+      213: 8253894077081017084
+    second: player sprite sheet no weapon_5
+  - first:
+      213: -656054452353148743
+    second: player sprite sheet no weapon_6
+  - first:
+      213: 1304013240915417539
+    second: player sprite sheet no weapon_7
+  - first:
+      213: 2997601674440376021
+    second: player sprite sheet no weapon_8
+  - first:
+      213: -1558427353753393572
+    second: player sprite sheet no weapon_9
+  - first:
+      213: 6952166606788095041
+    second: player sprite sheet no weapon_10
+  - first:
+      213: 2652239497035737046
+    second: player sprite sheet no weapon_11
+  - first:
+      213: -642546846891374648
+    second: player sprite sheet no weapon_12
+  - first:
+      213: -5366744726369167734
+    second: player sprite sheet no weapon_13
+  - first:
+      213: -7085974062308749027
+    second: player sprite sheet no weapon_14
+  - first:
+      213: 9160832908615323429
+    second: player sprite sheet no weapon_15
+  - first:
+      213: 8814038114571564669
+    second: player sprite sheet no weapon_16
+  - first:
+      213: -5442884087821797652
+    second: player sprite sheet no weapon_17
+  - first:
+      213: -3824140171908213479
+    second: player sprite sheet no weapon_18
+  - first:
+      213: -5396856500237641386
+    second: player sprite sheet no weapon_19
+  - first:
+      213: -4696159964381122956
+    second: player sprite sheet no weapon_20
+  - first:
+      213: 1176395895101832570
+    second: player sprite sheet no weapon_21
+  - first:
+      213: -8803866978164011160
+    second: player sprite sheet no weapon_22
+  - first:
+      213: -2863205335683028003
+    second: player sprite sheet no weapon_23
+  - first:
+      213: -183645602800092716
+    second: player sprite sheet no weapon_24
+  - first:
+      213: 5457236055089401432
+    second: player sprite sheet no weapon_25
+  - first:
+      213: 7047914077286211846
+    second: player sprite sheet no weapon_26
+  - first:
+      213: -1469421117746400316
+    second: player sprite sheet no weapon_27
+  - first:
+      213: 4781987433214514026
+    second: player sprite sheet no weapon_28
+  - first:
+      213: -3012579139709444375
+    second: player sprite sheet no weapon_29
+  - first:
+      213: -2381946195468019369
+    second: player sprite sheet no weapon_30
+  - first:
+      213: -7397771008314803910
+    second: player sprite sheet no weapon_31
+  - first:
+      213: -5070902423433993856
+    second: player sprite sheet no weapon_32
+  - first:
+      213: -4147134468959690764
+    second: player sprite sheet no weapon_33
+  - first:
+      213: 3686103371806449457
+    second: player sprite sheet no weapon_34
+  - first:
+      213: 2058790032258901555
+    second: player sprite sheet no weapon_35
+  - first:
+      213: -3680183840607698900
+    second: player sprite sheet no weapon_36
+  - first:
+      213: 1516288789923680162
+    second: player sprite sheet no weapon_37
+  - first:
+      213: 4679272074765467986
+    second: player sprite sheet no weapon_38
+  - first:
+      213: 6929328047351480177
+    second: player sprite sheet no weapon_39
+  - first:
+      213: 7705170152282586760
+    second: player sprite sheet no weapon_40
+  - first:
+      213: 7471985950513629711
+    second: player sprite sheet no weapon_41
+  - first:
+      213: 5913000602583668583
+    second: player sprite sheet no weapon_42
+  - first:
+      213: 7231340499938622314
+    second: player sprite sheet no weapon_43
+  - first:
+      213: -2348944349778490922
+    second: player sprite sheet no weapon_44
+  - first:
+      213: 4367903234255634693
+    second: player sprite sheet no weapon_45
+  - first:
+      213: -8779918314499241592
+    second: player sprite sheet no weapon_46
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_0
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 839
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65f3874718153fcf0800000000000000
+      internalID: -219742340364353706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_1
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 839
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12e270dd0adc46840800000000000000
+      internalID: 5216520359188573729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_2
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 775
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 089d1a530cbc35190800000000000000
+      internalID: -7974806488749057664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_3
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 775
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 731c396153a220bc0800000000000000
+      internalID: -3818443126556344009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_4
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 711
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9211c306ac75df5a0800000000000000
+      internalID: -6485931361634086615
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_5
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 711
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cfa5d1e9ee8bb8270800000000000000
+      internalID: 8253894077081017084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_6
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 711
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b85d2693f935e6f0800000000000000
+      internalID: -656054452353148743
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_7
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 711
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c95b273229c81210800000000000000
+      internalID: 1304013240915417539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_8
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 647
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5de722747de999920800000000000000
+      internalID: 2997601674440376021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_9
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 647
+        width: 18
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c56e643249a5f5ae0800000000000000
+      internalID: -1558427353753393572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_10
+      rect:
+        serializedVersion: 2
+        x: 156
+        y: 647
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14cefe8d1be0b7060800000000000000
+      internalID: 6952166606788095041
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_11
+      rect:
+        serializedVersion: 2
+        x: 219
+        y: 647
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d7631835c5aec420800000000000000
+      internalID: 2652239497035737046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_12
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 583
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c70e7f0c073517f0800000000000000
+      internalID: -642546846891374648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_13
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 583
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8690980b1e7585b0800000000000000
+      internalID: -5366744726369167734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_14
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 519
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d119478222099ad90800000000000000
+      internalID: -7085974062308749027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_15
+      rect:
+        serializedVersion: 2
+        x: 87
+        y: 519
+        width: 18
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52f89b48ef0d12f70800000000000000
+      internalID: 9160832908615323429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_16
+      rect:
+        serializedVersion: 2
+        x: 151
+        y: 519
+        width: 18
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d76bac767f0c15a70800000000000000
+      internalID: 8814038114571564669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_17
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 455
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce671cf72cdf674b0800000000000000
+      internalID: -5442884087821797652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_18
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 455
+        width: 15
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9151c1a56ccedeac0800000000000000
+      internalID: -3824140171908213479
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_19
+      rect:
+        serializedVersion: 2
+        x: 153
+        y: 455
+        width: 17
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 659d3975b938a15b0800000000000000
+      internalID: -5396856500237641386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_20
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 391
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47ee6aac463e3deb0800000000000000
+      internalID: -4696159964381122956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_21
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 391
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7db5c275d5635010800000000000000
+      internalID: 1176395895101832570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_22
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 391
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86f0eb4d0a162d580800000000000000
+      internalID: -8803866978164011160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_23
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 327
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ddb2c97cae9d348d0800000000000000
+      internalID: -2863205335683028003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_24
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 327
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d9b9881c4f837df0800000000000000
+      internalID: -183645602800092716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_25
+      rect:
+        serializedVersion: 2
+        x: 153
+        y: 327
+        width: 15
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85ece07474ffbbb40800000000000000
+      internalID: 5457236055089401432
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_26
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 327
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 601ae1803883fc160800000000000000
+      internalID: 7047914077286211846
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_27
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 263
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c3b44b57419b9be0800000000000000
+      internalID: -1469421117746400316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_28
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 263
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6312250c380d5240800000000000000
+      internalID: 4781987433214514026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_29
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 263
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9eeddd7db3b2136d0800000000000000
+      internalID: -3012579139709444375
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_30
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 263
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75919092e80a1fed0800000000000000
+      internalID: -2381946195468019369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_31
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 199
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3976b78676d55990800000000000000
+      internalID: -7397771008314803910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_32
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 199
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 081ac88dc1980a9b0800000000000000
+      internalID: -5070902423433993856
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_33
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 135
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ff11e54c2b6276c0800000000000000
+      internalID: -4147134468959690764
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_34
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 135
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 13f94e1ac7ba72330800000000000000
+      internalID: 3686103371806449457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_35
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 71
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 33628eb50aa429c10800000000000000
+      internalID: 2058790032258901555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_36
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 71
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c200270ab4c5decc0800000000000000
+      internalID: -3680183840607698900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_37
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 71
+        width: 18
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2afce4cee90fa0510800000000000000
+      internalID: 1516288789923680162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_38
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 7
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2510dcff82d10f040800000000000000
+      internalID: 4679272074765467986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_39
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 7
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 17f398a552be92060800000000000000
+      internalID: 6929328047351480177
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_40
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 9
+        width: 20
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88efeb40e634eea60800000000000000
+      internalID: 7705170152282586760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_41
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 12
+        width: 22
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0a031b32a3d1b760800000000000000
+      internalID: 7471985950513629711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_42
+      rect:
+        serializedVersion: 2
+        x: 285
+        y: 7
+        width: 18
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7679ba938b23f0250800000000000000
+      internalID: 5913000602583668583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_43
+      rect:
+        serializedVersion: 2
+        x: 347
+        y: 7
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6bbcb41fd1ea5460800000000000000
+      internalID: 7231340499938622314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_44
+      rect:
+        serializedVersion: 2
+        x: 409
+        y: 7
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d9ca422f8fd66fd0800000000000000
+      internalID: -2348944349778490922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_45
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 7
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 501461379d8ed9c30800000000000000
+      internalID: 4367903234255634693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player sprite sheet no weapon_46
+      rect:
+        serializedVersion: 2
+        x: 535
+        y: 7
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 889835b9fc6772680800000000000000
+      internalID: -8779918314499241592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      player sprite sheet no weapon_0: -219742340364353706
+      player sprite sheet no weapon_1: 5216520359188573729
+      player sprite sheet no weapon_10: 6952166606788095041
+      player sprite sheet no weapon_11: 2652239497035737046
+      player sprite sheet no weapon_12: -642546846891374648
+      player sprite sheet no weapon_13: -5366744726369167734
+      player sprite sheet no weapon_14: -7085974062308749027
+      player sprite sheet no weapon_15: 9160832908615323429
+      player sprite sheet no weapon_16: 8814038114571564669
+      player sprite sheet no weapon_17: -5442884087821797652
+      player sprite sheet no weapon_18: -3824140171908213479
+      player sprite sheet no weapon_19: -5396856500237641386
+      player sprite sheet no weapon_2: -7974806488749057664
+      player sprite sheet no weapon_20: -4696159964381122956
+      player sprite sheet no weapon_21: 1176395895101832570
+      player sprite sheet no weapon_22: -8803866978164011160
+      player sprite sheet no weapon_23: -2863205335683028003
+      player sprite sheet no weapon_24: -183645602800092716
+      player sprite sheet no weapon_25: 5457236055089401432
+      player sprite sheet no weapon_26: 7047914077286211846
+      player sprite sheet no weapon_27: -1469421117746400316
+      player sprite sheet no weapon_28: 4781987433214514026
+      player sprite sheet no weapon_29: -3012579139709444375
+      player sprite sheet no weapon_3: -3818443126556344009
+      player sprite sheet no weapon_30: -2381946195468019369
+      player sprite sheet no weapon_31: -7397771008314803910
+      player sprite sheet no weapon_32: -5070902423433993856
+      player sprite sheet no weapon_33: -4147134468959690764
+      player sprite sheet no weapon_34: 3686103371806449457
+      player sprite sheet no weapon_35: 2058790032258901555
+      player sprite sheet no weapon_36: -3680183840607698900
+      player sprite sheet no weapon_37: 1516288789923680162
+      player sprite sheet no weapon_38: 4679272074765467986
+      player sprite sheet no weapon_39: 6929328047351480177
+      player sprite sheet no weapon_4: -6485931361634086615
+      player sprite sheet no weapon_40: 7705170152282586760
+      player sprite sheet no weapon_41: 7471985950513629711
+      player sprite sheet no weapon_42: 5913000602583668583
+      player sprite sheet no weapon_43: 7231340499938622314
+      player sprite sheet no weapon_44: -2348944349778490922
+      player sprite sheet no weapon_45: 4367903234255634693
+      player sprite sheet no weapon_46: -8779918314499241592
+      player sprite sheet no weapon_5: 8253894077081017084
+      player sprite sheet no weapon_6: -656054452353148743
+      player sprite sheet no weapon_7: 1304013240915417539
+      player sprite sheet no weapon_8: 2997601674440376021
+      player sprite sheet no weapon_9: -1558427353753393572
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -66,16 +67,23 @@ public class EnemyProjectilePooler : MonoBehaviour
         }
     }
 
+    private Transform GetProjectileHierarchyParent()
+    {
+        // poolParent atanmadiysa prefab/pooler dusman altinda olmasin: sahne kokune al.
+        return poolParent != null ? poolParent : null;
+    }
+
     private GameObject CreateNewProjectile()
     {
-        Transform parent = poolParent != null ? poolParent : transform;
-        GameObject projectile = Instantiate(projectilePrefab, parent);
+        GameObject projectile = Instantiate(projectilePrefab);
+        projectile.transform.SetParent(GetProjectileHierarchyParent(), false);
         projectile.SetActive(false);
         _trackedProjectiles.Add(projectile);
         return projectile;
     }
 
-    public GameObject GetProjectile(Vector3 worldPosition, Quaternion rotation)
+    /// <param name="configureBeforeActivate">Aktif etmeden once (hasar/hiz) — boylece OnTriggerEnter2D Initialize'dan once 0 hasarla calismaz.</param>
+    public GameObject GetProjectile(Vector3 worldPosition, Quaternion rotation, Action<EnemyProjectile> configureBeforeActivate = null)
     {
         if (_availableProjectiles.Count == 0)
         {
@@ -91,7 +99,11 @@ public class EnemyProjectilePooler : MonoBehaviour
 
         GameObject projectile = _availableProjectiles.Dequeue();
         _queuedProjectiles.Remove(projectile);
+        projectile.transform.SetParent(GetProjectileHierarchyParent(), false);
         projectile.transform.SetPositionAndRotation(worldPosition, rotation);
+
+        configureBeforeActivate?.Invoke(projectile.GetComponent<EnemyProjectile>());
+
         projectile.SetActive(true);
         return projectile;
     }
@@ -104,7 +116,7 @@ public class EnemyProjectilePooler : MonoBehaviour
             _trackedProjectiles.Add(projectile);
 
         projectile.SetActive(false);
-        projectile.transform.SetParent(poolParent != null ? poolParent : transform);
+        projectile.transform.SetParent(GetProjectileHierarchyParent(), false);
 
         if (_queuedProjectiles.Add(projectile))
             _availableProjectiles.Enqueue(projectile);

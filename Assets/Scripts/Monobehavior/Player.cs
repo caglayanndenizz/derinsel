@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 using System.Collections;
 using System;
 using Unity.Cinemachine;
@@ -13,22 +14,34 @@ public class Player : BaseEntity
     public float maxChargeTime = 0.5f;
     public float hammerAOE = 2.5f;
     public float hammerCooldown = 3f;
+    [Tooltip("Sağ tık şarj çubuğu tam dolu (charge slider = 1) iken gelen hasardan düşürülecek oran. 0 = azaltma yok, 0.85 = %85 azaltma (cana gelen ≈ %15).")]
+    [Range(0f, 1f)]
+    [FormerlySerializedAs("chargeFullDamageReduction")]
+    public float heavyChargeFullDamageReduction = 0.85f;
+    [SerializeField] private float heavyImpactFallbackDelay = 0.2f;
 
     [Header("Light Attack Settings (Spammable)")]
     public float lightAttackRate = 0.2f; 
     public float lightAttackRange = 1.5f; 
     public float lightAttackDuration = 0.1f; 
+    [SerializeField] private float lightImpactFallbackDelay = 0.08f;
     private float _nextAttackTime = 0f;
+    private float _lastLightAttackResolveTime = -999f;
+    private bool _lightAttackInProgress = false;
+    private float _lightFallbackExecuteAt = -1f;
+    private float _lastHeavyResolveTime = -999f;
+    private bool _heavyAttackInProgress = false;
+    private float _heavyFallbackExecuteAt = -1f;
 
     [Header("Movement Modifiers")]
     [SerializeField] private float dungeonEntryBaseSpeedMultiplier = 1.25f;
     [Header("Damage")]
     [SerializeField] private float damageInvulnerabilityDuration = 0.2f;
-    [SerializeField, Range(0f, 1f)] private float chargeDamageMultiplier = 0.05f;
 
     [Header("References")]
     public Transform hammerPivot;
     public Transform attackPoint;
+    [SerializeField] private Animator animator;
     public LayerMask enemyLayers;
     [SerializeField] private float goldCount;
     [SerializeField] private float experienceCount;
@@ -68,6 +81,10 @@ public class Player : BaseEntity
     private float _baseSpeedMultiplier = 1f;
     private bool _hasAppliedDungeonEntryBoost = false;
     private float _invulnerableUntil = 0f;
+    private static readonly int SpeedHash = Animator.StringToHash("Speed");
+    private static readonly int IsChargingHash = Animator.StringToHash("IsCharging");
+    private static readonly int LightAttackHash = Animator.StringToHash("LightAttack");
+    private static readonly int HeavyAttackHash = Animator.StringToHash("HeavyAttack");
 
     public event Action<float, float> HealthChanged;
     public event Action<float, float> ExperienceChanged;
@@ -87,6 +104,8 @@ public class Player : BaseEntity
         _rb.freezeRotation = true; // Karakterin devrilmesini engelle
         _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // Duvar delmeyi engeller
         _defaultImpulseSource = GetComponent<CinemachineImpulseSource>();
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>();
 
         if (hitStopManager == null)
             hitStopManager = HitStopManager.Instance;
@@ -102,6 +121,8 @@ public class Player : BaseEntity
     {
         HandleHammerCharge(); // Sağ Tık
         HandleLightAttack();  // Sol Tık
+        HandleLightImpactFallback();
+        HandleHeavyImpactFallback();
         UpdateHammerCooldownUI();
     }
 
@@ -115,8 +136,8 @@ public class Player : BaseEntity
     {
         if (Time.time < _invulnerableUntil) return;
 
-        if (_isCharging)
-            amount *= Mathf.Clamp01(chargeDamageMultiplier);
+        if (IsChargeMeterFullWhileCharging())
+            amount *= Mathf.Clamp01(1f - heavyChargeFullDamageReduction);
 
         base.TakeDamage(amount, isHeavy);
         NotifyHealthChanged();
@@ -187,6 +208,8 @@ public class Player : BaseEntity
         
         // KRİTİK DÜZELTME: transform.Translate SİLİNDİ, Rigidbody Velocity GELDİ!
         _rb.linearVelocity = direction * currentSpeed;
+        if (animator != null)
+            animator.SetFloat(SpeedHash, direction.magnitude);
 
         // --- FLIP MANTIĞI ---
         if (moveX > 0) transform.localScale = new Vector3(1f, 1f, 1f);
@@ -200,25 +223,46 @@ public class Player : BaseEntity
         _hasAppliedDungeonEntryBoost = true;
     }
 
+    private bool IsChargeMeterFullWhileCharging()
+    {
+        if (!_isCharging) return false;
+        if (chargeMeter != null)
+            return chargeMeter.value >= 1f - 0.0001f;
+        return _currentCharge >= maxChargeTime - 0.0001f;
+    }
+
     private void HandleLightAttack()
     {
         if (_isCharging) return;
         if (Input.GetButtonDown("Fire1") && Time.time >= _nextAttackTime)
         {
-            LightAttack();
+            if (animator != null)
+                animator.SetTrigger(LightAttackHash);
+            _lightAttackInProgress = true;
+            _lightFallbackExecuteAt = Time.time + Mathf.Max(0.03f, lightImpactFallbackDelay);
             _nextAttackTime = Time.time + lightAttackRate;
         }
     }
 
-    private void LightAttack()
+    // Animation Event: LightAttack clip'inde hasar anına eklenmeli.
+    public void LightAttack()
     {
-        StartCoroutine(LightSwingRoutine());
+        ResolveLightAttackDamage();
+    }
+
+    private void ResolveLightAttackDamage()
+    {
+        if (Time.time - _lastLightAttackResolveTime < Mathf.Max(0.01f, lightAttackDuration * 0.5f))
+            return;
+        _lastLightAttackResolveTime = Time.time;
+        _lightAttackInProgress = false;
+        _lightFallbackExecuteAt = -1f;
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, lightAttackRange, enemyLayers);
         int successfulHits = 0;
         Vector3 firstHitPosition = attackPoint.position;
         foreach (Collider2D enemy in hitEnemies)
         {
-            IDamageable target = enemy.GetComponent<IDamageable>();
+            IDamageable target = enemy.GetComponent<IDamageable>() ?? enemy.GetComponentInParent<IDamageable>();
             if (target == null) continue;
             target.TakeDamage(stats.lightAttackDamage, false);
             if (successfulHits == 0)
@@ -233,13 +277,6 @@ public class Player : BaseEntity
         }
     }
 
-    private IEnumerator LightSwingRoutine()
-    {
-        hammerPivot.localRotation = Quaternion.Euler(0, 0, -45f);
-        yield return new WaitForSeconds(lightAttackDuration);
-        hammerPivot.localRotation = Quaternion.identity;
-    }
-
     private void HandleHammerCharge()
     {
         if (Time.time < _nextHammerUseTime)
@@ -251,34 +288,48 @@ public class Player : BaseEntity
         if (Input.GetButton("Fire2"))
         {
             _isCharging = true;
+            if (animator != null)
+                animator.SetBool(IsChargingHash, true);
             if (meterCanvas != null)
                 meterCanvas.SetActive(true);
             _currentCharge += Time.deltaTime;
             _currentCharge = Mathf.Clamp(_currentCharge, 0f, maxChargeTime);
             if (chargeMeter != null)
                 chargeMeter.value = _currentCharge / Mathf.Max(0.0001f, maxChargeTime);
-            hammerPivot.localRotation = Quaternion.Euler(0, 0, (_currentCharge / maxChargeTime) * 90f);
         }
 
         if (Input.GetButtonUp("Fire2"))
         {
             if (_currentCharge >= maxChargeTime)
             {
-                hammerPivot.localRotation = Quaternion.identity;
-                HammerSlam(); 
+                TriggerHeavyAttack();
             }
             ResetCharge();
         }
     }
 
-    private void HammerSlam()
+    private void TriggerHeavyAttack()
     {
         _nextHammerUseTime = Time.time + hammerCooldown;
         UpdateHammerCooldownUI();
+        if (animator != null)
+            animator.SetTrigger(HeavyAttackHash);
+        _heavyAttackInProgress = true;
+        _heavyFallbackExecuteAt = Time.time + Mathf.Max(0.05f, heavyImpactFallbackDelay);
+    }
+
+    // Animation Event: HeavyAttack clip'inde darbe anına eklenmeli.
+    public void HammerSlam()
+    {
+        if (Time.time - _lastHeavyResolveTime < 0.05f)
+            return;
+
+        _lastHeavyResolveTime = Time.time;
+        _heavyAttackInProgress = false;
+        _heavyFallbackExecuteAt = -1f;
 
         CinemachineImpulseSource source = _defaultImpulseSource;
-        if (source != null) source.GenerateImpulse(); 
-        
+        if (source != null) source.GenerateImpulse();
         if (generator != null) generator.BreakWallsInArea(attackPoint.position, hammerAOE);
 
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
@@ -286,9 +337,9 @@ public class Player : BaseEntity
         Vector3 firstHitPosition = attackPoint.position;
         foreach (Collider2D enemy in hitEnemies)
         {
-            IDamageable target = enemy.GetComponent<IDamageable>();
+            IDamageable target = enemy.GetComponent<IDamageable>() ?? enemy.GetComponentInParent<IDamageable>();
             if (target == null) continue;
-            BaseEntity targetEntity = enemy.GetComponent<BaseEntity>();
+            BaseEntity targetEntity = enemy.GetComponent<BaseEntity>() ?? enemy.GetComponentInParent<BaseEntity>();
             float heavyDamage = targetEntity != null ? targetEntity.CurrentHealth : stats.heavyAttackDamage;
             target.TakeDamage(heavyDamage, true);
             if (successfulHits == 0)
@@ -301,6 +352,20 @@ public class Player : BaseEntity
             SpawnHitVfx(firstHitPosition);
             PlayImpactFeedback(true);
         }
+    }
+
+    private void HandleHeavyImpactFallback()
+    {
+        if (!_heavyAttackInProgress) return;
+        if (Time.time < _heavyFallbackExecuteAt) return;
+        HammerSlam();
+    }
+
+    private void HandleLightImpactFallback()
+    {
+        if (!_lightAttackInProgress) return;
+        if (Time.time < _lightFallbackExecuteAt) return;
+        ResolveLightAttackDamage();
     }
 
     private void PlayImpactFeedback(bool isHeavy)
@@ -366,7 +431,8 @@ public class Player : BaseEntity
             chargeMeter.value = 0f;
         if (meterCanvas != null)
             meterCanvas.SetActive(false);
-        hammerPivot.localRotation = Quaternion.identity;
+        if (animator != null)
+            animator.SetBool(IsChargingHash, false);
     }
 
     private void OnLevelUp()
@@ -410,4 +476,5 @@ public class Player : BaseEntity
             hammerCooldownCanvas.SetActive(!isReady || showCooldownBarWhenReady);
         }
     }
+
 }
