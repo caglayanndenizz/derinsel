@@ -191,8 +191,8 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.006324455, y: 0.0010128468}
-  m_Radius: 0.09626584
+  m_Offset: {x: 0.006324455, y: -0.02050832}
+  m_Radius: 0.07474467
 --- !u!50 &4578505465515028023
 Rigidbody2D:
   serializedVersion: 5
@@ -266,6 +266,7 @@ MonoBehaviour:
   chaseApproachSpeedMultiplier: 1.6
   mageProjectileFireRateMultiplier: 1.5
   meleeAttackInterval: 2
+  meleeHitRange: 1.2
   goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
   experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
   goldDropChance: 0.2
