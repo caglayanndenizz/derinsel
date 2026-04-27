@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System;
 using Unity.Cinemachine;
 
 public class Player : BaseEntity
@@ -11,6 +12,7 @@ public class Player : BaseEntity
     [Header("Hammer Settings (Heavy)")]
     public float maxChargeTime = 0.5f;
     public float hammerAOE = 2.5f;
+    public float hammerCooldown = 3f;
 
     [Header("Light Attack Settings (Spammable)")]
     public float lightAttackRate = 0.2f; 
@@ -20,17 +22,21 @@ public class Player : BaseEntity
 
     [Header("Movement Modifiers")]
     [SerializeField] private float dungeonEntryBaseSpeedMultiplier = 1.25f;
+    [Header("Damage")]
+    [SerializeField] private float damageInvulnerabilityDuration = 0.2f;
 
     [Header("References")]
     public Transform hammerPivot;
     public Transform attackPoint;
     public LayerMask enemyLayers;
-    public float goldCount;
-    public float experienceCount;
+    [SerializeField] private float goldCount;
+    [SerializeField] private float experienceCount;
+    [SerializeField] private float requiredExperienceForNextLevel = 100f;
 
-    [Header("UI Reference")]
-    public Slider chargeMeter;
-    public GameObject meterCanvas;
+    [Header("Hammer Cooldown UI")]
+    public Slider hammerCooldownBar;
+    public GameObject hammerCooldownCanvas;
+    [SerializeField] private bool showCooldownBarWhenReady = true;
 
     [Header("Hit Stop")]
     public HitStopManager hitStopManager;
@@ -50,10 +56,18 @@ public class Player : BaseEntity
 
     private float _currentCharge = 0f;
     private bool _isCharging = false;
+    private float _nextHammerUseTime = 0f;
     private Rigidbody2D _rb; // FİZİK İÇİN ŞART
     private CinemachineImpulseSource _defaultImpulseSource;
     private float _baseSpeedMultiplier = 1f;
     private bool _hasAppliedDungeonEntryBoost = false;
+    private float _invulnerableUntil = 0f;
+
+    public event Action<float, float> HealthChanged;
+    public event Action<float, float> ExperienceChanged;
+
+    public float GoldCount => goldCount;
+    public float ExperienceCount => experienceCount;
 
     protected override void Awake()
     {
@@ -67,18 +81,55 @@ public class Player : BaseEntity
 
         if (hitStopManager == null)
             hitStopManager = HitStopManager.Instance;
+
+        InitializeHammerCooldownUI();
+        NotifyHealthChanged();
+        NotifyExperienceChanged();
     }
 
     void Update()
     {
         HandleHammerCharge(); // Sağ Tık
         HandleLightAttack();  // Sol Tık
+        UpdateHammerCooldownUI();
     }
 
     // FİZİK HAREKETİ BURADA OLMALI
     void FixedUpdate()
     {
         Move();
+    }
+
+    public override void TakeDamage(float amount, bool isHeavy)
+    {
+        if (Time.time < _invulnerableUntil) return;
+
+        base.TakeDamage(amount, isHeavy);
+        NotifyHealthChanged();
+        _invulnerableUntil = Time.time + Mathf.Max(0f, damageInvulnerabilityDuration);
+    }
+
+    public void AddGold(float amount)
+    {
+        if (amount <= 0f) return;
+        goldCount += amount;
+    }
+
+    public void AddExperience(float amount)
+    {
+        if (amount <= 0f) return;
+        experienceCount += amount;
+        ExperienceChanged?.Invoke(experienceCount, Mathf.Max(1f, requiredExperienceForNextLevel));
+    }
+
+    public void NotifyExperienceChanged()
+    {
+        ExperienceChanged?.Invoke(experienceCount, Mathf.Max(1f, requiredExperienceForNextLevel));
+    }
+
+    public void NotifyHealthChanged()
+    {
+        HealthChanged?.Invoke(CurrentHealth, Mathf.Max(1f, MaxHealth));
     }
 
     protected override void Move()
@@ -149,13 +200,17 @@ public class Player : BaseEntity
 
     private void HandleHammerCharge()
     {
+        if (Time.time < _nextHammerUseTime)
+        {
+            if (_isCharging) ResetCharge();
+            return;
+        }
+
         if (Input.GetButton("Fire2"))
         {
             _isCharging = true;
-            meterCanvas.SetActive(true);
             _currentCharge += Time.deltaTime;
             _currentCharge = Mathf.Clamp(_currentCharge, 0f, maxChargeTime);
-            chargeMeter.value = _currentCharge / maxChargeTime; 
             hammerPivot.localRotation = Quaternion.Euler(0, 0, (_currentCharge / maxChargeTime) * 90f);
         }
 
@@ -172,6 +227,9 @@ public class Player : BaseEntity
 
     private void HammerSlam()
     {
+        _nextHammerUseTime = Time.time + hammerCooldown;
+        UpdateHammerCooldownUI();
+
         CinemachineImpulseSource source = _defaultImpulseSource;
         if (source != null) source.GenerateImpulse(); 
         
@@ -184,7 +242,9 @@ public class Player : BaseEntity
         {
             IDamageable target = enemy.GetComponent<IDamageable>();
             if (target == null) continue;
-            target.TakeDamage(stats.heavyAttackDamage, true);
+            BaseEntity targetEntity = enemy.GetComponent<BaseEntity>();
+            float heavyDamage = targetEntity != null ? targetEntity.CurrentHealth : stats.heavyAttackDamage;
+            target.TakeDamage(heavyDamage, true);
             if (successfulHits == 0)
                 firstHitPosition = enemy.ClosestPoint(attackPoint.position);
             successfulHits++;
@@ -202,7 +262,7 @@ public class Player : BaseEntity
         if (hitStopManager == null)
             hitStopManager = HitStopManager.Instance != null
                 ? HitStopManager.Instance
-                : Object.FindAnyObjectByType<HitStopManager>();
+                : UnityEngine.Object.FindAnyObjectByType<HitStopManager>();
 
         if (hitStopManager == null)
         {
@@ -256,8 +316,41 @@ public class Player : BaseEntity
     {
         _isCharging = false;
         _currentCharge = 0f;
-        chargeMeter.value = 0f;
-        meterCanvas.SetActive(false);
         hammerPivot.localRotation = Quaternion.identity;
+    }
+
+    private void InitializeHammerCooldownUI()
+    {
+        if (hammerCooldownBar == null) return;
+        hammerCooldownBar.minValue = 0f;
+        hammerCooldownBar.maxValue = 1f;
+        hammerCooldownBar.value = 1f;
+
+        if (hammerCooldownCanvas != null)
+            hammerCooldownCanvas.SetActive(showCooldownBarWhenReady);
+    }
+
+    private void UpdateHammerCooldownUI()
+    {
+        if (hammerCooldownBar == null) return;
+
+        float cooldown = Mathf.Max(0f, hammerCooldown);
+        if (cooldown <= 0f)
+        {
+            hammerCooldownBar.value = 1f;
+            if (hammerCooldownCanvas != null)
+                hammerCooldownCanvas.SetActive(showCooldownBarWhenReady);
+            return;
+        }
+
+        float remaining = Mathf.Max(0f, _nextHammerUseTime - Time.time);
+        float normalized = 1f - (remaining / cooldown);
+        hammerCooldownBar.value = Mathf.Clamp01(normalized);
+
+        if (hammerCooldownCanvas != null)
+        {
+            bool isReady = remaining <= 0f;
+            hammerCooldownCanvas.SetActive(!isReady || showCooldownBarWhenReady);
+        }
     }
 }

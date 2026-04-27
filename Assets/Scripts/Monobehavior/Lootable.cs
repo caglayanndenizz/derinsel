@@ -81,8 +81,8 @@ public class Lootable : MonoBehaviour
         
         if (player != null)
         {
-            if (isGold) player.goldCount += value;
-            else player.experienceCount += value;
+            if (isGold) player.AddGold(value);
+            else player.AddExperience(value);
         }
 
         ReturnToPool();

@@ -66,6 +66,8 @@ public class Enemy : BaseEntity
     
     [Header("Melee Attack")]
     public float meleeAttackInterval = 2f;
+    [Tooltip("Melee hasarının uygulanması için gerçek temas/yakınlık menzili.")]
+    public float meleeHitRange = 1.6f;
 
     [Header("Loot Prefabs")]
     public GameObject goldPrefab;
@@ -406,9 +408,7 @@ public class Enemy : BaseEntity
     {
         if (currentState != State.Attack || player == null) return;
         if (Time.time < _nextTypeAttackTime) return;
-
-        float dist = Vector2.Distance(GetEnemyReferencePosition(), player.transform.position);
-        if (dist > attackCloseMaxDistance) return;
+        if (!CanHitPlayerWithMelee()) return;
 
         IDamageable target = player.GetComponent<IDamageable>();
         if (target != null)
@@ -421,15 +421,31 @@ public class Enemy : BaseEntity
     {
         if (currentState != State.Attack || player == null) return;
         if (Time.time < _nextTypeAttackTime) return;
-
-        float dist = Vector2.Distance(GetEnemyReferencePosition(), player.transform.position);
-        if (dist > attackCloseMaxDistance) return;
+        if (!CanHitPlayerWithMelee()) return;
 
         IDamageable target = player.GetComponent<IDamageable>();
         if (target != null)
             target.TakeDamage(stats != null ? stats.attackPower : 0f, false);
 
         _nextTypeAttackTime = Time.time + meleeAttackInterval;
+    }
+
+    private bool CanHitPlayerWithMelee()
+    {
+        if (player == null) return false;
+        if (!HasLineOfSight()) return false;
+
+        Vector2 origin = GetEnemyReferencePosition();
+        Collider2D[] nearby = Physics2D.OverlapCircleAll(origin, Mathf.Max(0.1f, meleeHitRange));
+        for (int i = 0; i < nearby.Length; i++)
+        {
+            Collider2D hit = nearby[i];
+            if (hit == null) continue;
+            if (hit.CompareTag("Player")) return true;
+            if (hit.GetComponentInParent<Player>() != null) return true;
+        }
+
+        return false;
     }
 
     private float GetLineOfSightMaxDistance()

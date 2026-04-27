@@ -6,6 +6,8 @@ public abstract class BaseEntity : MonoBehaviour , IDamageable
     public EntityStats stats; // Yarattığımız SO'yu buraya bağlayacağız
 
     protected float _currentHealth;
+    public float CurrentHealth => _currentHealth;
+    public float MaxHealth => stats != null ? stats.maxHealth : 0f;
 
     protected virtual void Awake() 
     {

@@ -33,9 +33,8 @@ public class DungeonGenerator : MonoBehaviour
     public EnemyObjectPooler enemyPooler;
 
     [Header("Transition Ayarlari")]
-    public Animator fadeAnimator; // FadeImage üzerindeki Animator
+    public TransitionFader transitionFader;
     public CinemachineCamera vcam; // Sahnedeki sanal kamera
-    public float transitionDuration;
 
     [Header("Yeni Mekanik: Kirilabilir Duvar")]
     public TileBase destructableWallTile; // Kırılabilir duvar görseli
@@ -76,7 +75,7 @@ public class DungeonGenerator : MonoBehaviour
         if (player == null) { Debug.LogError("DungeonGenerator: player referansi atanmamis."); hasError = true; }
         if (enemyPrefabs == null || enemyPrefabs.Count == 0) { Debug.LogError("DungeonGenerator: enemyPrefabs listesi bos."); hasError = true; }
         if (exitPrefab == null) { Debug.LogError("DungeonGenerator: exitPrefab atanmamis."); hasError = true; }
-        if (fadeAnimator == null) { Debug.LogError("DungeonGenerator: fadeAnimator atanmamis."); hasError = true; }
+        if (transitionFader == null) { Debug.LogError("DungeonGenerator: transitionFader atanmamis."); hasError = true; }
         if (vcam == null) { Debug.LogError("DungeonGenerator: vcam atanmamis."); hasError = true; }
 
         if (enemyPooler == null)
@@ -104,20 +103,12 @@ public class DungeonGenerator : MonoBehaviour
 
     private IEnumerator DungeonTransitionRoutine()
     {
-        // 1. Ekranı Karart
-        fadeAnimator.SetTrigger("StartFade");
-
-        // 2. Animasyonun tamamlanmasını bekle (0.5 saniye demiştik)
-        yield return new WaitForSeconds(transitionDuration);
-
-        // 3. Zindanı kur ve oyuncuyu ışınla
-        GenerateDungeon();
-
-        // 4. KRİTİK NOKTA: Kamerayı şak diye oyuncuya sabitle (Kayma bitti!)
-        vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
-
-        // 5. Ekranı Geri Aç
-        fadeAnimator.SetTrigger("EndFade");
+        yield return transitionFader.FadeOutIn(() =>
+        {
+            GenerateDungeon();
+            // KRİTİK NOKTA: Kamerayı şak diye oyuncuya sabitle (Kayma bitti!)
+            vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
+        });
     }
     public void StartNextFloorTransition()
     {
@@ -129,22 +120,13 @@ public class DungeonGenerator : MonoBehaviour
 
     private IEnumerator NextFloorTransitionRoutine()
     {
-        // 1. Ekranı karartmaya başla
-        fadeAnimator.SetTrigger("StartFade");
-
-        // 2. Animasyonun kararması için belirlediğin süre kadar bekle
-        // Eğer değişken tanımlamadıysan direkt 0.5f veya 1.0f yazabilirsin
-        yield return new WaitForSeconds(transitionDuration); 
-
-        // 3. Zindanı bir üst kat için yeniden oluştur (Eski fonksiyonun)
-        MoveToNextFloor();
-
-        // 4. Kamerayı yeni doğuş noktasına (0,0) şak diye ışınla
-        // Oyuncu MoveToNextFloor içinde zaten ışınlandığı için kamera onu burada yakalar
-        vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
-
-        // 5. Ekranı geri aç
-        fadeAnimator.SetTrigger("EndFade");
+        yield return transitionFader.FadeOutIn(() =>
+        {
+            // Zindanı bir üst kat için yeniden oluştur
+            MoveToNextFloor();
+            // Oyuncu MoveToNextFloor içinde zaten ışınlandığı için kamera onu burada yakalar.
+            vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
+        });
     }
         
     // Zindandan çıkarken de aynısını kullanabilirsin
@@ -156,14 +138,11 @@ public class DungeonGenerator : MonoBehaviour
 
     private IEnumerator ExitTransitionRoutine()
     {
-        fadeAnimator.SetTrigger("StartFade");
-        yield return new WaitForSeconds(transitionDuration);
-
-        ExitDungeon();
-
-        vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
-
-        fadeAnimator.SetTrigger("EndFade");
+        yield return transitionFader.FadeOutIn(() =>
+        {
+            ExitDungeon();
+            vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
+        });
     }
 
     public void GenerateDungeon()
