@@ -24,6 +24,7 @@ public class Player : BaseEntity
     [SerializeField] private float dungeonEntryBaseSpeedMultiplier = 1.25f;
     [Header("Damage")]
     [SerializeField] private float damageInvulnerabilityDuration = 0.2f;
+    [SerializeField, Range(0f, 1f)] private float chargeDamageMultiplier = 0.05f;
 
     [Header("References")]
     public Transform hammerPivot;
@@ -32,11 +33,16 @@ public class Player : BaseEntity
     [SerializeField] private float goldCount;
     [SerializeField] private float experienceCount;
     [SerializeField] private float requiredExperienceForNextLevel = 100f;
+    [SerializeField] private int currentLevel = 1;
 
     [Header("Hammer Cooldown UI")]
     public Slider hammerCooldownBar;
     public GameObject hammerCooldownCanvas;
     [SerializeField] private bool showCooldownBarWhenReady = true;
+    
+    [Header("Hammer Charge UI")]
+    public Slider chargeMeter;
+    public GameObject meterCanvas;
 
     [Header("Hit Stop")]
     public HitStopManager hitStopManager;
@@ -65,9 +71,12 @@ public class Player : BaseEntity
 
     public event Action<float, float> HealthChanged;
     public event Action<float, float> ExperienceChanged;
+    public event Action<int> LevelChanged;
+    public event Action<float> GoldChanged;
 
     public float GoldCount => goldCount;
     public float ExperienceCount => experienceCount;
+    public int CurrentLevel => currentLevel;
 
     protected override void Awake()
     {
@@ -85,6 +94,8 @@ public class Player : BaseEntity
         InitializeHammerCooldownUI();
         NotifyHealthChanged();
         NotifyExperienceChanged();
+        NotifyLevelChanged();
+        NotifyGoldChanged();
     }
 
     void Update()
@@ -104,6 +115,9 @@ public class Player : BaseEntity
     {
         if (Time.time < _invulnerableUntil) return;
 
+        if (_isCharging)
+            amount *= Mathf.Clamp01(chargeDamageMultiplier);
+
         base.TakeDamage(amount, isHeavy);
         NotifyHealthChanged();
         _invulnerableUntil = Time.time + Mathf.Max(0f, damageInvulnerabilityDuration);
@@ -113,13 +127,31 @@ public class Player : BaseEntity
     {
         if (amount <= 0f) return;
         goldCount += amount;
+        NotifyGoldChanged();
     }
 
     public void AddExperience(float amount)
     {
         if (amount <= 0f) return;
+
         experienceCount += amount;
-        ExperienceChanged?.Invoke(experienceCount, Mathf.Max(1f, requiredExperienceForNextLevel));
+        int levelUps = 0;
+        float requiredExperience = Mathf.Max(1f, requiredExperienceForNextLevel);
+
+        while (experienceCount >= requiredExperience)
+        {
+            experienceCount -= requiredExperience;
+            levelUps++;
+        }
+
+        if (levelUps > 0)
+        {
+            currentLevel += levelUps;
+            OnLevelUp();
+            NotifyLevelChanged();
+        }
+
+        ExperienceChanged?.Invoke(experienceCount, requiredExperience);
     }
 
     public void NotifyExperienceChanged()
@@ -130,6 +162,16 @@ public class Player : BaseEntity
     public void NotifyHealthChanged()
     {
         HealthChanged?.Invoke(CurrentHealth, Mathf.Max(1f, MaxHealth));
+    }
+
+    public void NotifyLevelChanged()
+    {
+        LevelChanged?.Invoke(Mathf.Max(1, currentLevel));
+    }
+
+    public void NotifyGoldChanged()
+    {
+        GoldChanged?.Invoke(Mathf.Max(0f, goldCount));
     }
 
     protected override void Move()
@@ -209,8 +251,12 @@ public class Player : BaseEntity
         if (Input.GetButton("Fire2"))
         {
             _isCharging = true;
+            if (meterCanvas != null)
+                meterCanvas.SetActive(true);
             _currentCharge += Time.deltaTime;
             _currentCharge = Mathf.Clamp(_currentCharge, 0f, maxChargeTime);
+            if (chargeMeter != null)
+                chargeMeter.value = _currentCharge / Mathf.Max(0.0001f, maxChargeTime);
             hammerPivot.localRotation = Quaternion.Euler(0, 0, (_currentCharge / maxChargeTime) * 90f);
         }
 
@@ -316,7 +362,18 @@ public class Player : BaseEntity
     {
         _isCharging = false;
         _currentCharge = 0f;
+        if (chargeMeter != null)
+            chargeMeter.value = 0f;
+        if (meterCanvas != null)
+            meterCanvas.SetActive(false);
         hammerPivot.localRotation = Quaternion.identity;
+    }
+
+    private void OnLevelUp()
+    {
+        _currentHealth = MaxHealth;
+        NotifyHealthChanged();
+        ResetCharge();
     }
 
     private void InitializeHammerCooldownUI()

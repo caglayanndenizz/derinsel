@@ -4,6 +4,8 @@ public class Lootable : MonoBehaviour
 {
     [Header("Basic Settings")]
     public int value = 1;
+    [Tooltip("isGold kapaliysa (XP orb) verilecek deneyim miktari.")]
+    public int experienceValue = 1;
     public bool isGold = true;
     
     [Header("Magnet Settings")]
@@ -81,8 +83,10 @@ public class Lootable : MonoBehaviour
         
         if (player != null)
         {
-            if (isGold) player.AddGold(value);
-            else player.AddExperience(value);
+            if (isGold)
+                player.AddGold(Mathf.Max(0, value));
+            else
+                player.AddExperience(Mathf.Max(0, experienceValue));
         }
 
         ReturnToPool();

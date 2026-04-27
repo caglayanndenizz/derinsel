@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerBarsUI : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class PlayerBarsUI : MonoBehaviour
     [SerializeField] private Player player;
     [SerializeField] private Slider healthBar;
     [SerializeField] private Slider experienceBar;
+    [SerializeField] private TMP_Text levelText;
+    [SerializeField] private TMP_Text goldText;
 
     private void Awake()
     {
@@ -30,6 +33,8 @@ public class PlayerBarsUI : MonoBehaviour
         if (player == null) return;
         player.HealthChanged += HandleHealthChanged;
         player.ExperienceChanged += HandleExperienceChanged;
+        player.LevelChanged += HandleLevelChanged;
+        player.GoldChanged += HandleGoldChanged;
     }
 
     private void UnbindPlayer()
@@ -37,6 +42,8 @@ public class PlayerBarsUI : MonoBehaviour
         if (player == null) return;
         player.HealthChanged -= HandleHealthChanged;
         player.ExperienceChanged -= HandleExperienceChanged;
+        player.LevelChanged -= HandleLevelChanged;
+        player.GoldChanged -= HandleGoldChanged;
     }
 
     private void PushInitialValues()
@@ -44,6 +51,8 @@ public class PlayerBarsUI : MonoBehaviour
         if (player == null) return;
         player.NotifyHealthChanged();
         player.NotifyExperienceChanged();
+        player.NotifyLevelChanged();
+        player.NotifyGoldChanged();
     }
 
     private void HandleHealthChanged(float currentHealth, float maxHealth)
@@ -58,5 +67,17 @@ public class PlayerBarsUI : MonoBehaviour
         if (experienceBar == null) return;
         experienceBar.maxValue = Mathf.Max(1f, requiredExperience);
         experienceBar.value = Mathf.Clamp(currentExperience, 0f, experienceBar.maxValue);
+    }
+
+    private void HandleLevelChanged(int level)
+    {
+        if (levelText == null) return;
+        levelText.text = $"Level: {Mathf.Max(1, level)}";
+    }
+
+    private void HandleGoldChanged(float gold)
+    {
+        if (goldText == null) return;
+        goldText.text = $"Gold: {Mathf.FloorToInt(Mathf.Max(0f, gold))}";
     }
 }
