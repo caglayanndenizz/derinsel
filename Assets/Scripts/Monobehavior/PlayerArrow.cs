@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 /// <summary>
 /// Oyuncu oku: Initialize sonrası hedef dünya noktasına doğru sabit hızla gider.
-/// Prefab: Collider2D (Is Trigger) önerilir; oyuncu colliderlarıyla IgnoreCollision uygulanır.
+/// Çarpışma: her kare Linecast — oyuncu / kendi colliderları hariç ilk engel (HammerSlam ile aynı kamera sarsıntısı).
 /// </summary>
 public class PlayerArrow : MonoBehaviour
 {
@@ -21,6 +21,7 @@ public class PlayerArrow : MonoBehaviour
     bool _fullyChargedBowExplosion;
     float _explosionRadius;
     DungeonGenerator _dungeonGenerator;
+    CinemachineImpulseSource _hitCameraImpulse;
     Vector2 _previousFramePosition;
 
     void Awake()
@@ -38,7 +39,8 @@ public class PlayerArrow : MonoBehaviour
         Transform ownerRoot,
         bool fullyChargedBowExplosion = false,
         float chargedExplosionRadius = 0f,
-        DungeonGenerator dungeonGenerator = null)
+        DungeonGenerator dungeonGenerator = null,
+        CinemachineImpulseSource hitCameraImpulse = null)
     {
         _enemyMask = enemyMask;
         _speed = speed;
@@ -48,6 +50,7 @@ public class PlayerArrow : MonoBehaviour
         _fullyChargedBowExplosion = fullyChargedBowExplosion;
         _explosionRadius = chargedExplosionRadius;
         _dungeonGenerator = dungeonGenerator;
+        _hitCameraImpulse = hitCameraImpulse;
 
         Vector2 origin = transform.position;
         Vector2 to = targetWorldPosition - origin;
@@ -89,82 +92,71 @@ public class PlayerArrow : MonoBehaviour
             return;
         }
 
-        if (_fullyChargedBowExplosion && _explosionRadius > 0f)
+        Vector2 prev = _previousFramePosition;
+        Vector2 next = (Vector2)transform.position + _direction * _speed * Time.deltaTime;
+
+        if (TryResolveMovementHit(prev, next, out RaycastHit2D hit))
         {
-            Vector2 prev = _previousFramePosition;
-            Vector2 next = (Vector2)transform.position + _direction * _speed * Time.deltaTime;
+            PlayHitCameraShake();
 
-            if (TryResolveChargedMovementHit(prev, next, out Vector2 hitPoint))
+            if (_fullyChargedBowExplosion && _explosionRadius > 0f)
             {
+                Vector2 p = hit.point;
                 if (_dungeonGenerator != null)
-                    _dungeonGenerator.BreakWallsInArea(hitPoint, _explosionRadius);
-                ApplyChargedExplosionDamage(hitPoint);
-                Destroy(gameObject);
-                return;
+                    _dungeonGenerator.BreakWallsInArea(p, _explosionRadius);
+                ApplyChargedExplosionDamage(p);
             }
+            else
+                TryApplyDirectArrowDamage(hit.collider);
 
-            _previousFramePosition = (Vector2)transform.position;
-            transform.position = new Vector3(next.x, next.y, transform.position.z);
+            Destroy(gameObject);
             return;
         }
 
-        transform.position += (Vector3)(_direction * _speed * Time.deltaTime);
+        _previousFramePosition = (Vector2)transform.position;
+        transform.position = new Vector3(next.x, next.y, transform.position.z);
     }
 
-    bool IsColliderOnDungeonWallTilemap(Collider2D other)
+    void PlayHitCameraShake()
     {
-        if (_dungeonGenerator == null || _dungeonGenerator.wallTilemap == null) return false;
-        Tilemap tm = other.GetComponent<Tilemap>() ?? other.GetComponentInParent<Tilemap>();
-        return tm != null && tm == _dungeonGenerator.wallTilemap;
+        if (_hitCameraImpulse != null)
+            _hitCameraImpulse.GenerateImpulse();
     }
 
-    /// <summary>
-    /// Duvarlar genelde enemy maskesinde değildir; transform ile hareket tetikleri kaçırabilir.
-    /// Tam şarjlı ok için segment üzerinde ilk duvar tilemap veya düşman layer isabeti.
-    /// </summary>
-    bool TryResolveChargedMovementHit(Vector2 from, Vector2 to, out Vector2 hitWorld)
+    bool IsOwnCollider(Collider2D c)
     {
-        hitWorld = default;
+        if (c == null) return false;
+        return c.transform == transform || c.transform.IsChildOf(transform);
+    }
+
+    /// <summary>Oyuncu ve ok kendi colliderları dışında segment üzerindeki ilk isabet.</summary>
+    bool TryResolveMovementHit(Vector2 from, Vector2 to, out RaycastHit2D hit)
+    {
+        hit = default;
         RaycastHit2D[] hits = Physics2D.LinecastAll(from, to);
         if (hits == null || hits.Length == 0) return false;
 
         foreach (RaycastHit2D h in hits.OrderBy(x => x.distance))
         {
             if (h.collider == null) continue;
+            if (IsOwnCollider(h.collider)) continue;
             if (h.collider.GetComponentInParent<Player>() != null) continue;
 
-            if (IsColliderOnDungeonWallTilemap(h.collider))
-            {
-                hitWorld = h.point;
-                return true;
-            }
-
-            if (((1 << h.collider.gameObject.layer) & _enemyMask) != 0)
-            {
-                hitWorld = h.point;
-                return true;
-            }
+            hit = h;
+            return true;
         }
 
         return false;
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    void TryApplyDirectArrowDamage(Collider2D other)
     {
-        if (!_initialized || other == null) return;
-        if (other.GetComponentInParent<Player>() != null) return;
-
-        // Tam şarjlı patlama: çarpışma Update içinde Linecast ile (duvar + düşman); tetikleyici ile çift işlemeyi önle.
-        if (_fullyChargedBowExplosion && _explosionRadius > 0f)
-            return;
-
+        if (other == null) return;
         if (((1 << other.gameObject.layer) & _enemyMask) == 0) return;
 
         IDamageable dmg = other.GetComponent<IDamageable>() ?? other.GetComponentInParent<IDamageable>();
         if (dmg != null)
             dmg.TakeDamage(_damage, false);
-
-        Destroy(gameObject);
     }
 
     static float GetLethalDamageForTarget(IDamageable target)

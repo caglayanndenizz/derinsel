@@ -352,7 +352,8 @@ public class Player : BaseEntity
                 transform,
                 chargedShot,
                 chargedShot ? Mathf.Max(0f, bowChargedExplosionRadius) : 0f,
-                generator);
+                generator,
+                chargedShot ? _defaultImpulseSource : null);
         }
     }
 
