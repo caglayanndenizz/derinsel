@@ -19,14 +19,11 @@ public abstract class BaseEntity : MonoBehaviour , IDamageable
     public virtual void TakeDamage(float amount, bool isHeavy)
     {
         _currentHealth -= amount;
-        Debug.Log(gameObject.name + " hasar aldi! Kalan can: " + _currentHealth);
-
         if (_currentHealth <= 0) Die();
     }
 
     protected virtual void Die() 
     {
-        Debug.Log(gameObject.name + " yok edildi.");
         // Ölüm efektleri buraya gelecek
     }
 

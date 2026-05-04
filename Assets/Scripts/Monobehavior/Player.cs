@@ -14,15 +14,34 @@ public class Player : BaseEntity
     public float maxChargeTime = 0.5f;
     public float hammerAOE = 2.5f;
     public float hammerCooldown = 3f;
-    [Tooltip("Sağ tık şarj çubuğu tam dolu (charge slider = 1) iken gelen hasardan düşürülecek oran. 0 = azaltma yok, 0.85 = %85 azaltma (cana gelen ≈ %15).")]
+    [Tooltip("Sol tık (çekiç) şarj çubuğu tam dolu (charge slider = 1) iken gelen hasardan düşürülecek oran. 0 = azaltma yok, 0.85 = %85 azaltma (cana gelen ≈ %15).")]
     [Range(0f, 1f)]
     [FormerlySerializedAs("chargeFullDamageReduction")]
     public float heavyChargeFullDamageReduction = 0.85f;
     [SerializeField] private float heavyImpactFallbackDelay = 0.2f;
 
+    [Header("Bow / Arrow")]
+    [Tooltip("Üzerinde PlayerArrow bileşeni olan ok prefabı.")]
+    public GameObject arrowPrefab;
+    public float arrowSpeed = 14f;
+    public float arrowMaxLifetime = 8f;
+    [Tooltip("Boş bırakılırsa Camera.main kullanılır; imleç dünya koordinatı için.")]
+    public Camera aimCamera;
+    [Tooltip("Yay animasyonu bittikten sonra ok instantiate edilir. Ok çıkarken imleç bu süre sonunda tekrar okunur (Time.timeScale ile).")]
+    public float bowArrowReleaseDelay = 0.4f;
+    [Tooltip("Tam şarjlı sağ-tık yayda ok hızı ve hasarı bu çarpanla çarpılır.")]
+    public float bowChargedSpeedDamageMultiplier = 3f;
+    [Tooltip("Tam şarjlı ok isabet ettiğinde duvar kırma ve IDamageable yok etme yarıçapı (dünya birimi).")]
+    public float bowChargedExplosionRadius = 3f;
+    [Tooltip("Sağ tık basılı tutma süresi (saniye); dolunca yay tam şarj sayılır.")]
+    public float maxBowChargeTime = 0.5f;
+    [Tooltip("Boşsa yay şarj çubuğu gösterilmez; Inspector'dan atayabilirsin.")]
+    public Slider bowChargeMeter;
+    [Tooltip("Boşsa yay şarj UI kanvası açılmaz.")]
+    public GameObject bowMeterCanvas;
+
     [Header("Light Attack Settings (Spammable)")]
     public float lightAttackRate = 0.2f; 
-    public float lightAttackRange = 1.5f; 
     public float lightAttackDuration = 0.1f; 
     [SerializeField] private float lightImpactFallbackDelay = 0.08f;
     private float _nextAttackTime = 0f;
@@ -32,6 +51,7 @@ public class Player : BaseEntity
     private float _lastHeavyResolveTime = -999f;
     private bool _heavyAttackInProgress = false;
     private float _heavyFallbackExecuteAt = -1f;
+    private Coroutine _bowArrowSpawnCoroutine;
 
     [Header("Movement Modifiers")]
     [SerializeField] private float dungeonEntryBaseSpeedMultiplier = 1.25f;
@@ -39,7 +59,6 @@ public class Player : BaseEntity
     [SerializeField] private float damageInvulnerabilityDuration = 0.2f;
 
     [Header("References")]
-    public Transform hammerPivot;
     public Transform attackPoint;
     [SerializeField] private Animator animator;
     public LayerMask enemyLayers;
@@ -74,7 +93,9 @@ public class Player : BaseEntity
     [Range(0.5f, 1f)] public float heavyHitPitch = 0.82f;
 
     private float _currentCharge = 0f;
-    private bool _isCharging = false;
+    private bool _isHammerCharging = false;
+    private float _bowCharge = 0f;
+    private bool _isBowCharging = false;
     private float _nextHammerUseTime = 0f;
     private Rigidbody2D _rb; // FİZİK İÇİN ŞART
     private CinemachineImpulseSource _defaultImpulseSource;
@@ -83,6 +104,7 @@ public class Player : BaseEntity
     private float _invulnerableUntil = 0f;
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int IsChargingHash = Animator.StringToHash("IsCharging");
+    private static readonly int BowChargeHash = Animator.StringToHash("BowCharge");
     private static readonly int LightAttackHash = Animator.StringToHash("LightAttack");
     private static readonly int HeavyAttackHash = Animator.StringToHash("HeavyAttack");
 
@@ -117,10 +139,15 @@ public class Player : BaseEntity
         NotifyGoldChanged();
     }
 
+    void OnDisable()
+    {
+        CancelPendingBowArrow();
+    }
+
     void Update()
     {
-        HandleHammerCharge(); // Sağ Tık
-        HandleLightAttack();  // Sol Tık
+        HandleHammerCharge(); // Sol tık (çekiç şarjı)
+        HandleBowChargeAndRelease(); // Sağ tık (yay şarjı + bırakınca ok)
         HandleLightImpactFallback();
         HandleHeavyImpactFallback();
         UpdateHammerCooldownUI();
@@ -203,7 +230,7 @@ public class Player : BaseEntity
         Vector2 direction = new Vector2(moveX, moveY).normalized;
         
         // Tüm hız modifiyerleri dungeon girişindeki baz çarpanın üstüne uygulanır.
-        float chargeMultiplier = _isCharging ? 0.3f : 1f;
+        float chargeMultiplier = (_isHammerCharging || _isBowCharging) ? 0.3f : 1f;
         float currentSpeed = stats.moveSpeed * _baseSpeedMultiplier * chargeMultiplier;
         
         // KRİTİK DÜZELTME: transform.Translate SİLİNDİ, Rigidbody Velocity GELDİ!
@@ -225,86 +252,177 @@ public class Player : BaseEntity
 
     private bool IsChargeMeterFullWhileCharging()
     {
-        if (!_isCharging) return false;
+        if (!_isHammerCharging) return false;
         if (chargeMeter != null)
             return chargeMeter.value >= 1f - 0.0001f;
         return _currentCharge >= maxChargeTime - 0.0001f;
     }
 
-    private void HandleLightAttack()
+    private void HandleBowChargeAndRelease()
     {
-        if (_isCharging) return;
-        if (Input.GetButtonDown("Fire1") && Time.time >= _nextAttackTime)
+        if (Input.GetButtonUp("Fire2"))
         {
-            if (animator != null)
-                animator.SetTrigger(LightAttackHash);
-            _lightAttackInProgress = true;
-            _lightFallbackExecuteAt = Time.time + Mathf.Max(0.03f, lightImpactFallbackDelay);
-            _nextAttackTime = Time.time + lightAttackRate;
+            bool wasFullBow = _bowCharge >= maxBowChargeTime - 0.0001f;
+            ResetBowChargeState();
+
+            if (Time.time >= _nextAttackTime)
+            {
+                if (animator != null)
+                    animator.SetTrigger(LightAttackHash);
+                Vector2 aimAtRelease = GetBowAimWorldPointAtCurrentMouse();
+                ScheduleBowArrow(stats != null ? stats.lightAttackDamage : 0f, wasFullBow, aimAtRelease);
+                _lightAttackInProgress = true;
+                _lightFallbackExecuteAt = Time.time + Mathf.Max(0.03f, lightImpactFallbackDelay);
+                _nextAttackTime = Time.time + lightAttackRate;
+            }
+        }
+
+        // BowCharge anim / yürüme yavaşlatma: sağ tık basılıyken
+        _isBowCharging = Input.GetButton("Fire2");
+
+        if (_isBowCharging)
+        {
+            if (bowMeterCanvas != null)
+                bowMeterCanvas.SetActive(true);
+            _bowCharge += Time.deltaTime;
+            _bowCharge = Mathf.Clamp(_bowCharge, 0f, maxBowChargeTime);
+            if (bowChargeMeter != null)
+                bowChargeMeter.value = _bowCharge / Mathf.Max(0.0001f, maxBowChargeTime);
+        }
+        else
+        {
+            if (bowMeterCanvas != null)
+                bowMeterCanvas.SetActive(false);
+            if (_bowCharge > 0f)
+            {
+                _bowCharge = 0f;
+                if (bowChargeMeter != null)
+                    bowChargeMeter.value = 0f;
+            }
+        }
+
+        UpdateChargingAnimator();
+    }
+
+    /// <summary>
+    /// O anki imleç ekran pozisyonunu attackPoint Z düzlemine projekte eder (ateş anında çağır).
+    /// </summary>
+    private Vector2 GetBowAimWorldPointAtCurrentMouse()
+    {
+        if (attackPoint == null)
+            return Vector2.zero;
+        Camera cam = aimCamera != null ? aimCamera : Camera.main;
+        if (cam == null)
+            return attackPoint.position;
+
+        Vector3 mouse = Input.mousePosition;
+        float planeZ = attackPoint.position.z;
+        mouse.z = Mathf.Abs(cam.transform.position.z - planeZ);
+        return cam.ScreenToWorldPoint(mouse);
+    }
+
+    private void SpawnArrowTowardWorld(float damage, bool useBowChargedMultiplier, Vector2 targetWorld)
+    {
+        if (arrowPrefab == null || attackPoint == null) return;
+        Camera cam = aimCamera != null ? aimCamera : Camera.main;
+        if (cam == null) return;
+
+        bool chargedShot = useBowChargedMultiplier;
+        float m = chargedShot ? Mathf.Max(1f, bowChargedSpeedDamageMultiplier) : 1f;
+        float useSpeed = arrowSpeed * m;
+        float useDamage = damage * m;
+
+        Vector2 origin = attackPoint.position;
+        Vector2 offset = targetWorld - origin;
+        if (offset.sqrMagnitude < 0.0001f)
+            offset = Vector2.right * 0.01f;
+        Vector2 dir = offset.normalized;
+        Vector2 spawnPos = origin + dir * 0.2f;
+
+        GameObject arrow = Instantiate(arrowPrefab, spawnPos, Quaternion.identity);
+        PlayerArrow mover = arrow.GetComponent<PlayerArrow>();
+        if (mover != null)
+        {
+            mover.Initialize(
+                targetWorld,
+                useSpeed,
+                useDamage,
+                arrowMaxLifetime,
+                enemyLayers,
+                transform,
+                chargedShot,
+                chargedShot ? Mathf.Max(0f, bowChargedExplosionRadius) : 0f,
+                generator);
         }
     }
 
-    // Animation Event: LightAttack clip'inde hasar anına eklenmeli.
-    public void LightAttack()
+    private void CancelPendingBowArrow()
     {
-        ResolveLightAttackDamage();
+        if (_bowArrowSpawnCoroutine == null) return;
+        StopCoroutine(_bowArrowSpawnCoroutine);
+        _bowArrowSpawnCoroutine = null;
     }
 
-    private void ResolveLightAttackDamage()
+    private void ScheduleBowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+    {
+        CancelPendingBowArrow();
+        float delay = Mathf.Max(0f, bowArrowReleaseDelay);
+        if (delay <= 0f)
+        {
+            SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
+            return;
+        }
+
+        _bowArrowSpawnCoroutine = StartCoroutine(BowArrowSpawnAfterDelay(delay, damage, useBowChargedMultiplier, aimWorldAtFireInput));
+    }
+
+    private IEnumerator BowArrowSpawnAfterDelay(float delaySeconds, float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+    {
+        yield return new WaitForSeconds(delaySeconds);
+        SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
+        _bowArrowSpawnCoroutine = null;
+    }
+
+    // Animation Event: yay animasyonu vuruş karesi — ok hasarı PlayerArrow'da; burada yalnızca zamanlama/fallback senkronu.
+    public void LightAttack()
+    {
+        ClearLightAttackPendingState();
+    }
+
+    private void ClearLightAttackPendingState()
     {
         if (Time.time - _lastLightAttackResolveTime < Mathf.Max(0.01f, lightAttackDuration * 0.5f))
             return;
         _lastLightAttackResolveTime = Time.time;
         _lightAttackInProgress = false;
         _lightFallbackExecuteAt = -1f;
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, lightAttackRange, enemyLayers);
-        int successfulHits = 0;
-        Vector3 firstHitPosition = attackPoint.position;
-        foreach (Collider2D enemy in hitEnemies)
-        {
-            IDamageable target = enemy.GetComponent<IDamageable>() ?? enemy.GetComponentInParent<IDamageable>();
-            if (target == null) continue;
-            target.TakeDamage(stats.lightAttackDamage, false);
-            if (successfulHits == 0)
-                firstHitPosition = enemy.ClosestPoint(attackPoint.position);
-            successfulHits++;
-        }
-
-        if (successfulHits > 0)
-        {
-            SpawnHitVfx(firstHitPosition);
-            PlayImpactFeedback(false);
-        }
     }
 
     private void HandleHammerCharge()
     {
         if (Time.time < _nextHammerUseTime)
         {
-            if (_isCharging) ResetCharge();
+            if (_isHammerCharging) ResetHammerCharge();
             return;
         }
 
-        if (Input.GetButton("Fire2"))
+        if (Input.GetButton("Fire1"))
         {
-            _isCharging = true;
-            if (animator != null)
-                animator.SetBool(IsChargingHash, true);
+            _isHammerCharging = true;
             if (meterCanvas != null)
                 meterCanvas.SetActive(true);
             _currentCharge += Time.deltaTime;
             _currentCharge = Mathf.Clamp(_currentCharge, 0f, maxChargeTime);
             if (chargeMeter != null)
                 chargeMeter.value = _currentCharge / Mathf.Max(0.0001f, maxChargeTime);
+            UpdateChargingAnimator();
         }
 
-        if (Input.GetButtonUp("Fire2"))
+        if (Input.GetButtonUp("Fire1"))
         {
             if (_currentCharge >= maxChargeTime)
-            {
                 TriggerHeavyAttack();
-            }
-            ResetCharge();
+            ResetHammerCharge();
         }
     }
 
@@ -365,7 +483,7 @@ public class Player : BaseEntity
     {
         if (!_lightAttackInProgress) return;
         if (Time.time < _lightFallbackExecuteAt) return;
-        ResolveLightAttackDamage();
+        ClearLightAttackPendingState();
     }
 
     private void PlayImpactFeedback(bool isHeavy)
@@ -423,16 +541,39 @@ public class Player : BaseEntity
         Instantiate(hitVfxPrefab, worldPos, Quaternion.identity);
     }
 
-    private void ResetCharge()
+    private void UpdateChargingAnimator()
     {
-        _isCharging = false;
+        if (animator == null) return;
+        animator.SetBool(IsChargingHash, _isHammerCharging);
+        animator.SetBool(BowChargeHash, _isBowCharging);
+    }
+
+    private void ResetHammerCharge()
+    {
+        _isHammerCharging = false;
         _currentCharge = 0f;
         if (chargeMeter != null)
             chargeMeter.value = 0f;
         if (meterCanvas != null)
             meterCanvas.SetActive(false);
-        if (animator != null)
-            animator.SetBool(IsChargingHash, false);
+        UpdateChargingAnimator();
+    }
+
+    private void ResetBowChargeState()
+    {
+        _isBowCharging = false;
+        _bowCharge = 0f;
+        if (bowChargeMeter != null)
+            bowChargeMeter.value = 0f;
+        if (bowMeterCanvas != null)
+            bowMeterCanvas.SetActive(false);
+        UpdateChargingAnimator();
+    }
+
+    private void ResetCharge()
+    {
+        ResetHammerCharge();
+        ResetBowChargeState();
     }
 
     private void OnLevelUp()

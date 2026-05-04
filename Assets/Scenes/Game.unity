@@ -3136,9 +3136,9 @@ MonoBehaviour:
   maxSteps: 250
   player: {fileID: 1700128186}
   enemyPrefabs:
-  - {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}
-  - {fileID: 4369630054169769414, guid: 6af5b04e133e80f448d9a8dd9c90f4c1, type: 3}
   - {fileID: 9054262178047731215, guid: f63ecbfb4afa04446aa4013cbf460301, type: 3}
+  - {fileID: 4369630054169769414, guid: 6af5b04e133e80f448d9a8dd9c90f4c1, type: 3}
+  - {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
   exitPrefab: {fileID: 1031347285994503552, guid: e8e1f7b624480ad4bb4d5f1810e05f5a, type: 3}
   enemyPooler: {fileID: 1679956769}
   transitionFader: {fileID: 816801429}
@@ -3943,11 +3943,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1295312150}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &745294193 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 3626925181394866402, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-  m_PrefabInstance: {fileID: 214915947830347461}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &763787861
 GameObject:
   m_ObjectHideFlags: 0
@@ -7128,6 +7123,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1452836556}
     m_Modifications:
+    - target: {fileID: 800428578735404159, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -1408436710, guid: ae0a268378c197a40836013dcaa951b9, type: 3}
     - target: {fileID: 1445455240794291464, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 32.71398
@@ -7169,13 +7168,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: animator
+      propertyPath: aimCamera
       value: 
-      objectReference: {fileID: 745294193}
+      objectReference: {fileID: 763787864}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: generator
       value: 
       objectReference: {fileID: 465123767}
+    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: maxBowChargeTime
+      value: 0.4
+      objectReference: {fileID: 0}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: hammerCooldownBar
       value: 
@@ -7184,37 +7187,9 @@ PrefabInstance:
       propertyPath: hammerCooldownCanvas
       value: 
       objectReference: {fileID: 1767116303}
-    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: heavyImpactFallbackDelay
-      value: 0.17
-      objectReference: {fileID: 0}
-    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: lightImpactFallbackDelay
-      value: 0.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: heavyChargeFullDamageReduction
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7198533950980055540, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.58
-      objectReference: {fileID: 0}
-    - target: {fileID: 7198533950980055540, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.37
-      objectReference: {fileID: 0}
     - target: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 8790453129827999283, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.55
-      objectReference: {fileID: 0}
-    - target: {fileID: 8790453129827999283, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.079
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -1,0 +1,1365 @@
+fileFormatVersion: 2
+guid: 9c6c6c782e87c4d40b7afddec07f1ca4
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5326215159447354983
+    second: SpriteSheetwithbow_0
+  - first:
+      213: 1743291569795604440
+    second: SpriteSheetwithbow_1
+  - first:
+      213: -7526101607775692119
+    second: SpriteSheetwithbow_2
+  - first:
+      213: -1945243393100203960
+    second: SpriteSheetwithbow_3
+  - first:
+      213: 4213195379466389984
+    second: SpriteSheetwithbow_4
+  - first:
+      213: 3036292586203200419
+    second: SpriteSheetwithbow_5
+  - first:
+      213: 1411858226660575178
+    second: SpriteSheetwithbow_6
+  - first:
+      213: -194933537853105714
+    second: SpriteSheetwithbow_7
+  - first:
+      213: -3449105240550675851
+    second: SpriteSheetwithbow_8
+  - first:
+      213: 8942458441082177435
+    second: SpriteSheetwithbow_9
+  - first:
+      213: 6986400790161341089
+    second: SpriteSheetwithbow_10
+  - first:
+      213: 5967620393916053700
+    second: SpriteSheetwithbow_11
+  - first:
+      213: 4525017653799150213
+    second: SpriteSheetwithbow_12
+  - first:
+      213: -1203267391904231156
+    second: SpriteSheetwithbow_13
+  - first:
+      213: 8797606432078238570
+    second: SpriteSheetwithbow_14
+  - first:
+      213: -2876246079053000166
+    second: SpriteSheetwithbow_15
+  - first:
+      213: -7469963328892082791
+    second: SpriteSheetwithbow_16
+  - first:
+      213: -8350166100151906499
+    second: SpriteSheetwithbow_17
+  - first:
+      213: 7656382125262898267
+    second: SpriteSheetwithbow_18
+  - first:
+      213: -8749764369548421249
+    second: SpriteSheetwithbow_19
+  - first:
+      213: 4967330739642625971
+    second: SpriteSheetwithbow_20
+  - first:
+      213: -2785262714569137257
+    second: SpriteSheetwithbow_21
+  - first:
+      213: 2624348504042478781
+    second: SpriteSheetwithbow_22
+  - first:
+      213: 5790736862391493321
+    second: SpriteSheetwithbow_23
+  - first:
+      213: -5347720844255812700
+    second: SpriteSheetwithbow_24
+  - first:
+      213: -8705453954510291991
+    second: SpriteSheetwithbow_25
+  - first:
+      213: 3657236227127691409
+    second: SpriteSheetwithbow_26
+  - first:
+      213: 1795033975112149663
+    second: SpriteSheetwithbow_27
+  - first:
+      213: 7548979415115928438
+    second: SpriteSheetwithbow_28
+  - first:
+      213: 3835808887216254597
+    second: SpriteSheetwithbow_29
+  - first:
+      213: -2708604449333517019
+    second: SpriteSheetwithbow_30
+  - first:
+      213: -679361555698699398
+    second: SpriteSheetwithbow_31
+  - first:
+      213: -5906206555596001300
+    second: SpriteSheetwithbow_32
+  - first:
+      213: 2747435331081194756
+    second: SpriteSheetwithbow_33
+  - first:
+      213: 3488341641121714844
+    second: SpriteSheetwithbow_34
+  - first:
+      213: -1359413579892282129
+    second: SpriteSheetwithbow_35
+  - first:
+      213: 7454865559291688149
+    second: SpriteSheetwithbow_36
+  - first:
+      213: 5319527181692707597
+    second: SpriteSheetwithbow_37
+  - first:
+      213: -6523223756832679099
+    second: SpriteSheetwithbow_38
+  - first:
+      213: -3291888817363332021
+    second: SpriteSheetwithbow_39
+  - first:
+      213: -7620962890102942219
+    second: SpriteSheetwithbow_40
+  - first:
+      213: 4759391132540886919
+    second: SpriteSheetwithbow_41
+  - first:
+      213: 6828709782708120994
+    second: SpriteSheetwithbow_42
+  - first:
+      213: -8397064877909834270
+    second: SpriteSheetwithbow_43
+  - first:
+      213: 1977393651787083165
+    second: SpriteSheetwithbow_44
+  - first:
+      213: 893231733697357394
+    second: SpriteSheetwithbow_45
+  - first:
+      213: 5352777952030453861
+    second: SpriteSheetwithbow_46
+  - first:
+      213: -1688679147022827172
+    second: SpriteSheetwithbow_47
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_0
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 839
+        width: 20
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99107df288b7516b0800000000000000
+      internalID: -5326215159447354983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_1
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 839
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8df9995427a613810800000000000000
+      internalID: 1743291569795604440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_2
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 775
+        width: 20
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9aa9805767aed8790800000000000000
+      internalID: -7526101607775692119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_3
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 775
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8483698b07b1105e0800000000000000
+      internalID: -1945243393100203960
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_4
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 711
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e9496a00e6487a30800000000000000
+      internalID: 4213195379466389984
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_5
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 711
+        width: 21
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ab3bca2504132a20800000000000000
+      internalID: 3036292586203200419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_6
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 711
+        width: 20
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac70159a39de79310800000000000000
+      internalID: 1411858226660575178
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_7
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 711
+        width: 18
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec99479eaf47b4df0800000000000000
+      internalID: -194933537853105714
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_8
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 647
+        width: 19
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57ae900de015220d0800000000000000
+      internalID: -3449105240550675851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_9
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 647
+        width: 18
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b97856fa29ef91c70800000000000000
+      internalID: 8942458441082177435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_10
+      rect:
+        serializedVersion: 2
+        x: 156
+        y: 647
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1aa331cc08ea4f060800000000000000
+      internalID: 6986400790161341089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_11
+      rect:
+        serializedVersion: 2
+        x: 219
+        y: 647
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c83eb5612f31d250800000000000000
+      internalID: 5967620393916053700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_12
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 583
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 582e111e4971cce30800000000000000
+      internalID: 4525017653799150213
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_13
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 583
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c01dcb7aea22d4fe0800000000000000
+      internalID: -1203267391904231156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_14
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 519
+        width: 21
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6317b13070671a70800000000000000
+      internalID: 8797606432078238570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_15
+      rect:
+        serializedVersion: 2
+        x: 87
+        y: 519
+        width: 23
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a129f6b1e658518d0800000000000000
+      internalID: -2876246079053000166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_16
+      rect:
+        serializedVersion: 2
+        x: 151
+        y: 519
+        width: 23
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99561301eeb555890800000000000000
+      internalID: -7469963328892082791
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_17
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 455
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3fcfe84c204e1c80800000000000000
+      internalID: -8350166100151906499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_18
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 455
+        width: 15
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5402f84afee04a60800000000000000
+      internalID: 7656382125262898267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_19
+      rect:
+        serializedVersion: 2
+        x: 153
+        y: 455
+        width: 17
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7752b40aa7929680800000000000000
+      internalID: -8749764369548421249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_20
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 391
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3bfe64a5df08fe440800000000000000
+      internalID: 4967330739642625971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_21
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 391
+        width: 20
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79367fb6152c859d0800000000000000
+      internalID: -2785262714569137257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_22
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 391
+        width: 21
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbc974e5f0f8b6420800000000000000
+      internalID: 2624348504042478781
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_23
+      rect:
+        serializedVersion: 2
+        x: 211
+        y: 394
+        width: 14
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c2ea96ee74dc5050800000000000000
+      internalID: 5790736862391493321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_24
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 327
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a32e20c93419c5b0800000000000000
+      internalID: -5347720844255812700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_25
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 327
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ebf4e870c3003780800000000000000
+      internalID: -8705453954510291991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_26
+      rect:
+        serializedVersion: 2
+        x: 153
+        y: 327
+        width: 15
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 198c2a1c8fc11c230800000000000000
+      internalID: 3657236227127691409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_27
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 327
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9a215ec3ed39e810800000000000000
+      internalID: 1795033975112149663
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_28
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 261
+        width: 16
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67398b628cc53c860800000000000000
+      internalID: 7548979415115928438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_29
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 261
+        width: 18
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58eafc42cd78b3530800000000000000
+      internalID: 3835808887216254597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_30
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 261
+        width: 19
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 525ee68aa9a196ad0800000000000000
+      internalID: -2708604449333517019
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_31
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 261
+        width: 19
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a73b586b34c6296f0800000000000000
+      internalID: -679361555698699398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_32
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 199
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cefed9b1e60f80ea0800000000000000
+      internalID: -5906206555596001300
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_33
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 199
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40dc37880e9d02620800000000000000
+      internalID: 2747435331081194756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_34
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 135
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9253469d34196030800000000000000
+      internalID: 3488341641121714844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_35
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 135
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fecada33d84622de0800000000000000
+      internalID: -1359413579892282129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_36
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 71
+        width: 20
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d4ffd58ab0057760800000000000000
+      internalID: 7454865559291688149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_37
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 71
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0324d5a9c1c2d940800000000000000
+      internalID: 5319527181692707597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_38
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 71
+        width: 18
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54b599ffd8ad875a0800000000000000
+      internalID: -6523223756832679099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_39
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 7
+        width: 20
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b445af0df8cd052d0800000000000000
+      internalID: -3291888817363332021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_40
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 7
+        width: 20
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f5daf801a6ec3690800000000000000
+      internalID: -7620962890102942219
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_41
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 9
+        width: 23
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78f5e3ac401cc0240800000000000000
+      internalID: 4759391132540886919
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_42
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 12
+        width: 27
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ad6d880e5374ce50800000000000000
+      internalID: 6828709782708120994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_43
+      rect:
+        serializedVersion: 2
+        x: 285
+        y: 7
+        width: 18
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e5864cabf1a77b80800000000000000
+      internalID: -8397064877909834270
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_44
+      rect:
+        serializedVersion: 2
+        x: 347
+        y: 7
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d9da1e3bc0d117b10800000000000000
+      internalID: 1977393651787083165
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_45
+      rect:
+        serializedVersion: 2
+        x: 409
+        y: 7
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 256232d7785656c00800000000000000
+      internalID: 893231733697357394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_46
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 7
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5607158ef23e84a40800000000000000
+      internalID: 5352777952030453861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpriteSheetwithbow_47
+      rect:
+        serializedVersion: 2
+        x: 535
+        y: 7
+        width: 18
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c514816434b9098e0800000000000000
+      internalID: -1688679147022827172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      SpriteSheetwithbow_0: -5326215159447354983
+      SpriteSheetwithbow_1: 1743291569795604440
+      SpriteSheetwithbow_10: 6986400790161341089
+      SpriteSheetwithbow_11: 5967620393916053700
+      SpriteSheetwithbow_12: 4525017653799150213
+      SpriteSheetwithbow_13: -1203267391904231156
+      SpriteSheetwithbow_14: 8797606432078238570
+      SpriteSheetwithbow_15: -2876246079053000166
+      SpriteSheetwithbow_16: -7469963328892082791
+      SpriteSheetwithbow_17: -8350166100151906499
+      SpriteSheetwithbow_18: 7656382125262898267
+      SpriteSheetwithbow_19: -8749764369548421249
+      SpriteSheetwithbow_2: -7526101607775692119
+      SpriteSheetwithbow_20: 4967330739642625971
+      SpriteSheetwithbow_21: -2785262714569137257
+      SpriteSheetwithbow_22: 2624348504042478781
+      SpriteSheetwithbow_23: 5790736862391493321
+      SpriteSheetwithbow_24: -5347720844255812700
+      SpriteSheetwithbow_25: -8705453954510291991
+      SpriteSheetwithbow_26: 3657236227127691409
+      SpriteSheetwithbow_27: 1795033975112149663
+      SpriteSheetwithbow_28: 7548979415115928438
+      SpriteSheetwithbow_29: 3835808887216254597
+      SpriteSheetwithbow_3: -1945243393100203960
+      SpriteSheetwithbow_30: -2708604449333517019
+      SpriteSheetwithbow_31: -679361555698699398
+      SpriteSheetwithbow_32: -5906206555596001300
+      SpriteSheetwithbow_33: 2747435331081194756
+      SpriteSheetwithbow_34: 3488341641121714844
+      SpriteSheetwithbow_35: -1359413579892282129
+      SpriteSheetwithbow_36: 7454865559291688149
+      SpriteSheetwithbow_37: 5319527181692707597
+      SpriteSheetwithbow_38: -6523223756832679099
+      SpriteSheetwithbow_39: -3291888817363332021
+      SpriteSheetwithbow_4: 4213195379466389984
+      SpriteSheetwithbow_40: -7620962890102942219
+      SpriteSheetwithbow_41: 4759391132540886919
+      SpriteSheetwithbow_42: 6828709782708120994
+      SpriteSheetwithbow_43: -8397064877909834270
+      SpriteSheetwithbow_44: 1977393651787083165
+      SpriteSheetwithbow_45: 893231733697357394
+      SpriteSheetwithbow_46: 5352777952030453861
+      SpriteSheetwithbow_47: -1688679147022827172
+      SpriteSheetwithbow_5: 3036292586203200419
+      SpriteSheetwithbow_6: 1411858226660575178
+      SpriteSheetwithbow_7: -194933537853105714
+      SpriteSheetwithbow_8: -3449105240550675851
+      SpriteSheetwithbow_9: 8942458441082177435
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

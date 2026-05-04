@@ -388,36 +388,16 @@ public class Enemy : BaseEntity
         switch (enemyType)
         {
             case EnemyType.Mage:
-                TryMageAttack();
+                TryFireRangedProjectile();
                 break;
             case EnemyType.Tanky:
-                TryTankyAttack();
-                break;
             case EnemyType.Warrior:
-                TryWarriorAttack();
+                TryMeleeAttackOnPlayer();
                 break;
         }
     }
 
-    private void TryMageAttack()
-    {
-        TryFireRangedProjectile();
-    }
-
-    private void TryTankyAttack()
-    {
-        if (currentState != State.Attack || player == null) return;
-        if (Time.time < _nextTypeAttackTime) return;
-        if (!CanHitPlayerWithMelee()) return;
-
-        IDamageable target = player.GetComponent<IDamageable>();
-        if (target != null)
-            target.TakeDamage(stats != null ? stats.attackPower : 0f, false);
-
-        _nextTypeAttackTime = Time.time + meleeAttackInterval;
-    }
-
-    private void TryWarriorAttack()
+    private void TryMeleeAttackOnPlayer()
     {
         if (currentState != State.Attack || player == null) return;
         if (Time.time < _nextTypeAttackTime) return;
