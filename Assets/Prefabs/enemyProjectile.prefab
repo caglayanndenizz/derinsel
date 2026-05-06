@@ -141,7 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7f1ef7f3488c435a8e5a78fa1af4aec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyProjectile
-  defaultMaxLifetime: 8
+  defaultMaxLifetime: 5
 --- !u!50 &549785536891718357
 Rigidbody2D:
   serializedVersion: 5

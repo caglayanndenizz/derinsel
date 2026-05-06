@@ -14,6 +14,7 @@ public class EnemyProjectile : MonoBehaviour
     float _maxLifetime;
     float _spawnTime;
     bool _initialized;
+    bool _wasVisibleSinceSpawn;
 
     private EnemyProjectilePooler _pooler;
 
@@ -60,6 +61,7 @@ public class EnemyProjectile : MonoBehaviour
         _direction = to.normalized;
         float angle = Mathf.Atan2(_direction.y, _direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        _wasVisibleSinceSpawn = false;
         _initialized = true;
     }
 
@@ -101,10 +103,24 @@ public class EnemyProjectile : MonoBehaviour
     void OnDisable()
     {
         _initialized = false;
+        _wasVisibleSinceSpawn = false;
         _speed = 0f;
         _damage = 0f;
         _direction = Vector2.zero;
         _maxLifetime = defaultMaxLifetime;
+    }
+
+    void OnBecameVisible()
+    {
+        if (!_initialized) return;
+        _wasVisibleSinceSpawn = true;
+    }
+
+    void OnBecameInvisible()
+    {
+        if (!_initialized) return;
+        if (!_wasVisibleSinceSpawn) return;
+        ReturnToPool();
     }
 
     private void ReturnToPool()
