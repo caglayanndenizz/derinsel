@@ -6,6 +6,8 @@ public class PlayerBarsUI : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Player player;
+    [SerializeField] private PlayerLevel playerLevel;
+    [SerializeField] private PlayerCurrency playerCurrency;
     [SerializeField] private Slider healthBar;
     [SerializeField] private Slider experienceBar;
     [SerializeField] private TMP_Text levelText;
@@ -15,6 +17,14 @@ public class PlayerBarsUI : MonoBehaviour
     {
         if (player == null)
             player = Object.FindAnyObjectByType<Player>();
+        if (playerLevel == null && player != null)
+            playerLevel = player.PlayerLevel;
+        if (playerLevel == null)
+            playerLevel = Object.FindAnyObjectByType<PlayerLevel>();
+        if (playerCurrency == null && player != null)
+            playerCurrency = player.PlayerCurrency;
+        if (playerCurrency == null)
+            playerCurrency = Object.FindAnyObjectByType<PlayerCurrency>();
     }
 
     private void OnEnable()
@@ -32,27 +42,39 @@ public class PlayerBarsUI : MonoBehaviour
     {
         if (player == null) return;
         player.HealthChanged += HandleHealthChanged;
-        player.ExperienceChanged += HandleExperienceChanged;
-        player.LevelChanged += HandleLevelChanged;
-        player.GoldChanged += HandleGoldChanged;
+        if (playerCurrency != null)
+            playerCurrency.GoldChanged += HandleGoldChanged;
+        if (playerLevel != null)
+        {
+            playerLevel.ExperienceChanged += HandleExperienceChanged;
+            playerLevel.LevelChanged += HandleLevelChanged;
+        }
     }
 
     private void UnbindPlayer()
     {
         if (player == null) return;
         player.HealthChanged -= HandleHealthChanged;
-        player.ExperienceChanged -= HandleExperienceChanged;
-        player.LevelChanged -= HandleLevelChanged;
-        player.GoldChanged -= HandleGoldChanged;
+        if (playerCurrency != null)
+            playerCurrency.GoldChanged -= HandleGoldChanged;
+        if (playerLevel != null)
+        {
+            playerLevel.ExperienceChanged -= HandleExperienceChanged;
+            playerLevel.LevelChanged -= HandleLevelChanged;
+        }
     }
 
     private void PushInitialValues()
     {
         if (player == null) return;
         player.NotifyHealthChanged();
-        player.NotifyExperienceChanged();
-        player.NotifyLevelChanged();
-        player.NotifyGoldChanged();
+        if (playerCurrency != null)
+            playerCurrency.NotifyGoldChanged();
+        if (playerLevel != null)
+        {
+            playerLevel.NotifyExperienceChanged();
+            playerLevel.NotifyLevelChanged();
+        }
     }
 
     private void HandleHealthChanged(float currentHealth, float maxHealth)

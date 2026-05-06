@@ -53,8 +53,6 @@ public class Player : BaseEntity
     private float _heavyFallbackExecuteAt = -1f;
     private Coroutine _bowArrowSpawnCoroutine;
 
-    [Header("Movement Modifiers")]
-    [SerializeField] private float dungeonEntryBaseSpeedMultiplier = 1.25f;
     [Header("Damage")]
     [SerializeField] private float damageInvulnerabilityDuration = 0.2f;
 
@@ -62,10 +60,9 @@ public class Player : BaseEntity
     public Transform attackPoint;
     [SerializeField] private Animator animator;
     public LayerMask enemyLayers;
-    [SerializeField] private float goldCount;
-    [SerializeField] private float experienceCount;
-    [SerializeField] private float requiredExperienceForNextLevel = 100f;
-    [SerializeField] private int currentLevel = 1;
+    private PlayerLevel playerLevel;
+    private PlayerCurrency playerCurrency;
+    private PlayerAugmentController playerAugmentController;
 
     [Header("Hammer Cooldown UI")]
     public Slider hammerCooldownBar;
@@ -76,21 +73,8 @@ public class Player : BaseEntity
     public Slider chargeMeter;
     public GameObject meterCanvas;
 
-    [Header("Hit Stop")]
-    public HitStopManager hitStopManager;
-    [Range(0.01f, 1f)] public float lightHitStopTimeScale = 0.14f;
-    public float lightHitStopDuration = 0.02f;
-    [Range(0.01f, 1f)] public float heavyHitStopTimeScale = 0.08f;
-    public float heavyHitStopDuration = 0.045f;
-
     [Header("Impact Feedback")]
-    public CinemachineImpulseSource lightHitImpulse;
-    public GameObject hitVfxPrefab;
-    public AudioSource hitAudioSource;
-    public AudioClip lightHitSfx;
-    public AudioClip heavyHitSfx;
-    [Range(0.5f, 1f)] public float lightHitPitch = 0.92f;
-    [Range(0.5f, 1f)] public float heavyHitPitch = 0.82f;
+    private PlayerImpactFeedback impactFeedback;
 
     private float _currentCharge = 0f;
     private bool _isHammerCharging = false;
@@ -99,8 +83,6 @@ public class Player : BaseEntity
     private float _nextHammerUseTime = 0f;
     private Rigidbody2D _rb; // FİZİK İÇİN ŞART
     private CinemachineImpulseSource _defaultImpulseSource;
-    private float _baseSpeedMultiplier = 1f;
-    private bool _hasAppliedDungeonEntryBoost = false;
     private float _invulnerableUntil = 0f;
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int IsChargingHash = Animator.StringToHash("IsCharging");
@@ -109,13 +91,10 @@ public class Player : BaseEntity
     private static readonly int HeavyAttackHash = Animator.StringToHash("HeavyAttack");
 
     public event Action<float, float> HealthChanged;
-    public event Action<float, float> ExperienceChanged;
-    public event Action<int> LevelChanged;
-    public event Action<float> GoldChanged;
 
-    public float GoldCount => goldCount;
-    public float ExperienceCount => experienceCount;
-    public int CurrentLevel => currentLevel;
+    public PlayerLevel PlayerLevel => playerLevel;
+    public PlayerCurrency PlayerCurrency => playerCurrency;
+    public PlayerAugmentController PlayerAugmentController => playerAugmentController;
 
     protected override void Awake()
     {
@@ -129,18 +108,31 @@ public class Player : BaseEntity
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
 
-        if (hitStopManager == null)
-            hitStopManager = HitStopManager.Instance;
+        if (playerLevel == null)
+            playerLevel = GetComponent<PlayerLevel>();
+        if (playerCurrency == null)
+            playerCurrency = GetComponent<PlayerCurrency>();
+        if (playerAugmentController == null)
+            playerAugmentController = GetComponent<PlayerAugmentController>();
+        if (impactFeedback == null)
+            impactFeedback = GetComponent<PlayerImpactFeedback>();
 
         InitializeHammerCooldownUI();
         NotifyHealthChanged();
-        NotifyExperienceChanged();
-        NotifyLevelChanged();
-        NotifyGoldChanged();
+        if (playerCurrency != null)
+            playerCurrency.NotifyGoldChanged();
+    }
+
+    private void OnEnable()
+    {
+        if (playerLevel != null)
+            playerLevel.LevelUp += HandleLevelUp;
     }
 
     void OnDisable()
     {
+        if (playerLevel != null)
+            playerLevel.LevelUp -= HandleLevelUp;
         CancelPendingBowArrow();
     }
 
@@ -171,55 +163,15 @@ public class Player : BaseEntity
         _invulnerableUntil = Time.time + Mathf.Max(0f, damageInvulnerabilityDuration);
     }
 
-    public void AddGold(float amount)
-    {
-        if (amount <= 0f) return;
-        goldCount += amount;
-        NotifyGoldChanged();
-    }
-
-    public void AddExperience(float amount)
-    {
-        if (amount <= 0f) return;
-
-        experienceCount += amount;
-        int levelUps = 0;
-        float requiredExperience = Mathf.Max(1f, requiredExperienceForNextLevel);
-
-        while (experienceCount >= requiredExperience)
-        {
-            experienceCount -= requiredExperience;
-            levelUps++;
-        }
-
-        if (levelUps > 0)
-        {
-            currentLevel += levelUps;
-            OnLevelUp();
-            NotifyLevelChanged();
-        }
-
-        ExperienceChanged?.Invoke(experienceCount, requiredExperience);
-    }
-
-    public void NotifyExperienceChanged()
-    {
-        ExperienceChanged?.Invoke(experienceCount, Mathf.Max(1f, requiredExperienceForNextLevel));
-    }
-
     public void NotifyHealthChanged()
     {
         HealthChanged?.Invoke(CurrentHealth, Mathf.Max(1f, MaxHealth));
     }
 
-    public void NotifyLevelChanged()
+    public void AddExperience(float amount)
     {
-        LevelChanged?.Invoke(Mathf.Max(1, currentLevel));
-    }
-
-    public void NotifyGoldChanged()
-    {
-        GoldChanged?.Invoke(Mathf.Max(0f, goldCount));
+        if (amount <= 0f || playerLevel == null) return;
+        playerLevel.AddExperience(amount);
     }
 
     protected override void Move()
@@ -229,9 +181,9 @@ public class Player : BaseEntity
 
         Vector2 direction = new Vector2(moveX, moveY).normalized;
         
-        // Tüm hız modifiyerleri dungeon girişindeki baz çarpanın üstüne uygulanır.
+        float augmentSpeedBonus = playerAugmentController != null ? playerAugmentController.MovementSpeedBonus : 0f;
         float chargeMultiplier = (_isHammerCharging || _isBowCharging) ? 0.3f : 1f;
-        float currentSpeed = stats.moveSpeed * _baseSpeedMultiplier * chargeMultiplier;
+        float currentSpeed = stats.moveSpeed * (1f + augmentSpeedBonus) * chargeMultiplier;
         
         // KRİTİK DÜZELTME: transform.Translate SİLİNDİ, Rigidbody Velocity GELDİ!
         _rb.linearVelocity = direction * currentSpeed;
@@ -241,13 +193,6 @@ public class Player : BaseEntity
         // --- FLIP MANTIĞI ---
         if (moveX > 0) transform.localScale = new Vector3(1f, 1f, 1f);
         else if (moveX < 0) transform.localScale = new Vector3(-1f, 1f, 1f);
-    }
-
-    public void ApplyDungeonEntrySpeedBoost()
-    {
-        if (_hasAppliedDungeonEntryBoost) return;
-        _baseSpeedMultiplier *= Mathf.Max(1f, dungeonEntryBaseSpeedMultiplier);
-        _hasAppliedDungeonEntryBoost = true;
     }
 
     private bool IsChargeMeterFullWhileCharging()
@@ -468,8 +413,7 @@ public class Player : BaseEntity
 
         if (successfulHits > 0)
         {
-            SpawnHitVfx(firstHitPosition);
-            PlayImpactFeedback(true);
+            impactFeedback?.PlayHeavyHit(firstHitPosition, _defaultImpulseSource);
         }
     }
 
@@ -485,61 +429,6 @@ public class Player : BaseEntity
         if (!_lightAttackInProgress) return;
         if (Time.time < _lightFallbackExecuteAt) return;
         ClearLightAttackPendingState();
-    }
-
-    private void PlayImpactFeedback(bool isHeavy)
-    {
-        if (hitStopManager == null)
-            hitStopManager = HitStopManager.Instance != null
-                ? HitStopManager.Instance
-                : UnityEngine.Object.FindAnyObjectByType<HitStopManager>();
-
-        if (hitStopManager == null)
-        {
-            GameObject managerObject = new GameObject("HitStopManager");
-            hitStopManager = managerObject.AddComponent<HitStopManager>();
-        }
-
-        if (hitStopManager != null)
-        {
-            float rawTimeScale = isHeavy ? heavyHitStopTimeScale : lightHitStopTimeScale;
-            float rawDuration = isHeavy ? heavyHitStopDuration : lightHitStopDuration;
-
-            // Inspector'da agresif değer kalsa bile hissi "kasma"ya çevirmemek için güvenli aralık.
-            float minimumSmoothScale = isHeavy ? 0.08f : 0.14f;
-            float maximumSmoothDuration = isHeavy ? 0.045f : 0.02f;
-            float timeScale = Mathf.Clamp(rawTimeScale, minimumSmoothScale, 1f);
-            float duration = Mathf.Clamp(rawDuration, 0f, maximumSmoothDuration);
-            hitStopManager.TriggerHitStop(timeScale, duration);
-        }
-
-        if (!isHeavy)
-        {
-            CinemachineImpulseSource lightImpulseSource = lightHitImpulse != null ? lightHitImpulse : _defaultImpulseSource;
-            if (lightImpulseSource != null)
-                lightImpulseSource.GenerateImpulse();
-        }
-
-        PlayHitSfx(isHeavy);
-    }
-
-    private void PlayHitSfx(bool isHeavy)
-    {
-        if (hitAudioSource == null) return;
-
-        AudioClip clip = isHeavy ? heavyHitSfx : lightHitSfx;
-        if (clip == null) return;
-
-        float previousPitch = hitAudioSource.pitch;
-        hitAudioSource.pitch = isHeavy ? heavyHitPitch : lightHitPitch;
-        hitAudioSource.PlayOneShot(clip);
-        hitAudioSource.pitch = previousPitch;
-    }
-
-    private void SpawnHitVfx(Vector3 worldPos)
-    {
-        if (hitVfxPrefab == null) return;
-        Instantiate(hitVfxPrefab, worldPos, Quaternion.identity);
     }
 
     private void UpdateChargingAnimator()
@@ -577,7 +466,7 @@ public class Player : BaseEntity
         ResetBowChargeState();
     }
 
-    private void OnLevelUp()
+    private void HandleLevelUp()
     {
         _currentHealth = MaxHealth;
         NotifyHealthChanged();

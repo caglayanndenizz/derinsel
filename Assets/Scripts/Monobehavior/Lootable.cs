@@ -80,11 +80,12 @@ public class Lootable : MonoBehaviour
     {
         isCollected = true;
         Player player = playerObj.GetComponent<Player>();
+        PlayerCurrency playerCurrency = player != null ? player.PlayerCurrency : null;
         
         if (player != null)
         {
             if (isGold)
-                player.AddGold(Mathf.Max(0, value));
+                playerCurrency?.AddGold(Mathf.Max(0, value));
             else
                 player.AddExperience(Mathf.Max(0, experienceValue));
         }
