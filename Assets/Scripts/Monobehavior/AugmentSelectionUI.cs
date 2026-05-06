@@ -13,6 +13,7 @@ public class AugmentSelectionUI : MonoBehaviour
 
     [Header("Behavior")]
     [SerializeField] private bool pauseGameWhenPanelOpen = true;
+    [SerializeField] private bool deactivatePanelRootWhenHidden = true;
 
     private float _previousTimeScale = 1f;
     private bool _isSubscribed;
@@ -21,16 +22,13 @@ public class AugmentSelectionUI : MonoBehaviour
 
     private void Awake()
     {
-        if (panelRoot == null)
-            panelRoot = gameObject;
+        ResolvePanelRootIfNeeded();
 
         AutoResolveOptionButtonsIfNeeded();
         TryResolvePlayer();
         TryResolvePlayerLevel();
         TryResolveAugmentController();
         EnsurePanelCanvasGroup();
-        if (!panelRoot.activeSelf)
-            panelRoot.SetActive(true);
         HidePanel();
     }
 
@@ -100,6 +98,8 @@ public class AugmentSelectionUI : MonoBehaviour
         _panelCanvasGroup.alpha = 0f;
         _panelCanvasGroup.interactable = false;
         _panelCanvasGroup.blocksRaycasts = false;
+        if (deactivatePanelRootWhenHidden && CanDeactivatePanelRootWithoutDisablingListener() && panelRoot.activeSelf)
+            panelRoot.SetActive(false);
     }
 
     private List<AugmentDefinition> BuildMovementSpeedOptions()
@@ -206,6 +206,44 @@ public class AugmentSelectionUI : MonoBehaviour
         _panelCanvasGroup = panelRoot.GetComponent<CanvasGroup>();
         if (_panelCanvasGroup == null)
             _panelCanvasGroup = panelRoot.AddComponent<CanvasGroup>();
+    }
+
+    private void ResolvePanelRootIfNeeded()
+    {
+        if (panelRoot != null) return;
+
+        panelRoot = gameObject;
+        AugmentOptionButton[] ownButtons = panelRoot.GetComponentsInChildren<AugmentOptionButton>(true);
+        if (ownButtons.Length > 0) return;
+
+        Transform ancestor = transform.parent;
+        while (ancestor != null)
+        {
+            if (ancestor.GetComponentsInChildren<AugmentOptionButton>(true).Length > 0)
+            {
+                panelRoot = ancestor.gameObject;
+                return;
+            }
+
+            ancestor = ancestor.parent;
+        }
+    }
+
+    private bool CanDeactivatePanelRootWithoutDisablingListener()
+    {
+        if (panelRoot == null || panelRoot == gameObject)
+            return false;
+
+        bool thisObjectWillBeDisabled = transform.IsChildOf(panelRoot.transform);
+        if (thisObjectWillBeDisabled)
+        {
+            Debug.LogWarning(
+                "AugmentSelectionUI: panelRoot deactivated this object would also be disabled, so level-up events would stop. " +
+                "Keep this script on an always-active object (e.g. AugmentCanvas) and assign panelRoot to the visual panel.");
+            return false;
+        }
+
+        return true;
     }
 
     private void AutoResolveOptionButtonsIfNeeded()
