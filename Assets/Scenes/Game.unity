@@ -740,6 +740,9 @@ MonoBehaviour:
   - {fileID: 2072830267}
   pauseGameWhenPanelOpen: 1
   deactivatePanelRootWhenHidden: 1
+  panelThemeTargetImage: {fileID: 0}
+  levelUpPanelThemeColor: {r: 1, g: 1, b: 1, a: 1}
+  wallLootGiftPanelThemeColor: {r: 0.35, g: 0.35, b: 0.35, a: 1}
 --- !u!1 &314556255
 GameObject:
   m_ObjectHideFlags: 0
@@ -7541,6 +7544,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAugmentController
   movementSpeedBonus: 0
+  hasChargedBowAoe: 0
+  chargedBowAoeRadius: 3
+  hasDoubleArrowUnlock: 0
+  hasWallLootsUnlock: 0
 --- !u!1 &1730437410
 GameObject:
   m_ObjectHideFlags: 0

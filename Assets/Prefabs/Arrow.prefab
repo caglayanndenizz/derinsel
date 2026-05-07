@@ -151,3 +151,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerArrow
   defaultMaxLifetime: 8
+  wallLootDropGateChance: 0.05
+  wallLootAugmentGiftChance: 0.01
+  wallLootGoldChance: 0.7
+  wallLootExpChance: 0.29
+  wallLootExpValue: 40
+  maxWallLootDropsPerRoom: 5

@@ -31,8 +31,6 @@ public class Player : BaseEntity
     public float bowArrowReleaseDelay = 0.4f;
     [Tooltip("Tam şarjlı sağ-tık yayda ok hızı ve hasarı bu çarpanla çarpılır.")]
     public float bowChargedSpeedDamageMultiplier = 3f;
-    [Tooltip("Tam şarjlı ok isabet ettiğinde duvar kırma ve IDamageable yok etme yarıçapı (dünya birimi).")]
-    public float bowChargedExplosionRadius = 3f;
     [Tooltip("Sağ tık basılı tutma süresi (saniye); dolunca yay tam şarj sayılır.")]
     public float maxBowChargeTime = 0.5f;
     [Tooltip("Boşsa yay şarj çubuğu gösterilmez; Inspector'dan atayabilirsin.")]
@@ -51,7 +49,6 @@ public class Player : BaseEntity
     private float _lastHeavyResolveTime = -999f;
     private bool _heavyAttackInProgress = false;
     private float _heavyFallbackExecuteAt = -1f;
-    private Coroutine _bowArrowSpawnCoroutine;
 
     [Header("Damage")]
     [SerializeField] private float damageInvulnerabilityDuration = 0.2f;
@@ -273,6 +270,9 @@ public class Player : BaseEntity
         if (cam == null) return;
 
         bool chargedShot = useBowChargedMultiplier;
+        bool chargedExplosionEnabled = chargedShot &&
+                                       playerAugmentController != null &&
+                                       playerAugmentController.HasChargedBowAoe;
         float m = chargedShot ? Mathf.Max(1f, bowChargedSpeedDamageMultiplier) : 1f;
         float useSpeed = arrowSpeed * m;
         float useDamage = damage * m;
@@ -282,36 +282,56 @@ public class Player : BaseEntity
         if (offset.sqrMagnitude < 0.0001f)
             offset = Vector2.right * 0.01f;
         Vector2 dir = offset.normalized;
-        Vector2 spawnPos = origin + dir * 0.2f;
+        float targetDistance = Mathf.Max(0.5f, offset.magnitude);
+        int arrowCount = playerAugmentController != null
+            ? Mathf.Max(1, playerAugmentController.ArrowShotMultiplier)
+            : 1;
+        float spreadStepDegrees = GetArrowSpreadStepDegrees(arrowCount);
+        float centerOffset = (arrowCount - 1) * 0.5f;
 
-        GameObject arrow = Instantiate(arrowPrefab, spawnPos, Quaternion.identity);
-        PlayerArrow mover = arrow.GetComponent<PlayerArrow>();
-        if (mover != null)
+        for (int i = 0; i < arrowCount; i++)
         {
+            float angleOffset = (i - centerOffset) * spreadStepDegrees;
+            Vector2 shotDir = Quaternion.Euler(0f, 0f, angleOffset) * dir;
+            Vector2 spawnPos = origin + shotDir * 0.2f;
+            Vector2 shotTarget = origin + shotDir * targetDistance;
+
+            GameObject arrow = Instantiate(arrowPrefab, spawnPos, Quaternion.identity);
+            PlayerArrow mover = arrow.GetComponent<PlayerArrow>();
+            if (mover == null) continue;
+
             mover.Initialize(
-                targetWorld,
+                shotTarget,
                 useSpeed,
                 useDamage,
                 arrowMaxLifetime,
                 enemyLayers,
                 transform,
-                chargedShot,
-                chargedShot ? Mathf.Max(0f, bowChargedExplosionRadius) : 0f,
+                chargedExplosionEnabled,
+                chargedExplosionEnabled ? playerAugmentController.ChargedBowAoeRadius : 0f,
                 generator,
-                chargedShot ? _defaultImpulseSource : null);
+                chargedExplosionEnabled ? _defaultImpulseSource : null);
+        }
+    }
+
+    private static float GetArrowSpreadStepDegrees(int arrowCount)
+    {
+        switch (arrowCount)
+        {
+            case 2: return 15f;
+            case 3: return 10f;
+            case 4: return 8f;
+            default: return arrowCount > 4 ? 8f : 0f;
         }
     }
 
     private void CancelPendingBowArrow()
     {
-        if (_bowArrowSpawnCoroutine == null) return;
-        StopCoroutine(_bowArrowSpawnCoroutine);
-        _bowArrowSpawnCoroutine = null;
+        StopAllCoroutines();
     }
 
     private void ScheduleBowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
     {
-        CancelPendingBowArrow();
         float delay = Mathf.Max(0f, bowArrowReleaseDelay);
         if (delay <= 0f)
         {
@@ -319,14 +339,13 @@ public class Player : BaseEntity
             return;
         }
 
-        _bowArrowSpawnCoroutine = StartCoroutine(BowArrowSpawnAfterDelay(delay, damage, useBowChargedMultiplier, aimWorldAtFireInput));
+        StartCoroutine(BowArrowSpawnAfterDelay(delay, damage, useBowChargedMultiplier, aimWorldAtFireInput));
     }
 
     private IEnumerator BowArrowSpawnAfterDelay(float delaySeconds, float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
     {
         yield return new WaitForSeconds(delaySeconds);
         SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
-        _bowArrowSpawnCoroutine = null;
     }
 
     // Animation Event: yay animasyonu vuruş karesi — ok hasarı PlayerArrow'da; burada yalnızca zamanlama/fallback senkronu.

@@ -233,14 +233,22 @@ public class DungeonGenerator : MonoBehaviour
         if (floorPositions.Contains(pos + Vector2Int.right)) count++;
         return count;
     }
-    public void BreakWallsInArea(Vector3 worldPosition, float radius)
+    public List<Vector3> BreakWallsInArea(Vector3 worldPosition, float radius)
     {
+        List<Vector3> brokenWallWorldPositions = new List<Vector3>();
+        if (wallTilemap == null || floorTilemap == null)
+            return brokenWallWorldPositions;
+
+        HashSet<Vector3Int> processedCells = new HashSet<Vector3Int>();
+
         for (float x = -radius; x <= radius; x += 0.5f)
         {
             for (float y = -radius; y <= radius; y += 0.5f)
             {
                 Vector3 offsetPos = worldPosition + new Vector3(x, y, 0);
                 Vector3Int cellPos = wallTilemap.WorldToCell(offsetPos);
+                if (!processedCells.Add(cellPos))
+                    continue;
 
                 if (wallTilemap.GetTile(cellPos) != null)
                 {
@@ -250,10 +258,13 @@ public class DungeonGenerator : MonoBehaviour
                     {
                         wallTilemap.SetTile(cellPos, null);
                         floorTilemap.SetTile(cellPos, floorTile);
+                        brokenWallWorldPositions.Add(wallTilemap.GetCellCenterWorld(cellPos));
                     }
                 }
             }
         }
+
+        return brokenWallWorldPositions;
     }
 
     bool IsNearFloor(Vector2Int pos, int radius)

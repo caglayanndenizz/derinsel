@@ -10,6 +10,13 @@ using UnityEngine;
 public class PlayerArrow : MonoBehaviour
 {
     [SerializeField] float defaultMaxLifetime = 8f;
+    [Header("Wall Loot (Charged AOE)")]
+    [SerializeField] private float wallLootDropGateChance = 0.05f;
+    [SerializeField] private float wallLootAugmentGiftChance = 0.01f;
+    [SerializeField] private float wallLootGoldChance = 0.70f;
+    [SerializeField] private float wallLootExpChance = 0.29f;
+    [SerializeField] private int wallLootExpValue = 500;
+    [SerializeField] private int maxWallLootDropsPerRoom = 5;
 
     float _speed;
     float _damage;
@@ -23,6 +30,13 @@ public class PlayerArrow : MonoBehaviour
     DungeonGenerator _dungeonGenerator;
     CinemachineImpulseSource _hitCameraImpulse;
     Vector2 _previousFramePosition;
+    PlayerAugmentController _playerAugmentController;
+    AugmentSelectionUI _augmentSelectionUI;
+    GoldLootPooler _goldLootPooler;
+    ExperienceLootPooler _experienceLootPooler;
+    int _wallLootDropsSpawnedThisRoom;
+
+    public int WallLootDropsSpawnedThisRoom => _wallLootDropsSpawnedThisRoom;
 
     void Awake()
     {
@@ -68,6 +82,11 @@ public class PlayerArrow : MonoBehaviour
 
         if (ownerRoot != null)
         {
+            _playerAugmentController = ownerRoot.GetComponent<PlayerAugmentController>();
+            _augmentSelectionUI = Object.FindAnyObjectByType<AugmentSelectionUI>();
+            _goldLootPooler = GoldLootPooler.Instance ?? Object.FindAnyObjectByType<GoldLootPooler>();
+            _experienceLootPooler = ExperienceLootPooler.Instance ?? Object.FindAnyObjectByType<ExperienceLootPooler>();
+
             var arrowCols = GetComponentsInChildren<Collider2D>(true);
             var ownerCols = ownerRoot.GetComponentsInChildren<Collider2D>(true);
             foreach (var ac in arrowCols)
@@ -102,9 +121,11 @@ public class PlayerArrow : MonoBehaviour
             if (_fullyChargedBowExplosion && _explosionRadius > 0f)
             {
                 Vector2 p = hit.point;
+                List<Vector3> brokenWalls = null;
                 if (_dungeonGenerator != null)
-                    _dungeonGenerator.BreakWallsInArea(p, _explosionRadius);
+                    brokenWalls = _dungeonGenerator.BreakWallsInArea(p, _explosionRadius);
                 ApplyChargedExplosionDamage(p);
+                TrySpawnWallLootForBrokenWalls(brokenWalls);
             }
             else
                 TryApplyDirectArrowDamage(hit.collider);
@@ -141,6 +162,7 @@ public class PlayerArrow : MonoBehaviour
             if (h.collider == null) continue;
             if (IsOwnCollider(h.collider)) continue;
             if (h.collider.GetComponentInParent<Player>() != null) continue;
+            if (h.collider.GetComponentInParent<PlayerArrow>() != null) continue;
 
             hit = h;
             return true;
@@ -193,5 +215,56 @@ public class PlayerArrow : MonoBehaviour
             if (amount <= 0f) continue;
             dmg.TakeDamage(amount, false);
         }
+    }
+
+    private void TrySpawnWallLootForBrokenWalls(List<Vector3> brokenWalls)
+    {
+        if (brokenWalls == null || brokenWalls.Count == 0) return;
+        if (_playerAugmentController == null || !_playerAugmentController.HasWallLootsUnlock) return;
+        if (_wallLootDropsSpawnedThisRoom >= Mathf.Max(0, maxWallLootDropsPerRoom)) return;
+
+        foreach (Vector3 wallPosition in brokenWalls)
+        {
+            if (_wallLootDropsSpawnedThisRoom >= Mathf.Max(0, maxWallLootDropsPerRoom))
+                break;
+
+            if (Random.value > Mathf.Clamp01(wallLootDropGateChance))
+                continue;
+
+            if (TrySpawnSingleWallLoot(wallPosition))
+                _wallLootDropsSpawnedThisRoom++;
+        }
+    }
+
+    private bool TrySpawnSingleWallLoot(Vector3 spawnPosition)
+    {
+        float augmentChance = Mathf.Clamp01(wallLootAugmentGiftChance);
+        float goldChance = Mathf.Clamp01(wallLootGoldChance);
+        float expChance = Mathf.Clamp01(wallLootExpChance);
+        float total = augmentChance + goldChance + expChance;
+        if (total <= 0.0001f) return false;
+
+        float roll = Random.value * total;
+        if (roll < augmentChance)
+            return _augmentSelectionUI != null && _augmentSelectionUI.TryShowWallLootGiftPanel();
+
+        roll -= augmentChance;
+        if (roll < goldChance)
+            return _goldLootPooler != null && _goldLootPooler.GetGold(spawnPosition, Quaternion.identity) != null;
+
+        GameObject expObj = _experienceLootPooler != null
+            ? _experienceLootPooler.GetExperience(spawnPosition, Quaternion.identity)
+            : null;
+        if (expObj == null) return false;
+
+        Lootable lootable = expObj.GetComponent<Lootable>();
+        if (lootable != null)
+            lootable.experienceValue = Mathf.Max(0, wallLootExpValue);
+        return true;
+    }
+
+    public void ResetWallLootDropCounterForRoom()
+    {
+        _wallLootDropsSpawnedThisRoom = 0;
     }
 }

@@ -1,8 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AugmentSelectionUI : MonoBehaviour
 {
+    private enum PanelSource
+    {
+        LevelUp,
+        WallLootGift
+    }
+
     [Header("References")]
     [SerializeField] private Player player;
     [SerializeField] private PlayerLevel playerLevel;
@@ -15,10 +22,16 @@ public class AugmentSelectionUI : MonoBehaviour
     [SerializeField] private bool pauseGameWhenPanelOpen = true;
     [SerializeField] private bool deactivatePanelRootWhenHidden = true;
 
+    [Header("Visual Theme")]
+    [SerializeField] private Image panelThemeTargetImage;
+    [SerializeField] private Color levelUpPanelThemeColor = Color.white;
+    [SerializeField] private Color wallLootGiftPanelThemeColor = new Color(0.35f, 0.35f, 0.35f, 1f);
+
     private float _previousTimeScale = 1f;
     private bool _isSubscribed;
     private CanvasGroup _panelCanvasGroup;
     private bool _isPanelOpen;
+    private PanelSource _currentPanelSource = PanelSource.LevelUp;
 
     private void Awake()
     {
@@ -52,28 +65,31 @@ public class AugmentSelectionUI : MonoBehaviour
             Time.timeScale = _previousTimeScale;
     }
 
-    private void ShowPanel()
+    private bool ShowPanel(PanelSource source)
     {
-        if (_isPanelOpen) return;
+        if (_isPanelOpen) return false;
 
         if (panelRoot == null)
         {
             Debug.LogWarning("AugmentSelectionUI: panelRoot is not assigned.");
-            return;
+            return false;
         }
 
         if (optionButtons == null || optionButtons.Length == 0)
         {
             Debug.LogWarning("AugmentSelectionUI: optionButtons are not assigned.");
-            return;
+            return false;
         }
 
-        List<AugmentDefinition> options = BuildMovementSpeedOptions();
+        List<AugmentDefinition> options = BuildRandomAugmentOptions(optionButtons.Length);
         if (options.Count == 0)
         {
-            Debug.LogWarning("AugmentSelectionUI: no matching movement speed augments found in AugmentDatabase. Check database assignment and entries.");
-            return;
+            Debug.LogWarning("AugmentSelectionUI: no matching available augments found in AugmentDatabase. Check database assignment and entries.");
+            return false;
         }
+
+        _currentPanelSource = source;
+        ApplyPanelTheme(_currentPanelSource);
 
         for (int i = 0; i < optionButtons.Length; i++)
         {
@@ -89,12 +105,25 @@ public class AugmentSelectionUI : MonoBehaviour
             _previousTimeScale = Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale;
             Time.timeScale = 0f;
         }
+
+        return true;
+    }
+
+    private void ShowPanel()
+    {
+        ShowPanel(PanelSource.LevelUp);
+    }
+
+    public bool TryShowWallLootGiftPanel()
+    {
+        return ShowPanel(PanelSource.WallLootGift);
     }
 
     private void HidePanel()
     {
         if (panelRoot == null) return;
         EnsurePanelCanvasGroup();
+        ApplyPanelTheme(PanelSource.LevelUp);
         _panelCanvasGroup.alpha = 0f;
         _panelCanvasGroup.interactable = false;
         _panelCanvasGroup.blocksRaycasts = false;
@@ -102,31 +131,62 @@ public class AugmentSelectionUI : MonoBehaviour
             panelRoot.SetActive(false);
     }
 
-    private List<AugmentDefinition> BuildMovementSpeedOptions()
+    private List<AugmentDefinition> BuildRandomAugmentOptions(int maxOptions)
     {
-        List<AugmentDefinition> options = new List<AugmentDefinition>(3);
-        AddIfFound(options, AugmentId.MovementSpeedIncreaseCommon);
-        AddIfFound(options, AugmentId.MovementSpeedIncreaseRare);
-        AddIfFound(options, AugmentId.MovementSpeedIncreaseExtraordinary);
-        return options;
+        List<AugmentDefinition> candidates = BuildAvailableAugmentOptions();
+        if (candidates.Count <= 1)
+            return candidates;
+
+        ShuffleInPlace(candidates);
+
+        int takeCount = Mathf.Clamp(maxOptions, 1, candidates.Count);
+        if (takeCount >= candidates.Count)
+            return candidates;
+
+        return candidates.GetRange(0, takeCount);
     }
 
-    private void AddIfFound(List<AugmentDefinition> options, AugmentId id)
+    private List<AugmentDefinition> BuildAvailableAugmentOptions()
     {
+        List<AugmentDefinition> options = new List<AugmentDefinition>(augmentDatabase != null && augmentDatabase.allAugments != null
+            ? augmentDatabase.allAugments.Count
+            : 0);
         if (augmentDatabase == null || augmentDatabase.allAugments == null)
         {
             Debug.LogWarning("AugmentSelectionUI: augmentDatabase is not assigned.");
-            return;
+            return options;
         }
 
         for (int i = 0; i < augmentDatabase.allAugments.Count; i++)
         {
             AugmentDefinition definition = augmentDatabase.allAugments[i];
-            if (definition == null) continue;
-            if (definition.id != id) continue;
+            if (definition == null || definition.id == AugmentId.None)
+                continue;
+            if (playerAugmentController != null && !playerAugmentController.CanApplyAugment(definition))
+                continue;
             options.Add(definition);
-            return;
         }
+
+        return options;
+    }
+
+    private static void ShuffleInPlace(List<AugmentDefinition> list)
+    {
+        if (list == null || list.Count <= 1) return;
+
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
+    }
+
+    private void ApplyPanelTheme(PanelSource source)
+    {
+        if (panelThemeTargetImage == null) return;
+        panelThemeTargetImage.color = source == PanelSource.WallLootGift
+            ? wallLootGiftPanelThemeColor
+            : levelUpPanelThemeColor;
     }
 
     private void HandleAugmentSelected(AugmentDefinition selectedAugment)
