@@ -847,6 +847,11 @@ MonoBehaviour:
   maxBowChargeTime: 0.5
   bowChargeMeter: {fileID: 911403621568502592}
   bowMeterCanvas: {fileID: 2397508272434322654}
+  radialBowAutoVolleyIntervalSeconds: 1
+  autoArrowVolleyCount: 8
+  autoArrowVolleyAngleStepDegrees: 45
+  radialBowSpawnInset: 0.2
+  radialBowAutoVolleyTravelDistance: 8
   lightAttackRate: 0.2
   lightAttackDuration: 0.1
   lightImpactFallbackDelay: 0.7

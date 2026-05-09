@@ -8,4 +8,11 @@ public enum AugmentId
     DoubleArrowUnlock = 5,
     WallLootsUnlock = 6,
     ExtraAugmentSlotUnlock = 7,
+    GlassCannonDoubleDamageHalveMaxHealth = 8,
+    MaxHealthIncreasePercent = 9,
+    ArrowCount_IncreaseNumberOfArrowsBy1 = 10,
+    ArrowCount_PlusOneArrows = 11,
+    ArrowCount_PlusOneAndSpeed10Percent = 12,
+    ArrowCount_PlusOneAndSpeed15Percent = 13,
+    ArrowCount_IncreaseYourArrowsBy1 = 14,
 }

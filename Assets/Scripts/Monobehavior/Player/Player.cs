@@ -38,6 +38,15 @@ public class Player : BaseEntity
     [Tooltip("Boşsa yay şarj UI kanvası açılmaz.")]
     public GameObject bowMeterCanvas;
 
+    [Header("Bow radial mutation (auto)")]
+    [Tooltip("Beş farklı ok augment sonrası, ek input olmadan kaç saniyede bir salvı.")]
+    [SerializeField] private float radialBowAutoVolleyIntervalSeconds = 1f;
+    [SerializeField] private int autoArrowVolleyCount = 8;
+    [SerializeField] private float autoArrowVolleyAngleStepDegrees = 45f;
+    [SerializeField] private float radialBowSpawnInset = 0.2f;
+    [Tooltip("Otomatik salvıda hedef mesafe (imleç yok).")]
+    [SerializeField] private float radialBowAutoVolleyTravelDistance = 8f;
+
     [Header("Light Attack Settings (Spammable)")]
     public float lightAttackRate = 0.2f; 
     public float lightAttackDuration = 0.1f; 
@@ -81,6 +90,8 @@ public class Player : BaseEntity
     private Rigidbody2D _rb; // FİZİK İÇİN ŞART
     private CinemachineImpulseSource _defaultImpulseSource;
     private float _invulnerableUntil = 0f;
+    private bool _hadRadialBowMutationLastFrame;
+    private float _nextRadialBowAutoVolleyTime;
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int IsChargingHash = Animator.StringToHash("IsCharging");
     private static readonly int BowChargeHash = Animator.StringToHash("BowCharge");
@@ -92,6 +103,28 @@ public class Player : BaseEntity
     public PlayerLevel PlayerLevel => playerLevel;
     public PlayerCurrency PlayerCurrency => playerCurrency;
     public PlayerAugmentController PlayerAugmentController => playerAugmentController;
+
+    public override float MaxHealth
+    {
+        get
+        {
+            float baseMax = stats != null ? stats.maxHealth : 0f;
+            float mult = playerAugmentController != null ? playerAugmentController.MaxHealthMultiplier : 1f;
+            return baseMax * mult;
+        }
+    }
+
+    public void OnMaxHealthMultiplierChanged(float previousMultiplier, float newMultiplier)
+    {
+        if (stats == null) return;
+        float baseMax = stats.maxHealth;
+        float oldMax = baseMax * previousMultiplier;
+        float newMax = baseMax * newMultiplier;
+        if (oldMax <= 0.001f || newMax <= 0f) return;
+        _currentHealth *= newMax / oldMax;
+        _currentHealth = Mathf.Clamp(_currentHealth, 1f, newMax);
+        NotifyHealthChanged();
+    }
 
     protected override void Awake()
     {
@@ -140,6 +173,7 @@ public class Player : BaseEntity
         HandleLightImpactFallback();
         HandleHeavyImpactFallback();
         UpdateHammerCooldownUI();
+        UpdateRadialBowAutoVolley();
     }
 
     // FİZİK HAREKETİ BURADA OLMALI
@@ -266,16 +300,18 @@ public class Player : BaseEntity
     private void SpawnArrowTowardWorld(float damage, bool useBowChargedMultiplier, Vector2 targetWorld)
     {
         if (arrowPrefab == null || attackPoint == null) return;
-        Camera cam = aimCamera != null ? aimCamera : Camera.main;
-        if (cam == null) return;
 
         bool chargedShot = useBowChargedMultiplier;
         bool chargedExplosionEnabled = chargedShot &&
                                        playerAugmentController != null &&
                                        playerAugmentController.HasChargedBowAoe;
         float m = chargedShot ? Mathf.Max(1f, bowChargedSpeedDamageMultiplier) : 1f;
-        float useSpeed = arrowSpeed * m;
-        float useDamage = damage * m;
+        float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
+        float arrowSpdMult = playerAugmentController != null
+            ? playerAugmentController.ArrowProjectileSpeedMultiplier
+            : 1f;
+        float useSpeed = arrowSpeed * m * arrowSpdMult;
+        float useDamage = damage * m * dmgMult;
 
         Vector2 origin = attackPoint.position;
         Vector2 offset = targetWorld - origin;
@@ -293,25 +329,112 @@ public class Player : BaseEntity
         {
             float angleOffset = (i - centerOffset) * spreadStepDegrees;
             Vector2 shotDir = Quaternion.Euler(0f, 0f, angleOffset) * dir;
-            Vector2 spawnPos = origin + shotDir * 0.2f;
-            Vector2 shotTarget = origin + shotDir * targetDistance;
+            Vector2 spawnPos = origin + shotDir * radialBowSpawnInset;
+            TrySpawnSinglePlayerArrow(
+                spawnPos,
+                origin + shotDir * targetDistance,
+                useSpeed,
+                useDamage,
+                chargedExplosionEnabled);
+        }
+    }
 
-            GameObject arrow = Instantiate(arrowPrefab, spawnPos, Quaternion.identity);
-            PlayerArrow mover = arrow.GetComponent<PlayerArrow>();
-            if (mover == null) continue;
+    private void UpdateRadialBowAutoVolley()
+    {
+        if (arrowPrefab == null) return;
 
-            mover.Initialize(
+        bool active = playerAugmentController != null &&
+                      playerAugmentController.ShouldUseRadialBowVolleyMutation(this);
+        if (!active)
+        {
+            _hadRadialBowMutationLastFrame = false;
+            return;
+        }
+
+        if (!_hadRadialBowMutationLastFrame)
+            _nextRadialBowAutoVolleyTime = Time.time;
+
+        _hadRadialBowMutationLastFrame = true;
+
+        if (Time.time < _nextRadialBowAutoVolleyTime) return;
+
+        float baseDamage = stats != null ? stats.lightAttackDamage : 0f;
+        FireRadialBowMutationAutoVolley(baseDamage);
+        _nextRadialBowAutoVolleyTime = Time.time +
+            Mathf.Max(0.05f, radialBowAutoVolleyIntervalSeconds);
+    }
+
+    private void FireRadialBowMutationAutoVolley(float lightDamage)
+    {
+        bool chargedExplosionEnabled = false;
+        float m = 1f;
+        float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
+        float arrowSpdMult = playerAugmentController != null
+            ? playerAugmentController.ArrowProjectileSpeedMultiplier
+            : 1f;
+        float useSpeed = arrowSpeed * m * arrowSpdMult;
+        float useDamage = lightDamage * m * dmgMult;
+
+        Vector2 radialOrigin = transform.position;
+        float targetDistance = Mathf.Max(0.5f, radialBowAutoVolleyTravelDistance);
+
+        int volleyCount = Mathf.Clamp(autoArrowVolleyCount, 1, 64);
+        float step = Mathf.Max(1f, autoArrowVolleyAngleStepDegrees);
+
+        for (int i = 0; i < volleyCount; i++)
+        {
+            Vector2 radialDir = RadialBowDirFromAngleDegrees(i * step);
+            float forward = Mathf.Max(0f, radialBowSpawnInset);
+            Vector2 spawnPos = radialOrigin + radialDir * forward;
+            Vector2 shotTarget = radialOrigin + radialDir * Mathf.Max(forward + 0.3f, targetDistance);
+            TrySpawnSinglePlayerArrow(
+                spawnPos,
                 shotTarget,
                 useSpeed,
                 useDamage,
-                arrowMaxLifetime,
-                enemyLayers,
-                transform,
-                chargedExplosionEnabled,
-                chargedExplosionEnabled ? playerAugmentController.ChargedBowAoeRadius : 0f,
-                generator,
-                chargedExplosionEnabled ? _defaultImpulseSource : null);
+                chargedExplosionEnabled);
         }
+    }
+
+    private static Vector2 RadialBowDirFromAngleDegrees(float angleDeg)
+    {
+        float rad = angleDeg * Mathf.Deg2Rad;
+        return new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
+    }
+
+    private void TrySpawnSinglePlayerArrow(
+        Vector2 spawnWorldPosition,
+        Vector2 targetWorldPoint,
+        float useSpeed,
+        float useDamage,
+        bool chargedExplosionEnabled)
+    {
+        if (arrowPrefab == null) return;
+
+        float explosionRadius =
+            chargedExplosionEnabled && playerAugmentController != null
+                ? playerAugmentController.ChargedBowAoeRadius
+                : 0f;
+
+        GameObject arrow = Instantiate(arrowPrefab, spawnWorldPosition, Quaternion.identity);
+        PlayerArrow mover = arrow.GetComponent<PlayerArrow>();
+        if (mover == null)
+        {
+            Destroy(arrow);
+            return;
+        }
+
+        mover.Initialize(
+            targetWorldPoint,
+            useSpeed,
+            useDamage,
+            arrowMaxLifetime,
+            enemyLayers,
+            transform,
+            chargedExplosionEnabled,
+            explosionRadius,
+            generator,
+            chargedExplosionEnabled ? _defaultImpulseSource : null);
     }
 
     private static float GetArrowSpreadStepDegrees(int arrowCount)
@@ -424,7 +547,8 @@ public class Player : BaseEntity
             if (target == null) continue;
             BaseEntity targetEntity = enemy.GetComponent<BaseEntity>() ?? enemy.GetComponentInParent<BaseEntity>();
             float heavyDamage = targetEntity != null ? targetEntity.CurrentHealth : stats.heavyAttackDamage;
-            target.TakeDamage(heavyDamage, true);
+            float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
+            target.TakeDamage(heavyDamage * dmgMult, true);
             if (successfulHits == 0)
                 firstHitPosition = enemy.ClosestPoint(attackPoint.position);
             successfulHits++;

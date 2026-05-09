@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf6f4c16b5f34ab45880a8a4afae4941, type: 3}
-  m_Name: DoubleTheAmountOfArrows
+  m_Name: Arrow_PlusOneSpeed15
   m_EditorClassIdentifier: Assembly-CSharp::AugmentDefinition
-  id: 5
-  displayName: Double Arrow
-  description: Double the amount of your arrows
+  id: 13
+  displayName: Swift Quiver II
+  description: Increase the number of your arrows by 1 and speed it up by another 15%.
   icon: {fileID: 0}
   rarity: 2
   tier: 1
-  value: 1
+  value: 0.15
   scalingCurve:
     serializedVersion: 2
     m_Curve:

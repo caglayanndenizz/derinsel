@@ -7,7 +7,7 @@ public abstract class BaseEntity : MonoBehaviour , IDamageable
 
     protected float _currentHealth;
     public float CurrentHealth => _currentHealth;
-    public float MaxHealth => stats != null ? stats.maxHealth : 0f;
+    public virtual float MaxHealth => stats != null ? stats.maxHealth : 0f;
 
     protected virtual void Awake() 
     {

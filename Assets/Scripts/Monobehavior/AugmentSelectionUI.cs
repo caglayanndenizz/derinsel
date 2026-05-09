@@ -440,6 +440,10 @@ public class AugmentSelectionUI : MonoBehaviour
                 continue;
             if (playerAugmentController != null && !playerAugmentController.CanApplyAugment(definition))
                 continue;
+            if (playerAugmentController != null &&
+                playerAugmentController.HasRadialBowMutationUnlock &&
+                definition.excludeFromAugmentPickerWhenRadialBowMutationComplete)
+                continue;
             opts.Add(definition);
         }
 

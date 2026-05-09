@@ -18,4 +18,8 @@ public class AugmentDefinition : ScriptableObject
     [Header("Balance (Optional)")]
     public float value = 1f;
     public AnimationCurve scalingCurve = AnimationCurve.Linear(0f, 1f, 1f, 1f);
+
+    [Header("Mutation / picker")]
+    [Tooltip("Oyuncuda otomatik radial ok mutasyonu açılmışsa augment havuzundan çıkar.")]
+    public bool excludeFromAugmentPickerWhenRadialBowMutationComplete;
 }
