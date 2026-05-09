@@ -9,6 +9,7 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float chargedBowAoeRadius = 3f;
     [SerializeField] private bool hasDoubleArrowUnlock;
     [SerializeField] private bool hasWallLootsUnlock;
+    [SerializeField] private bool hasExtraAugmentSlotUnlock;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
 
     public event Action<AugmentDefinition> AugmentApplied;
@@ -18,6 +19,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float ChargedBowAoeRadius => Mathf.Max(0f, chargedBowAoeRadius);
     public int ArrowShotMultiplier => hasDoubleArrowUnlock ? 2 : 1;
     public bool HasWallLootsUnlock => hasWallLootsUnlock;
+    public bool HasExtraAugmentSlotUnlock => hasExtraAugmentSlotUnlock;
 
     public bool HasAugment(AugmentId id)
     {
@@ -62,6 +64,9 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.WallLootsUnlock:
                 hasWallLootsUnlock = true;
+                break;
+            case AugmentId.ExtraAugmentSlotUnlock:
+                hasExtraAugmentSlotUnlock = true;
                 break;
         }
 

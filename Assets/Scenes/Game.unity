@@ -734,10 +734,15 @@ MonoBehaviour:
   playerAugmentController: {fileID: 1700128199}
   augmentDatabase: {fileID: 11400000, guid: ee11eeb5a1811f94bbbaddd1c3ab4613, type: 2}
   panelRoot: {fileID: 1400214898}
-  optionButtons:
-  - {fileID: 66581339}
-  - {fileID: 1318843555}
-  - {fileID: 2072830267}
+  optionButtonPrefab: {fileID: 5762706493578251936, guid: 110e365c744754004996d40255d96f3a, type: 3}
+  optionsContainer: {fileID: 0}
+  baseOptionCount: 3
+  unlockedOptionCount: 4
+  runtimeCardPreferredWidth: 400
+  runtimeCardPreferredHeight: 400
+  augmentRowSpacing: 24
+  augmentRowPaddingPx: 8
+  forceAugmentRowToCenterViewport: 1
   pauseGameWhenPanelOpen: 1
   deactivatePanelRootWhenHidden: 1
   panelThemeTargetImage: {fileID: 0}

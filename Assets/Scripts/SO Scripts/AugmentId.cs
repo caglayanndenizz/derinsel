@@ -7,4 +7,5 @@ public enum AugmentId
     ChargedBowAoeUnlock = 4,
     DoubleArrowUnlock = 5,
     WallLootsUnlock = 6,
+    ExtraAugmentSlotUnlock = 7,
 }

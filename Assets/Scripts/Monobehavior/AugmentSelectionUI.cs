@@ -16,28 +16,47 @@ public class AugmentSelectionUI : MonoBehaviour
     [SerializeField] private PlayerAugmentController playerAugmentController;
     [SerializeField] private AugmentDatabase augmentDatabase;
     [SerializeField] private GameObject panelRoot;
-    [SerializeField] private AugmentOptionButton[] optionButtons;
+
+    [Header("Augment cards")]
+    [Tooltip("Required. Cards are instantiated from this prefab under the resolved row parent.")]
+    [SerializeField] private AugmentOptionButton optionButtonPrefab;
+    [Tooltip("Optional RectTransform holding the row — e.g. child named CardsContainer. If unset, CardsContainer under panelRoot is searched, else an AugmentCards row is created automatically.")]
+    [SerializeField] private Transform optionsContainer;
+    [SerializeField] private int baseOptionCount = 3;
+    [SerializeField] private int unlockedOptionCount = 4;
+    [Tooltip("Runtime augment card size (LayoutElement + prefab root).")]
+    [SerializeField] private float runtimeCardPreferredWidth = 400f;
+    [SerializeField] private float runtimeCardPreferredHeight = 400f;
+    [SerializeField] private float augmentRowSpacing = 24f;
+    [SerializeField] private int augmentRowPaddingPx = 8;
+    [Tooltip("Row is anchored to the center of PanelRoot and sized via ContentSizeFitter to fit the cards.")]
+    [SerializeField] private bool forceAugmentRowToCenterViewport = true;
 
     [Header("Behavior")]
     [SerializeField] private bool pauseGameWhenPanelOpen = true;
     [SerializeField] private bool deactivatePanelRootWhenHidden = true;
 
-    [Header("Visual Theme")]
+    [Header("Visual theme")]
     [SerializeField] private Image panelThemeTargetImage;
     [SerializeField] private Color levelUpPanelThemeColor = Color.white;
     [SerializeField] private Color wallLootGiftPanelThemeColor = new Color(0.35f, 0.35f, 0.35f, 1f);
 
+    private const string AutoCardsRowName = "AugmentCards";
+    private readonly List<AugmentOptionButton> _runtimeButtons = new();
+    private RectTransform _runtimeCardsParent;
     private float _previousTimeScale = 1f;
     private bool _isSubscribed;
     private CanvasGroup _panelCanvasGroup;
     private bool _isPanelOpen;
-    private PanelSource _currentPanelSource = PanelSource.LevelUp;
+
+    private bool UsesPrefabAugmentCards =>
+        optionButtonPrefab != null && panelRoot != null;
 
     private void Awake()
     {
         ResolvePanelRootIfNeeded();
 
-        AutoResolveOptionButtonsIfNeeded();
+        TryResolveAugmentDynamicsOnAwake();
         TryResolvePlayer();
         TryResolvePlayerLevel();
         TryResolveAugmentController();
@@ -54,7 +73,6 @@ public class AugmentSelectionUI : MonoBehaviour
     {
         // In some scene setups Player is created/enabled after this UI.
         TrySubscribeToPlayer();
-        AutoResolveOptionButtonsIfNeeded();
     }
 
     private void OnDisable()
@@ -75,29 +93,47 @@ public class AugmentSelectionUI : MonoBehaviour
             return false;
         }
 
-        if (optionButtons == null || optionButtons.Length == 0)
+        TryResolveAugmentController();
+
+        if (!UsesPrefabAugmentCards)
         {
-            Debug.LogWarning("AugmentSelectionUI: optionButtons are not assigned.");
+            Debug.LogWarning(
+                "AugmentSelectionUI: Assign panelRoot and optionButtonPrefab — augment cards are always spawned from the prefab.");
             return false;
         }
 
-        List<AugmentDefinition> options = BuildRandomAugmentOptions(optionButtons.Length);
+        int slotCount = GetDesiredOptionSlotCount();
+
+        RefreshAugmentRowPositionAndLayout();
+        EnsureButtonPool(slotCount);
+        if (_runtimeButtons.Count < slotCount)
+        {
+            Debug.LogWarning(
+                "AugmentSelectionUI: could not instantiate enough augment buttons; check PanelRoot and augment row RectTransform.");
+            return false;
+        }
+
+        HideUnusedRuntimeButtons(slotCount);
+
+        List<AugmentDefinition> options = BuildRandomAugmentOptions(slotCount);
         if (options.Count == 0)
         {
-            Debug.LogWarning("AugmentSelectionUI: no matching available augments found in AugmentDatabase. Check database assignment and entries.");
+            Debug.LogWarning(
+                "AugmentSelectionUI: no matching available augments found in AugmentDatabase. Check database assignment and entries.");
             return false;
         }
 
-        _currentPanelSource = source;
-        ApplyPanelTheme(_currentPanelSource);
+        ApplyPanelTheme(source);
 
-        for (int i = 0; i < optionButtons.Length; i++)
+        for (int i = 0; i < slotCount; i++)
         {
             AugmentDefinition option = i < options.Count ? options[i] : null;
-            optionButtons[i].SetOption(option, HandleAugmentSelected);
+            _runtimeButtons[i].SetOption(option, HandleAugmentSelected);
         }
 
         ShowPanelRoot();
+        if (GetRuntimeCardsParent() != null)
+            RefreshRuntimeCardsLayout();
         _isPanelOpen = true;
 
         if (pauseGameWhenPanelOpen)
@@ -131,6 +167,245 @@ public class AugmentSelectionUI : MonoBehaviour
             panelRoot.SetActive(false);
     }
 
+    private int GetDesiredOptionSlotCount()
+    {
+        if (playerAugmentController != null && playerAugmentController.HasExtraAugmentSlotUnlock)
+            return Mathf.Max(1, unlockedOptionCount);
+        return Mathf.Max(1, baseOptionCount);
+    }
+
+    private void TryResolveAugmentDynamicsOnAwake()
+    {
+        if (!UsesPrefabAugmentCards)
+            return;
+
+        RectTransform row = GetRuntimeCardsParent();
+        if (row != null)
+        {
+            if (forceAugmentRowToCenterViewport)
+                ApplyPreferredAugmentRowFrame(row);
+
+            EnsureAugmentRowHorizontalLayout(row);
+            HideLegacyAugmentButtonsOutsideRow(row);
+        }
+    }
+
+    /// <summary>Re-run before each picker open so scene-assigned Containers pick up anchors + HorizontalLayout reliably.</summary>
+    private void RefreshAugmentRowPositionAndLayout()
+    {
+        RectTransform row = GetRuntimeCardsParent();
+        if (row == null)
+            return;
+
+        if (forceAugmentRowToCenterViewport)
+            ApplyPreferredAugmentRowFrame(row);
+
+        EnsureAugmentRowHorizontalLayout(row);
+    }
+
+    private RectTransform GetRuntimeCardsParent()
+    {
+        if (!UsesPrefabAugmentCards)
+            return null;
+
+        if (_runtimeCardsParent != null && _runtimeCardsParent.gameObject == null)
+            _runtimeCardsParent = null;
+
+        if (_runtimeCardsParent != null)
+            return _runtimeCardsParent;
+
+        if (optionsContainer != null &&
+            (ReferenceEquals(gameObject, optionsContainer.gameObject) ||
+             ReferenceEquals(panelRoot != null ? panelRoot.gameObject : null, optionsContainer.gameObject)))
+        {
+            Debug.LogWarning(
+                "AugmentSelectionUI: optionsContainer should reference a PanelRoot child row (CardsContainer/AugmentCards), not PanelRoot nor this UI object.");
+        }
+
+        if (optionsContainer != null)
+        {
+            var explicitRect = optionsContainer as RectTransform;
+            if (explicitRect != null)
+            {
+                _runtimeCardsParent = explicitRect;
+                return _runtimeCardsParent;
+            }
+        }
+
+        Transform named = FindDescendantNamed(panelRoot.transform, "CardsContainer")
+                          ?? FindDescendantNamed(panelRoot.transform, "OptionsContainer");
+
+        if (named != null)
+        {
+            RectTransform rect = named as RectTransform;
+            if (rect != null)
+            {
+                _runtimeCardsParent = rect;
+                if (optionsContainer == null)
+                    optionsContainer = named;
+                return _runtimeCardsParent;
+            }
+
+            Debug.LogWarning(
+                $"AugmentSelectionUI: found '{named.name}' for augment row parent but it has no RectTransform; add one or use CardsContainer RectTransform.");
+        }
+
+        Transform auto = FindDescendantNamed(panelRoot.transform, AutoCardsRowName);
+        if (auto != null && auto.TryGetComponent(out RectTransform autoRect))
+        {
+            _runtimeCardsParent = autoRect;
+            return _runtimeCardsParent;
+        }
+
+        var rowGo = new GameObject(AutoCardsRowName, typeof(RectTransform));
+        RectTransform row = rowGo.GetComponent<RectTransform>();
+        row.SetParent(panelRoot.transform, false);
+        row.SetSiblingIndex(panelRoot.transform.childCount - 1);
+        ApplyPreferredAugmentRowFrame(row);
+        row.localScale = Vector3.one;
+        row.localRotation = Quaternion.identity;
+
+        _runtimeCardsParent = row;
+        return _runtimeCardsParent;
+    }
+
+    private static Transform FindDescendantNamed(Transform root, string name)
+    {
+        if (root == null)
+            return null;
+
+        var q = new Queue<Transform>();
+        q.Enqueue(root);
+        while (q.Count > 0)
+        {
+            Transform cur = q.Dequeue();
+            if (cur.name == name)
+                return cur;
+            foreach (Transform c in cur)
+                q.Enqueue(c);
+        }
+
+        return null;
+    }
+
+    /// <summary>Places the card row at the center of PanelRoot; width/height come from layout children + ContentSizeFitter.</summary>
+    private void ApplyPreferredAugmentRowFrame(RectTransform row)
+    {
+        if (row == null)
+            return;
+
+        row.anchorMin = row.anchorMax = new Vector2(0.5f, 0.5f);
+        row.pivot = new Vector2(0.5f, 0.5f);
+        row.anchoredPosition = Vector2.zero;
+        row.sizeDelta = Vector2.zero;
+        row.offsetMin = Vector2.zero;
+        row.offsetMax = Vector2.zero;
+        row.localScale = Vector3.one;
+    }
+
+    /// <summary>Horizontal stack + PreferredSize shrink-wrap for the centred AugmentCards row.</summary>
+    private void EnsureAugmentRowHorizontalLayout(RectTransform row)
+    {
+        if (row == null)
+            return;
+
+        ContentSizeFitter csf = row.GetComponent<ContentSizeFitter>();
+        if (csf == null)
+            csf = row.gameObject.AddComponent<ContentSizeFitter>();
+        csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+        csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        HorizontalLayoutGroup hlg = row.GetComponent<HorizontalLayoutGroup>();
+        if (hlg == null)
+            hlg = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+
+        hlg.childAlignment = TextAnchor.MiddleCenter;
+        hlg.reverseArrangement = false;
+        hlg.spacing = augmentRowSpacing;
+        hlg.childForceExpandHeight = false;
+        hlg.childForceExpandWidth = false;
+        hlg.childControlWidth = true;
+        hlg.childControlHeight = true;
+        int p = Mathf.Max(0, augmentRowPaddingPx);
+        hlg.padding = new RectOffset(p, p, p, p);
+    }
+
+    /// <summary>Hides old scene augment buttons left under PanelRoot outside the spawned row.</summary>
+    private void HideLegacyAugmentButtonsOutsideRow(RectTransform rowParent)
+    {
+        if (panelRoot == null || rowParent == null)
+            return;
+
+        AugmentOptionButton[] all = panelRoot.GetComponentsInChildren<AugmentOptionButton>(true);
+        for (int i = 0; i < all.Length; i++)
+        {
+            AugmentOptionButton b = all[i];
+            if (b == null || b.transform.IsChildOf(rowParent))
+                continue;
+            b.gameObject.SetActive(false);
+        }
+    }
+
+    private static void ConfigureRuntimeAugmentCardTransform(AugmentOptionButton btn, float prefW, float prefH)
+    {
+        Transform t = btn.transform;
+        t.localScale = Vector3.one;
+        t.localRotation = Quaternion.identity;
+
+        LayoutElement le = btn.GetComponent<LayoutElement>();
+        if (le == null)
+            le = btn.gameObject.AddComponent<LayoutElement>();
+        float w = Mathf.Max(1f, prefW);
+        float h = Mathf.Max(1f, prefH);
+        le.minWidth = w;
+        le.preferredWidth = w;
+        le.flexibleWidth = 0f;
+        le.minHeight = h;
+        le.preferredHeight = h;
+        le.flexibleHeight = 0f;
+    }
+
+    private void RefreshRuntimeCardsLayout()
+    {
+        if (_runtimeCardsParent == null)
+            return;
+
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(_runtimeCardsParent);
+    }
+
+    private void EnsureButtonPool(int needed)
+    {
+        RectTransform row = GetRuntimeCardsParent();
+        if (row == null)
+        {
+            Debug.LogError(
+                "AugmentSelectionUI: augment row RectTransform could not be resolved (PanelRoot?) — cannot instantiate option cards.");
+            return;
+        }
+
+        EnsureAugmentRowHorizontalLayout(row);
+
+        while (_runtimeButtons.Count < needed)
+        {
+            AugmentOptionButton btn = Instantiate(optionButtonPrefab, row);
+            ConfigureRuntimeAugmentCardTransform(btn, runtimeCardPreferredWidth, runtimeCardPreferredHeight);
+            _runtimeButtons.Add(btn);
+        }
+
+        for (int i = 0; i < _runtimeButtons.Count; i++)
+        {
+            if (_runtimeButtons[i] != null)
+                ConfigureRuntimeAugmentCardTransform(_runtimeButtons[i], runtimeCardPreferredWidth, runtimeCardPreferredHeight);
+        }
+    }
+
+    private void HideUnusedRuntimeButtons(int usedCount)
+    {
+        for (int i = usedCount; i < _runtimeButtons.Count; i++)
+            _runtimeButtons[i].SetOption(null, HandleAugmentSelected);
+    }
+
     private List<AugmentDefinition> BuildRandomAugmentOptions(int maxOptions)
     {
         List<AugmentDefinition> candidates = BuildAvailableAugmentOptions();
@@ -148,13 +423,14 @@ public class AugmentSelectionUI : MonoBehaviour
 
     private List<AugmentDefinition> BuildAvailableAugmentOptions()
     {
-        List<AugmentDefinition> options = new List<AugmentDefinition>(augmentDatabase != null && augmentDatabase.allAugments != null
-            ? augmentDatabase.allAugments.Count
-            : 0);
+        List<AugmentDefinition> opts = new List<AugmentDefinition>(
+            augmentDatabase != null && augmentDatabase.allAugments != null
+                ? augmentDatabase.allAugments.Count
+                : 0);
         if (augmentDatabase == null || augmentDatabase.allAugments == null)
         {
             Debug.LogWarning("AugmentSelectionUI: augmentDatabase is not assigned.");
-            return options;
+            return opts;
         }
 
         for (int i = 0; i < augmentDatabase.allAugments.Count; i++)
@@ -164,10 +440,10 @@ public class AugmentSelectionUI : MonoBehaviour
                 continue;
             if (playerAugmentController != null && !playerAugmentController.CanApplyAugment(definition))
                 continue;
-            options.Add(definition);
+            opts.Add(definition);
         }
 
-        return options;
+        return opts;
     }
 
     private static void ShuffleInPlace(List<AugmentDefinition> list)
@@ -306,17 +582,9 @@ public class AugmentSelectionUI : MonoBehaviour
         return true;
     }
 
-    private void AutoResolveOptionButtonsIfNeeded()
-    {
-        if (panelRoot == null) return;
-        if (optionButtons != null && optionButtons.Length > 0) return;
-        optionButtons = panelRoot.GetComponentsInChildren<AugmentOptionButton>(true);
-    }
-
     [ContextMenu("Debug/Show Augment Panel")]
     private void DebugShowAugmentPanel()
     {
         ShowPanel();
     }
-
 }
