@@ -185,7 +185,6 @@ public class PlayerAugmentController : MonoBehaviour
             return;
 
         _loggedAllArrowAugmentsComplete = true;
-        Debug.Log("arrow augmentleri tamamlandi");
     }
 
     private static int GetMaxApplyCount(AugmentDefinition augment)

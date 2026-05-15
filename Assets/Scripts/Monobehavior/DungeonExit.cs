@@ -78,8 +78,6 @@ public class DungeonExit : MonoBehaviour
         if (_triggerCollider != null)
             _triggerCollider.enabled = false;
 
-        Debug.Log($"Oyuncu {exitAction} kapisina girdi.");
-
         if (interactionUI != null) interactionUI.SetActive(false);
 
         if (dungeonGenerator == null)
@@ -99,7 +97,6 @@ public class DungeonExit : MonoBehaviour
         if (_isTriggered) return;
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Oyuncu kapıdan uzaklaştı!");
             if (interactionUI != null) interactionUI.SetActive(false);
         }
     }

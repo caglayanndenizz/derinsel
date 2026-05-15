@@ -94,13 +94,12 @@ public class Enemy : BaseEntity
         _rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        _generator = UnityEngine.Object.FindAnyObjectByType<DungeonGenerator>(); // Unity 6 için güncel arama
+        _generator = UnityEngine.Object.FindAnyObjectByType<DungeonGenerator>();
         if (goldPooler == null) goldPooler = GoldLootPooler.Instance;
         if (experiencePooler == null) experiencePooler = ExperienceLootPooler.Instance;
         
         _originalColor = _spriteRenderer.color;
 
-        // Fizik Ayarları
         if (_rb != null)
         {
             _rb.gravityScale = 0f;

@@ -9,9 +9,8 @@ public abstract class BaseEntity : MonoBehaviour , IDamageable
     public float CurrentHealth => _currentHealth;
     public virtual float MaxHealth => stats != null ? stats.maxHealth : 0f;
 
-    protected virtual void Awake() 
+    protected virtual void Awake()
     {
-        // Oyun başladığında canı SO'daki veriden çekiyoruz
         if (stats != null)
             _currentHealth = stats.maxHealth;
     }
@@ -22,12 +21,8 @@ public abstract class BaseEntity : MonoBehaviour , IDamageable
         if (_currentHealth <= 0) Die();
     }
 
-    protected virtual void Die() 
-    {
-        // Ölüm efektleri buraya gelecek
-    }
+    protected virtual void Die() { }
 
-    // Hareket her varlıkta farklı olacağı için gövdesini boş bırakıyoruz
     protected abstract void Move();
 
 

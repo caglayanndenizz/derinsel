@@ -106,15 +106,12 @@ public class DungeonGenerator : MonoBehaviour
         yield return transitionFader.FadeOutIn(() =>
         {
             GenerateDungeon();
-            // KRİTİK NOKTA: Kamerayı şak diye oyuncuya sabitle (Kayma bitti!)
             vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
         });
     }
     public void StartNextFloorTransition()
     {
-        // BUTONA BASILDIĞI AN: Çıkış panelini hemen gizle
-        if (exitUI != null) exitUI.SetActive(false); 
-
+        if (exitUI != null) exitUI.SetActive(false);
         StartCoroutine(NextFloorTransitionRoutine());
     }
 
@@ -122,14 +119,11 @@ public class DungeonGenerator : MonoBehaviour
     {
         yield return transitionFader.FadeOutIn(() =>
         {
-            // Zindanı bir üst kat için yeniden oluştur
             MoveToNextFloor();
-            // Oyuncu MoveToNextFloor içinde zaten ışınlandığı için kamera onu burada yakalar.
             vcam.ForceCameraPosition(player.transform.position, Quaternion.identity);
         });
     }
-        
-    // Zindandan çıkarken de aynısını kullanabilirsin
+
     public void StartExitTransition()
     {
         if (exitUI != null) exitUI.SetActive(false);
@@ -283,19 +277,14 @@ public class DungeonGenerator : MonoBehaviour
     }
     void VisualiseDungeon()
     {
-        // 1. Zeminleri yerleştir
-        foreach (var pos in floorPositions) 
-        {
+        foreach (var pos in floorPositions)
             floorTilemap.SetTile((Vector3Int)pos, floorTile);
-        }
 
-        // 2. Sınırları hesapla
         int minX = floorPositions.Min(p => p.x) - 10;
         int maxX = floorPositions.Max(p => p.x) + 10;
         int minY = floorPositions.Min(p => p.y) - 10;
         int maxY = floorPositions.Max(p => p.y) + 10;
 
-        // 3. Duvarları yerleştir
         for (int x = minX; x <= maxX; x++)
         {
             for (int y = minY; y <= maxY; y++)
@@ -307,13 +296,10 @@ public class DungeonGenerator : MonoBehaviour
                 {
                     wallTilemap.SetTile(cellPos, wallTile);
 
-                    // --- GÜNCELLEME: Mesafe kontrolünü 2 yaptık ---
-                    // Eğer bu duvar 2 birimlik alanda bir zemine komşuysa ve şans tutarsa
                     if (IsNearFloor(currentTile, 2) && Random.value < destructableChance)
                     {
                         wallTilemap.SetTileFlags(cellPos, TileFlags.None);
-                        // Rengi yine 2 ton açıyoruz (0.85f)
-                        wallTilemap.SetColor(cellPos, new Color(0.85f, 0.85f, 0.85f, 1.0f)); 
+                        wallTilemap.SetColor(cellPos, new Color(0.85f, 0.85f, 0.85f, 1.0f));
                     }
                 }
             }
@@ -438,12 +424,10 @@ public class DungeonGenerator : MonoBehaviour
 
         if (exitUI != null) exitUI.SetActive(false);
 
-        // --- DEĞİŞİKLİK: Zindandan çıkıldığında giriş kapısını tekrar aç ---
         if (dungeonEntrance != null)
         {
             dungeonEntrance.SetActive(true);
-            // Oyuncuyu ana dünyadaki kapının önüne ışınla
-            player.transform.position = dungeonEntrance.transform.position + new Vector3(0, -1.5f, 0); 
+            player.transform.position = dungeonEntrance.transform.position + new Vector3(0, -1.5f, 0);
         }
 
         _currentDungeonFloor = 1;

@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Spawn sonrası Initialize çağrılır. Hedef dünya noktasına doğru sabit hızda düz gider.
-/// Prefab: Rigidbody2D (Kinematic) + Collider2D (Is Trigger) önerilir — yok olma sadece player tetikleyicisiyle.
-/// </summary>
 public class EnemyProjectile : MonoBehaviour
 {
     [SerializeField] float defaultMaxLifetime = 12f;
@@ -23,9 +19,6 @@ public class EnemyProjectile : MonoBehaviour
         ConfigureNoPushThroughPlayer();
     }
 
-    /// <summary>
-    /// Player'ı itmesin: kinematic RB + trigger collider. Player ile IgnoreCollision kullanma — yoksa OnTriggerEnter çalışmaz.
-    /// </summary>
     void ConfigureNoPushThroughPlayer()
     {
         var rb = GetComponent<Rigidbody2D>();
@@ -43,8 +36,6 @@ public class EnemyProjectile : MonoBehaviour
 
     public void Initialize(Vector2 targetWorldPosition, float speed, float damage, float maxLifetime = -1f)
     {
-        ConfigureNoPushThroughPlayer();
-
         _speed = speed;
         _damage = damage;
         _maxLifetime = maxLifetime > 0f ? maxLifetime : defaultMaxLifetime;
@@ -94,8 +85,6 @@ public class EnemyProjectile : MonoBehaviour
     void OnEnable()
     {
         if (_pooler == null) _pooler = EnemyProjectilePooler.Instance;
-        // Kritik: _damage / _initialized burada sifirlanmamali — SetActive(true) sonrasi
-        // fizik ayni karede OnTriggerEnter2D calisabilir; Initialize() bundan sonra gelirse hasar 0 gider.
         transform.rotation = Quaternion.identity;
         ConfigureNoPushThroughPlayer();
     }

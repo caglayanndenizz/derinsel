@@ -87,7 +87,7 @@ public class Player : BaseEntity
     private float _bowCharge = 0f;
     private bool _isBowCharging = false;
     private float _nextHammerUseTime = 0f;
-    private Rigidbody2D _rb; // FİZİK İÇİN ŞART
+    private Rigidbody2D _rb;
     private CinemachineImpulseSource _defaultImpulseSource;
     private float _invulnerableUntil = 0f;
     private bool _hadRadialBowMutationLastFrame;
@@ -131,9 +131,9 @@ public class Player : BaseEntity
         base.Awake();
         // Rigidbody referansını al ve ayarla
         _rb = GetComponent<Rigidbody2D>();
-        _rb.gravityScale = 0f; // 2D Top-down olduğu için yerçekimini kapat
-        _rb.freezeRotation = true; // Karakterin devrilmesini engelle
-        _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // Duvar delmeyi engeller
+        _rb.gravityScale = 0f;
+        _rb.freezeRotation = true;
+        _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         _defaultImpulseSource = GetComponent<CinemachineImpulseSource>();
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
@@ -168,15 +168,14 @@ public class Player : BaseEntity
 
     void Update()
     {
-        HandleHammerCharge(); // Sol tık (çekiç şarjı)
-        HandleBowChargeAndRelease(); // Sağ tık (yay şarjı + bırakınca ok)
+        HandleHammerCharge();
+        HandleBowChargeAndRelease();
         HandleLightImpactFallback();
         HandleHeavyImpactFallback();
         UpdateHammerCooldownUI();
         UpdateRadialBowAutoVolley();
     }
 
-    // FİZİK HAREKETİ BURADA OLMALI
     void FixedUpdate()
     {
         Move();
@@ -216,12 +215,10 @@ public class Player : BaseEntity
         float chargeMultiplier = (_isHammerCharging || _isBowCharging) ? 0.3f : 1f;
         float currentSpeed = stats.moveSpeed * (1f + augmentSpeedBonus) * chargeMultiplier;
         
-        // KRİTİK DÜZELTME: transform.Translate SİLİNDİ, Rigidbody Velocity GELDİ!
         _rb.linearVelocity = direction * currentSpeed;
         if (animator != null)
             animator.SetFloat(SpeedHash, direction.magnitude);
 
-        // --- FLIP MANTIĞI ---
         if (moveX > 0) transform.localScale = new Vector3(1f, 1f, 1f);
         else if (moveX < 0) transform.localScale = new Vector3(-1f, 1f, 1f);
     }
@@ -280,9 +277,6 @@ public class Player : BaseEntity
         UpdateChargingAnimator();
     }
 
-    /// <summary>
-    /// O anki imleç ekran pozisyonunu attackPoint Z düzlemine projekte eder (ateş anında çağır).
-    /// </summary>
     private Vector2 GetBowAimWorldPointAtCurrentMouse()
     {
         if (attackPoint == null)
@@ -301,11 +295,10 @@ public class Player : BaseEntity
     {
         if (arrowPrefab == null || attackPoint == null) return;
 
-        bool chargedShot = useBowChargedMultiplier;
-        bool chargedExplosionEnabled = chargedShot &&
+        bool chargedExplosionEnabled = useBowChargedMultiplier &&
                                        playerAugmentController != null &&
                                        playerAugmentController.HasChargedBowAoe;
-        float m = chargedShot ? Mathf.Max(1f, bowChargedSpeedDamageMultiplier) : 1f;
+        float m = useBowChargedMultiplier ? Mathf.Max(1f, bowChargedSpeedDamageMultiplier) : 1f;
         float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
         float arrowSpdMult = playerAugmentController != null
             ? playerAugmentController.ArrowProjectileSpeedMultiplier
@@ -471,7 +464,6 @@ public class Player : BaseEntity
         SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
     }
 
-    // Animation Event: yay animasyonu vuruş karesi — ok hasarı PlayerArrow'da; burada yalnızca zamanlama/fallback senkronu.
     public void LightAttack()
     {
         ClearLightAttackPendingState();
@@ -524,7 +516,6 @@ public class Player : BaseEntity
         _heavyFallbackExecuteAt = Time.time + Mathf.Max(0.05f, heavyImpactFallbackDelay);
     }
 
-    // Animation Event: HeavyAttack clip'inde darbe anına eklenmeli.
     public void HammerSlam()
     {
         if (Time.time - _lastHeavyResolveTime < 0.05f)

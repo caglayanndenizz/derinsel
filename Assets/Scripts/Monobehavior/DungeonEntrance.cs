@@ -32,20 +32,13 @@ public class DungeonEntrance : MonoBehaviour
         }
     }
 
-    // "EVET" butonuna basıldığında çalışacak fonksiyon
     public void OnAcceptEnter()
     {
         if (isPlayerNearby)
         {
-            // 1. UI Panelini kapat
             interactionUI.SetActive(false);
-
-            // 2. Zindanı oluştur
-            generator.GenerateDungeon(); 
-
-            // 3. Giriş Sprite'ını (bu objeyi) devre dışı bırak
-            // Artık zindanın içindesin, kapı görünmez olacak.
-            gameObject.SetActive(false); 
+            generator.GenerateDungeon();
+            gameObject.SetActive(false);
         }
     }
 

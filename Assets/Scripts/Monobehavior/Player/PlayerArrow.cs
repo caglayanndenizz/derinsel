@@ -3,10 +3,6 @@ using System.Linq;
 using Unity.Cinemachine;
 using UnityEngine;
 
-/// <summary>
-/// Oyuncu oku: Initialize sonrası hedef dünya noktasına doğru sabit hızla gider.
-/// Çarpışma: her kare Linecast — oyuncu / kendi colliderları hariç ilk engel (HammerSlam ile aynı kamera sarsıntısı).
-/// </summary>
 public class PlayerArrow : MonoBehaviour
 {
     [SerializeField] float defaultMaxLifetime = 8f;
@@ -150,7 +146,6 @@ public class PlayerArrow : MonoBehaviour
         return c.transform == transform || c.transform.IsChildOf(transform);
     }
 
-    /// <summary>Oyuncu ve ok kendi colliderları dışında segment üzerindeki ilk isabet.</summary>
     bool TryResolveMovementHit(Vector2 from, Vector2 to, out RaycastHit2D hit)
     {
         hit = default;
