@@ -15,6 +15,7 @@ public class AugmentSelectionUI : MonoBehaviour
     [SerializeField] private PlayerLevel playerLevel;
     [SerializeField] private PlayerAugmentController playerAugmentController;
     [SerializeField] private AugmentDatabase augmentDatabase;
+    [SerializeField] private AugmentWeightSystem weightSystem;
     [SerializeField] private GameObject panelRoot;
 
     [Header("Augment cards")]
@@ -48,6 +49,8 @@ public class AugmentSelectionUI : MonoBehaviour
     private bool _isSubscribed;
     private CanvasGroup _panelCanvasGroup;
     private bool _isPanelOpen;
+    private List<AugmentDefinition> _currentOffer;
+    private DungeonGenerator _dungeonGenerator;
 
     private bool UsesPrefabAugmentCards =>
         optionButtonPrefab != null && panelRoot != null;
@@ -115,13 +118,14 @@ public class AugmentSelectionUI : MonoBehaviour
 
         HideUnusedRuntimeButtons(slotCount);
 
-        List<AugmentDefinition> options = BuildRandomAugmentOptions(slotCount);
+        List<AugmentDefinition> options = BuildOfferOptions(slotCount);
         if (options.Count == 0)
         {
             Debug.LogWarning(
                 "AugmentSelectionUI: no matching available augments found in AugmentDatabase. Check database assignment and entries.");
             return false;
         }
+        _currentOffer = options;
 
         ApplyPanelTheme(source);
 
@@ -406,6 +410,29 @@ public class AugmentSelectionUI : MonoBehaviour
             _runtimeButtons[i].SetOption(null, HandleAugmentSelected);
     }
 
+    private List<AugmentDefinition> BuildOfferOptions(int slotCount)
+    {
+        TryResolveWeightSystem();
+        if (weightSystem != null)
+            return weightSystem.BuildOffer(playerAugmentController, slotCount, GetCurrentFloor());
+        return BuildRandomAugmentOptions(slotCount);
+    }
+
+    private void TryResolveWeightSystem()
+    {
+        if (weightSystem != null) return;
+        weightSystem = AugmentWeightSystem.Instance;
+        if (weightSystem == null)
+            weightSystem = Object.FindAnyObjectByType<AugmentWeightSystem>();
+    }
+
+    private int GetCurrentFloor()
+    {
+        if (_dungeonGenerator == null)
+            _dungeonGenerator = Object.FindAnyObjectByType<DungeonGenerator>();
+        return _dungeonGenerator != null ? _dungeonGenerator.CurrentFloor : 0;
+    }
+
     private List<AugmentDefinition> BuildRandomAugmentOptions(int maxOptions)
     {
         List<AugmentDefinition> candidates = BuildAvailableAugmentOptions();
@@ -473,6 +500,10 @@ public class AugmentSelectionUI : MonoBehaviour
     {
         if (playerAugmentController != null)
             playerAugmentController.ApplyAugment(selectedAugment);
+
+        TryResolveWeightSystem();
+        if (weightSystem != null)
+            weightSystem.NotifySelection(selectedAugment, _currentOffer);
 
         HidePanel();
         _isPanelOpen = false;

@@ -629,7 +629,7 @@ public class Player : BaseEntity
     private void HandleDash()
     {
         if (!Input.GetKeyDown(KeyCode.Space)) return;
-        if (playerAugmentController == null || !playerAugmentController.HasDashUnlock) return;
+        if (playerAugmentController == null || !playerAugmentController.HasDashUnluck) return;
         if (Time.time < _nextDashTime) return;
 
         Vector2 dashDir = GetDashDirection();

@@ -23,7 +23,7 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private bool hasDoubleArrowUnlock;
     [SerializeField] private bool hasWallLootsUnlock;
     [SerializeField] private bool hasExtraAugmentSlotUnlock;
-    [SerializeField] private bool hasDashUnlock;
+    [SerializeField] private bool hasDashUnluck;
     [SerializeField] private float dashCooldownMultiplier = 1f;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
 
@@ -61,7 +61,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float MaxHealthMultiplier => Mathf.Max(0.01f, maxHealthMultiplier);
     public bool HasWallLootsUnlock => hasWallLootsUnlock;
     public bool HasExtraAugmentSlotUnlock => hasExtraAugmentSlotUnlock;
-    public bool HasDashUnlock => hasDashUnlock;
+    public bool HasDashUnluck => hasDashUnluck;
     public float DashCooldownMultiplier => Mathf.Max(0.01f, dashCooldownMultiplier);
 
     public int CountDistinctArrowAugmentTypesOwnedForMutation()
@@ -154,8 +154,8 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.ExtraAugmentSlotUnlock:
                 hasExtraAugmentSlotUnlock = true;
                 break;
-            case AugmentId.DashUnlock:
-                hasDashUnlock = true;
+            case AugmentId.DashUnluck:
+                hasDashUnluck = true;
                 break;
             case AugmentId.DashCooldownReduce_Common_I:
             case AugmentId.DashCooldownReduce_Common_II:
@@ -218,7 +218,15 @@ public class PlayerAugmentController : MonoBehaviour
 
     private static bool IsUnlockAugment(AugmentId id)
     {
-        return id.ToString().Contains("Unlock");
+        switch (id)
+        {
+            case AugmentId.ChargedBowAoeUnlock:
+            case AugmentId.WallLootsUnlock:
+            case AugmentId.DashUnluck:
+                return true;
+            default:
+                return false;
+        }
     }
 
     private static int GetMovementSpeedMaxApplyCountFromRarity(int rarity)
@@ -238,6 +246,11 @@ public class PlayerAugmentController : MonoBehaviour
         {
             case AugmentId.WallLootsUnlock:
                 return hasChargedBowAoe;
+            case AugmentId.DashCooldownReduce_Common_I:
+            case AugmentId.DashCooldownReduce_Common_II:
+            case AugmentId.DashCooldownReduce_Rare:
+            case AugmentId.DashCooldownReduce_Extraordinary:
+                return hasDashUnluck;
             default:
                 return true;
         }

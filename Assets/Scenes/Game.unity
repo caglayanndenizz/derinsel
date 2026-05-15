@@ -733,6 +733,7 @@ MonoBehaviour:
   playerLevel: {fileID: 1700128196}
   playerAugmentController: {fileID: 1700128199}
   augmentDatabase: {fileID: 11400000, guid: ee11eeb5a1811f94bbbaddd1c3ab4613, type: 2}
+  weightSystem: {fileID: 1451887777}
   panelRoot: {fileID: 1400214898}
   optionButtonPrefab: {fileID: 5762706493578251936, guid: 110e365c744754004996d40255d96f3a, type: 3}
   optionsContainer: {fileID: 0}
@@ -6581,6 +6582,65 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1448499959}
   m_CullTransparentMesh: 1
+--- !u!1 &1451887776
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1451887778}
+  - component: {fileID: 1451887777}
+  m_Layer: 0
+  m_Name: AugmentWeightSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1451887777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1451887776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9781165df2b2e4341adb9ac5e0cec038, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AugmentWeightSystem
+  augmentDatabase: {fileID: 11400000, guid: ee11eeb5a1811f94bbbaddd1c3ab4613, type: 2}
+  t1BaseWeight: 100
+  t2BaseWeight: 35
+  t3BaseWeight: 8
+  t2UnlockFloor: 5
+  t2SlotChancePerInterval: 0.15
+  t3UnlockFloor: 15
+  pityThresholdRounds: 5
+  pityIncrementPerRound: 0.2
+  rejectionStartMultiplier: 0.3
+  rejectionRecoveryPerRound: 0.14
+  t3FloorScalePerFloor: 0.05
+  milestoneFloorInterval: 5
+  offersWithoutT3: 0
+  totalOffers: 0
+--- !u!4 &1451887778
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1451887776}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.38186, y: -3.42125, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1452836555
 GameObject:
   m_ObjectHideFlags: 0
@@ -7553,6 +7613,16 @@ MonoBehaviour:
   chargedBowAoeRadius: 3
   hasDoubleArrowUnlock: 0
   hasWallLootsUnlock: 0
+  hasExtraAugmentSlotUnlock: 0
+  hasDashUnluck: 0
+  dashCooldownMultiplier: 1
+  arrowShotBonusCount: 0
+  arrowProjectileSpeedMultiplier: 1
+  outgoingDamageMultiplier: 1
+  maxHealthMultiplier: 1
+  cheatForceRadialArrowMutation: 0
+  mutatedArrowShotsMotor: 0
+  arrowMutationProgressMotor: 0
 --- !u!1 &1730437410
 GameObject:
   m_ObjectHideFlags: 0
@@ -8856,3 +8926,4 @@ SceneRoots:
   - {fileID: 1134197084}
   - {fileID: 2137899507}
   - {fileID: 1452836556}
+  - {fileID: 1451887778}

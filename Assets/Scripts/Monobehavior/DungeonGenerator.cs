@@ -48,6 +48,7 @@ public class DungeonGenerator : MonoBehaviour
     private const float TargetDoorSpawnDistanceFromPlayer = 2f;
     private static readonly Color ExitDoorTint = new Color(0.6f, 0.6f, 0.6f, 1f);
     private int _currentDungeonFloor = 1;
+    public int CurrentFloor => _currentDungeonFloor;
 
     private void Awake()
     {
