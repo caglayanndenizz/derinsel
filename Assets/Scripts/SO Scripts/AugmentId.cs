@@ -25,4 +25,8 @@ public enum AugmentId
     LuckIncrease_Common_III = 22,
     LuckIncrease_Rare = 23,
     LuckIncrease_Extraordinary = 24,
+    HammerChargeReduce_Common_I = 25,
+    HammerChargeReduce_Common_II = 26,
+    HammerChargeReduce_Rare = 27,
+    HammerChargeReduce_Extraordinary = 28,
 }

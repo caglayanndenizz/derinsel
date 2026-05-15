@@ -247,7 +247,8 @@ public class Player : BaseEntity
         if (!_isHammerCharging) return false;
         if (chargeMeter != null)
             return chargeMeter.value >= 1f - 0.0001f;
-        return _currentCharge >= maxChargeTime - 0.0001f;
+        float effectiveChargeTime = maxChargeTime * (playerAugmentController != null ? playerAugmentController.HammerChargeMultiplier : 1f);
+        return _currentCharge >= effectiveChargeTime - 0.0001f;
     }
 
     private void HandleBowChargeAndRelease()
@@ -505,21 +506,23 @@ public class Player : BaseEntity
             return;
         }
 
+        float effectiveChargeTime = maxChargeTime * (playerAugmentController != null ? playerAugmentController.HammerChargeMultiplier : 1f);
+
         if (Input.GetButton("Fire1"))
         {
             _isHammerCharging = true;
             if (meterCanvas != null)
                 meterCanvas.SetActive(true);
             _currentCharge += Time.deltaTime;
-            _currentCharge = Mathf.Clamp(_currentCharge, 0f, maxChargeTime);
+            _currentCharge = Mathf.Clamp(_currentCharge, 0f, effectiveChargeTime);
             if (chargeMeter != null)
-                chargeMeter.value = _currentCharge / Mathf.Max(0.0001f, maxChargeTime);
+                chargeMeter.value = _currentCharge / Mathf.Max(0.0001f, effectiveChargeTime);
             UpdateChargingAnimator();
         }
 
         if (Input.GetButtonUp("Fire1"))
         {
-            if (_currentCharge >= maxChargeTime)
+            if (_currentCharge >= effectiveChargeTime)
                 TriggerHeavyAttack();
             ResetHammerCharge();
         }
