@@ -5658,6 +5658,7 @@ Transform:
   - {fileID: 273267496}
   - {fileID: 711965915}
   - {fileID: 619394802}
+  - {fileID: 1451887778}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1318843553
@@ -6634,12 +6635,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1451887776}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.38186, y: -3.42125, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 31.33212, y: -18.35709, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1295312150}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1452836555
 GameObject:
@@ -7612,7 +7613,7 @@ MonoBehaviour:
   hasChargedBowAoe: 0
   chargedBowAoeRadius: 3
   hasDoubleArrowUnlock: 0
-  hasWallLootsUnlock: 1
+  hasWallLootsUnlock: 0
   hasExtraAugmentSlotUnlock: 0
   hasDashUnluck: 0
   dashCooldownMultiplier: 1
@@ -8952,4 +8953,3 @@ SceneRoots:
   - {fileID: 1134197084}
   - {fileID: 2137899507}
   - {fileID: 1452836556}
-  - {fileID: 1451887778}
