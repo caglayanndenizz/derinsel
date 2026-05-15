@@ -34,10 +34,9 @@ public class WallLootHandler : MonoBehaviour
         if (brokenWalls == null || brokenWalls.Count == 0) return;
         if (_playerAugmentController == null || !_playerAugmentController.HasWallLootsUnlock) return;
 
-        float luckMult = _playerAugmentController.LuckMultiplier;
         foreach (Vector3 wallPosition in brokenWalls)
         {
-            if (Random.value > Mathf.Clamp01(wallLootDropGateChance * luckMult))
+            if (Random.value > wallLootDropGateChance)
                 continue;
             TrySpawnSingleWallLoot(wallPosition);
         }

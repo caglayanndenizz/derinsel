@@ -272,6 +272,7 @@ public class AugmentWeightSystem : MonoBehaviour
     {
         if (aug == null || aug.id == AugmentId.None) return false;
         if (usedIds.Contains(aug.id)) return false;
+        if (SharesExclusiveGroupWithUsed(aug.id, usedIds)) return false;
         if (controller != null && !controller.CanApplyAugment(aug)) return false;
         if (controller != null
             && controller.HasRadialBowMutationUnlock
@@ -299,6 +300,43 @@ public class AugmentWeightSystem : MonoBehaviour
             default:
                 return false;
         }
+    }
+
+    // Augments in the same group cannot appear together in a single offer.
+    private static readonly AugmentId[][] ExclusiveOfferGroups =
+    {
+        new[] { AugmentId.LuckIncrease_Common_I, AugmentId.LuckIncrease_Common_II, AugmentId.LuckIncrease_Common_III },
+        new[] { AugmentId.DashCooldownReduce_Common_I, AugmentId.DashCooldownReduce_Common_II },
+        new[] { AugmentId.HammerChargeReduce_Common_I, AugmentId.HammerChargeReduce_Common_II },
+        new[]
+        {
+            AugmentId.ArrowCount_IncreaseNumberOfArrowsBy1,
+            AugmentId.ArrowCount_PlusOneArrows,
+            AugmentId.ArrowCount_PlusOneAndSpeed10Percent,
+            AugmentId.ArrowCount_PlusOneAndSpeed15Percent,
+            AugmentId.ArrowCount_IncreaseYourArrowsBy1,
+        },
+        new[]
+        {
+            AugmentId.MovementSpeedIncreaseCommon,
+            AugmentId.MovementSpeedIncreaseRare,
+            AugmentId.MovementSpeedIncreaseExtraordinary,
+        },
+    };
+
+    private static bool SharesExclusiveGroupWithUsed(AugmentId id, HashSet<AugmentId> usedIds)
+    {
+        if (usedIds.Count == 0) return false;
+        foreach (AugmentId[] group in ExclusiveOfferGroups)
+        {
+            bool idInGroup = false;
+            foreach (AugmentId gid in group)
+                if (gid == id) { idInGroup = true; break; }
+            if (!idInGroup) continue;
+            foreach (AugmentId gid in group)
+                if (usedIds.Contains(gid)) return true;
+        }
+        return false;
     }
 
     private AugmentDefinition WeightedRandom(List<AugmentDefinition> candidates, int currentFloor)
