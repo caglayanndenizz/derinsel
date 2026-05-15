@@ -64,15 +64,12 @@ sysinfo.txt
 *.unitypackage.meta
 *.app
 
-
 # AI Coding Assistants
 .claude/
 .cline/
 .cursor/
 claude_config.json
 cline_config.json
-
-
 
 # Crashlytics generated file
 crashlytics-build.properties
