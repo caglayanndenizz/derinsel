@@ -69,6 +69,7 @@ public class Player : BaseEntity
     private PlayerLevel playerLevel;
     private PlayerCurrency playerCurrency;
     private PlayerAugmentController playerAugmentController;
+    private WallLootHandler wallLootHandler;
 
     [Header("Dash Settings")]
     [Tooltip("Dash mesafesi (birim). Duvara çarparsa öncesinde durur.")]
@@ -158,6 +159,8 @@ public class Player : BaseEntity
             playerCurrency = GetComponent<PlayerCurrency>();
         if (playerAugmentController == null)
             playerAugmentController = GetComponent<PlayerAugmentController>();
+        if (wallLootHandler == null)
+            wallLootHandler = GetComponent<WallLootHandler>();
         if (impactFeedback == null)
             impactFeedback = GetComponent<PlayerImpactFeedback>();
         if (dashFlashTarget == null)
@@ -556,7 +559,11 @@ public class Player : BaseEntity
 
         CinemachineImpulseSource source = _defaultImpulseSource;
         if (source != null) source.GenerateImpulse();
-        if (generator != null) generator.BreakWallsInArea(attackPoint.position, hammerAOE);
+        if (generator != null)
+        {
+            var brokenWalls = generator.BreakWallsInArea(attackPoint.position, hammerAOE);
+            wallLootHandler?.TrySpawnWallLootForBrokenWalls(brokenWalls);
+        }
 
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
         int successfulHits = 0;

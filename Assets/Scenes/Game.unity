@@ -7612,10 +7612,12 @@ MonoBehaviour:
   hasChargedBowAoe: 0
   chargedBowAoeRadius: 3
   hasDoubleArrowUnlock: 0
-  hasWallLootsUnlock: 0
+  hasWallLootsUnlock: 1
   hasExtraAugmentSlotUnlock: 0
   hasDashUnluck: 0
   dashCooldownMultiplier: 1
+  luckMultiplier: 1
+  hammerChargeMultiplier: 1
   arrowShotBonusCount: 0
   arrowProjectileSpeedMultiplier: 1
   outgoingDamageMultiplier: 1
@@ -7623,6 +7625,27 @@ MonoBehaviour:
   cheatForceRadialArrowMutation: 0
   mutatedArrowShotsMotor: 0
   arrowMutationProgressMotor: 0
+--- !u!114 &1700128204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700128186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 969a95253d56643dd91f69a9a6baea31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallLootHandler
+  wallLootDropGateChance: 0.05
+  wallLootGoldChance: 0.3
+  wallLootExpChance: 0.5
+  wallLootHealingPotionChance: 0.2
+  wallLootExpValue: 5
+  maxGoldPerRoom: 10
+  maxExpOrbsPerRoom: 10
+  maxHealingPotionsPerRoom: 2
+  healingPotionPrefab: {fileID: 5071090204471560867, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
 --- !u!1 &1730437410
 GameObject:
   m_ObjectHideFlags: 0
@@ -8851,6 +8874,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       insertIndex: 5
       addedObject: {fileID: 1700128198}
+    - targetCorrespondingSourceObject: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      insertIndex: 6
+      addedObject: {fileID: 1700128204}
   m_SourcePrefab: {fileID: 100100000, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
 --- !u!1001 &425736149327663609
 PrefabInstance:
@@ -8917,6 +8943,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e9133290db3fe8244b03e6064a99e160, type: 3}
+--- !u!1001 &6676402591834828723
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3745580765338413671, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.89
+      objectReference: {fileID: 0}
+    - target: {fileID: 3745580765338413671, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.89
+      objectReference: {fileID: 0}
+    - target: {fileID: 3745580765338413671, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3745580765338413671, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3745580765338413671, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3745580765338413671, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3745580765338413671, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3745580765338413671, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3745580765338413671, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3745580765338413671, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5071090204471560867, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
+      propertyPath: m_Name
+      value: Healing
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -8927,3 +9010,4 @@ SceneRoots:
   - {fileID: 2137899507}
   - {fileID: 1452836556}
   - {fileID: 1451887778}
+  - {fileID: 6676402591834828723}

@@ -6,15 +6,6 @@ using UnityEngine;
 public class PlayerArrow : MonoBehaviour
 {
     [SerializeField] float defaultMaxLifetime = 8f;
-    [Header("Wall Loot (Charged AOE)")]
-    [SerializeField] private float wallLootDropGateChance = 0.05f;
-    [SerializeField] private float wallLootGoldChance = 0.70f;
-    [SerializeField] private float wallLootExpChance = 0.20f;
-    [SerializeField] private float wallLootHealingPotionChance = 0.10f;
-    [SerializeField] private int wallLootExpValue = 500;
-    [SerializeField] private int maxWallLootDropsPerRoom = 5;
-    [SerializeField] private int maxHealingPotionsPerRoom = 2;
-    [SerializeField] private GameObject healingPotionPrefab;
 
     float _speed;
     float _damage;
@@ -28,13 +19,7 @@ public class PlayerArrow : MonoBehaviour
     DungeonGenerator _dungeonGenerator;
     CinemachineImpulseSource _hitCameraImpulse;
     Vector2 _previousFramePosition;
-    PlayerAugmentController _playerAugmentController;
-    GoldLootPooler _goldLootPooler;
-    ExperienceLootPooler _experienceLootPooler;
-    int _wallLootDropsSpawnedThisRoom;
-    int _wallHealingPotionsSpawnedThisRoom;
-
-    public int WallLootDropsSpawnedThisRoom => _wallLootDropsSpawnedThisRoom;
+    WallLootHandler _wallLootHandler;
 
     void Awake()
     {
@@ -80,9 +65,7 @@ public class PlayerArrow : MonoBehaviour
 
         if (ownerRoot != null)
         {
-            _playerAugmentController = ownerRoot.GetComponent<PlayerAugmentController>();
-            _goldLootPooler = GoldLootPooler.Instance ?? Object.FindAnyObjectByType<GoldLootPooler>();
-            _experienceLootPooler = ExperienceLootPooler.Instance ?? Object.FindAnyObjectByType<ExperienceLootPooler>();
+            _wallLootHandler = ownerRoot.GetComponent<WallLootHandler>();
 
             var arrowCols = GetComponentsInChildren<Collider2D>(true);
             var ownerCols = ownerRoot.GetComponentsInChildren<Collider2D>(true);
@@ -122,7 +105,7 @@ public class PlayerArrow : MonoBehaviour
                 if (_dungeonGenerator != null)
                     brokenWalls = _dungeonGenerator.BreakWallsInArea(p, _explosionRadius);
                 ApplyChargedExplosionDamage(p);
-                TrySpawnWallLootForBrokenWalls(brokenWalls);
+                _wallLootHandler?.TrySpawnWallLootForBrokenWalls(brokenWalls);
             }
             else
                 TryApplyDirectArrowDamage(hit.collider);
@@ -211,66 +194,5 @@ public class PlayerArrow : MonoBehaviour
             if (amount <= 0f) continue;
             dmg.TakeDamage(amount, false);
         }
-    }
-
-    private void TrySpawnWallLootForBrokenWalls(List<Vector3> brokenWalls)
-    {
-        if (brokenWalls == null || brokenWalls.Count == 0) return;
-        if (_playerAugmentController == null || !_playerAugmentController.HasWallLootsUnlock) return;
-        if (_wallLootDropsSpawnedThisRoom >= Mathf.Max(0, maxWallLootDropsPerRoom)) return;
-
-        foreach (Vector3 wallPosition in brokenWalls)
-        {
-            if (_wallLootDropsSpawnedThisRoom >= Mathf.Max(0, maxWallLootDropsPerRoom))
-                break;
-
-            float luckMult = _playerAugmentController != null ? _playerAugmentController.LuckMultiplier : 1f;
-            if (Random.value > Mathf.Clamp01(wallLootDropGateChance * luckMult))
-                continue;
-
-            if (TrySpawnSingleWallLoot(wallPosition))
-                _wallLootDropsSpawnedThisRoom++;
-        }
-    }
-
-    private bool TrySpawnSingleWallLoot(Vector3 spawnPosition)
-    {
-        // Potion slot is 0 if room cap reached
-        float potionChance = _wallHealingPotionsSpawnedThisRoom < maxHealingPotionsPerRoom
-            ? Mathf.Clamp01(wallLootHealingPotionChance)
-            : 0f;
-        float goldChance = Mathf.Clamp01(wallLootGoldChance);
-        float expChance = Mathf.Clamp01(wallLootExpChance);
-        float total = potionChance + goldChance + expChance;
-        if (total <= 0.0001f) return false;
-
-        float roll = Random.value * total;
-        if (roll < potionChance)
-        {
-            if (healingPotionPrefab == null) return false;
-            Instantiate(healingPotionPrefab, spawnPosition, Quaternion.identity);
-            _wallHealingPotionsSpawnedThisRoom++;
-            return true;
-        }
-
-        roll -= potionChance;
-        if (roll < goldChance)
-            return _goldLootPooler != null && _goldLootPooler.GetGold(spawnPosition, Quaternion.identity) != null;
-
-        GameObject expObj = _experienceLootPooler != null
-            ? _experienceLootPooler.GetExperience(spawnPosition, Quaternion.identity)
-            : null;
-        if (expObj == null) return false;
-
-        Lootable lootable = expObj.GetComponent<Lootable>();
-        if (lootable != null)
-            lootable.experienceValue = Mathf.Max(0, wallLootExpValue);
-        return true;
-    }
-
-    public void ResetWallLootDropCounterForRoom()
-    {
-        _wallLootDropsSpawnedThisRoom = 0;
-        _wallHealingPotionsSpawnedThisRoom = 0;
     }
 }
