@@ -73,7 +73,7 @@ public class Player : BaseEntity
     [Header("Dash Settings")]
     [Tooltip("Dash mesafesi (birim). Duvara çarparsa öncesinde durur.")]
     public float dashDistance = 4f;
-    public float dashCooldown = 3f;
+    public float dashCooldown = 10f;
     [SerializeField] private float dashAlphaFlashDuration = 0.1f;
     [Tooltip("Boşsa root/child'dan otomatik aranır.")]
     [SerializeField] private SpriteRenderer dashFlashTarget;
@@ -651,7 +651,8 @@ public class Player : BaseEntity
 
         float actualDistance = Mathf.Max(0f, closestBlockingDist - 0.3f);
         _rb.position = from + dashDir * actualDistance;
-        _nextDashTime = Time.time + dashCooldown;
+        float effectiveCooldown = dashCooldown * (playerAugmentController != null ? playerAugmentController.DashCooldownMultiplier : 1f);
+        _nextDashTime = Time.time + Mathf.Max(0f, effectiveCooldown);
         StartCoroutine(DashAlphaFlash());
     }
 
@@ -688,7 +689,7 @@ public class Player : BaseEntity
     private void UpdateDashCooldownUI()
     {
         if (dashCooldownBar == null) return;
-        float cooldown = Mathf.Max(0f, dashCooldown);
+        float cooldown = Mathf.Max(0f, dashCooldown * (playerAugmentController != null ? playerAugmentController.DashCooldownMultiplier : 1f));
         if (cooldown <= 0f)
         {
             dashCooldownBar.value = 1f;

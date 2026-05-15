@@ -16,4 +16,8 @@ public enum AugmentId
     ArrowCount_PlusOneAndSpeed15Percent = 13,
     ArrowCount_IncreaseYourArrowsBy1 = 14,
     DashUnlock = 15,
+    DashCooldownReduce_Common_I = 16,
+    DashCooldownReduce_Common_II = 17,
+    DashCooldownReduce_Rare = 18,
+    DashCooldownReduce_Extraordinary = 19,
 }
