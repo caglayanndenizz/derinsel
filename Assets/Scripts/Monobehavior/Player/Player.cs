@@ -114,6 +114,7 @@ public class Player : BaseEntity
     private static readonly int HeavyAttackHash = Animator.StringToHash("HeavyAttack");
 
     public event Action<float, float> HealthChanged;
+    public event Action Died;
 
     public PlayerLevel PlayerLevel => playerLevel;
     public PlayerCurrency PlayerCurrency => playerCurrency;
@@ -215,6 +216,19 @@ public class Player : BaseEntity
         _invulnerableUntil = Time.time + Mathf.Max(0f, damageInvulnerabilityDuration);
     }
 
+    protected override void Die()
+    {
+        _currentHealth = 0f;
+        Died?.Invoke();
+    }
+
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        ICollectable collectable = col.GetComponent<ICollectable>()
+            ?? col.GetComponentInParent<ICollectable>();
+        collectable?.Collect(this);
+    }
+
     public void Heal(float amount)
     {
         if (amount <= 0f) return;
@@ -263,6 +277,12 @@ public class Player : BaseEntity
 
     private void HandleBowChargeAndRelease()
     {
+        if (_isHammerCharging)
+        {
+            ResetBowChargeState();
+            return;
+        }
+
         if (Input.GetButtonUp("Fire2"))
         {
             bool wasFullBow = _bowCharge >= maxBowChargeTime - 0.0001f;

@@ -1,13 +1,11 @@
 using UnityEngine;
 
-public class HealingPotion : MonoBehaviour
+public class HealingPotion : MonoBehaviour, ICollectable
 {
     [SerializeField] private float healAmount = 20f;
 
-    private void OnTriggerEnter2D(Collider2D col)
+    public void Collect(Player player)
     {
-        if (!col.CompareTag("Player")) return;
-        Player player = col.GetComponentInParent<Player>();
         if (player == null) return;
         player.Heal(healAmount);
         Destroy(gameObject);

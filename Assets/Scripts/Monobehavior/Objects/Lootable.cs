@@ -1,30 +1,30 @@
 using UnityEngine;
 
-public class Lootable : MonoBehaviour
+public class Lootable : MonoBehaviour, ICollectable
 {
     [Header("Basic Settings")]
     public int value = 1;
     [Tooltip("isGold kapaliysa (XP orb) verilecek deneyim miktari.")]
     public int experienceValue = 1;
     public bool isGold = true;
-    
+
     [Header("Magnet Settings")]
     public float moveSpeed = 6f;
     public float goldHomingDelay = 5f;
-    
-    private bool isCollected = false;
-    private Transform playerTransform;
-    private bool goldHomingUnlocked;
 
-    private void Awake()
+    bool _isCollected;
+    Transform _playerTransform;
+    bool _goldHomingUnlocked;
+
+    void Awake()
     {
         ResolvePlayerTransform();
     }
 
-    private void OnEnable()
+    void OnEnable()
     {
-        isCollected = false;
-        goldHomingUnlocked = !isGold;
+        _isCollected = false;
+        _goldHomingUnlocked = !isGold;
         ResolvePlayerTransform();
         CancelInvoke(nameof(EnableGoldHoming));
 
@@ -32,60 +32,45 @@ public class Lootable : MonoBehaviour
             Invoke(nameof(EnableGoldHoming), Mathf.Max(0f, goldHomingDelay));
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         CancelInvoke(nameof(EnableGoldHoming));
     }
 
-    private void EnableGoldHoming()
+    void EnableGoldHoming()
     {
-        goldHomingUnlocked = true;
+        _goldHomingUnlocked = true;
     }
 
-    private void ResolvePlayerTransform()
+    void ResolvePlayerTransform()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
-        {
-            playerTransform = playerObj.transform;
-        }
+            _playerTransform = playerObj.transform;
     }
 
     void Update()
     {
-        if (isCollected) return;
+        if (_isCollected) return;
 
-        if (playerTransform == null)
-        {
+        if (_playerTransform == null)
             ResolvePlayerTransform();
-        }
 
-        if (playerTransform == null) return;
+        if (_playerTransform == null) return;
 
-        if (isGold && !goldHomingUnlocked) return;
-        transform.position = Vector2.MoveTowards(transform.position, playerTransform.position, moveSpeed * Time.deltaTime);
+        if (isGold && !_goldHomingUnlocked) return;
+        transform.position = Vector2.MoveTowards(transform.position, _playerTransform.position, moveSpeed * Time.deltaTime);
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    public void Collect(Player player)
     {
-        if (isCollected) return;
+        if (_isCollected) return;
+        _isCollected = true;
 
-        if (other.CompareTag("Player"))
-        {
-            Collect(other.gameObject);
-        }
-    }
-
-    private void Collect(GameObject playerObj)
-    {
-        isCollected = true;
-        Player player = playerObj.GetComponent<Player>();
-        PlayerCurrency playerCurrency = player != null ? player.PlayerCurrency : null;
-        
         if (player != null)
         {
             if (isGold)
-                playerCurrency?.AddGold(Mathf.Max(0, value));
+                player.PlayerCurrency?.AddGold(Mathf.Max(0, value));
             else
                 player.AddExperience(Mathf.Max(0, experienceValue));
         }
@@ -93,7 +78,7 @@ public class Lootable : MonoBehaviour
         ReturnToPool();
     }
 
-    private void ReturnToPool()
+    void ReturnToPool()
     {
         if (isGold && GoldLootPooler.Instance != null)
         {
@@ -107,7 +92,6 @@ public class Lootable : MonoBehaviour
             return;
         }
 
-        // Pooler bulunamazsa güvenli fallback
         Destroy(gameObject);
     }
 }

@@ -79,6 +79,8 @@ public class Enemy : BaseEntity
     private SpriteRenderer _spriteRenderer;
     private Color _originalColor;
 
+    public event System.Action<Enemy> Died;
+
     protected GameObject player;
     private bool _isDead = false;
     private Vector2 _lastKnownPlayerWorld;
@@ -270,6 +272,7 @@ public class Enemy : BaseEntity
         if (_rb != null && hit.attachedRigidbody == _rb) return false;
         if (hit.gameObject == gameObject || hit.transform.IsChildOf(transform)) return false;
         if (hit.CompareTag("Player")) return false;
+        if (hit.GetComponentInParent<Enemy>() != null) return false;
         return true;
     }
 
@@ -359,8 +362,6 @@ public class Enemy : BaseEntity
             else if (dist <= attackDistance)
             {
                 currentState = State.Attack;
-                if (enemyType == EnemyType.Mage)
-                    _nextRangedFireTime = Time.time + AdjustedMageRangedFireInterval;
             }
         }
         else if (currentState == State.Attack)
@@ -376,8 +377,6 @@ public class Enemy : BaseEntity
             else if (dist > attackDistance)
             {
                 currentState = State.Chase;
-                if (enemyType == EnemyType.Mage)
-                    _nextRangedFireTime = Time.time + AdjustedMageRangedFireInterval;
             }
         }
     }
@@ -460,6 +459,7 @@ public class Enemy : BaseEntity
             if (hit.collider.isTrigger) continue;
             if (_rb != null && hit.collider.attachedRigidbody == _rb) continue;
             if (hit.collider.gameObject == gameObject || hit.collider.transform.IsChildOf(transform)) continue;
+            if (hit.collider.GetComponentInParent<Enemy>() != null) continue;
             if (hit.collider.CompareTag("Player")) return true;
             return false;
         }
@@ -480,7 +480,7 @@ public class Enemy : BaseEntity
     private void TryFireRangedProjectile()
     {
         if (enemyType != EnemyType.Mage) return;
-        if (currentState != State.Attack || player == null || mageProjectilePrefab == null) return;
+        if (currentState == State.Patrol || player == null || mageProjectilePrefab == null) return;
         if (!HasLineOfSight()) return;
         if (Time.time < _nextRangedFireTime) return;
 
@@ -552,7 +552,8 @@ public class Enemy : BaseEntity
         else if (experiencePrefab != null)
             Instantiate(experiencePrefab, (Vector3)deathPosition + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
 
-        base.Die(); 
+        Died?.Invoke(this);
+        base.Die();
         if (EnemyObjectPooler.Instance != null)
         {
             EnemyObjectPooler.Instance.ReturnEnemy(gameObject);
