@@ -20,4 +20,9 @@ public enum AugmentId
     DashCooldownReduce_Common_II = 17,
     DashCooldownReduce_Rare = 18,
     DashCooldownReduce_Extraordinary = 19,
+    LuckIncrease_Common_I = 20,
+    LuckIncrease_Common_II = 21,
+    LuckIncrease_Common_III = 22,
+    LuckIncrease_Rare = 23,
+    LuckIncrease_Extraordinary = 24,
 }

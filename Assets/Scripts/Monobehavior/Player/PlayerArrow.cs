@@ -223,7 +223,8 @@ public class PlayerArrow : MonoBehaviour
             if (_wallLootDropsSpawnedThisRoom >= Mathf.Max(0, maxWallLootDropsPerRoom))
                 break;
 
-            if (Random.value > Mathf.Clamp01(wallLootDropGateChance))
+            float luckMult = _playerAugmentController != null ? _playerAugmentController.LuckMultiplier : 1f;
+            if (Random.value > Mathf.Clamp01(wallLootDropGateChance * luckMult))
                 continue;
 
             if (TrySpawnSingleWallLoot(wallPosition))

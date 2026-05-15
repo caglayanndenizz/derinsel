@@ -536,7 +536,9 @@ public class Enemy : BaseEntity
         if (experiencePooler == null) experiencePooler = ExperienceLootPooler.Instance;
         Vector2 deathPosition = GetEnemyReferencePosition();
 
-        if (UnityEngine.Random.value <= goldDropChance)
+        Player playerComponent = player != null ? player.GetComponent<Player>() : null;
+        float luckMult = playerComponent?.PlayerAugmentController?.LuckMultiplier ?? 1f;
+        if (UnityEngine.Random.value <= goldDropChance * luckMult)
         {
             Vector2 goldSpawnPosition = GetValidGoldSpawnPosition(deathPosition);
             if (goldPooler != null)

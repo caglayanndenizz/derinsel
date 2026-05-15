@@ -25,6 +25,7 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private bool hasExtraAugmentSlotUnlock;
     [SerializeField] private bool hasDashUnluck;
     [SerializeField] private float dashCooldownMultiplier = 1f;
+    [SerializeField] private float luckMultiplier = 1f;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
 
     [SerializeField] private int arrowShotBonusCount;
@@ -63,6 +64,7 @@ public class PlayerAugmentController : MonoBehaviour
     public bool HasExtraAugmentSlotUnlock => hasExtraAugmentSlotUnlock;
     public bool HasDashUnluck => hasDashUnluck;
     public float DashCooldownMultiplier => Mathf.Max(0.01f, dashCooldownMultiplier);
+    public float LuckMultiplier => Mathf.Max(0.01f, luckMultiplier);
 
     public int CountDistinctArrowAugmentTypesOwnedForMutation()
     {
@@ -162,6 +164,13 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.DashCooldownReduce_Rare:
             case AugmentId.DashCooldownReduce_Extraordinary:
                 dashCooldownMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
+                break;
+            case AugmentId.LuckIncrease_Common_I:
+            case AugmentId.LuckIncrease_Common_II:
+            case AugmentId.LuckIncrease_Common_III:
+            case AugmentId.LuckIncrease_Rare:
+            case AugmentId.LuckIncrease_Extraordinary:
+                luckMultiplier *= 1f + Mathf.Max(0f, augment.value);
                 break;
             case AugmentId.GlassCannonDoubleDamageHalveMaxHealth:
                 outgoingDamageMultiplier *= 2f;
