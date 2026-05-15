@@ -8,11 +8,13 @@ public class PlayerArrow : MonoBehaviour
     [SerializeField] float defaultMaxLifetime = 8f;
     [Header("Wall Loot (Charged AOE)")]
     [SerializeField] private float wallLootDropGateChance = 0.05f;
-    [SerializeField] private float wallLootAugmentGiftChance = 0.01f;
     [SerializeField] private float wallLootGoldChance = 0.70f;
-    [SerializeField] private float wallLootExpChance = 0.29f;
+    [SerializeField] private float wallLootExpChance = 0.20f;
+    [SerializeField] private float wallLootHealingPotionChance = 0.10f;
     [SerializeField] private int wallLootExpValue = 500;
     [SerializeField] private int maxWallLootDropsPerRoom = 5;
+    [SerializeField] private int maxHealingPotionsPerRoom = 2;
+    [SerializeField] private GameObject healingPotionPrefab;
 
     float _speed;
     float _damage;
@@ -27,10 +29,10 @@ public class PlayerArrow : MonoBehaviour
     CinemachineImpulseSource _hitCameraImpulse;
     Vector2 _previousFramePosition;
     PlayerAugmentController _playerAugmentController;
-    AugmentSelectionUI _augmentSelectionUI;
     GoldLootPooler _goldLootPooler;
     ExperienceLootPooler _experienceLootPooler;
     int _wallLootDropsSpawnedThisRoom;
+    int _wallHealingPotionsSpawnedThisRoom;
 
     public int WallLootDropsSpawnedThisRoom => _wallLootDropsSpawnedThisRoom;
 
@@ -79,7 +81,6 @@ public class PlayerArrow : MonoBehaviour
         if (ownerRoot != null)
         {
             _playerAugmentController = ownerRoot.GetComponent<PlayerAugmentController>();
-            _augmentSelectionUI = Object.FindAnyObjectByType<AugmentSelectionUI>();
             _goldLootPooler = GoldLootPooler.Instance ?? Object.FindAnyObjectByType<GoldLootPooler>();
             _experienceLootPooler = ExperienceLootPooler.Instance ?? Object.FindAnyObjectByType<ExperienceLootPooler>();
 
@@ -234,17 +235,25 @@ public class PlayerArrow : MonoBehaviour
 
     private bool TrySpawnSingleWallLoot(Vector3 spawnPosition)
     {
-        float augmentChance = Mathf.Clamp01(wallLootAugmentGiftChance);
+        // Potion slot is 0 if room cap reached
+        float potionChance = _wallHealingPotionsSpawnedThisRoom < maxHealingPotionsPerRoom
+            ? Mathf.Clamp01(wallLootHealingPotionChance)
+            : 0f;
         float goldChance = Mathf.Clamp01(wallLootGoldChance);
         float expChance = Mathf.Clamp01(wallLootExpChance);
-        float total = augmentChance + goldChance + expChance;
+        float total = potionChance + goldChance + expChance;
         if (total <= 0.0001f) return false;
 
         float roll = Random.value * total;
-        if (roll < augmentChance)
-            return _augmentSelectionUI != null && _augmentSelectionUI.TryShowWallLootGiftPanel();
+        if (roll < potionChance)
+        {
+            if (healingPotionPrefab == null) return false;
+            Instantiate(healingPotionPrefab, spawnPosition, Quaternion.identity);
+            _wallHealingPotionsSpawnedThisRoom++;
+            return true;
+        }
 
-        roll -= augmentChance;
+        roll -= potionChance;
         if (roll < goldChance)
             return _goldLootPooler != null && _goldLootPooler.GetGold(spawnPosition, Quaternion.identity) != null;
 
@@ -262,5 +271,6 @@ public class PlayerArrow : MonoBehaviour
     public void ResetWallLootDropCounterForRoom()
     {
         _wallLootDropsSpawnedThisRoom = 0;
+        _wallHealingPotionsSpawnedThisRoom = 0;
     }
 }

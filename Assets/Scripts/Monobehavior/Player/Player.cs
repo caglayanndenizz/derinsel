@@ -212,6 +212,13 @@ public class Player : BaseEntity
         _invulnerableUntil = Time.time + Mathf.Max(0f, damageInvulnerabilityDuration);
     }
 
+    public void Heal(float amount)
+    {
+        if (amount <= 0f) return;
+        _currentHealth = Mathf.Clamp(_currentHealth + amount, 0f, MaxHealth);
+        NotifyHealthChanged();
+    }
+
     public void NotifyHealthChanged()
     {
         HealthChanged?.Invoke(CurrentHealth, Mathf.Max(1f, MaxHealth));
