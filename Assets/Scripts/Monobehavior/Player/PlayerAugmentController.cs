@@ -23,6 +23,7 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private bool hasDoubleArrowUnlock;
     [SerializeField] private bool hasWallLootsUnlock;
     [SerializeField] private bool hasExtraAugmentSlotUnlock;
+    [SerializeField] private bool hasDashUnlock;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
 
     [SerializeField] private int arrowShotBonusCount;
@@ -59,6 +60,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float MaxHealthMultiplier => Mathf.Max(0.01f, maxHealthMultiplier);
     public bool HasWallLootsUnlock => hasWallLootsUnlock;
     public bool HasExtraAugmentSlotUnlock => hasExtraAugmentSlotUnlock;
+    public bool HasDashUnlock => hasDashUnlock;
 
     public int CountDistinctArrowAugmentTypesOwnedForMutation()
     {
@@ -149,6 +151,9 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.ExtraAugmentSlotUnlock:
                 hasExtraAugmentSlotUnlock = true;
+                break;
+            case AugmentId.DashUnlock:
+                hasDashUnlock = true;
                 break;
             case AugmentId.GlassCannonDoubleDamageHalveMaxHealth:
                 outgoingDamageMultiplier *= 2f;
