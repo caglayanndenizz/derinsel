@@ -31,11 +31,17 @@ public class AugmentWeightSystem : MonoBehaviour
 
     [Header("Floor Gates")]
     [Tooltip("First floor where T2 augments can appear.")]
-    [SerializeField] private int t2UnlockFloor = 5;
-    [Tooltip("Probability that a T2 slot is granted per interval above t2UnlockFloor. 0.15 = +15% per interval of 5 floors.")]
-    [SerializeField] private float t2SlotChancePerInterval = 0.15f;
+    [SerializeField] private int t2UnlockFloor = 2;
+    [Tooltip("Probability that a T2 slot is granted per interval above t2UnlockFloor. 0.35 = +35% per interval of 5 floors.")]
+    [SerializeField] private float t2SlotChancePerInterval = 0.35f;
     [Tooltip("First floor where T3 augments can appear. Milestone composition fully active from here.")]
-    [SerializeField] private int t3UnlockFloor = 15;
+    [SerializeField] private int t3UnlockFloor = 8;
+
+    [Header("Player Level Gates (secondary unlock — bypasses floor gates)")]
+    [Tooltip("Player level at which T2 augments can appear regardless of floor.")]
+    [SerializeField] private int t2UnlockPlayerLevel = 5;
+    [Tooltip("Player level at which T3 augments can appear regardless of floor.")]
+    [SerializeField] private int t3UnlockPlayerLevel = 10;
 
     [Header("Pity (T3 only)")]
     [Tooltip("Offers without any T3 in pool before pity activates.")]
@@ -97,21 +103,24 @@ public class AugmentWeightSystem : MonoBehaviour
     /// <summary>
     /// Builds a weighted augment offer following composition rules.
     /// Updates pity state after building (current offer uses pre-update state).
+    /// playerLevel is used as a secondary unlock condition — bypasses floor gates when high enough.
     /// </summary>
     public List<AugmentDefinition> BuildOffer(
         PlayerAugmentController controller,
         int slotCount,
-        int currentFloor)
+        int currentFloor,
+        int playerLevel = 1)
     {
         if (slotCount <= 0) return new List<AugmentDefinition>();
 
-        List<int> tierSlots = GetTierSlotComposition(slotCount, IsMilestoneFloor(currentFloor), currentFloor);
+        int effectiveFloor = EffectiveFloor(currentFloor, playerLevel);
+        List<int> tierSlots = GetTierSlotComposition(slotCount, IsMilestoneFloor(effectiveFloor), effectiveFloor);
         var result  = new List<AugmentDefinition>(slotCount);
         var usedIds = new HashSet<AugmentId>();
 
         foreach (int tier in tierSlots)
         {
-            AugmentDefinition pick = PickFromTier(tier, controller, usedIds, currentFloor);
+            AugmentDefinition pick = PickFromTier(tier, controller, usedIds, effectiveFloor);
             if (pick == null) break;
             result.Add(pick);
             usedIds.Add(pick.id);
@@ -126,6 +135,17 @@ public class AugmentWeightSystem : MonoBehaviour
         totalOffers++;
 
         return result;
+    }
+
+    // Player level yeterliyse floor'u minimum unlock eşiğine yükselt
+    private int EffectiveFloor(int floor, int playerLevel)
+    {
+        int effective = floor;
+        if (playerLevel >= t2UnlockPlayerLevel && effective < t2UnlockFloor)
+            effective = t2UnlockFloor;
+        if (playerLevel >= t3UnlockPlayerLevel && effective < t3UnlockFloor)
+            effective = t3UnlockFloor;
+        return effective;
     }
 
     /// <summary>

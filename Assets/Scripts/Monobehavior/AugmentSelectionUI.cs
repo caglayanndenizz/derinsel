@@ -414,7 +414,7 @@ public class AugmentSelectionUI : MonoBehaviour
     {
         TryResolveWeightSystem();
         if (weightSystem != null)
-            return weightSystem.BuildOffer(playerAugmentController, slotCount, GetCurrentFloor());
+            return weightSystem.BuildOffer(playerAugmentController, slotCount, GetCurrentFloor(), GetCurrentPlayerLevel());
         return BuildRandomAugmentOptions(slotCount);
     }
 
@@ -431,6 +431,12 @@ public class AugmentSelectionUI : MonoBehaviour
         if (_dungeonGenerator == null)
             _dungeonGenerator = Object.FindAnyObjectByType<DungeonGenerator>();
         return _dungeonGenerator != null ? _dungeonGenerator.CurrentFloor : 0;
+    }
+
+    private int GetCurrentPlayerLevel()
+    {
+        TryResolvePlayerLevel();
+        return playerLevel != null ? playerLevel.CurrentLevel : 1;
     }
 
     private List<AugmentDefinition> BuildRandomAugmentOptions(int maxOptions)

@@ -6616,9 +6616,9 @@ MonoBehaviour:
   t1BaseWeight: 100
   t2BaseWeight: 35
   t3BaseWeight: 8
-  t2UnlockFloor: 5
-  t2SlotChancePerInterval: 0.15
-  t3UnlockFloor: 15
+  t2UnlockFloor: 2
+  t2SlotChancePerInterval: 0.35
+  t3UnlockFloor: 8
   pityThresholdRounds: 5
   pityIncrementPerRound: 0.2
   rejectionStartMultiplier: 0.3

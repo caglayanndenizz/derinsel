@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: +1 Augment Slot
   description: From the next augmentation choice onward you may pick from one extra option.
   icon: {fileID: 0}
-  rarity: 3
+  rarity: 2
   tier: 1
   value: 1
   scalingCurve:

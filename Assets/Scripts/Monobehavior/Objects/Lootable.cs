@@ -67,9 +67,16 @@ public class Lootable : MonoBehaviour, ICollectable
         if (player != null)
         {
             if (isGold)
+            {
                 player.PlayerCurrency?.AddGold(Mathf.Max(0, value));
+            }
             else
-                player.AddExperience(Mathf.Max(0, experienceValue));
+            {
+                int playerLevel = player.PlayerLevel != null ? player.PlayerLevel.CurrentLevel : 1;
+                // Her 5 level'da bir %50 artis: level 1-5 = x1, 6-10 = x1.5, 11-15 = x2.25 ...
+                float levelMultiplier = Mathf.Pow(1.5f, (playerLevel - 1) / 5);
+                player.AddExperience(Mathf.Max(0, experienceValue * levelMultiplier));
+            }
         }
 
         ReturnToPool();
