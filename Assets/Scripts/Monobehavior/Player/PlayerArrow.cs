@@ -17,6 +17,12 @@ public class PlayerArrow : MonoBehaviour
     bool _fullyChargedBowExplosion;
     float _explosionRadius;
     float _freezeDuration;
+    bool  _hasFireArrow;
+    float _fireDotDuration;
+    float _fireDotDps;
+    bool  _hasPoisonArrow;
+    float _poisonDotDuration;
+    float _poisonDotDps;
     DungeonGenerator _dungeonGenerator;
     CinemachineImpulseSource _hitCameraImpulse;
     Vector2 _previousFramePosition;
@@ -39,7 +45,13 @@ public class PlayerArrow : MonoBehaviour
         float chargedExplosionRadius = 0f,
         DungeonGenerator dungeonGenerator = null,
         CinemachineImpulseSource hitCameraImpulse = null,
-        float freezeDuration = 0f)
+        float freezeDuration = 0f,
+        bool hasFireArrow = false,
+        float fireDotDuration = 0f,
+        float fireDotDps = 0f,
+        bool hasPoisonArrow = false,
+        float poisonDotDuration = 0f,
+        float poisonDotDps = 0f)
     {
         _enemyMask = enemyMask;
         _speed = speed;
@@ -47,9 +59,15 @@ public class PlayerArrow : MonoBehaviour
         _maxLifetime = maxLifetime > 0f ? maxLifetime : defaultMaxLifetime;
         _spawnTime = Time.time;
         _fullyChargedBowExplosion = fullyChargedBowExplosion;
-        _explosionRadius = chargedExplosionRadius;
-        _freezeDuration = freezeDuration;
-        _dungeonGenerator = dungeonGenerator;
+        _explosionRadius   = chargedExplosionRadius;
+        _freezeDuration    = freezeDuration;
+        _hasFireArrow      = hasFireArrow;
+        _fireDotDuration   = fireDotDuration;
+        _fireDotDps        = fireDotDps;
+        _hasPoisonArrow    = hasPoisonArrow;
+        _poisonDotDuration = poisonDotDuration;
+        _poisonDotDps      = poisonDotDps;
+        _dungeonGenerator  = dungeonGenerator;
         _hitCameraImpulse = hitCameraImpulse;
 
         Vector2 origin = transform.position;
@@ -163,15 +181,15 @@ public class PlayerArrow : MonoBehaviour
 
         dmg.TakeDamage(_damage, false);
 
-        if (_freezeDuration > 0f)
+        Enemy enemy = other.GetComponent<Enemy>() ?? other.GetComponentInParent<Enemy>();
+
+        if (_freezeDuration > 0f && enemy != null && enemy.CurrentHealth > 0f)
+            enemy.Freeze(_freezeDuration);
+
+        if (enemy != null && enemy.CurrentHealth > 0f)
         {
-            BaseEntity entity = other.GetComponent<BaseEntity>() ?? other.GetComponentInParent<BaseEntity>();
-            if (entity != null && entity.CurrentHealth > 0f)
-            {
-                Enemy enemyComp = entity as Enemy ?? other.GetComponentInParent<Enemy>();
-                if (enemyComp != null)
-                    enemyComp.Freeze(_freezeDuration);
-            }
+            if (_hasFireArrow   && _fireDotDps   > 0f) enemy.ApplyFireDoT(_fireDotDuration, _fireDotDps);
+            if (_hasPoisonArrow && _poisonDotDps > 0f) enemy.ApplyPoisonDoT(_poisonDotDuration, _poisonDotDps);
         }
     }
 

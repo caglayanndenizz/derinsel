@@ -81,9 +81,16 @@ public class Enemy : BaseEntity
 
     public event System.Action<Enemy> Died;
 
-    private static readonly Color FreezeColor = new Color(0.3f, 0.6f, 1f);
-    private bool _isFrozen = false;
+    private static readonly Color FreezeColor  = new Color(0.3f, 0.6f, 1f);
+    private static readonly Color FireColor    = new Color(1f, 0.45f, 0.1f);
+    private static readonly Color PoisonColor  = new Color(0.2f, 0.8f, 0.2f);
+
+    private bool      _isFrozen = false;
     private Coroutine _freezeCoroutine;
+    private bool      _isOnFire = false;
+    private Coroutine _fireCoroutine;
+    private bool      _isPoisoned = false;
+    private Coroutine _poisonCoroutine;
 
     protected GameObject player;
     private bool _isDead = false;
@@ -584,14 +591,84 @@ public class Enemy : BaseEntity
 
         _isFrozen = false;
         _freezeCoroutine = null;
-        if (_spriteRenderer != null) _spriteRenderer.color = _originalColor;
+        if (_spriteRenderer != null)
+            _spriteRenderer.color = GetCurrentStatusColor();
+    }
+
+    public void ApplyFireDoT(float duration, float dps)
+    {
+        if (_isDead || duration <= 0f || dps <= 0f) return;
+        if (_fireCoroutine != null) StopCoroutine(_fireCoroutine);
+        _fireCoroutine = StartCoroutine(FireDoTRoutine(duration, dps));
+    }
+
+    public void ApplyPoisonDoT(float duration, float dps)
+    {
+        if (_isDead || duration <= 0f || dps <= 0f) return;
+        if (_poisonCoroutine != null) StopCoroutine(_poisonCoroutine);
+        _poisonCoroutine = StartCoroutine(PoisonDoTRoutine(duration, dps));
+    }
+
+    private Color GetCurrentStatusColor()
+    {
+        if (_isOnFire)   return FireColor;
+        if (_isFrozen)   return FreezeColor;
+        if (_isPoisoned) return PoisonColor;
+        return _originalColor;
+    }
+
+    private IEnumerator FireDoTRoutine(float duration, float dps)
+    {
+        _isOnFire = true;
+        if (_spriteRenderer != null) _spriteRenderer.color = FireColor;
+
+        float elapsed = 0f;
+        float tickInterval = 0.5f;
+        float damagePerTick = dps * tickInterval;
+
+        while (elapsed < duration && !_isDead)
+        {
+            yield return new WaitForSeconds(tickInterval);
+            elapsed += tickInterval;
+            if (_isDead) break;
+            TakeDamage(damagePerTick, false);
+        }
+
+        _isOnFire = false;
+        _fireCoroutine = null;
+        if (_spriteRenderer != null)
+            _spriteRenderer.color = GetCurrentStatusColor();
+    }
+
+    private IEnumerator PoisonDoTRoutine(float duration, float dps)
+    {
+        _isPoisoned = true;
+        if (_spriteRenderer != null && !_isOnFire)
+            _spriteRenderer.color = PoisonColor;
+
+        float elapsed = 0f;
+        float tickInterval = 1f;
+        float damagePerTick = dps * tickInterval;
+
+        while (elapsed < duration && !_isDead)
+        {
+            yield return new WaitForSeconds(tickInterval);
+            elapsed += tickInterval;
+            if (_isDead) break;
+            TakeDamage(damagePerTick, false);
+        }
+
+        _isPoisoned = false;
+        _poisonCoroutine = null;
+        if (_spriteRenderer != null)
+            _spriteRenderer.color = GetCurrentStatusColor();
     }
 
     private IEnumerator HitFlashRoutine()
     {
         _spriteRenderer.color = flashColor;
         yield return new WaitForSeconds(0.1f);
-        _spriteRenderer.color = _isFrozen ? FreezeColor : _originalColor;
+        _spriteRenderer.color = GetCurrentStatusColor();
     }
 
     private IEnumerator KnockbackRoutine(float force) {
@@ -647,9 +724,16 @@ public class Enemy : BaseEntity
     {
         _isDead = false;
         _isKnockedBack = false;
+        _isFrozen   = false;
+        _isOnFire   = false;
+        _isPoisoned = false;
+        if (_fireCoroutine   != null) { StopCoroutine(_fireCoroutine);   _fireCoroutine   = null; }
+        if (_poisonCoroutine != null) { StopCoroutine(_poisonCoroutine); _poisonCoroutine = null; }
+        if (_freezeCoroutine != null) { StopCoroutine(_freezeCoroutine); _freezeCoroutine = null; }
         if (cd != null) cd.enabled = true;
         if (_rb != null) _rb.linearVelocity = Vector2.zero;
         if (stats != null) _currentHealth = stats.maxHealth;
+        if (_spriteRenderer != null) _spriteRenderer.color = _originalColor;
         _nextRangedFireTime = enemyType == EnemyType.Mage
             ? Time.time + AdjustedMageRangedFireInterval
             : 0f;

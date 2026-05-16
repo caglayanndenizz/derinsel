@@ -4,10 +4,22 @@ using UnityEngine;
 
 public class PlayerAugmentController : MonoBehaviour
 {
-    /// <summary>Bu id'lerden kaç farklısı alındıysa otomatik ok mutasyonu ilerler (VS tarzı).</summary>
-    private static readonly AugmentId[] ArrowAugmentIdsForAutomaticMutation =
+    // ── Cevher Sistemi ────────────────────────────────────────────────────────
+
+    public const int CevherAltinThreshold    = 2;
+    public const int CevherElmasThreshold    = 4;
+    public const int CevherObsidyenThreshold = 6;
+
+    private static readonly AugmentId[] BowCevherAugmentIds =
     {
+        AugmentId.ChargedBowAoeUnlock,
         AugmentId.DoubleArrowUnlock,
+        AugmentId.BowFreezeUnlock,
+        AugmentId.FireArrowUnlock,
+        AugmentId.PoisonArrowUnlock,
+        AugmentId.BowAoeRadius_Common,
+        AugmentId.BowAoeRadius_Rare,
+        AugmentId.BowAoeRadius_Extraordinary,
         AugmentId.ArrowCount_IncreaseNumberOfArrowsBy1,
         AugmentId.ArrowCount_PlusOneArrows,
         AugmentId.ArrowCount_PlusOneAndSpeed10Percent,
@@ -15,102 +27,125 @@ public class PlayerAugmentController : MonoBehaviour
         AugmentId.ArrowCount_IncreaseYourArrowsBy1,
     };
 
-    public const int ArrowAutomaticMutationRequiredDistinctTypes = 5;
+    // ── Runtime stats ─────────────────────────────────────────────────────────
 
     [SerializeField] private float movementSpeedBonus;
-    [SerializeField] private bool hasChargedBowAoe;
+    [SerializeField] private bool  hasChargedBowAoe;
     [SerializeField] private float chargedBowAoeRadius = 3f;
-    [SerializeField] private bool hasDoubleArrowUnlock;
-    [SerializeField] private bool hasWallLootsUnlock;
-    [SerializeField] private bool hasExtraAugmentSlotUnlock;
-    [SerializeField] private bool hasDashUnluck;
-    [SerializeField] private float dashCooldownMultiplier = 1f;
-    [SerializeField] private float luckMultiplier = 1f;
-    [SerializeField] private float hammerChargeMultiplier = 1f;
-    [SerializeField] private float dashDistanceMultiplier = 1f;
+    [SerializeField] private bool  hasDoubleArrowUnlock;
+    [SerializeField] private bool  hasWallLootsUnlock;
+    [SerializeField] private bool  hasExtraAugmentSlotUnlock;
+    [SerializeField] private bool  hasDashUnluck;
+    [SerializeField] private float dashCooldownMultiplier  = 1f;
+    [SerializeField] private float luckMultiplier          = 1f;
+    [SerializeField] private float hammerChargeMultiplier  = 1f;
+    [SerializeField] private float dashDistanceMultiplier  = 1f;
     [SerializeField] private float incomingDamageReduction = 0f;
-    [SerializeField] private bool hasHammerChargeDamageReductionUnlock;
-    [SerializeField] private float hammerFreezeDuration = 0f;
-    [SerializeField] private float bowFreezeDuration = 0f;
-    [SerializeField] private float hammerAoeRadiusBonus = 0f;
-    [SerializeField] private float bowAoeRadiusBonus = 0f;
-    [SerializeField] private float flatMaxHealthBonus = 0f;
+    [SerializeField] private bool  hasHammerChargeDamageReductionUnlock;
+    [SerializeField] private float hammerFreezeDuration    = 0f;
+    [SerializeField] private float bowFreezeDuration       = 0f;
+    [SerializeField] private bool  hasBowFreezeUnlock;
+    [SerializeField] private bool  hasFireArrowUnlock;
+    [SerializeField] private bool  hasPoisonArrowUnlock;
+    [SerializeField] private float hammerAoeRadiusBonus    = 0f;
+    [SerializeField] private float bowAoeRadiusBonus       = 0f;
+    [SerializeField] private float flatMaxHealthBonus      = 0f;
+
+    [Header("Fire Arrow DoT")]
+    [SerializeField] private float fireDotDuration         = 3f;
+    [SerializeField] private float fireDotDamagePerSecond  = 2f;
+
+    [Header("Poison Arrow DoT")]
+    [SerializeField] private float poisonDotDuration          = 5f;
+    [SerializeField] private float poisonDotDamagePerSecond   = 1.5f;
+
     private float _initialChargedBowAoeRadius;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
 
-    [SerializeField] private int arrowShotBonusCount;
+    [SerializeField] private int   arrowShotBonusCount;
     [SerializeField] private float arrowProjectileSpeedMultiplier = 1f;
-    [SerializeField] private float outgoingDamageMultiplier = 1f;
-    [SerializeField] private float maxHealthMultiplier = 1f;
+    [SerializeField] private float outgoingDamageMultiplier       = 1f;
+    [SerializeField] private float maxHealthMultiplier            = 1f;
 
     [Header("Motor / hızlı test")]
     [SerializeField]
-    [Tooltip("Play modunda işaretle: 5 augment toplamadan otomatik ok mutasyonu açılmış gider (gerçek ilerleme değişmez).")]
+    [Tooltip("Play modunda işaretle: Obsidyen kademesine ulaşmadan mutasyon açılmış gider.")]
     private bool cheatForceRadialArrowMutation;
 
     [Header("Motor test (Play Mode'da güncellenir)")]
-    [SerializeField]
-    [Tooltip("Read-only görünüm: MutatedArrowShots ile aynı; Play’de seçili oyuncunun Inspectorunda izle.")]
-    private bool mutatedArrowShotsMotor;
-    [SerializeField]
-    [Tooltip("Sayılan farklı ok-augment çeşitleri (bu run’da kaçını topladin; 5+ mutasyon).")]
-    private int arrowMutationProgressMotor;
+    [SerializeField] private int      bowCevherCountMotor;
+    [SerializeField] private string   bowCevherTierMotor;
 
-    private bool _loggedAllArrowAugmentsComplete;
     private Player _player;
 
     public event Action<AugmentDefinition> AugmentApplied;
 
-    public float MovementSpeedBonus => Mathf.Max(0f, movementSpeedBonus);
-    public bool HasChargedBowAoe => hasChargedBowAoe;
+    // ── Properties ────────────────────────────────────────────────────────────
+
+    public float MovementSpeedBonus          => Mathf.Max(0f, movementSpeedBonus);
+    public bool  HasChargedBowAoe            => hasChargedBowAoe;
+    public bool  HasBowFreezeUnlock          => hasBowFreezeUnlock;
+    public bool  HasFireArrowUnlock          => hasFireArrowUnlock;
+    public bool  HasPoisonArrowUnlock        => hasPoisonArrowUnlock;
+    public float FireDotDuration             => Mathf.Max(0f, fireDotDuration);
+    public float FireDotDamagePerSecond      => Mathf.Max(0f, fireDotDamagePerSecond);
+    public float PoisonDotDuration           => Mathf.Max(0f, poisonDotDuration);
+    public float PoisonDotDamagePerSecond    => Mathf.Max(0f, poisonDotDamagePerSecond);
 
     public int ArrowShotMultiplier => Mathf.Max(
         1,
         1 + Mathf.Max(0, arrowShotBonusCount) + (hasDoubleArrowUnlock ? 1 : 0));
     public float ArrowProjectileSpeedMultiplier => Mathf.Max(0.01f, arrowProjectileSpeedMultiplier);
-    public float OutgoingDamageMultiplier => Mathf.Max(0.01f, outgoingDamageMultiplier);
-    public float MaxHealthMultiplier => Mathf.Max(0.01f, maxHealthMultiplier);
-    public bool HasWallLootsUnlock => hasWallLootsUnlock;
-    public bool HasExtraAugmentSlotUnlock => hasExtraAugmentSlotUnlock;
-    public bool HasDashUnluck => hasDashUnluck;
-    public float DashCooldownMultiplier => Mathf.Max(0.01f, dashCooldownMultiplier);
-    public float LuckMultiplier => Mathf.Max(0.01f, luckMultiplier);
-    public float HammerChargeMultiplier => Mathf.Max(0.01f, hammerChargeMultiplier);
-    public float DashDistanceMultiplier => Mathf.Max(0.01f, dashDistanceMultiplier);
-    public float IncomingDamageReduction => Mathf.Clamp01(incomingDamageReduction);
-    public bool HasHammerChargeDamageReductionUnlock => hasHammerChargeDamageReductionUnlock;
-    public float HammerFreezeDuration => Mathf.Max(0f, hammerFreezeDuration);
-    public float BowFreezeDuration => Mathf.Max(0f, bowFreezeDuration);
-    public float HammerAoeRadiusMultiplier => 1f + Mathf.Max(0f, hammerAoeRadiusBonus);
-    public float ChargedBowAoeRadius => Mathf.Max(0f, chargedBowAoeRadius * (1f + Mathf.Max(0f, bowAoeRadiusBonus)));
-    public float FlatMaxHealthBonus => Mathf.Max(0f, flatMaxHealthBonus);
+    public float OutgoingDamageMultiplier       => Mathf.Max(0.01f, outgoingDamageMultiplier);
+    public float MaxHealthMultiplier            => Mathf.Max(0.01f, maxHealthMultiplier);
+    public bool  HasWallLootsUnlock             => hasWallLootsUnlock;
+    public bool  HasExtraAugmentSlotUnlock      => hasExtraAugmentSlotUnlock;
+    public bool  HasDashUnluck                  => hasDashUnluck;
+    public float DashCooldownMultiplier         => Mathf.Max(0.01f, dashCooldownMultiplier);
+    public float LuckMultiplier                 => Mathf.Max(0.01f, luckMultiplier);
+    public float HammerChargeMultiplier         => Mathf.Max(0.01f, hammerChargeMultiplier);
+    public float DashDistanceMultiplier         => Mathf.Max(0.01f, dashDistanceMultiplier);
+    public float IncomingDamageReduction        => Mathf.Clamp01(incomingDamageReduction);
+    public bool  HasHammerChargeDamageReductionUnlock => hasHammerChargeDamageReductionUnlock;
+    public float HammerFreezeDuration           => Mathf.Max(0f, hammerFreezeDuration);
+    public float BowFreezeDuration              => Mathf.Max(0f, bowFreezeDuration);
+    public float HammerAoeRadiusMultiplier      => 1f + Mathf.Max(0f, hammerAoeRadiusBonus);
+    public float ChargedBowAoeRadius            => Mathf.Max(0f, chargedBowAoeRadius * (1f + Mathf.Max(0f, bowAoeRadiusBonus)));
+    public float FlatMaxHealthBonus             => Mathf.Max(0f, flatMaxHealthBonus);
 
-    public int CountDistinctArrowAugmentTypesOwnedForMutation()
+    // ── Cevher Sistemi hesaplama ──────────────────────────────────────────────
+
+    public int BowCevherAugmentCount
     {
-        int n = 0;
-        for (int i = 0; i < ArrowAugmentIdsForAutomaticMutation.Length; i++)
+        get
         {
-            if (GetAppliedCount(ArrowAugmentIdsForAutomaticMutation[i]) > 0)
-                n++;
+            int total = 0;
+            for (int i = 0; i < BowCevherAugmentIds.Length; i++)
+                total += GetAppliedCount(BowCevherAugmentIds[i]);
+            return total;
         }
+    }
 
-        return n;
+    public CevherTier BowCevherTier
+    {
+        get
+        {
+            int n = BowCevherAugmentCount;
+            if (n >= CevherObsidyenThreshold) return CevherTier.Obsidyen;
+            if (n >= CevherElmasThreshold)    return CevherTier.Elmas;
+            if (n >= CevherAltinThreshold)    return CevherTier.Altin;
+            return CevherTier.Komur;
+        }
     }
 
     public bool HasRadialBowMutationUnlock =>
-        cheatForceRadialArrowMutation ||
-        CountDistinctArrowAugmentTypesOwnedForMutation() >= ArrowAutomaticMutationRequiredDistinctTypes;
+        cheatForceRadialArrowMutation || BowCevherTier == CevherTier.Obsidyen;
 
-    /// <summary>
-    /// Test amaçlı: mutasyon için gerekli 5 farklı arrow augmenttan sonra true (aynı kosul <see cref="HasRadialBowMutationUnlock"/> ile).
-    /// </summary>
     public bool MutatedArrowShots => HasRadialBowMutationUnlock;
 
-    /// <summary>İleride kombo/policy buraya bağlanır (otomatik radialı iptal vb.).</summary>
-    public bool ShouldUseRadialBowVolleyMutation(Player _)
-    {
-        return HasRadialBowMutationUnlock;
-    }
+    public bool ShouldUseRadialBowVolleyMutation(Player _) => HasRadialBowMutationUnlock;
+
+    // ── Unity lifecycle ───────────────────────────────────────────────────────
 
     private void Awake()
     {
@@ -118,42 +153,45 @@ public class PlayerAugmentController : MonoBehaviour
         _initialChargedBowAoeRadius = chargedBowAoeRadius;
     }
 
-    public void ResetAll()
-    {
-        movementSpeedBonus = 0f;
-        hasChargedBowAoe = false;
-        chargedBowAoeRadius = _initialChargedBowAoeRadius;
-        hasDoubleArrowUnlock = false;
-        hasWallLootsUnlock = false;
-        hasExtraAugmentSlotUnlock = false;
-        hasDashUnluck = false;
-        dashCooldownMultiplier = 1f;
-        luckMultiplier = 1f;
-        hammerChargeMultiplier = 1f;
-        dashDistanceMultiplier = 1f;
-        incomingDamageReduction = 0f;
-        hasHammerChargeDamageReductionUnlock = false;
-        hammerFreezeDuration = 0f;
-        bowFreezeDuration = 0f;
-        hammerAoeRadiusBonus = 0f;
-        bowAoeRadiusBonus = 0f;
-        flatMaxHealthBonus = 0f;
-        arrowShotBonusCount = 0;
-        arrowProjectileSpeedMultiplier = 1f;
-        outgoingDamageMultiplier = 1f;
-        maxHealthMultiplier = 1f;
-        _appliedAugmentCounts.Clear();
-        _loggedAllArrowAugmentsComplete = false;
-    }
-
     private void LateUpdate()
     {
-        int real = CountDistinctArrowAugmentTypesOwnedForMutation();
-        arrowMutationProgressMotor = cheatForceRadialArrowMutation
-            ? Mathf.Max(real, ArrowAutomaticMutationRequiredDistinctTypes)
-            : real;
-        mutatedArrowShotsMotor = MutatedArrowShots;
+        bowCevherCountMotor = BowCevherAugmentCount;
+        bowCevherTierMotor  = BowCevherTier.ToString();
     }
+
+    // ── Reset ─────────────────────────────────────────────────────────────────
+
+    public void ResetAll()
+    {
+        movementSpeedBonus                  = 0f;
+        hasChargedBowAoe                    = false;
+        chargedBowAoeRadius                 = _initialChargedBowAoeRadius;
+        hasDoubleArrowUnlock                = false;
+        hasWallLootsUnlock                  = false;
+        hasExtraAugmentSlotUnlock           = false;
+        hasDashUnluck                       = false;
+        dashCooldownMultiplier              = 1f;
+        luckMultiplier                      = 1f;
+        hammerChargeMultiplier              = 1f;
+        dashDistanceMultiplier              = 1f;
+        incomingDamageReduction             = 0f;
+        hasHammerChargeDamageReductionUnlock = false;
+        hammerFreezeDuration                = 0f;
+        bowFreezeDuration                   = 0f;
+        hasBowFreezeUnlock                  = false;
+        hasFireArrowUnlock                  = false;
+        hasPoisonArrowUnlock                = false;
+        hammerAoeRadiusBonus                = 0f;
+        bowAoeRadiusBonus                   = 0f;
+        flatMaxHealthBonus                  = 0f;
+        arrowShotBonusCount                 = 0;
+        arrowProjectileSpeedMultiplier      = 1f;
+        outgoingDamageMultiplier            = 1f;
+        maxHealthMultiplier                 = 1f;
+        _appliedAugmentCounts.Clear();
+    }
+
+    // ── Augment query ─────────────────────────────────────────────────────────
 
     public bool HasAugment(AugmentId id)
     {
@@ -172,9 +210,11 @@ public class PlayerAugmentController : MonoBehaviour
         if (augment == null) return false;
         if (!MeetsAugmentPrerequisites(augment.id)) return false;
         int currentCount = GetAppliedCount(augment.id);
-        int maxCount = GetMaxApplyCount(augment);
+        int maxCount     = GetMaxApplyCount(augment);
         return currentCount < maxCount;
     }
+
+    // ── Apply ─────────────────────────────────────────────────────────────────
 
     public void ApplyAugment(AugmentDefinition augment)
     {
@@ -206,6 +246,16 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.DashUnluck:
                 hasDashUnluck = true;
+                break;
+            case AugmentId.BowFreezeUnlock:
+                hasBowFreezeUnlock = true;
+                bowFreezeDuration  = augment.value > 0f ? augment.value : 1.5f;
+                break;
+            case AugmentId.FireArrowUnlock:
+                hasFireArrowUnlock = true;
+                break;
+            case AugmentId.PoisonArrowUnlock:
+                hasPoisonArrowUnlock = true;
                 break;
             case AugmentId.DashCooldownReduce_Common_I:
             case AugmentId.DashCooldownReduce_Common_II:
@@ -246,11 +296,6 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.HammerFreeze_Extraordinary:
                 hammerFreezeDuration += Mathf.Max(0f, augment.value);
                 break;
-            case AugmentId.BowFreeze_Common:
-            case AugmentId.BowFreeze_Rare:
-            case AugmentId.BowFreeze_Extraordinary:
-                bowFreezeDuration += Mathf.Max(0f, augment.value);
-                break;
             case AugmentId.HammerAoeRadius_Common:
             case AugmentId.HammerAoeRadius_Rare:
             case AugmentId.HammerAoeRadius_Extraordinary:
@@ -270,11 +315,11 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.HalfHealthBonusDamage:
                 outgoingDamageMultiplier *= 1.5f;
-                maxHealthMultiplier *= 0.5f;
+                maxHealthMultiplier      *= 0.5f;
                 break;
             case AugmentId.GlassCannonDoubleDamageHalveMaxHealth:
                 outgoingDamageMultiplier *= 2f;
-                maxHealthMultiplier *= 0.5f;
+                maxHealthMultiplier      *= 0.5f;
                 break;
             case AugmentId.MaxHealthIncreasePercent:
                 maxHealthMultiplier *= 1f + Mathf.Max(0f, augment.value);
@@ -296,18 +341,9 @@ public class PlayerAugmentController : MonoBehaviour
 
         if (!Mathf.Approximately(prevMaxHpMult, maxHealthMultiplier))
             _player?.OnMaxHealthMultiplierChanged(prevMaxHpMult, maxHealthMultiplier);
-
-        MaybeLogArrowAugmentSetComplete();
     }
 
-    private void MaybeLogArrowAugmentSetComplete()
-    {
-        if (_loggedAllArrowAugmentsComplete) return;
-        if (CountDistinctArrowAugmentTypesOwnedForMutation() < ArrowAutomaticMutationRequiredDistinctTypes)
-            return;
-
-        _loggedAllArrowAugmentsComplete = true;
-    }
+    // ── Private helpers ───────────────────────────────────────────────────────
 
     private static int GetMaxApplyCount(AugmentDefinition augment)
     {
@@ -333,6 +369,9 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.WallLootsUnlock:
             case AugmentId.DashUnluck:
             case AugmentId.HammerChargeDamageReductionUnlock:
+            case AugmentId.BowFreezeUnlock:
+            case AugmentId.FireArrowUnlock:
+            case AugmentId.PoisonArrowUnlock:
                 return true;
             default:
                 return false;
@@ -343,9 +382,9 @@ public class PlayerAugmentController : MonoBehaviour
     {
         switch (rarity)
         {
-            case 1: return 3;
-            case 2: return 2;
-            case 3: return 1;
+            case 1:  return 3;
+            case 2:  return 2;
+            case 3:  return 1;
             default: return 1;
         }
     }

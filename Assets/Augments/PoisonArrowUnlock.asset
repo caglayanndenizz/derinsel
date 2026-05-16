@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf6f4c16b5f34ab45880a8a4afae4941, type: 3}
-  m_Name: BowFreeze_Common
+  m_Name: PoisonArrowUnlock
   m_EditorClassIdentifier: Assembly-CSharp::AugmentDefinition
-  id: 41
-  displayName: Frost Arrow I
-  description: Arrow hits that fail to kill freeze the enemy for 0.5 seconds.
+  id: 56
+  displayName: Sewer Rat
+  description: Your arrow now becomes toxic!
   icon: {fileID: 0}
   rarity: 1
   tier: 1
-  value: 0.5
+  value: 1
   scalingCurve:
     serializedVersion: 2
     m_Curve:
@@ -43,5 +43,5 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  excludeFromAugmentPickerWhenRadialBowMutationComplete: 0
   baseWeight: 0
+  excludeFromAugmentPickerWhenRadialBowMutationComplete: 0

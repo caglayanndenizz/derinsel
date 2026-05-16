@@ -559,7 +559,13 @@ public class Player : BaseEntity, IPlayerContext
             explosionRadius,
             generator,
             chargedExplosionEnabled ? _defaultImpulseSource : null,
-            playerAugmentController != null ? playerAugmentController.BowFreezeDuration : 0f);
+            playerAugmentController != null ? playerAugmentController.BowFreezeDuration : 0f,
+            playerAugmentController != null && playerAugmentController.HasFireArrowUnlock,
+            playerAugmentController != null ? playerAugmentController.FireDotDuration : 0f,
+            playerAugmentController != null ? playerAugmentController.FireDotDamagePerSecond : 0f,
+            playerAugmentController != null && playerAugmentController.HasPoisonArrowUnlock,
+            playerAugmentController != null ? playerAugmentController.PoisonDotDuration : 0f,
+            playerAugmentController != null ? playerAugmentController.PoisonDotDamagePerSecond : 0f);
     }
 
     private static float GetArrowSpreadStepDegrees(int arrowCount)
