@@ -5,11 +5,11 @@ using System.Collections;
 using System;
 using Unity.Cinemachine;
 
-public class Player : BaseEntity
+public class Player : BaseEntity, IPlayerContext
 {
     [Header("External References")]
     public DungeonGenerator generator;
-    
+
     [Header("Hammer Settings (Heavy)")]
     public float maxChargeTime = 0.5f;
     public float hammerAOE = 2.5f;
@@ -48,8 +48,8 @@ public class Player : BaseEntity
     [SerializeField] private float radialBowAutoVolleyTravelDistance = 8f;
 
     [Header("Light Attack Settings (Spammable)")]
-    public float lightAttackRate = 0.2f; 
-    public float lightAttackDuration = 0.1f; 
+    public float lightAttackRate = 0.2f;
+    public float lightAttackDuration = 0.1f;
     [SerializeField] private float lightImpactFallbackDelay = 0.08f;
     private float _nextAttackTime = 0f;
     private float _lastLightAttackResolveTime = -999f;
@@ -88,7 +88,7 @@ public class Player : BaseEntity
     public Slider hammerCooldownBar;
     public GameObject hammerCooldownCanvas;
     [SerializeField] private bool showCooldownBarWhenReady = true;
-    
+
     [Header("Hammer Charge UI")]
     public Slider chargeMeter;
     public GameObject meterCanvas;
@@ -96,22 +96,16 @@ public class Player : BaseEntity
     [Header("Impact Feedback")]
     private PlayerImpactFeedback impactFeedback;
 
-    private float _currentCharge = 0f;
-    private bool _isHammerCharging = false;
-    private float _bowCharge = 0f;
-    private bool _isBowCharging = false;
     private float _nextHammerUseTime = 0f;
     private float _nextDashTime = 0f;
+    private bool _hadRadialBowMutationLastFrame;
+    private float _nextRadialBowAutoVolleyTime;
     private Rigidbody2D _rb;
     private CinemachineImpulseSource _defaultImpulseSource;
     private float _invulnerableUntil = 0f;
-    private bool _hadRadialBowMutationLastFrame;
-    private float _nextRadialBowAutoVolleyTime;
+    private PlayerState _currentState;
+
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
-    private static readonly int IsChargingHash = Animator.StringToHash("IsCharging");
-    private static readonly int BowChargeHash = Animator.StringToHash("BowCharge");
-    private static readonly int LightAttackHash = Animator.StringToHash("LightAttack");
-    private static readonly int HeavyAttackHash = Animator.StringToHash("HeavyAttack");
 
     public event Action<float, float> HealthChanged;
     public event Action Died;
@@ -119,6 +113,74 @@ public class Player : BaseEntity
     public PlayerLevel PlayerLevel => playerLevel;
     public PlayerCurrency PlayerCurrency => playerCurrency;
     public PlayerAugmentController PlayerAugmentController => playerAugmentController;
+
+    // ─── IPlayerContext ───────────────────────────────────────────────────────
+
+    public void SetState(PlayerState newState)
+    {
+        _currentState?.Exit(this);
+        _currentState = newState;
+        _currentState.Enter(this);
+    }
+
+    EntityStats IPlayerContext.Stats => stats;
+    PlayerAugmentController IPlayerContext.AugmentController => playerAugmentController;
+    float IPlayerContext.MaxChargeTime => maxChargeTime;
+    Slider IPlayerContext.ChargeMeter => chargeMeter;
+    GameObject IPlayerContext.MeterCanvas => meterCanvas;
+    float IPlayerContext.MaxBowChargeTime => maxBowChargeTime;
+    float IPlayerContext.LightAttackRate => lightAttackRate;
+    float IPlayerContext.LightImpactFallbackDelay => lightImpactFallbackDelay;
+    Slider IPlayerContext.BowChargeMeter => bowChargeMeter;
+    GameObject IPlayerContext.BowMeterCanvas => bowMeterCanvas;
+    float IPlayerContext.RadialBowAutoVolleyIntervalSeconds => radialBowAutoVolleyIntervalSeconds;
+    GameObject IPlayerContext.ArrowPrefab => arrowPrefab;
+    Animator IPlayerContext.Animator => animator;
+
+    float IPlayerContext.NextHammerUseTime
+    {
+        get => _nextHammerUseTime;
+        set => _nextHammerUseTime = value;
+    }
+    float IPlayerContext.NextAttackTime
+    {
+        get => _nextAttackTime;
+        set => _nextAttackTime = value;
+    }
+    bool IPlayerContext.HadRadialBowMutationLastFrame
+    {
+        get => _hadRadialBowMutationLastFrame;
+        set => _hadRadialBowMutationLastFrame = value;
+    }
+    float IPlayerContext.NextRadialBowAutoVolleyTime
+    {
+        get => _nextRadialBowAutoVolleyTime;
+        set => _nextRadialBowAutoVolleyTime = value;
+    }
+    bool IPlayerContext.LightAttackInProgress
+    {
+        get => _lightAttackInProgress;
+        set => _lightAttackInProgress = value;
+    }
+    float IPlayerContext.LightFallbackExecuteAt
+    {
+        get => _lightFallbackExecuteAt;
+        set => _lightFallbackExecuteAt = value;
+    }
+
+    void IPlayerContext.ScheduleBowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+        => ScheduleBowArrow(damage, useBowChargedMultiplier, aimWorldAtFireInput);
+
+    Vector2 IPlayerContext.GetBowAimWorldPointAtCurrentMouse()
+        => GetBowAimWorldPointAtCurrentMouse();
+
+    void IPlayerContext.FireRadialBowMutationAutoVolley(float lightDamage)
+        => FireRadialBowMutationAutoVolley(lightDamage);
+
+    void IPlayerContext.TriggerHeavyAttack()
+        => TriggerHeavyAttack();
+
+    // ─── MaxHealth ────────────────────────────────────────────────────────────
 
     public override float MaxHealth
     {
@@ -142,18 +204,19 @@ public class Player : BaseEntity
         NotifyHealthChanged();
     }
 
+    // ─── Unity lifecycle ──────────────────────────────────────────────────────
+
     protected override void Awake()
     {
         base.Awake();
-        // Rigidbody referansını al ve ayarla
         _rb = GetComponent<Rigidbody2D>();
         _rb.gravityScale = 0f;
         _rb.freezeRotation = true;
         _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         _defaultImpulseSource = GetComponent<CinemachineImpulseSource>();
+
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
-
         if (playerLevel == null)
             playerLevel = GetComponent<PlayerLevel>();
         if (playerCurrency == null)
@@ -166,6 +229,9 @@ public class Player : BaseEntity
             impactFeedback = GetComponent<PlayerImpactFeedback>();
         if (dashFlashTarget == null)
             dashFlashTarget = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
+
+        _currentState = new IdleState();
+        _currentState.Enter(this);
 
         InitializeHammerCooldownUI();
         InitializeDashCooldownUI();
@@ -189,14 +255,12 @@ public class Player : BaseEntity
 
     void Update()
     {
-        HandleHammerCharge();
-        HandleBowChargeAndRelease();
-        HandleDash();
+        _currentState.Handle(this);
         HandleLightImpactFallback();
         HandleHeavyImpactFallback();
+        HandleDash();
         UpdateHammerCooldownUI();
         UpdateDashCooldownUI();
-        UpdateRadialBowAutoVolley();
     }
 
     void FixedUpdate()
@@ -204,11 +268,13 @@ public class Player : BaseEntity
         Move();
     }
 
+    // ─── Damage / health ──────────────────────────────────────────────────────
+
     public override void TakeDamage(float amount, bool isHeavy)
     {
         if (Time.time < _invulnerableUntil) return;
 
-        if (IsChargeMeterFullWhileCharging())
+        if (_currentState.IsChargeMeterFull(this))
             amount *= Mathf.Clamp01(1f - heavyChargeFullDamageReduction);
 
         base.TakeDamage(amount, isHeavy);
@@ -219,6 +285,7 @@ public class Player : BaseEntity
     protected override void Die()
     {
         _currentHealth = 0f;
+        SetState(new DiedState());
         Died?.Invoke();
     }
 
@@ -247,17 +314,19 @@ public class Player : BaseEntity
         playerLevel.AddExperience(amount);
     }
 
+    // ─── Movement ─────────────────────────────────────────────────────────────
+
     protected override void Move()
     {
-        float moveX = Input.GetAxisRaw("Horizontal"); 
-        float moveY = Input.GetAxisRaw("Vertical");   
+        float moveX = Input.GetAxisRaw("Horizontal");
+        float moveY = Input.GetAxisRaw("Vertical");
 
         Vector2 direction = new Vector2(moveX, moveY).normalized;
-        
+
         float augmentSpeedBonus = playerAugmentController != null ? playerAugmentController.MovementSpeedBonus : 0f;
-        float chargeMultiplier = (_isHammerCharging || _isBowCharging) ? 0.3f : 1f;
+        float chargeMultiplier = _currentState.IsChargingForMovement ? 0.3f : 1f;
         float currentSpeed = stats.moveSpeed * (1f + augmentSpeedBonus) * chargeMultiplier;
-        
+
         _rb.linearVelocity = direction * currentSpeed;
         if (animator != null)
             animator.SetFloat(SpeedHash, direction.magnitude);
@@ -266,79 +335,110 @@ public class Player : BaseEntity
         else if (moveX < 0) transform.localScale = new Vector3(-1f, 1f, 1f);
     }
 
-    private bool IsChargeMeterFullWhileCharging()
+    // ─── Attack resolution (animation events + fallbacks) ────────────────────
+
+    public void LightAttack()
     {
-        if (!_isHammerCharging) return false;
-        if (chargeMeter != null)
-            return chargeMeter.value >= 1f - 0.0001f;
-        float effectiveChargeTime = maxChargeTime * (playerAugmentController != null ? playerAugmentController.HammerChargeMultiplier : 1f);
-        return _currentCharge >= effectiveChargeTime - 0.0001f;
+        ClearLightAttackPendingState();
     }
 
-    private void HandleBowChargeAndRelease()
+    private void ClearLightAttackPendingState()
     {
-        if (_isHammerCharging)
-        {
-            ResetBowChargeState();
+        if (Time.time - _lastLightAttackResolveTime < Mathf.Max(0.01f, lightAttackDuration * 0.5f))
             return;
-        }
-
-        if (Input.GetButtonUp("Fire2"))
-        {
-            bool wasFullBow = _bowCharge >= maxBowChargeTime - 0.0001f;
-            ResetBowChargeState();
-
-            if (Time.time >= _nextAttackTime)
-            {
-                if (animator != null)
-                    animator.SetTrigger(LightAttackHash);
-                Vector2 aimAtRelease = GetBowAimWorldPointAtCurrentMouse();
-                ScheduleBowArrow(stats != null ? stats.lightAttackDamage : 0f, wasFullBow, aimAtRelease);
-                _lightAttackInProgress = true;
-                _lightFallbackExecuteAt = Time.time + Mathf.Max(0.03f, lightImpactFallbackDelay);
-                _nextAttackTime = Time.time + lightAttackRate;
-            }
-        }
-
-        // BowCharge anim / yürüme yavaşlatma: sağ tık basılıyken
-        _isBowCharging = Input.GetButton("Fire2");
-
-        if (_isBowCharging)
-        {
-            if (bowMeterCanvas != null)
-                bowMeterCanvas.SetActive(true);
-            _bowCharge += Time.deltaTime;
-            _bowCharge = Mathf.Clamp(_bowCharge, 0f, maxBowChargeTime);
-            if (bowChargeMeter != null)
-                bowChargeMeter.value = _bowCharge / Mathf.Max(0.0001f, maxBowChargeTime);
-        }
-        else
-        {
-            if (bowMeterCanvas != null)
-                bowMeterCanvas.SetActive(false);
-            if (_bowCharge > 0f)
-            {
-                _bowCharge = 0f;
-                if (bowChargeMeter != null)
-                    bowChargeMeter.value = 0f;
-            }
-        }
-
-        UpdateChargingAnimator();
+        _lastLightAttackResolveTime = Time.time;
+        _lightAttackInProgress = false;
+        _lightFallbackExecuteAt = -1f;
     }
+
+    private void HandleLightImpactFallback()
+    {
+        if (!_lightAttackInProgress) return;
+        if (Time.time < _lightFallbackExecuteAt) return;
+        ClearLightAttackPendingState();
+    }
+
+    private void HandleHeavyImpactFallback()
+    {
+        if (!_heavyAttackInProgress) return;
+        if (Time.time < _heavyFallbackExecuteAt) return;
+        HammerSlam();
+    }
+
+    private void TriggerHeavyAttack()
+    {
+        _nextHammerUseTime = Time.time + hammerCooldown;
+        UpdateHammerCooldownUI();
+        if (animator != null)
+            animator.SetTrigger(Animator.StringToHash("HeavyAttack"));
+        _heavyAttackInProgress = true;
+        _heavyFallbackExecuteAt = Time.time + Mathf.Max(0.05f, heavyImpactFallbackDelay);
+    }
+
+    public void HammerSlam()
+    {
+        if (Time.time - _lastHeavyResolveTime < 0.05f) return;
+
+        _lastHeavyResolveTime = Time.time;
+        _heavyAttackInProgress = false;
+        _heavyFallbackExecuteAt = -1f;
+
+        if (_defaultImpulseSource != null) _defaultImpulseSource.GenerateImpulse();
+        if (generator != null)
+        {
+            var brokenWalls = generator.BreakWallsInArea(attackPoint.position, hammerAOE);
+            wallLootHandler?.TrySpawnWallLootForBrokenWalls(brokenWalls);
+        }
+
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
+        int successfulHits = 0;
+        Vector3 firstHitPosition = attackPoint.position;
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            IDamageable target = enemy.GetComponent<IDamageable>() ?? enemy.GetComponentInParent<IDamageable>();
+            if (target == null) continue;
+            BaseEntity targetEntity = enemy.GetComponent<BaseEntity>() ?? enemy.GetComponentInParent<BaseEntity>();
+            float heavyDamage = targetEntity != null ? targetEntity.CurrentHealth : stats.heavyAttackDamage;
+            float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
+            target.TakeDamage(heavyDamage * dmgMult, true);
+            if (successfulHits == 0)
+                firstHitPosition = enemy.ClosestPoint(attackPoint.position);
+            successfulHits++;
+        }
+
+        if (successfulHits > 0)
+            impactFeedback?.PlayHeavyHit(firstHitPosition, _defaultImpulseSource);
+    }
+
+    // ─── Bow / arrow ──────────────────────────────────────────────────────────
 
     private Vector2 GetBowAimWorldPointAtCurrentMouse()
     {
-        if (attackPoint == null)
-            return Vector2.zero;
+        if (attackPoint == null) return Vector2.zero;
         Camera cam = aimCamera != null ? aimCamera : Camera.main;
-        if (cam == null)
-            return attackPoint.position;
+        if (cam == null) return attackPoint.position;
 
         Vector3 mouse = Input.mousePosition;
         float planeZ = attackPoint.position.z;
         mouse.z = Mathf.Abs(cam.transform.position.z - planeZ);
         return cam.ScreenToWorldPoint(mouse);
+    }
+
+    private void ScheduleBowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+    {
+        float delay = Mathf.Max(0f, bowArrowReleaseDelay);
+        if (delay <= 0f)
+        {
+            SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
+            return;
+        }
+        StartCoroutine(BowArrowSpawnAfterDelay(delay, damage, useBowChargedMultiplier, aimWorldAtFireInput));
+    }
+
+    private IEnumerator BowArrowSpawnAfterDelay(float delaySeconds, float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+    {
+        yield return new WaitForSeconds(delaySeconds);
+        SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
     }
 
     private void SpawnArrowTowardWorld(float damage, bool useBowChargedMultiplier, Vector2 targetWorld)
@@ -350,21 +450,16 @@ public class Player : BaseEntity
                                        playerAugmentController.HasChargedBowAoe;
         float m = useBowChargedMultiplier ? Mathf.Max(1f, bowChargedSpeedDamageMultiplier) : 1f;
         float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
-        float arrowSpdMult = playerAugmentController != null
-            ? playerAugmentController.ArrowProjectileSpeedMultiplier
-            : 1f;
+        float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;
         float useSpeed = arrowSpeed * m * arrowSpdMult;
         float useDamage = damage * m * dmgMult;
 
         Vector2 origin = attackPoint.position;
         Vector2 offset = targetWorld - origin;
-        if (offset.sqrMagnitude < 0.0001f)
-            offset = Vector2.right * 0.01f;
+        if (offset.sqrMagnitude < 0.0001f) offset = Vector2.right * 0.01f;
         Vector2 dir = offset.normalized;
         float targetDistance = Mathf.Max(0.5f, offset.magnitude);
-        int arrowCount = playerAugmentController != null
-            ? Mathf.Max(1, playerAugmentController.ArrowShotMultiplier)
-            : 1;
+        int arrowCount = playerAugmentController != null ? Mathf.Max(1, playerAugmentController.ArrowShotMultiplier) : 1;
         float spreadStepDegrees = GetArrowSpreadStepDegrees(arrowCount);
         float centerOffset = (arrowCount - 1) * 0.5f;
 
@@ -373,54 +468,19 @@ public class Player : BaseEntity
             float angleOffset = (i - centerOffset) * spreadStepDegrees;
             Vector2 shotDir = Quaternion.Euler(0f, 0f, angleOffset) * dir;
             Vector2 spawnPos = origin + shotDir * radialBowSpawnInset;
-            TrySpawnSinglePlayerArrow(
-                spawnPos,
-                origin + shotDir * targetDistance,
-                useSpeed,
-                useDamage,
-                chargedExplosionEnabled);
+            TrySpawnSinglePlayerArrow(spawnPos, origin + shotDir * targetDistance, useSpeed, useDamage, chargedExplosionEnabled);
         }
-    }
-
-    private void UpdateRadialBowAutoVolley()
-    {
-        if (arrowPrefab == null) return;
-
-        bool active = playerAugmentController != null &&
-                      playerAugmentController.ShouldUseRadialBowVolleyMutation(this);
-        if (!active)
-        {
-            _hadRadialBowMutationLastFrame = false;
-            return;
-        }
-
-        if (!_hadRadialBowMutationLastFrame)
-            _nextRadialBowAutoVolleyTime = Time.time;
-
-        _hadRadialBowMutationLastFrame = true;
-
-        if (Time.time < _nextRadialBowAutoVolleyTime) return;
-
-        float baseDamage = stats != null ? stats.lightAttackDamage : 0f;
-        FireRadialBowMutationAutoVolley(baseDamage);
-        _nextRadialBowAutoVolleyTime = Time.time +
-            Mathf.Max(0.05f, radialBowAutoVolleyIntervalSeconds);
     }
 
     private void FireRadialBowMutationAutoVolley(float lightDamage)
     {
-        bool chargedExplosionEnabled = false;
-        float m = 1f;
         float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
-        float arrowSpdMult = playerAugmentController != null
-            ? playerAugmentController.ArrowProjectileSpeedMultiplier
-            : 1f;
-        float useSpeed = arrowSpeed * m * arrowSpdMult;
-        float useDamage = lightDamage * m * dmgMult;
+        float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;
+        float useSpeed = arrowSpeed * arrowSpdMult;
+        float useDamage = lightDamage * dmgMult;
 
         Vector2 radialOrigin = transform.position;
         float targetDistance = Mathf.Max(0.5f, radialBowAutoVolleyTravelDistance);
-
         int volleyCount = Mathf.Clamp(autoArrowVolleyCount, 1, 64);
         float step = Mathf.Max(1f, autoArrowVolleyAngleStepDegrees);
 
@@ -430,12 +490,7 @@ public class Player : BaseEntity
             float forward = Mathf.Max(0f, radialBowSpawnInset);
             Vector2 spawnPos = radialOrigin + radialDir * forward;
             Vector2 shotTarget = radialOrigin + radialDir * Mathf.Max(forward + 0.3f, targetDistance);
-            TrySpawnSinglePlayerArrow(
-                spawnPos,
-                shotTarget,
-                useSpeed,
-                useDamage,
-                chargedExplosionEnabled);
+            TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, useDamage, false);
         }
     }
 
@@ -454,10 +509,9 @@ public class Player : BaseEntity
     {
         if (arrowPrefab == null) return;
 
-        float explosionRadius =
-            chargedExplosionEnabled && playerAugmentController != null
-                ? playerAugmentController.ChargedBowAoeRadius
-                : 0f;
+        float explosionRadius = chargedExplosionEnabled && playerAugmentController != null
+            ? playerAugmentController.ChargedBowAoeRadius
+            : 0f;
 
         GameObject arrow = Instantiate(arrowPrefab, spawnWorldPosition, Quaternion.identity);
         PlayerArrow mover = arrow.GetComponent<PlayerArrow>();
@@ -496,172 +550,7 @@ public class Player : BaseEntity
         StopAllCoroutines();
     }
 
-    private void ScheduleBowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
-    {
-        float delay = Mathf.Max(0f, bowArrowReleaseDelay);
-        if (delay <= 0f)
-        {
-            SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
-            return;
-        }
-
-        StartCoroutine(BowArrowSpawnAfterDelay(delay, damage, useBowChargedMultiplier, aimWorldAtFireInput));
-    }
-
-    private IEnumerator BowArrowSpawnAfterDelay(float delaySeconds, float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
-    {
-        yield return new WaitForSeconds(delaySeconds);
-        SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
-    }
-
-    public void LightAttack()
-    {
-        ClearLightAttackPendingState();
-    }
-
-    private void ClearLightAttackPendingState()
-    {
-        if (Time.time - _lastLightAttackResolveTime < Mathf.Max(0.01f, lightAttackDuration * 0.5f))
-            return;
-        _lastLightAttackResolveTime = Time.time;
-        _lightAttackInProgress = false;
-        _lightFallbackExecuteAt = -1f;
-    }
-
-    private void HandleHammerCharge()
-    {
-        if (Time.time < _nextHammerUseTime)
-        {
-            if (_isHammerCharging) ResetHammerCharge();
-            return;
-        }
-
-        float effectiveChargeTime = maxChargeTime * (playerAugmentController != null ? playerAugmentController.HammerChargeMultiplier : 1f);
-
-        if (Input.GetButton("Fire1"))
-        {
-            _isHammerCharging = true;
-            if (meterCanvas != null)
-                meterCanvas.SetActive(true);
-            _currentCharge += Time.deltaTime;
-            _currentCharge = Mathf.Clamp(_currentCharge, 0f, effectiveChargeTime);
-            if (chargeMeter != null)
-                chargeMeter.value = _currentCharge / Mathf.Max(0.0001f, effectiveChargeTime);
-            UpdateChargingAnimator();
-        }
-
-        if (Input.GetButtonUp("Fire1"))
-        {
-            if (_currentCharge >= effectiveChargeTime)
-                TriggerHeavyAttack();
-            ResetHammerCharge();
-        }
-    }
-
-    private void TriggerHeavyAttack()
-    {
-        _nextHammerUseTime = Time.time + hammerCooldown;
-        UpdateHammerCooldownUI();
-        if (animator != null)
-            animator.SetTrigger(HeavyAttackHash);
-        _heavyAttackInProgress = true;
-        _heavyFallbackExecuteAt = Time.time + Mathf.Max(0.05f, heavyImpactFallbackDelay);
-    }
-
-    public void HammerSlam()
-    {
-        if (Time.time - _lastHeavyResolveTime < 0.05f)
-            return;
-
-        _lastHeavyResolveTime = Time.time;
-        _heavyAttackInProgress = false;
-        _heavyFallbackExecuteAt = -1f;
-
-        CinemachineImpulseSource source = _defaultImpulseSource;
-        if (source != null) source.GenerateImpulse();
-        if (generator != null)
-        {
-            var brokenWalls = generator.BreakWallsInArea(attackPoint.position, hammerAOE);
-            wallLootHandler?.TrySpawnWallLootForBrokenWalls(brokenWalls);
-        }
-
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
-        int successfulHits = 0;
-        Vector3 firstHitPosition = attackPoint.position;
-        foreach (Collider2D enemy in hitEnemies)
-        {
-            IDamageable target = enemy.GetComponent<IDamageable>() ?? enemy.GetComponentInParent<IDamageable>();
-            if (target == null) continue;
-            BaseEntity targetEntity = enemy.GetComponent<BaseEntity>() ?? enemy.GetComponentInParent<BaseEntity>();
-            float heavyDamage = targetEntity != null ? targetEntity.CurrentHealth : stats.heavyAttackDamage;
-            float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
-            target.TakeDamage(heavyDamage * dmgMult, true);
-            if (successfulHits == 0)
-                firstHitPosition = enemy.ClosestPoint(attackPoint.position);
-            successfulHits++;
-        }
-
-        if (successfulHits > 0)
-        {
-            impactFeedback?.PlayHeavyHit(firstHitPosition, _defaultImpulseSource);
-        }
-    }
-
-    private void HandleHeavyImpactFallback()
-    {
-        if (!_heavyAttackInProgress) return;
-        if (Time.time < _heavyFallbackExecuteAt) return;
-        HammerSlam();
-    }
-
-    private void HandleLightImpactFallback()
-    {
-        if (!_lightAttackInProgress) return;
-        if (Time.time < _lightFallbackExecuteAt) return;
-        ClearLightAttackPendingState();
-    }
-
-    private void UpdateChargingAnimator()
-    {
-        if (animator == null) return;
-        animator.SetBool(IsChargingHash, _isHammerCharging);
-        animator.SetBool(BowChargeHash, _isBowCharging);
-    }
-
-    private void ResetHammerCharge()
-    {
-        _isHammerCharging = false;
-        _currentCharge = 0f;
-        if (chargeMeter != null)
-            chargeMeter.value = 0f;
-        if (meterCanvas != null)
-            meterCanvas.SetActive(false);
-        UpdateChargingAnimator();
-    }
-
-    private void ResetBowChargeState()
-    {
-        _isBowCharging = false;
-        _bowCharge = 0f;
-        if (bowChargeMeter != null)
-            bowChargeMeter.value = 0f;
-        if (bowMeterCanvas != null)
-            bowMeterCanvas.SetActive(false);
-        UpdateChargingAnimator();
-    }
-
-    private void ResetCharge()
-    {
-        ResetHammerCharge();
-        ResetBowChargeState();
-    }
-
-    private void HandleLevelUp()
-    {
-        _currentHealth = MaxHealth;
-        NotifyHealthChanged();
-        ResetCharge();
-    }
+    // ─── Dash ────────────────────────────────────────────────────────────────
 
     private void HandleDash()
     {
@@ -713,6 +602,17 @@ public class Player : BaseEntity
         dashFlashTarget.color = original;
     }
 
+    // ─── Level / misc ─────────────────────────────────────────────────────────
+
+    private void HandleLevelUp()
+    {
+        _currentHealth = MaxHealth;
+        NotifyHealthChanged();
+        SetState(new IdleState());
+    }
+
+    // ─── UI ──────────────────────────────────────────────────────────────────
+
     private void InitializeDashCooldownUI()
     {
         if (dashCooldownBar == null) return;
@@ -730,8 +630,7 @@ public class Player : BaseEntity
         if (cooldown <= 0f)
         {
             dashCooldownBar.value = 1f;
-            if (dashCooldownCanvas != null)
-                dashCooldownCanvas.SetActive(showDashCooldownBarWhenReady);
+            if (dashCooldownCanvas != null) dashCooldownCanvas.SetActive(showDashCooldownBarWhenReady);
             return;
         }
         float remaining = Mathf.Max(0f, _nextDashTime - Time.time);
@@ -749,7 +648,6 @@ public class Player : BaseEntity
         hammerCooldownBar.minValue = 0f;
         hammerCooldownBar.maxValue = 1f;
         hammerCooldownBar.value = 1f;
-
         if (hammerCooldownCanvas != null)
             hammerCooldownCanvas.SetActive(showCooldownBarWhenReady);
     }
@@ -757,25 +655,19 @@ public class Player : BaseEntity
     private void UpdateHammerCooldownUI()
     {
         if (hammerCooldownBar == null) return;
-
         float cooldown = Mathf.Max(0f, hammerCooldown);
         if (cooldown <= 0f)
         {
             hammerCooldownBar.value = 1f;
-            if (hammerCooldownCanvas != null)
-                hammerCooldownCanvas.SetActive(showCooldownBarWhenReady);
+            if (hammerCooldownCanvas != null) hammerCooldownCanvas.SetActive(showCooldownBarWhenReady);
             return;
         }
-
         float remaining = Mathf.Max(0f, _nextHammerUseTime - Time.time);
-        float normalized = 1f - (remaining / cooldown);
-        hammerCooldownBar.value = Mathf.Clamp01(normalized);
-
+        hammerCooldownBar.value = Mathf.Clamp01(1f - (remaining / cooldown));
         if (hammerCooldownCanvas != null)
         {
             bool isReady = remaining <= 0f;
             hammerCooldownCanvas.SetActive(!isReady || showCooldownBarWhenReady);
         }
     }
-
 }

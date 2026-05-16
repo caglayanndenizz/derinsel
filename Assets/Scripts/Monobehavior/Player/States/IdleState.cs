@@ -1,0 +1,30 @@
+using UnityEngine;
+
+public class IdleState : PlayerState
+{
+    public override void Enter(IPlayerContext context)
+    {
+        if (context.Animator == null) return;
+        context.Animator.SetBool(IsChargingHash, false);
+        context.Animator.SetBool(BowChargeHash, false);
+    }
+
+    public override void Handle(IPlayerContext context)
+    {
+        if (Input.GetButton("Fire1") && Time.time >= context.NextHammerUseTime)
+        {
+            context.SetState(new HammerState());
+            return;
+        }
+
+        if (Input.GetButton("Fire2"))
+        {
+            context.SetState(new ArcherState());
+            return;
+        }
+
+        UpdateRadialBowAutoVolley(context);
+    }
+
+    public override void Exit(IPlayerContext context) { }
+}
