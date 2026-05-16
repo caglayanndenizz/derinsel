@@ -16,6 +16,7 @@ public class PlayerArrow : MonoBehaviour
     LayerMask _enemyMask;
     bool _fullyChargedBowExplosion;
     float _explosionRadius;
+    float _freezeDuration;
     DungeonGenerator _dungeonGenerator;
     CinemachineImpulseSource _hitCameraImpulse;
     Vector2 _previousFramePosition;
@@ -37,7 +38,8 @@ public class PlayerArrow : MonoBehaviour
         bool fullyChargedBowExplosion = false,
         float chargedExplosionRadius = 0f,
         DungeonGenerator dungeonGenerator = null,
-        CinemachineImpulseSource hitCameraImpulse = null)
+        CinemachineImpulseSource hitCameraImpulse = null,
+        float freezeDuration = 0f)
     {
         _enemyMask = enemyMask;
         _speed = speed;
@@ -46,6 +48,7 @@ public class PlayerArrow : MonoBehaviour
         _spawnTime = Time.time;
         _fullyChargedBowExplosion = fullyChargedBowExplosion;
         _explosionRadius = chargedExplosionRadius;
+        _freezeDuration = freezeDuration;
         _dungeonGenerator = dungeonGenerator;
         _hitCameraImpulse = hitCameraImpulse;
 
@@ -156,8 +159,20 @@ public class PlayerArrow : MonoBehaviour
         if (((1 << other.gameObject.layer) & _enemyMask) == 0) return;
 
         IDamageable dmg = other.GetComponent<IDamageable>() ?? other.GetComponentInParent<IDamageable>();
-        if (dmg != null)
-            dmg.TakeDamage(_damage, false);
+        if (dmg == null) return;
+
+        dmg.TakeDamage(_damage, false);
+
+        if (_freezeDuration > 0f)
+        {
+            BaseEntity entity = other.GetComponent<BaseEntity>() ?? other.GetComponentInParent<BaseEntity>();
+            if (entity != null && entity.CurrentHealth > 0f)
+            {
+                Enemy enemyComp = entity as Enemy ?? other.GetComponentInParent<Enemy>();
+                if (enemyComp != null)
+                    enemyComp.Freeze(_freezeDuration);
+            }
+        }
     }
 
     static float GetLethalDamageForTarget(IDamageable target)

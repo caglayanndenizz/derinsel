@@ -81,6 +81,10 @@ public class Enemy : BaseEntity
 
     public event System.Action<Enemy> Died;
 
+    private static readonly Color FreezeColor = new Color(0.3f, 0.6f, 1f);
+    private bool _isFrozen = false;
+    private Coroutine _freezeCoroutine;
+
     protected GameObject player;
     private bool _isDead = false;
     private Vector2 _lastKnownPlayerWorld;
@@ -123,7 +127,7 @@ public class Enemy : BaseEntity
 
     void Update()
     {
-        if (_isDead || _isKnockedBack) return;
+        if (_isDead || _isKnockedBack || _isFrozen) return;
         CheckState();
         UpdateLastKnownPlayerPosition();
         ExecuteTypeAttack();
@@ -131,7 +135,7 @@ public class Enemy : BaseEntity
 
     void FixedUpdate()
     {
-        if (_isDead || _isKnockedBack) return;
+        if (_isDead || _isKnockedBack || _isFrozen) return;
         TrackLastSafePosition();
         Move();
     }
@@ -179,9 +183,9 @@ public class Enemy : BaseEntity
         _patrolLegIndex = 0;
     }
 
-    protected override void Move() 
+    protected override void Move()
     {
-        if (_isDead) return;
+        if (_isDead || _isFrozen) return;
 
         if (enemyType != EnemyType.Mage)
         {
@@ -562,10 +566,32 @@ public class Enemy : BaseEntity
         gameObject.SetActive(false);
     }
 
-    private IEnumerator HitFlashRoutine() { 
-        _spriteRenderer.color = flashColor; 
-        yield return new WaitForSeconds(0.1f); 
-        _spriteRenderer.color = _originalColor; 
+    public void Freeze(float duration)
+    {
+        if (_isDead) return;
+        if (_freezeCoroutine != null)
+            StopCoroutine(_freezeCoroutine);
+        _freezeCoroutine = StartCoroutine(FreezeRoutine(duration));
+    }
+
+    private IEnumerator FreezeRoutine(float duration)
+    {
+        _isFrozen = true;
+        if (_rb != null) _rb.linearVelocity = Vector2.zero;
+        if (_spriteRenderer != null) _spriteRenderer.color = FreezeColor;
+
+        yield return new WaitForSeconds(duration);
+
+        _isFrozen = false;
+        _freezeCoroutine = null;
+        if (_spriteRenderer != null) _spriteRenderer.color = _originalColor;
+    }
+
+    private IEnumerator HitFlashRoutine()
+    {
+        _spriteRenderer.color = flashColor;
+        yield return new WaitForSeconds(0.1f);
+        _spriteRenderer.color = _isFrozen ? FreezeColor : _originalColor;
     }
 
     private IEnumerator KnockbackRoutine(float force) {

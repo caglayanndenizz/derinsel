@@ -296,6 +296,7 @@ public class AugmentWeightSystem : MonoBehaviour
             case AugmentId.ChargedBowAoeUnlock:
             case AugmentId.WallLootsUnlock:
             case AugmentId.DashUnluck:
+            case AugmentId.HammerChargeDamageReductionUnlock:
                 return true;
             default:
                 return false;

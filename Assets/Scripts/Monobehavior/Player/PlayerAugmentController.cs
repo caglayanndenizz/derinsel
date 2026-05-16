@@ -29,6 +29,11 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float hammerChargeMultiplier = 1f;
     [SerializeField] private float dashDistanceMultiplier = 1f;
     [SerializeField] private float incomingDamageReduction = 0f;
+    [SerializeField] private bool hasHammerChargeDamageReductionUnlock;
+    [SerializeField] private float hammerFreezeDuration = 0f;
+    [SerializeField] private float bowFreezeDuration = 0f;
+    [SerializeField] private float hammerAoeRadiusBonus = 0f;
+    [SerializeField] private float bowAoeRadiusBonus = 0f;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
 
     [SerializeField] private int arrowShotBonusCount;
@@ -56,7 +61,7 @@ public class PlayerAugmentController : MonoBehaviour
 
     public float MovementSpeedBonus => Mathf.Max(0f, movementSpeedBonus);
     public bool HasChargedBowAoe => hasChargedBowAoe;
-    public float ChargedBowAoeRadius => Mathf.Max(0f, chargedBowAoeRadius);
+
     public int ArrowShotMultiplier => Mathf.Max(
         1,
         1 + Mathf.Max(0, arrowShotBonusCount) + (hasDoubleArrowUnlock ? 1 : 0));
@@ -71,6 +76,11 @@ public class PlayerAugmentController : MonoBehaviour
     public float HammerChargeMultiplier => Mathf.Max(0.01f, hammerChargeMultiplier);
     public float DashDistanceMultiplier => Mathf.Max(0.01f, dashDistanceMultiplier);
     public float IncomingDamageReduction => Mathf.Clamp01(incomingDamageReduction);
+    public bool HasHammerChargeDamageReductionUnlock => hasHammerChargeDamageReductionUnlock;
+    public float HammerFreezeDuration => Mathf.Max(0f, hammerFreezeDuration);
+    public float BowFreezeDuration => Mathf.Max(0f, bowFreezeDuration);
+    public float HammerAoeRadiusMultiplier => 1f + Mathf.Max(0f, hammerAoeRadiusBonus);
+    public float ChargedBowAoeRadius => Mathf.Max(0f, chargedBowAoeRadius * (1f + Mathf.Max(0f, bowAoeRadiusBonus)));
 
     public int CountDistinctArrowAugmentTypesOwnedForMutation()
     {
@@ -196,6 +206,29 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.DamageReduction_Extraordinary:
                 incomingDamageReduction = Mathf.Clamp01(incomingDamageReduction + augment.value);
                 break;
+            case AugmentId.HammerChargeDamageReductionUnlock:
+                hasHammerChargeDamageReductionUnlock = true;
+                break;
+            case AugmentId.HammerFreeze_Common:
+            case AugmentId.HammerFreeze_Rare:
+            case AugmentId.HammerFreeze_Extraordinary:
+                hammerFreezeDuration += Mathf.Max(0f, augment.value);
+                break;
+            case AugmentId.BowFreeze_Common:
+            case AugmentId.BowFreeze_Rare:
+            case AugmentId.BowFreeze_Extraordinary:
+                bowFreezeDuration += Mathf.Max(0f, augment.value);
+                break;
+            case AugmentId.HammerAoeRadius_Common:
+            case AugmentId.HammerAoeRadius_Rare:
+            case AugmentId.HammerAoeRadius_Extraordinary:
+                hammerAoeRadiusBonus += Mathf.Max(0f, augment.value);
+                break;
+            case AugmentId.BowAoeRadius_Common:
+            case AugmentId.BowAoeRadius_Rare:
+            case AugmentId.BowAoeRadius_Extraordinary:
+                bowAoeRadiusBonus += Mathf.Max(0f, augment.value);
+                break;
             case AugmentId.GlassCannonDoubleDamageHalveMaxHealth:
                 outgoingDamageMultiplier *= 2f;
                 maxHealthMultiplier *= 0.5f;
@@ -256,6 +289,7 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.ChargedBowAoeUnlock:
             case AugmentId.WallLootsUnlock:
             case AugmentId.DashUnluck:
+            case AugmentId.HammerChargeDamageReductionUnlock:
                 return true;
             default:
                 return false;
@@ -289,6 +323,10 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.DashDistanceIncrease_Rare:
             case AugmentId.DashDistanceIncrease_Extraordinary:
                 return hasDashUnluck;
+            case AugmentId.BowAoeRadius_Common:
+            case AugmentId.BowAoeRadius_Rare:
+            case AugmentId.BowAoeRadius_Extraordinary:
+                return hasChargedBowAoe;
             default:
                 return true;
         }

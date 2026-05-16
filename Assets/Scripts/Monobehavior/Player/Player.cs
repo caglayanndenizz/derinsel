@@ -14,10 +14,6 @@ public class Player : BaseEntity, IPlayerContext
     public float maxChargeTime = 0.5f;
     public float hammerAOE = 2.5f;
     public float hammerCooldown = 3f;
-    [Tooltip("Sol tık (çekiç) şarj çubuğu tam dolu (charge slider = 1) iken gelen hasardan düşürülecek oran. 0 = azaltma yok, 0.85 = %85 azaltma (cana gelen ≈ %15).")]
-    [Range(0f, 1f)]
-    [FormerlySerializedAs("chargeFullDamageReduction")]
-    public float heavyChargeFullDamageReduction = 0.85f;
     [SerializeField] private float heavyImpactFallbackDelay = 0.2f;
 
     [Header("Bow / Arrow")]
@@ -260,8 +256,8 @@ public class Player : BaseEntity, IPlayerContext
     {
         if (Time.time < _invulnerableUntil) return;
 
-        if (_currentState.IsChargeMeterFull(this))
-            amount *= Mathf.Clamp01(1f - heavyChargeFullDamageReduction);
+        if (_currentState.IsChargeMeterFull(this) && playerAugmentController != null && playerAugmentController.HasHammerChargeDamageReductionUnlock)
+            amount *= 0.75f;
 
         if (playerAugmentController != null && playerAugmentController.IncomingDamageReduction > 0f)
             amount *= 1f - playerAugmentController.IncomingDamageReduction;
@@ -373,13 +369,16 @@ public class Player : BaseEntity, IPlayerContext
         _heavyFallbackExecuteAt = -1f;
 
         if (_defaultImpulseSource != null) _defaultImpulseSource.GenerateImpulse();
+        float effectiveHammerAoe = hammerAOE * (playerAugmentController != null ? playerAugmentController.HammerAoeRadiusMultiplier : 1f);
+        float hammerFreezeDuration = playerAugmentController != null ? playerAugmentController.HammerFreezeDuration : 0f;
+
         if (generator != null)
         {
-            var brokenWalls = generator.BreakWallsInArea(attackPoint.position, hammerAOE);
+            var brokenWalls = generator.BreakWallsInArea(attackPoint.position, effectiveHammerAoe);
             wallLootHandler?.TrySpawnWallLootForBrokenWalls(brokenWalls);
         }
 
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, hammerAOE, enemyLayers);
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, effectiveHammerAoe, enemyLayers);
         int successfulHits = 0;
         Vector3 firstHitPosition = attackPoint.position;
         foreach (Collider2D enemy in hitEnemies)
@@ -390,6 +389,12 @@ public class Player : BaseEntity, IPlayerContext
             float heavyDamage = targetEntity != null ? targetEntity.CurrentHealth : stats.heavyAttackDamage;
             float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
             target.TakeDamage(heavyDamage * dmgMult, true);
+            if (hammerFreezeDuration > 0f && targetEntity != null && targetEntity.CurrentHealth > 0f)
+            {
+                Enemy enemyComp = targetEntity as Enemy ?? enemy.GetComponentInParent<Enemy>();
+                if (enemyComp != null)
+                    enemyComp.Freeze(hammerFreezeDuration);
+            }
             if (successfulHits == 0)
                 firstHitPosition = enemy.ClosestPoint(attackPoint.position);
             successfulHits++;
@@ -544,7 +549,8 @@ public class Player : BaseEntity, IPlayerContext
             chargedExplosionEnabled,
             explosionRadius,
             generator,
-            chargedExplosionEnabled ? _defaultImpulseSource : null);
+            chargedExplosionEnabled ? _defaultImpulseSource : null,
+            playerAugmentController != null ? playerAugmentController.BowFreezeDuration : 0f);
     }
 
     private static float GetArrowSpreadStepDegrees(int arrowCount)
