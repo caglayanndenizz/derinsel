@@ -5,7 +5,7 @@ public class Lootable : MonoBehaviour, ICollectable
     [Header("Basic Settings")]
     public int value = 1;
     [Tooltip("isGold kapaliysa (XP orb) verilecek deneyim miktari.")]
-    public int experienceValue = 1;
+    public int experienceValue = 10;
     public bool isGold = true;
 
     [Header("Magnet Settings")]
@@ -27,9 +27,6 @@ public class Lootable : MonoBehaviour, ICollectable
         _goldHomingUnlocked = !isGold;
         ResolvePlayerTransform();
         CancelInvoke(nameof(EnableGoldHoming));
-
-        if (isGold)
-            Invoke(nameof(EnableGoldHoming), Mathf.Max(0f, goldHomingDelay));
     }
 
     void OnDisable()
@@ -78,7 +75,7 @@ public class Lootable : MonoBehaviour, ICollectable
         ReturnToPool();
     }
 
-    void ReturnToPool()
+    public void ReturnToPool()
     {
         if (isGold && GoldLootPooler.Instance != null)
         {

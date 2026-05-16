@@ -46,7 +46,7 @@ public class DungeonGenerator : MonoBehaviour
     private float _nextRoomClearCheckTime;
     private const float RoomClearCheckInterval = 0.35f;
     private const float TargetDoorSpawnDistanceFromPlayer = 2f;
-    private static readonly Color ExitDoorTint = new Color(0.6f, 0.6f, 0.6f, 1f);
+    private static readonly Color ExitDoorTint = Color.black;
     private int _currentDungeonFloor = 1;
     public int CurrentFloor => _currentDungeonFloor;
 
@@ -389,6 +389,7 @@ public class DungeonGenerator : MonoBehaviour
 
     public void MoveToNextFloor()
     {
+        ClearActiveLoot();
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
         if (enemyPooler == null)
             enemyPooler = EnemyObjectPooler.Instance;
@@ -407,6 +408,8 @@ public class DungeonGenerator : MonoBehaviour
 
     public void ExitDungeon()
     {
+        ClearActiveLoot();
+        player.GetComponent<Player>()?.ResetForDungeonExit();
         floorTilemap.ClearAllTiles();
         wallTilemap.ClearAllTiles();
         floorPositions.Clear();
@@ -457,7 +460,7 @@ public class DungeonGenerator : MonoBehaviour
         Vector2Int secondDoorPos;
         GetSideBySideDoorPositions(out firstDoorPos, out secondDoorPos);
 
-        bool isExitFloor = _currentDungeonFloor % 3 == 0;
+        bool isExitFloor = _currentDungeonFloor % 20 == 0;
         DungeonExit.ExitAction firstAction;
         DungeonExit.ExitAction secondAction;
         if (isExitFloor)
@@ -589,6 +592,16 @@ public class DungeonGenerator : MonoBehaviour
     {
         if (enemyPooler == null) return;
         enemyCount = Mathf.Max(0, enemyPooler.initialPoolSize);
+    }
+
+    private void ClearActiveLoot()
+    {
+        Lootable[] lootables = FindObjectsByType<Lootable>(FindObjectsSortMode.None);
+        foreach (Lootable loot in lootables)
+        {
+            if (loot != null && loot.gameObject.activeInHierarchy)
+                loot.ReturnToPool();
+        }
     }
 
     private void ClearCurrentExits()

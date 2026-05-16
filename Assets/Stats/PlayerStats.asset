@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerStats
   m_EditorClassIdentifier: Assembly-CSharp::EntityStats
   entityName: Player
-  maxHealth: 1000
+  maxHealth: 100
   moveSpeed: 5
   attackPower: 5
   lightAttackDamage: 10

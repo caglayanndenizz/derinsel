@@ -34,6 +34,8 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float bowFreezeDuration = 0f;
     [SerializeField] private float hammerAoeRadiusBonus = 0f;
     [SerializeField] private float bowAoeRadiusBonus = 0f;
+    [SerializeField] private float flatMaxHealthBonus = 0f;
+    private float _initialChargedBowAoeRadius;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
 
     [SerializeField] private int arrowShotBonusCount;
@@ -81,6 +83,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float BowFreezeDuration => Mathf.Max(0f, bowFreezeDuration);
     public float HammerAoeRadiusMultiplier => 1f + Mathf.Max(0f, hammerAoeRadiusBonus);
     public float ChargedBowAoeRadius => Mathf.Max(0f, chargedBowAoeRadius * (1f + Mathf.Max(0f, bowAoeRadiusBonus)));
+    public float FlatMaxHealthBonus => Mathf.Max(0f, flatMaxHealthBonus);
 
     public int CountDistinctArrowAugmentTypesOwnedForMutation()
     {
@@ -112,6 +115,35 @@ public class PlayerAugmentController : MonoBehaviour
     private void Awake()
     {
         _player = GetComponent<Player>();
+        _initialChargedBowAoeRadius = chargedBowAoeRadius;
+    }
+
+    public void ResetAll()
+    {
+        movementSpeedBonus = 0f;
+        hasChargedBowAoe = false;
+        chargedBowAoeRadius = _initialChargedBowAoeRadius;
+        hasDoubleArrowUnlock = false;
+        hasWallLootsUnlock = false;
+        hasExtraAugmentSlotUnlock = false;
+        hasDashUnluck = false;
+        dashCooldownMultiplier = 1f;
+        luckMultiplier = 1f;
+        hammerChargeMultiplier = 1f;
+        dashDistanceMultiplier = 1f;
+        incomingDamageReduction = 0f;
+        hasHammerChargeDamageReductionUnlock = false;
+        hammerFreezeDuration = 0f;
+        bowFreezeDuration = 0f;
+        hammerAoeRadiusBonus = 0f;
+        bowAoeRadiusBonus = 0f;
+        flatMaxHealthBonus = 0f;
+        arrowShotBonusCount = 0;
+        arrowProjectileSpeedMultiplier = 1f;
+        outgoingDamageMultiplier = 1f;
+        maxHealthMultiplier = 1f;
+        _appliedAugmentCounts.Clear();
+        _loggedAllArrowAugmentsComplete = false;
     }
 
     private void LateUpdate()
@@ -228,6 +260,17 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.BowAoeRadius_Rare:
             case AugmentId.BowAoeRadius_Extraordinary:
                 bowAoeRadiusBonus += Mathf.Max(0f, augment.value);
+                break;
+            case AugmentId.MaxHealthFlatIncrease_Common_I:
+            case AugmentId.MaxHealthFlatIncrease_Common_II:
+            case AugmentId.MaxHealthFlatIncrease_Common_III:
+            case AugmentId.MaxHealthFlatIncrease_Common_IV:
+                flatMaxHealthBonus += Mathf.Max(0f, augment.value);
+                _player?.OnFlatMaxHealthBonusChanged(augment.value);
+                break;
+            case AugmentId.HalfHealthBonusDamage:
+                outgoingDamageMultiplier *= 1.5f;
+                maxHealthMultiplier *= 0.5f;
                 break;
             case AugmentId.GlassCannonDoubleDamageHalveMaxHealth:
                 outgoingDamageMultiplier *= 2f;

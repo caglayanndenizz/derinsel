@@ -169,7 +169,8 @@ public class Player : BaseEntity, IPlayerContext
         {
             float baseMax = stats != null ? stats.maxHealth : 0f;
             float mult = playerAugmentController != null ? playerAugmentController.MaxHealthMultiplier : 1f;
-            return baseMax * mult;
+            float flat = playerAugmentController != null ? playerAugmentController.FlatMaxHealthBonus : 0f;
+            return baseMax * mult + flat;
         }
     }
 
@@ -177,11 +178,19 @@ public class Player : BaseEntity, IPlayerContext
     {
         if (stats == null) return;
         float baseMax = stats.maxHealth;
-        float oldMax = baseMax * previousMultiplier;
-        float newMax = baseMax * newMultiplier;
+        float flat = playerAugmentController != null ? playerAugmentController.FlatMaxHealthBonus : 0f;
+        float oldMax = baseMax * previousMultiplier + flat;
+        float newMax = baseMax * newMultiplier + flat;
         if (oldMax <= 0.001f || newMax <= 0f) return;
         _currentHealth *= newMax / oldMax;
         _currentHealth = Mathf.Clamp(_currentHealth, 1f, newMax);
+        NotifyHealthChanged();
+    }
+
+    public void OnFlatMaxHealthBonusChanged(float addedAmount)
+    {
+        if (addedAmount <= 0f) return;
+        _currentHealth = Mathf.Clamp(_currentHealth + addedAmount, 1f, MaxHealth);
         NotifyHealthChanged();
     }
 
@@ -622,6 +631,16 @@ public class Player : BaseEntity, IPlayerContext
     }
 
     // ─── Level / misc ─────────────────────────────────────────────────────────
+
+    public void ResetForDungeonExit()
+    {
+        playerAugmentController?.ResetAll();
+        playerLevel?.Reset();
+        _currentHealth = MaxHealth;
+        NotifyHealthChanged();
+        if (playerCurrency != null)
+            playerCurrency.NotifyGoldChanged();
+    }
 
     private void HandleLevelUp()
     {

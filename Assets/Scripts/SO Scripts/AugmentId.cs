@@ -50,4 +50,9 @@ public enum AugmentId
     BowAoeRadius_Common = 47,
     BowAoeRadius_Rare = 48,
     BowAoeRadius_Extraordinary = 49,
+    MaxHealthFlatIncrease_Common_I = 50,
+    MaxHealthFlatIncrease_Common_II = 51,
+    MaxHealthFlatIncrease_Common_III = 52,
+    MaxHealthFlatIncrease_Common_IV = 53,
+    HalfHealthBonusDamage = 54,
 }
