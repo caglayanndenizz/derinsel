@@ -29,4 +29,12 @@ public enum AugmentId
     HammerChargeReduce_Common_II = 26,
     HammerChargeReduce_Rare = 27,
     HammerChargeReduce_Extraordinary = 28,
+    DashDistanceIncrease_Uncommon_I = 29,
+    DashDistanceIncrease_Uncommon_II = 30,
+    DashDistanceIncrease_Uncommon_III = 31,
+    DashDistanceIncrease_Rare = 32,
+    DashDistanceIncrease_Extraordinary = 33,
+    DamageReduction_Common = 34,
+    DamageReduction_Rare = 35,
+    DamageReduction_Extraordinary = 36,
 }

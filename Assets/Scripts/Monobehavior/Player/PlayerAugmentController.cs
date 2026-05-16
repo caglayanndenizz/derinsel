@@ -27,6 +27,8 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float dashCooldownMultiplier = 1f;
     [SerializeField] private float luckMultiplier = 1f;
     [SerializeField] private float hammerChargeMultiplier = 1f;
+    [SerializeField] private float dashDistanceMultiplier = 1f;
+    [SerializeField] private float incomingDamageReduction = 0f;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
 
     [SerializeField] private int arrowShotBonusCount;
@@ -67,6 +69,8 @@ public class PlayerAugmentController : MonoBehaviour
     public float DashCooldownMultiplier => Mathf.Max(0.01f, dashCooldownMultiplier);
     public float LuckMultiplier => Mathf.Max(0.01f, luckMultiplier);
     public float HammerChargeMultiplier => Mathf.Max(0.01f, hammerChargeMultiplier);
+    public float DashDistanceMultiplier => Mathf.Max(0.01f, dashDistanceMultiplier);
+    public float IncomingDamageReduction => Mathf.Clamp01(incomingDamageReduction);
 
     public int CountDistinctArrowAugmentTypesOwnedForMutation()
     {
@@ -180,6 +184,18 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.HammerChargeReduce_Extraordinary:
                 hammerChargeMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
                 break;
+            case AugmentId.DashDistanceIncrease_Uncommon_I:
+            case AugmentId.DashDistanceIncrease_Uncommon_II:
+            case AugmentId.DashDistanceIncrease_Uncommon_III:
+            case AugmentId.DashDistanceIncrease_Rare:
+            case AugmentId.DashDistanceIncrease_Extraordinary:
+                dashDistanceMultiplier *= 1f + Mathf.Max(0f, augment.value);
+                break;
+            case AugmentId.DamageReduction_Common:
+            case AugmentId.DamageReduction_Rare:
+            case AugmentId.DamageReduction_Extraordinary:
+                incomingDamageReduction = Mathf.Clamp01(incomingDamageReduction + augment.value);
+                break;
             case AugmentId.GlassCannonDoubleDamageHalveMaxHealth:
                 outgoingDamageMultiplier *= 2f;
                 maxHealthMultiplier *= 0.5f;
@@ -267,6 +283,11 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.DashCooldownReduce_Common_II:
             case AugmentId.DashCooldownReduce_Rare:
             case AugmentId.DashCooldownReduce_Extraordinary:
+            case AugmentId.DashDistanceIncrease_Uncommon_I:
+            case AugmentId.DashDistanceIncrease_Uncommon_II:
+            case AugmentId.DashDistanceIncrease_Uncommon_III:
+            case AugmentId.DashDistanceIncrease_Rare:
+            case AugmentId.DashDistanceIncrease_Extraordinary:
                 return hasDashUnluck;
             default:
                 return true;

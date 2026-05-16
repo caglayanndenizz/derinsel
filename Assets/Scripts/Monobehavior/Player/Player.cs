@@ -263,6 +263,9 @@ public class Player : BaseEntity, IPlayerContext
         if (_currentState.IsChargeMeterFull(this))
             amount *= Mathf.Clamp01(1f - heavyChargeFullDamageReduction);
 
+        if (playerAugmentController != null && playerAugmentController.IncomingDamageReduction > 0f)
+            amount *= 1f - playerAugmentController.IncomingDamageReduction;
+
         base.TakeDamage(amount, isHeavy);
         NotifyHealthChanged();
         _invulnerableUntil = Time.time + Mathf.Max(0f, damageInvulnerabilityDuration);
@@ -572,7 +575,7 @@ public class Player : BaseEntity, IPlayerContext
         if (dashDir.sqrMagnitude < 0.0001f) return;
 
         Vector2 from = _rb.position;
-        float closestBlockingDist = Mathf.Max(0f, dashDistance);
+        float closestBlockingDist = Mathf.Max(0f, dashDistance * (playerAugmentController != null ? playerAugmentController.DashDistanceMultiplier : 1f));
 
         RaycastHit2D[] hits = Physics2D.RaycastAll(from, dashDir, closestBlockingDist);
         for (int i = 0; i < hits.Length; i++)
