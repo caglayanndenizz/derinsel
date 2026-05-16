@@ -22,8 +22,6 @@ public class IdleState : PlayerState
             context.SetState(new ArcherState());
             return;
         }
-
-        UpdateRadialBowAutoVolley(context);
     }
 
     public override void Exit(IPlayerContext context) { }

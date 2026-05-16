@@ -53,7 +53,6 @@ public class ArcherState : PlayerState
         }
 
         UpdateAnimator(context);
-        UpdateRadialBowAutoVolley(context);
     }
 
     public override void Exit(IPlayerContext context)

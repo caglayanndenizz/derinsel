@@ -133,8 +133,6 @@ public class Player : BaseEntity, IPlayerContext
     float IPlayerContext.LightImpactFallbackDelay => lightImpactFallbackDelay;
     Slider IPlayerContext.BowChargeMeter => bowChargeMeter;
     GameObject IPlayerContext.BowMeterCanvas => bowMeterCanvas;
-    float IPlayerContext.RadialBowAutoVolleyIntervalSeconds => radialBowAutoVolleyIntervalSeconds;
-    GameObject IPlayerContext.ArrowPrefab => arrowPrefab;
     Animator IPlayerContext.Animator => animator;
 
     float IPlayerContext.NextHammerUseTime
@@ -146,16 +144,6 @@ public class Player : BaseEntity, IPlayerContext
     {
         get => _nextAttackTime;
         set => _nextAttackTime = value;
-    }
-    bool IPlayerContext.HadRadialBowMutationLastFrame
-    {
-        get => _hadRadialBowMutationLastFrame;
-        set => _hadRadialBowMutationLastFrame = value;
-    }
-    float IPlayerContext.NextRadialBowAutoVolleyTime
-    {
-        get => _nextRadialBowAutoVolleyTime;
-        set => _nextRadialBowAutoVolleyTime = value;
     }
     bool IPlayerContext.LightAttackInProgress
     {
@@ -173,9 +161,6 @@ public class Player : BaseEntity, IPlayerContext
 
     Vector2 IPlayerContext.GetBowAimWorldPointAtCurrentMouse()
         => GetBowAimWorldPointAtCurrentMouse();
-
-    void IPlayerContext.FireRadialBowMutationAutoVolley(float lightDamage)
-        => FireRadialBowMutationAutoVolley(lightDamage);
 
     void IPlayerContext.TriggerHeavyAttack()
         => TriggerHeavyAttack();
@@ -261,6 +246,7 @@ public class Player : BaseEntity, IPlayerContext
         HandleDash();
         UpdateHammerCooldownUI();
         UpdateDashCooldownUI();
+        UpdateRadialBowAutoVolley();
     }
 
     void FixedUpdate()
@@ -470,6 +456,30 @@ public class Player : BaseEntity, IPlayerContext
             Vector2 spawnPos = origin + shotDir * radialBowSpawnInset;
             TrySpawnSinglePlayerArrow(spawnPos, origin + shotDir * targetDistance, useSpeed, useDamage, chargedExplosionEnabled);
         }
+    }
+
+    private void UpdateRadialBowAutoVolley()
+    {
+        if (arrowPrefab == null) return;
+
+        bool active = playerAugmentController != null &&
+                      playerAugmentController.ShouldUseRadialBowVolleyMutation(this);
+        if (!active)
+        {
+            _hadRadialBowMutationLastFrame = false;
+            return;
+        }
+
+        if (!_hadRadialBowMutationLastFrame)
+            _nextRadialBowAutoVolleyTime = Time.time;
+
+        _hadRadialBowMutationLastFrame = true;
+
+        if (Time.time < _nextRadialBowAutoVolleyTime) return;
+
+        float baseDamage = stats != null ? stats.lightAttackDamage : 0f;
+        FireRadialBowMutationAutoVolley(baseDamage);
+        _nextRadialBowAutoVolleyTime = Time.time + Mathf.Max(0.05f, radialBowAutoVolleyIntervalSeconds);
     }
 
     private void FireRadialBowMutationAutoVolley(float lightDamage)
