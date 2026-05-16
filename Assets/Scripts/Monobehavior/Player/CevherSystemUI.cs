@@ -2,103 +2,116 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// TFT tarzı Cevher Sistemi göstergesi.
+/// Sol panel örneği:
+///
+///   [BowIcon]  3
+///   [2] > [4] > [6]
+///
+/// Her milestone badge'i, eşik aşılınca kendi tier rengine geçer.
+/// Bow ikonu da aktif tier rengine boyandırılır.
+/// </summary>
 public class CevherSystemUI : MonoBehaviour
 {
-    [Header("Tier Icons (sırayla: Kömür, Altın, Elmas, Obsidyen)")]
-    [SerializeField] private Image komurIcon;
-    [SerializeField] private Image altinIcon;
-    [SerializeField] private Image elmasIcon;
-    [SerializeField] private Image obsidyenIcon;
+    [Header("Ana Eleman")]
+    [Tooltip("Bow ikonu — aktif tier rengine boyanır.")]
+    [SerializeField] private Image bowIcon;
 
-    [Header("Tier Renkleri")]
-    [SerializeField] private Color inactiveColor     = new Color(0.18f, 0.18f, 0.18f, 0.55f);
-    [SerializeField] private Color completedColor    = new Color(0.65f, 0.65f, 0.65f, 0.80f);
-    [SerializeField] private Color komurActiveColor  = new Color(0.45f, 0.45f, 0.45f, 1.00f);
-    [SerializeField] private Color altinActiveColor  = new Color(1.00f, 0.84f, 0.00f, 1.00f);
-    [SerializeField] private Color elmasActiveColor  = new Color(0.00f, 0.75f, 1.00f, 1.00f);
-    [SerializeField] private Color obsidyenActiveColor = new Color(0.55f, 0.00f, 1.00f, 1.00f);
+    [Tooltip("Alınan bow augment sayısını gösterir. (örnek: '3')")]
+    [SerializeField] private TextMeshProUGUI countText;
 
-    [Header("İlerleme Metni (opsiyonel)")]
-    [SerializeField] private TextMeshProUGUI progressText;
+    [Header("Kilometre Taşı Rozet Arka Planları")]
+    [SerializeField] private Image milestone2Badge;
+    [SerializeField] private Image milestone4Badge;
+    [SerializeField] private Image milestone6Badge;
+
+    [Header("Kilometre Taşı Sayı Metinleri")]
+    [Tooltip("Rozet üzerindeki '2' metni.")]
+    [SerializeField] private TextMeshProUGUI milestone2Label;
+    [Tooltip("Rozet üzerindeki '4' metni.")]
+    [SerializeField] private TextMeshProUGUI milestone4Label;
+    [Tooltip("Rozet üzerindeki '6' metni.")]
+    [SerializeField] private TextMeshProUGUI milestone6Label;
+
+    [Header("Renkler")]
+    [SerializeField] private Color inactiveColor     = new Color(0.22f, 0.22f, 0.22f, 1.00f);
+    [SerializeField] private Color altinColor        = new Color(1.00f, 0.84f, 0.00f, 1.00f);
+    [SerializeField] private Color elmasColor        = new Color(0.00f, 0.75f, 1.00f, 1.00f);
+    [SerializeField] private Color obsidyenColor     = new Color(0.55f, 0.00f, 1.00f, 1.00f);
 
     [Header("Referans")]
     [SerializeField] private PlayerAugmentController augmentController;
 
-    private CevherTier _lastTier  = (CevherTier)(-1);
-    private int        _lastCount = -1;
+    private CevherTier _cachedTier  = (CevherTier)(-1);
+    private int        _cachedCount = -1;
 
     private void Awake()
     {
         if (augmentController != null) return;
-        Player player = Object.FindAnyObjectByType<Player>();
-        if (player != null)
-            augmentController = player.PlayerAugmentController;
+        Player p = Object.FindAnyObjectByType<Player>();
+        if (p != null) augmentController = p.PlayerAugmentController;
     }
 
     private void OnEnable()
     {
         if (augmentController != null)
-            augmentController.AugmentApplied += OnAugmentApplied;
+            augmentController.AugmentApplied += HandleAugmentApplied;
         RefreshUI();
     }
 
     private void OnDisable()
     {
         if (augmentController != null)
-            augmentController.AugmentApplied -= OnAugmentApplied;
+            augmentController.AugmentApplied -= HandleAugmentApplied;
     }
 
-    private void OnAugmentApplied(AugmentDefinition _) => RefreshUI();
+    private void HandleAugmentApplied(AugmentDefinition _) => RefreshUI();
 
-    private void RefreshUI()
+    public void RefreshUI()
     {
         if (augmentController == null) return;
 
         CevherTier tier  = augmentController.BowCevherTier;
         int        count = augmentController.BowCevherAugmentCount;
 
-        if (tier == _lastTier && count == _lastCount) return;
-        _lastTier  = tier;
-        _lastCount = count;
+        if (tier == _cachedTier && count == _cachedCount) return;
+        _cachedTier  = tier;
+        _cachedCount = count;
 
-        SetTierIcon(komurIcon,    CevherTier.Komur,    tier, komurActiveColor);
-        SetTierIcon(altinIcon,    CevherTier.Altin,    tier, altinActiveColor);
-        SetTierIcon(elmasIcon,    CevherTier.Elmas,    tier, elmasActiveColor);
-        SetTierIcon(obsidyenIcon, CevherTier.Obsidyen, tier, obsidyenActiveColor);
+        // Sayaç
+        if (countText != null)
+            countText.text = count.ToString();
 
-        RefreshProgressText(tier, count);
+        // Milestone rozetleri
+        bool altinReached    = count >= PlayerAugmentController.CevherAltinThreshold;
+        bool elmasReached    = count >= PlayerAugmentController.CevherElmasThreshold;
+        bool obsidyenReached = count >= PlayerAugmentController.CevherObsidyenThreshold;
+
+        ApplyMilestoneColor(milestone2Badge, milestone2Label, altinReached,    altinColor);
+        ApplyMilestoneColor(milestone4Badge, milestone4Label, elmasReached,    elmasColor);
+        ApplyMilestoneColor(milestone6Badge, milestone6Label, obsidyenReached, obsidyenColor);
+
+        // Bow ikonu aktif tier rengini alır
+        if (bowIcon != null)
+            bowIcon.color = TierColor(tier);
     }
 
-    private void SetTierIcon(Image icon, CevherTier thisTier, CevherTier currentTier, Color activeColor)
+    private void ApplyMilestoneColor(Image badge, TextMeshProUGUI label, bool reached, Color activeColor)
     {
-        if (icon == null) return;
-
-        if ((int)currentTier > (int)thisTier)
-            icon.color = completedColor;
-        else if (currentTier == thisTier)
-            icon.color = activeColor;
-        else
-            icon.color = inactiveColor;
+        Color c = reached ? activeColor : inactiveColor;
+        if (badge != null) badge.color = c;
+        if (label != null) label.color = c;
     }
 
-    private void RefreshProgressText(CevherTier tier, int count)
+    private Color TierColor(CevherTier tier)
     {
-        if (progressText == null) return;
-
         switch (tier)
         {
-            case CevherTier.Komur:
-                progressText.text = $"{count} / {PlayerAugmentController.CevherAltinThreshold}";
-                break;
-            case CevherTier.Altin:
-                progressText.text = $"{count} / {PlayerAugmentController.CevherElmasThreshold}";
-                break;
-            case CevherTier.Elmas:
-                progressText.text = $"{count} / {PlayerAugmentController.CevherObsidyenThreshold}";
-                break;
-            case CevherTier.Obsidyen:
-                progressText.text = "OBSIDYEN";
-                break;
+            case CevherTier.Altin:    return altinColor;
+            case CevherTier.Elmas:    return elmasColor;
+            case CevherTier.Obsidyen: return obsidyenColor;
+            default:                  return inactiveColor;
         }
     }
 }

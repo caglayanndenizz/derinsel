@@ -35,7 +35,7 @@ public class Player : BaseEntity, IPlayerContext
     public GameObject bowMeterCanvas;
 
     [Header("Bow radial mutation (auto)")]
-    [Tooltip("Beş farklı ok augment sonrası, ek input olmadan kaç saniyede bir salvı.")]
+    [Tooltip("6 bow cevher augmenti ile Obsidyen'e ulaşınca, ek input olmadan kaç saniyede bir salvı.")]
     [SerializeField] private float radialBowAutoVolleyIntervalSeconds = 1f;
     [SerializeField] private int autoArrowVolleyCount = 8;
     [SerializeField] private float autoArrowVolleyAngleStepDegrees = 45f;

@@ -314,6 +314,7 @@ public class AugmentWeightSystem : MonoBehaviour
         switch (id)
         {
             case AugmentId.ChargedBowAoeUnlock:
+            case AugmentId.DoubleArrowUnlock:
             case AugmentId.WallLootsUnlock:
             case AugmentId.DashUnluck:
             case AugmentId.HammerChargeDamageReductionUnlock:
