@@ -14,8 +14,8 @@ public class EnemyProjectilePooler : MonoBehaviour
     public EnemyObjectPooler enemyPoolerSource;
 
     private readonly Queue<GameObject> _availableProjectiles = new Queue<GameObject>();
-    private readonly HashSet<GameObject> _trackedProjectiles = new HashSet<GameObject>();
     private readonly HashSet<GameObject> _queuedProjectiles = new HashSet<GameObject>();
+    private readonly Dictionary<GameObject, EnemyProjectile> _componentCache = new Dictionary<GameObject, EnemyProjectile>();
     private bool _warmupCompleted;
 
     private void Awake()
@@ -27,11 +27,6 @@ public class EnemyProjectilePooler : MonoBehaviour
         }
 
         Instance = this;
-        SyncPoolSizeWithEnemyPooler();
-    }
-
-    private void OnValidate()
-    {
         SyncPoolSizeWithEnemyPooler();
     }
 
@@ -69,7 +64,6 @@ public class EnemyProjectilePooler : MonoBehaviour
 
     private Transform GetProjectileHierarchyParent()
     {
-        // poolParent atanmadiysa prefab/pooler dusman altinda olmasin: sahne kokune al.
         return poolParent != null ? poolParent : null;
     }
 
@@ -78,7 +72,7 @@ public class EnemyProjectilePooler : MonoBehaviour
         GameObject projectile = Instantiate(projectilePrefab);
         projectile.transform.SetParent(GetProjectileHierarchyParent(), false);
         projectile.SetActive(false);
-        _trackedProjectiles.Add(projectile);
+        _componentCache[projectile] = projectile.GetComponent<EnemyProjectile>();
         return projectile;
     }
 
@@ -102,7 +96,11 @@ public class EnemyProjectilePooler : MonoBehaviour
         projectile.transform.SetParent(GetProjectileHierarchyParent(), false);
         projectile.transform.SetPositionAndRotation(worldPosition, rotation);
 
-        configureBeforeActivate?.Invoke(projectile.GetComponent<EnemyProjectile>());
+        if (configureBeforeActivate != null)
+        {
+            _componentCache.TryGetValue(projectile, out EnemyProjectile ep);
+            configureBeforeActivate(ep);
+        }
 
         projectile.SetActive(true);
         return projectile;
@@ -112,13 +110,14 @@ public class EnemyProjectilePooler : MonoBehaviour
     {
         if (projectile == null) return;
 
-        if (!_trackedProjectiles.Contains(projectile))
-            _trackedProjectiles.Add(projectile);
-
         projectile.SetActive(false);
         projectile.transform.SetParent(GetProjectileHierarchyParent(), false);
 
         if (_queuedProjectiles.Add(projectile))
+        {
+            if (!_componentCache.ContainsKey(projectile))
+                _componentCache[projectile] = projectile.GetComponent<EnemyProjectile>();
             _availableProjectiles.Enqueue(projectile);
+        }
     }
 }

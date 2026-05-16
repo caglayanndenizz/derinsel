@@ -20,8 +20,8 @@ public class EnemyObjectPooler : MonoBehaviour
     [SerializeField] private EnemyProjectilePooler linkedProjectilePooler;
 
     private readonly Queue<GameObject> _availableEnemies = new Queue<GameObject>();
-    private readonly HashSet<GameObject> _trackedEnemies = new HashSet<GameObject>();
     private readonly HashSet<GameObject> _queuedEnemies = new HashSet<GameObject>();
+    private List<GameObject> _validPrefabCache;
     private int _leasedActiveEnemyCount;
 
     private void Awake()
@@ -40,6 +40,7 @@ public class EnemyObjectPooler : MonoBehaviour
     {
         if (enemyPrefabs == null)
             enemyPrefabs = new List<GameObject>();
+        _validPrefabCache = null;
     }
 
     private void Start()
@@ -70,7 +71,7 @@ public class EnemyObjectPooler : MonoBehaviour
 
     private void WarmupPool()
     {
-        if (!HasAnyValidEnemyPrefab())
+        if (!HasValidPrefabs())
         {
             Debug.LogWarning("EnemyObjectPooler: enemyPrefabs listesinde gecerli prefab yok.");
             return;
@@ -95,7 +96,6 @@ public class EnemyObjectPooler : MonoBehaviour
         Transform parent = poolParent != null ? poolParent : transform;
         GameObject enemy = Instantiate(prefab, parent);
         enemy.SetActive(false);
-        _trackedEnemies.Add(enemy);
         return enemy;
     }
 
@@ -117,8 +117,11 @@ public class EnemyObjectPooler : MonoBehaviour
         GameObject enemy = _availableEnemies.Dequeue();
         _queuedEnemies.Remove(enemy);
         enemy.transform.SetPositionAndRotation(worldPosition, rotation);
-        SetLinkedPoolersActive(true);
+
+        if (_leasedActiveEnemyCount == 0)
+            SetLinkedPoolersActive(true);
         _leasedActiveEnemyCount++;
+
         enemy.SetActive(true);
         return enemy;
     }
@@ -128,11 +131,6 @@ public class EnemyObjectPooler : MonoBehaviour
         if (enemy == null) return;
 
         bool wasActiveInWorld = enemy.activeSelf;
-
-        if (!_trackedEnemies.Contains(enemy))
-        {
-            _trackedEnemies.Add(enemy);
-        }
 
         enemy.SetActive(false);
         enemy.transform.SetParent(poolParent != null ? poolParent : transform);
@@ -148,37 +146,26 @@ public class EnemyObjectPooler : MonoBehaviour
             SetLinkedPoolersActive(false);
     }
 
-    private bool HasAnyValidEnemyPrefab()
+    private bool HasValidPrefabs()
     {
-        if (enemyPrefabs == null || enemyPrefabs.Count == 0) return false;
-        for (int i = 0; i < enemyPrefabs.Count; i++)
-        {
-            if (enemyPrefabs[i] != null) return true;
-        }
-        return false;
+        RebuildCacheIfNeeded();
+        return _validPrefabCache.Count > 0;
     }
 
     private GameObject GetRandomEnemyPrefab()
     {
-        if (!HasAnyValidEnemyPrefab()) return null;
+        RebuildCacheIfNeeded();
+        if (_validPrefabCache.Count == 0) return null;
+        return _validPrefabCache[Random.Range(0, _validPrefabCache.Count)];
+    }
 
-        int validCount = 0;
+    private void RebuildCacheIfNeeded()
+    {
+        if (_validPrefabCache != null) return;
+        _validPrefabCache = new List<GameObject>();
+        if (enemyPrefabs == null) return;
         for (int i = 0; i < enemyPrefabs.Count; i++)
-        {
-            if (enemyPrefabs[i] != null) validCount++;
-        }
-
-        if (validCount == 0) return null;
-
-        int target = Random.Range(0, validCount);
-        int seen = 0;
-        for (int i = 0; i < enemyPrefabs.Count; i++)
-        {
-            if (enemyPrefabs[i] == null) continue;
-            if (seen == target) return enemyPrefabs[i];
-            seen++;
-        }
-
-        return null;
+            if (enemyPrefabs[i] != null)
+                _validPrefabCache.Add(enemyPrefabs[i]);
     }
 }

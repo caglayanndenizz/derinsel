@@ -13,7 +13,6 @@ public class ExperienceLootPooler : MonoBehaviour
     public EnemyObjectPooler enemyPoolerSource;
 
     private readonly Queue<GameObject> _availableExperience = new Queue<GameObject>();
-    private readonly HashSet<GameObject> _trackedExperience = new HashSet<GameObject>();
     private readonly HashSet<GameObject> _queuedExperience = new HashSet<GameObject>();
     private bool _warmupCompleted;
 
@@ -35,11 +34,6 @@ public class ExperienceLootPooler : MonoBehaviour
             return;
         WarmupPool();
         _warmupCompleted = true;
-    }
-
-    private void OnValidate()
-    {
-        SyncPoolSizeWithEnemyPooler();
     }
 
     private void SyncPoolSizeWithEnemyPooler()
@@ -70,8 +64,9 @@ public class ExperienceLootPooler : MonoBehaviour
     {
         Transform parent = poolParent != null ? poolParent : transform;
         GameObject exp = Instantiate(experiencePrefab, parent);
+        Lootable lootable = exp.GetComponent<Lootable>();
+        if (lootable != null) lootable.isGold = false;
         exp.SetActive(false);
-        _trackedExperience.Add(exp);
         return exp;
     }
 
@@ -92,8 +87,6 @@ public class ExperienceLootPooler : MonoBehaviour
         GameObject exp = _availableExperience.Dequeue();
         _queuedExperience.Remove(exp);
         exp.transform.SetPositionAndRotation(worldPosition, rotation);
-        Lootable lootable = exp.GetComponent<Lootable>();
-        if (lootable != null) lootable.isGold = false;
         exp.SetActive(true);
         return exp;
     }
@@ -101,9 +94,6 @@ public class ExperienceLootPooler : MonoBehaviour
     public void ReturnExperience(GameObject exp)
     {
         if (exp == null) return;
-
-        if (!_trackedExperience.Contains(exp))
-            _trackedExperience.Add(exp);
 
         exp.SetActive(false);
         exp.transform.SetParent(poolParent != null ? poolParent : transform);

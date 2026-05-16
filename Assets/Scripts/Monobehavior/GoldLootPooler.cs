@@ -13,7 +13,6 @@ public class GoldLootPooler : MonoBehaviour
     public EnemyObjectPooler enemyPoolerSource;
 
     private readonly Queue<GameObject> _availableGold = new Queue<GameObject>();
-    private readonly HashSet<GameObject> _trackedGold = new HashSet<GameObject>();
     private readonly HashSet<GameObject> _queuedGold = new HashSet<GameObject>();
     private bool _warmupCompleted;
 
@@ -35,11 +34,6 @@ public class GoldLootPooler : MonoBehaviour
             return;
         WarmupPool();
         _warmupCompleted = true;
-    }
-
-    private void OnValidate()
-    {
-        SyncPoolSizeWithEnemyPooler();
     }
 
     private void SyncPoolSizeWithEnemyPooler()
@@ -70,8 +64,9 @@ public class GoldLootPooler : MonoBehaviour
     {
         Transform parent = poolParent != null ? poolParent : transform;
         GameObject gold = Instantiate(goldPrefab, parent);
+        Lootable lootable = gold.GetComponent<Lootable>();
+        if (lootable != null) lootable.isGold = true;
         gold.SetActive(false);
-        _trackedGold.Add(gold);
         return gold;
     }
 
@@ -92,8 +87,6 @@ public class GoldLootPooler : MonoBehaviour
         GameObject gold = _availableGold.Dequeue();
         _queuedGold.Remove(gold);
         gold.transform.SetPositionAndRotation(worldPosition, rotation);
-        Lootable lootable = gold.GetComponent<Lootable>();
-        if (lootable != null) lootable.isGold = true;
         gold.SetActive(true);
         return gold;
     }
@@ -101,9 +94,6 @@ public class GoldLootPooler : MonoBehaviour
     public void ReturnGold(GameObject gold)
     {
         if (gold == null) return;
-
-        if (!_trackedGold.Contains(gold))
-            _trackedGold.Add(gold);
 
         gold.SetActive(false);
         gold.transform.SetParent(poolParent != null ? poolParent : transform);
