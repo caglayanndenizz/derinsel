@@ -906,7 +906,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &316761505
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4530,7 +4530,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &730445645
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4800,7 +4800,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &770729808
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4840,7 +4840,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 2182134533958552500, guid: 8dc013224c66d4762af157fbdffa7d6c, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4857,6 +4857,81 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 770729807}
+  m_CullTransparentMesh: 1
+--- !u!1 &772821795
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 772821796}
+  - component: {fileID: 772821798}
+  - component: {fileID: 772821797}
+  m_Layer: 0
+  m_Name: Bow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &772821796
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 772821795}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 883284789}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -146, y: -89}
+  m_SizeDelta: {x: 50, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &772821797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 772821795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: -7107710588982011371, guid: 8dc013224c66d4762af157fbdffa7d6c, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &772821798
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 772821795}
   m_CullTransparentMesh: 1
 --- !u!1 &816801424
 GameObject:
@@ -5026,6 +5101,7 @@ RectTransform:
   - {fileID: 730445645}
   - {fileID: 316761505}
   - {fileID: 2097224906}
+  - {fileID: 772821796}
   m_Father: {fileID: 1134197084}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5045,17 +5121,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f01d83f117822490095b93f34ef0295b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CevherSystemUI
-  komurIcon: {fileID: 770729809}
-  altinIcon: {fileID: 1491263440}
-  elmasIcon: {fileID: 730445646}
-  obsidyenIcon: {fileID: 316761506}
+  bowIcon: {fileID: 772821797}
+  countText: {fileID: 2097224907}
+  milestone2Badge: {fileID: 0}
+  milestone4Badge: {fileID: 0}
+  milestone6Badge: {fileID: 0}
+  milestone2Label: {fileID: 0}
+  milestone4Label: {fileID: 0}
+  milestone6Label: {fileID: 0}
   inactiveColor: {r: 0.18, g: 0.18, b: 0.18, a: 0.55}
-  completedColor: {r: 0.65, g: 0.65, b: 0.65, a: 0.8}
-  komurActiveColor: {r: 0.45, g: 0.45, b: 0.45, a: 1}
-  altinActiveColor: {r: 1, g: 0.84, b: 0, a: 1}
-  elmasActiveColor: {r: 0, g: 0.75, b: 1, a: 1}
-  obsidyenActiveColor: {r: 0.55, g: 0, b: 1, a: 1}
-  progressText: {fileID: 0}
+  altinColor: {r: 1, g: 0.84, b: 0, a: 1}
+  elmasColor: {r: 0, g: 0.75, b: 1, a: 1}
+  obsidyenColor: {r: 0.55, g: 0, b: 1, a: 1}
   augmentController: {fileID: 0}
 --- !u!114 &883284791
 MonoBehaviour:
@@ -7092,7 +7169,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1491263439
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8877,7 +8954,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2097224906
 RectTransform:
   m_ObjectHideFlags: 0
