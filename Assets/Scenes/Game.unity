@@ -4891,9 +4891,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f01d83f117822490095b93f34ef0295b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CevherSystemUI
-  bowTrait: {fileID: 1481143875}
+  longbowTrait: {fileID: 0}
   badgeImage: {fileID: 2017166911}
-  bowIcon: {fileID: 772821797}
+  longbowIcon: {fileID: 0}
   countText: {fileID: 2097224907}
   inactiveColor: {r: 0.18, g: 0.18, b: 0.18, a: 0.55}
   komurColor: {r: 0.45, g: 0.4, b: 0.35, a: 1}
@@ -7827,8 +7827,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAugmentController
   movementSpeedBonus: 0
-  hasChargedBowAoe: 0
-  chargedBowAoeRadius: 3
+  hasChargedLongbowAoe: 0
+  chargedLongbowAoeRadius: 3
   hasDoubleArrowUnlock: 0
   hasWallLootsUnlock: 0
   hasExtraAugmentSlotUnlock: 0
@@ -7840,24 +7840,32 @@ MonoBehaviour:
   incomingDamageReduction: 0
   hasHammerChargeDamageReductionUnlock: 0
   hammerFreezeDuration: 0
-  bowFreezeDuration: 0
-  hasBowFreezeUnlock: 0
+  longbowFreezeDuration: 0
+  hasLongbowFreezeUnlock: 0
   hasFireArrowUnlock: 0
   hasPoisonArrowUnlock: 0
   hammerAoeRadiusBonus: 0
-  bowAoeRadiusBonus: 0
+  longbowAoeRadiusBonus: 0
   flatMaxHealthBonus: 0
   fireDotDuration: 3
   fireDotDamagePerSecond: 2
   poisonDotDuration: 5
   poisonDotDamagePerSecond: 1.5
+  hasCrossbowBoltPierce: 0
+  crossbowPierceDamageFalloff: 0.2
+  crossbowPierceDamageFloor: 0.3
+  crossbowPierceFalloffCount: 3
+  hasCrossbowBoltBleed: 0
+  crossbowBleedDamageRatioPerStack: 0.01
+  crossbowBleedMaxStacks: 5
+  crossbowBleedExpireSeconds: 5
   arrowShotBonusCount: 0
   arrowProjectileSpeedMultiplier: 1
   outgoingDamageMultiplier: 1
   maxHealthMultiplier: 1
-  mutationAugmentsBow: 0
-  bowCevherCountMotor: 0
-  bowCevherTierMotor: 
+  mutationAugmentsLongbow: 0
+  longbowCevherCountMotor: 0
+  longbowCevherTierMotor: 
 --- !u!114 &1700128204
 MonoBehaviour:
   m_ObjectHideFlags: 0

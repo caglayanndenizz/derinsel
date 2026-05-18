@@ -16,7 +16,7 @@ public class Player : BaseEntity, IPlayerContext
     public float hammerCooldown = 3f;
     [SerializeField] private float heavyImpactFallbackDelay = 0.2f;
 
-    [Header("Bow / Arrow")]
+    [Header("Longbow / Arrow")]
     [Tooltip("Üzerinde PlayerArrow bileşeni olan ok prefabı.")]
     public GameObject arrowPrefab;
     public float arrowSpeed = 14f;
@@ -24,24 +24,38 @@ public class Player : BaseEntity, IPlayerContext
     [Tooltip("Boş bırakılırsa Camera.main kullanılır; imleç dünya koordinatı için.")]
     public Camera aimCamera;
     [Tooltip("Yay animasyonu bittikten sonra ok instantiate edilir. Ok çıkarken imleç bu süre sonunda tekrar okunur (Time.timeScale ile).")]
-    public float bowArrowReleaseDelay = 0.4f;
+    public float longbowArrowReleaseDelay = 0.4f;
     [Tooltip("Tam şarjlı sağ-tık yayda ok hızı ve hasarı bu çarpanla çarpılır.")]
-    public float bowChargedSpeedDamageMultiplier = 3f;
+    public float longbowChargedSpeedDamageMultiplier = 3f;
     [Tooltip("Sağ tık basılı tutma süresi (saniye); dolunca yay tam şarj sayılır.")]
-    public float maxBowChargeTime = 0.5f;
+    public float maxLongbowChargeTime = 0.5f;
     [Tooltip("Boşsa yay şarj çubuğu gösterilmez; Inspector'dan atayabilirsin.")]
-    public Slider bowChargeMeter;
+    public Slider longbowChargeMeter;
     [Tooltip("Boşsa yay şarj UI kanvası açılmaz.")]
-    public GameObject bowMeterCanvas;
+    public GameObject longbowMeterCanvas;
 
-    [Header("Bow radial mutation (auto)")]
-    [Tooltip("6 bow cevher augmenti ile Obsidyen'e ulaşınca, ek input olmadan kaç saniyede bir salvı.")]
-    [SerializeField] private float radialBowAutoVolleyIntervalSeconds = 1f;
+    [Header("Crossbow / Bolt")]
+    [Tooltip("Bolt hızı = arrowSpeed * bu çarpan.")]
+    public float crossbowBoltSpeedMultiplier = 2f;
+    [Tooltip("Bolt hasarı = lightAttackDamage * bu çarpan.")]
+    public float crossbowBoltDamageMultiplier = 2f;
+    [Tooltip("Crossbow ateş aralığı (saniye). Longbow'dan (lightAttackRate) daha kısa tutulur.")]
+    public float crossbowAttackRate = 0.1f;
+    [Tooltip("Bolt instantiate gecikme süresi (saniye).")]
+    public float crossbowBoltReleaseDelay = 0.05f;
+    [Tooltip("Üzerinde CrossbowBolt bileşeni olan bolt prefabı.")]
+    public GameObject crossbowBoltPrefab;
+    [Tooltip("Bolt maksimum hayat süresi (saniye).")]
+    public float crossbowBoltMaxLifetime = 5f;
+
+    [Header("Longbow radial mutation (auto)")]
+    [Tooltip("6 longbow cevher augmenti ile Obsidyen'e ulaşınca, ek input olmadan kaç saniyede bir salvı.")]
+    [SerializeField] private float radialLongbowAutoVolleyIntervalSeconds = 1f;
     [SerializeField] private int autoArrowVolleyCount = 8;
     [SerializeField] private float autoArrowVolleyAngleStepDegrees = 45f;
-    [SerializeField] private float radialBowSpawnInset = 0.2f;
+    [SerializeField] private float radialLongbowSpawnInset = 0.2f;
     [Tooltip("Otomatik salvıda hedef mesafe (imleç yok).")]
-    [SerializeField] private float radialBowAutoVolleyTravelDistance = 8f;
+    [SerializeField] private float radialLongbowAutoVolleyTravelDistance = 8f;
 
     [Header("Light Attack Settings (Spammable)")]
     public float lightAttackRate = 0.2f;
@@ -94,8 +108,8 @@ public class Player : BaseEntity, IPlayerContext
 
     private float _nextHammerUseTime = 0f;
     private float _nextDashTime = 0f;
-    private bool _hadRadialBowMutationLastFrame;
-    private float _nextRadialBowAutoVolleyTime;
+    private bool _hadRadialLongbowMutationLastFrame;
+    private float _nextRadialLongbowAutoVolleyTime;
     private Rigidbody2D _rb;
     private CinemachineImpulseSource _defaultImpulseSource;
     private float _invulnerableUntil = 0f;
@@ -124,11 +138,17 @@ public class Player : BaseEntity, IPlayerContext
     float IPlayerContext.MaxChargeTime => maxChargeTime;
     Slider IPlayerContext.ChargeMeter => chargeMeter;
     GameObject IPlayerContext.MeterCanvas => meterCanvas;
-    float IPlayerContext.MaxBowChargeTime => maxBowChargeTime;
+    float IPlayerContext.MaxLongbowChargeTime => maxLongbowChargeTime;
     float IPlayerContext.LightAttackRate => lightAttackRate;
     float IPlayerContext.LightImpactFallbackDelay => lightImpactFallbackDelay;
-    Slider IPlayerContext.BowChargeMeter => bowChargeMeter;
-    GameObject IPlayerContext.BowMeterCanvas => bowMeterCanvas;
+    Slider IPlayerContext.LongbowChargeMeter => longbowChargeMeter;
+    GameObject IPlayerContext.LongbowMeterCanvas => longbowMeterCanvas;
+    float IPlayerContext.CrossbowBoltSpeedMultiplier => crossbowBoltSpeedMultiplier;
+    float IPlayerContext.CrossbowBoltDamageMultiplier => crossbowBoltDamageMultiplier;
+    float IPlayerContext.CrossbowAttackRate => crossbowAttackRate;
+    float IPlayerContext.CrossbowBoltReleaseDelay => crossbowBoltReleaseDelay;
+    GameObject IPlayerContext.CrossbowBoltPrefab => crossbowBoltPrefab;
+    float IPlayerContext.CrossbowBoltMaxLifetime => crossbowBoltMaxLifetime;
     Animator IPlayerContext.Animator => animator;
 
     float IPlayerContext.NextHammerUseTime
@@ -152,11 +172,14 @@ public class Player : BaseEntity, IPlayerContext
         set => _lightFallbackExecuteAt = value;
     }
 
-    void IPlayerContext.ScheduleBowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
-        => ScheduleBowArrow(damage, useBowChargedMultiplier, aimWorldAtFireInput);
+    void IPlayerContext.ScheduleLongbowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+        => ScheduleLongbowArrow(damage, useBowChargedMultiplier, aimWorldAtFireInput);
 
-    Vector2 IPlayerContext.GetBowAimWorldPointAtCurrentMouse()
-        => GetBowAimWorldPointAtCurrentMouse();
+    void IPlayerContext.ScheduleCrossbowBolt(float damage, Vector2 aimWorldAtFireInput)
+        => ScheduleCrossbowBolt(damage, aimWorldAtFireInput);
+
+    Vector2 IPlayerContext.GetLongbowAimWorldPointAtCurrentMouse()
+        => GetLongbowAimWorldPointAtCurrentMouse();
 
     void IPlayerContext.TriggerHeavyAttack()
         => TriggerHeavyAttack();
@@ -240,7 +263,7 @@ public class Player : BaseEntity, IPlayerContext
     {
         if (playerLevel != null)
             playerLevel.LevelUp -= HandleLevelUp;
-        CancelPendingBowArrow();
+        CancelPendingLongbowArrow();
     }
 
     void Update()
@@ -251,7 +274,7 @@ public class Player : BaseEntity, IPlayerContext
         HandleDash();
         UpdateHammerCooldownUI();
         UpdateDashCooldownUI();
-        UpdateRadialBowAutoVolley();
+        UpdateRadialLongbowAutoVolley();
     }
 
     void FixedUpdate()
@@ -413,9 +436,9 @@ public class Player : BaseEntity, IPlayerContext
             impactFeedback?.PlayHeavyHit(firstHitPosition, _defaultImpulseSource);
     }
 
-    // ─── Bow / arrow ──────────────────────────────────────────────────────────
+    // ─── Longbow / arrow ──────────────────────────────────────────────────────────
 
-    private Vector2 GetBowAimWorldPointAtCurrentMouse()
+    private Vector2 GetLongbowAimWorldPointAtCurrentMouse()
     {
         if (attackPoint == null) return Vector2.zero;
         Camera cam = aimCamera != null ? aimCamera : Camera.main;
@@ -427,18 +450,18 @@ public class Player : BaseEntity, IPlayerContext
         return cam.ScreenToWorldPoint(mouse);
     }
 
-    private void ScheduleBowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+    private void ScheduleLongbowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
     {
-        float delay = Mathf.Max(0f, bowArrowReleaseDelay);
+        float delay = Mathf.Max(0f, longbowArrowReleaseDelay);
         if (delay <= 0f)
         {
             SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
             return;
         }
-        StartCoroutine(BowArrowSpawnAfterDelay(delay, damage, useBowChargedMultiplier, aimWorldAtFireInput));
+        StartCoroutine(LongbowArrowSpawnAfterDelay(delay, damage, useBowChargedMultiplier, aimWorldAtFireInput));
     }
 
-    private IEnumerator BowArrowSpawnAfterDelay(float delaySeconds, float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+    private IEnumerator LongbowArrowSpawnAfterDelay(float delaySeconds, float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
     {
         yield return new WaitForSeconds(delaySeconds);
         SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
@@ -450,8 +473,8 @@ public class Player : BaseEntity, IPlayerContext
 
         bool chargedExplosionEnabled = useBowChargedMultiplier &&
                                        playerAugmentController != null &&
-                                       playerAugmentController.HasChargedBowAoe;
-        float m = useBowChargedMultiplier ? Mathf.Max(1f, bowChargedSpeedDamageMultiplier) : 1f;
+                                       playerAugmentController.HasChargedLongbowAoe;
+        float m = useBowChargedMultiplier ? Mathf.Max(1f, longbowChargedSpeedDamageMultiplier) : 1f;
         float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
         float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;
         float useSpeed = arrowSpeed * m * arrowSpdMult;
@@ -470,52 +493,52 @@ public class Player : BaseEntity, IPlayerContext
         {
             float angleOffset = (i - centerOffset) * spreadStepDegrees;
             Vector2 shotDir = Quaternion.Euler(0f, 0f, angleOffset) * dir;
-            Vector2 spawnPos = origin + shotDir * radialBowSpawnInset;
+            Vector2 spawnPos = origin + shotDir * radialLongbowSpawnInset;
             TrySpawnSinglePlayerArrow(spawnPos, origin + shotDir * targetDistance, useSpeed, useDamage, chargedExplosionEnabled);
         }
     }
 
-    private void UpdateRadialBowAutoVolley()
+    private void UpdateRadialLongbowAutoVolley()
     {
         if (arrowPrefab == null) return;
 
         bool active = playerAugmentController != null &&
-                      playerAugmentController.ShouldUseRadialBowVolleyMutation(this);
+                      playerAugmentController.ShouldUseRadialLongbowVolleyMutation(this);
         if (!active)
         {
-            _hadRadialBowMutationLastFrame = false;
+            _hadRadialLongbowMutationLastFrame = false;
             return;
         }
 
-        if (!_hadRadialBowMutationLastFrame)
-            _nextRadialBowAutoVolleyTime = Time.time;
+        if (!_hadRadialLongbowMutationLastFrame)
+            _nextRadialLongbowAutoVolleyTime = Time.time;
 
-        _hadRadialBowMutationLastFrame = true;
+        _hadRadialLongbowMutationLastFrame = true;
 
-        if (Time.time < _nextRadialBowAutoVolleyTime) return;
+        if (Time.time < _nextRadialLongbowAutoVolleyTime) return;
 
         float baseDamage = stats != null ? stats.lightAttackDamage : 0f;
-        FireRadialBowMutationAutoVolley(baseDamage);
-        _nextRadialBowAutoVolleyTime = Time.time + Mathf.Max(0.05f, radialBowAutoVolleyIntervalSeconds);
+        FireRadialLongbowMutationAutoVolley(baseDamage);
+        _nextRadialLongbowAutoVolleyTime = Time.time + Mathf.Max(0.05f, radialLongbowAutoVolleyIntervalSeconds);
     }
 
-    private void FireRadialBowMutationAutoVolley(float lightDamage)
+    private void FireRadialLongbowMutationAutoVolley(float lightDamage)
     {
         float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
         float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;
         float useSpeed = arrowSpeed * arrowSpdMult;
         float useDamage = lightDamage * dmgMult;
-        bool chargedExplosion = playerAugmentController != null && playerAugmentController.HasChargedBowAoe;
+        bool chargedExplosion = playerAugmentController != null && playerAugmentController.HasChargedLongbowAoe;
 
         Vector2 radialOrigin = transform.position;
-        float targetDistance = Mathf.Max(0.5f, radialBowAutoVolleyTravelDistance);
+        float targetDistance = Mathf.Max(0.5f, radialLongbowAutoVolleyTravelDistance);
         int volleyCount = Mathf.Clamp(autoArrowVolleyCount, 1, 64);
         float step = Mathf.Max(1f, autoArrowVolleyAngleStepDegrees);
 
         for (int i = 0; i < volleyCount; i++)
         {
             Vector2 radialDir = RadialBowDirFromAngleDegrees(i * step);
-            float forward = Mathf.Max(0f, radialBowSpawnInset);
+            float forward = Mathf.Max(0f, radialLongbowSpawnInset);
             Vector2 spawnPos = radialOrigin + radialDir * forward;
             Vector2 shotTarget = radialOrigin + radialDir * Mathf.Max(forward + 0.3f, targetDistance);
             TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, useDamage, chargedExplosion);
@@ -538,7 +561,7 @@ public class Player : BaseEntity, IPlayerContext
         if (arrowPrefab == null) return;
 
         float explosionRadius = chargedExplosionEnabled && playerAugmentController != null
-            ? playerAugmentController.ChargedBowAoeRadius
+            ? playerAugmentController.ChargedLongbowAoeRadius
             : 0f;
 
         GameObject arrow = Instantiate(arrowPrefab, spawnWorldPosition, Quaternion.identity);
@@ -560,7 +583,7 @@ public class Player : BaseEntity, IPlayerContext
             explosionRadius,
             generator,
             chargedExplosionEnabled ? _defaultImpulseSource : null,
-            playerAugmentController != null ? playerAugmentController.BowFreezeDuration : 0f,
+            playerAugmentController != null ? playerAugmentController.LongbowFreezeDuration : 0f,
             playerAugmentController != null && playerAugmentController.HasFireArrowUnlock,
             playerAugmentController != null ? playerAugmentController.FireDotDuration : 0f,
             playerAugmentController != null ? playerAugmentController.FireDotDamagePerSecond : 0f,
@@ -580,9 +603,67 @@ public class Player : BaseEntity, IPlayerContext
         }
     }
 
-    private void CancelPendingBowArrow()
+    private void CancelPendingLongbowArrow()
     {
         StopAllCoroutines();
+    }
+
+    // ─── Crossbow / bolt ─────────────────────────────────────────────────────
+
+    private void ScheduleCrossbowBolt(float damage, Vector2 aimWorld)
+    {
+        float delay = Mathf.Max(0f, crossbowBoltReleaseDelay);
+        if (delay <= 0f) { SpawnCrossbowBolt(damage, aimWorld); return; }
+        StartCoroutine(CrossbowBoltSpawnAfterDelay(delay, damage, aimWorld));
+    }
+
+    private IEnumerator CrossbowBoltSpawnAfterDelay(float delay, float damage, Vector2 aimWorld)
+    {
+        yield return new WaitForSeconds(delay);
+        SpawnCrossbowBolt(damage, aimWorld);
+    }
+
+    private void SpawnCrossbowBolt(float damage, Vector2 aimWorld)
+    {
+        if (crossbowBoltPrefab == null || attackPoint == null) return;
+
+        PlayerAugmentController aug = playerAugmentController;
+        // Sadece genel çarpan (glass cannon vb.) uygulanır — longbow augmentleri uygulanmaz.
+        float dmgMult   = aug != null ? aug.OutgoingDamageMultiplier : 1f;
+        float useSpeed  = arrowSpeed * crossbowBoltSpeedMultiplier;
+        float useDamage = damage * dmgMult;
+
+        Vector2 origin = attackPoint.position;
+        Vector2 offset = aimWorld - origin;
+        if (offset.sqrMagnitude < 0.0001f) offset = Vector2.right * 0.01f;
+
+        GameObject boltGO = Instantiate(crossbowBoltPrefab, origin, Quaternion.identity);
+        CrossbowBolt bolt = boltGO.GetComponent<CrossbowBolt>();
+        if (bolt == null) { Destroy(boltGO); return; }
+
+        bolt.Initialize(
+            aimWorld,
+            useSpeed,
+            useDamage,
+            crossbowBoltMaxLifetime,
+            enemyLayers,
+            transform,
+            hasPierce:                aug != null && aug.HasCrossbowBoltPierce,
+            pierceFalloff:            aug != null ? aug.CrossbowPierceDamageFalloff    : 0.20f,
+            pierceFloor:              aug != null ? aug.CrossbowPierceDamageFloor      : 0.30f,
+            pierceFalloffCount:       aug != null ? aug.CrossbowPierceFalloffCount     : 3,
+            freezeDuration:           0f,   // longbow augmenti — crossbow'a uygulanmaz
+            hasFireArrow:             false, // longbow augmenti — crossbow'a uygulanmaz
+            fireDotDuration:          0f,
+            fireDotDps:               0f,
+            hasPoisonArrow:           false, // longbow augmenti — crossbow'a uygulanmaz
+            poisonDotDuration:        0f,
+            poisonDotDps:             0f,
+            hasBleed:                 aug != null && aug.HasCrossbowBoltBleed,
+            bleedDamageRatioPerStack: aug != null ? aug.CrossbowBleedDamageRatioPerStack : 0.01f,
+            bleedMaxStacks:           aug != null ? aug.CrossbowBleedMaxStacks          : 5,
+            bleedExpireSeconds:       aug != null ? aug.CrossbowBleedExpireSeconds      : 5f
+        );
     }
 
     // ─── Dash ────────────────────────────────────────────────────────────────

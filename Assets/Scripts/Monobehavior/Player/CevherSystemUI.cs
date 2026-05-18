@@ -9,9 +9,9 @@ using TMPro;
 public class CevherSystemUI : MonoBehaviour
 {
     [Header("UI Elemanları")]
-    [SerializeField] private GameObject      bowTrait;
+    [SerializeField] private GameObject      longbowTrait;
     [SerializeField] private Image           badgeImage;
-    [SerializeField] private Image           bowIcon;
+    [SerializeField] private Image           longbowIcon;
     [SerializeField] private TextMeshProUGUI countText;
 
     [Header("Renkler")]
@@ -66,18 +66,18 @@ public class CevherSystemUI : MonoBehaviour
     {
         if (augmentController == null) return;
 
-        CevherTier tier  = augmentController.BowCevherTier;
-        int        count = augmentController.BowCevherAugmentCount;
+        CevherTier tier  = augmentController.LongbowCevherTier;
+        int        count = augmentController.LongbowCevherAugmentCount;
 
         if (tier == _cachedTier && count == _cachedCount) return;
         _cachedTier  = tier;
         _cachedCount = count;
 
-        if (bowTrait != null) bowTrait.SetActive(count > 0);
+        if (longbowTrait != null) longbowTrait.SetActive(count > 0);
 
         Color c = TierColor(tier);
         if (badgeImage != null) badgeImage.color = c;
-        if (bowIcon    != null) bowIcon.color    = c;
+        if (longbowIcon    != null) longbowIcon.color    = c;
         if (countText  != null) countText.text   = $"{count}/{PlayerAugmentController.CevherObsidyenThreshold}";
     }
 

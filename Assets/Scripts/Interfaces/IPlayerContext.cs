@@ -14,12 +14,20 @@ public interface IPlayerContext
     Slider ChargeMeter { get; }
     GameObject MeterCanvas { get; }
 
-    // Bow / archer settings & UI
-    float MaxBowChargeTime { get; }
+    // Longbow / archer settings & UI
+    float MaxLongbowChargeTime { get; }
     float LightAttackRate { get; }
     float LightImpactFallbackDelay { get; }
-    Slider BowChargeMeter { get; }
-    GameObject BowMeterCanvas { get; }
+    Slider LongbowChargeMeter { get; }
+    GameObject LongbowMeterCanvas { get; }
+
+    // Crossbow / bolt settings
+    float CrossbowBoltSpeedMultiplier { get; }
+    float CrossbowBoltDamageMultiplier { get; }
+    float CrossbowAttackRate { get; }
+    float CrossbowBoltReleaseDelay { get; }
+    GameObject CrossbowBoltPrefab { get; }
+    float CrossbowBoltMaxLifetime { get; }
 
     // Unity references
     Animator Animator { get; }
@@ -33,7 +41,8 @@ public interface IPlayerContext
     float LightFallbackExecuteAt { get; set; }
 
     // Methods
-    void ScheduleBowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput);
-    Vector2 GetBowAimWorldPointAtCurrentMouse();
+    void ScheduleLongbowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput);
+    void ScheduleCrossbowBolt(float damage, Vector2 aimWorldAtFireInput);
+    Vector2 GetLongbowAimWorldPointAtCurrentMouse();
     void TriggerHeavyAttack();
 }

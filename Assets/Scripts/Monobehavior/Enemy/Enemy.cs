@@ -84,6 +84,7 @@ public class Enemy : BaseEntity
     private static readonly Color FreezeColor  = new Color(0.3f, 0.6f, 1f);
     private static readonly Color FireColor    = new Color(1f, 0.45f, 0.1f);
     private static readonly Color PoisonColor  = new Color(0.2f, 0.8f, 0.2f);
+    private static readonly Color BleedColor   = new Color(0.65f, 0.05f, 0.1f);
 
     private bool      _isFrozen = false;
     private Coroutine _freezeCoroutine;
@@ -92,6 +93,14 @@ public class Enemy : BaseEntity
     private bool      _isPoisoned = false;
     private Coroutine _poisonCoroutine;
     private Coroutine _colorCycleCoroutine;
+
+    private bool      _isBleeding = false;
+    private Coroutine _bleedCoroutine;
+    private int       _bleedStacks;
+    private float     _bleedDamagePerStack;
+    private float     _lastBleedHitTime;
+    private int       _bleedMaxStacks;
+    private float     _bleedExpireSeconds;
 
     protected GameObject player;
     private bool _isDead = false;
@@ -609,11 +618,45 @@ public class Enemy : BaseEntity
         _poisonCoroutine = StartCoroutine(PoisonDoTRoutine(duration, dps));
     }
 
+    public void ApplyBleedStack(float damagePerStack, int maxStacks = 5, float expireSeconds = 5f)
+    {
+        if (_isDead || damagePerStack <= 0f) return;
+        _bleedMaxStacks     = Mathf.Max(1, maxStacks);
+        _bleedExpireSeconds = Mathf.Max(0f, expireSeconds);
+        _bleedDamagePerStack = damagePerStack;
+        _bleedStacks        = Mathf.Min(_bleedStacks + 1, _bleedMaxStacks);
+        _lastBleedHitTime   = Time.time;
+        _isBleeding         = true;
+        RefreshStatusColor();
+        if (_bleedCoroutine == null)
+            _bleedCoroutine = StartCoroutine(BleedRoutine());
+    }
+
+    private IEnumerator BleedRoutine()
+    {
+        while (_bleedStacks > 0 && !_isDead)
+        {
+            yield return new WaitForSeconds(1f);
+            if (_isDead) break;
+
+            if (Time.time - _lastBleedHitTime > _bleedExpireSeconds)
+                break;
+
+            TakeDamage(_bleedStacks * _bleedDamagePerStack, false);
+        }
+
+        _bleedStacks    = 0;
+        _isBleeding     = false;
+        _bleedCoroutine = null;
+        RefreshStatusColor();
+    }
+
     private Color GetCurrentStatusColor()
     {
         if (_isOnFire)   return FireColor;
         if (_isFrozen)   return FreezeColor;
         if (_isPoisoned) return PoisonColor;
+        if (_isBleeding) return BleedColor;
         return _originalColor;
     }
 
@@ -773,6 +816,9 @@ public class Enemy : BaseEntity
         if (_poisonCoroutine     != null) { StopCoroutine(_poisonCoroutine);     _poisonCoroutine     = null; }
         if (_freezeCoroutine     != null) { StopCoroutine(_freezeCoroutine);     _freezeCoroutine     = null; }
         if (_colorCycleCoroutine != null) { StopCoroutine(_colorCycleCoroutine); _colorCycleCoroutine = null; }
+        if (_bleedCoroutine      != null) { StopCoroutine(_bleedCoroutine);      _bleedCoroutine      = null; }
+        _isBleeding  = false;
+        _bleedStacks = 0;
         if (cd != null) cd.enabled = true;
         if (_rb != null) _rb.linearVelocity = Vector2.zero;
         if (stats != null) _currentHealth = stats.maxHealth;

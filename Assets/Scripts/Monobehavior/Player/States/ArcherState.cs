@@ -2,30 +2,30 @@ using UnityEngine;
 
 public class ArcherState : PlayerState
 {
-    private float _bowCharge;
-    private bool _isBowCharging;
+    private float _longbowCharge;
+    private bool _isLongbowCharging;
 
-    public override bool IsChargingForMovement => _isBowCharging;
+    public override bool IsChargingForMovement => _isLongbowCharging;
 
     public override void Enter(IPlayerContext context)
     {
-        _bowCharge = 0f;
-        _isBowCharging = false;
+        _longbowCharge = 0f;
+        _isLongbowCharging = false;
     }
 
     public override void Handle(IPlayerContext context)
     {
         if (Input.GetButtonUp("Fire2"))
         {
-            bool wasFull = _bowCharge >= context.MaxBowChargeTime - 0.0001f;
+            bool wasFull = _longbowCharge >= context.MaxLongbowChargeTime - 0.0001f;
             ResetBowCharge(context);
 
             if (Time.time >= context.NextAttackTime)
             {
                 context.Animator?.SetTrigger(LightAttackHash);
-                Vector2 aim = context.GetBowAimWorldPointAtCurrentMouse();
+                Vector2 aim = context.GetLongbowAimWorldPointAtCurrentMouse();
                 float dmg = context.Stats != null ? context.Stats.lightAttackDamage : 0f;
-                context.ScheduleBowArrow(dmg, wasFull, aim);
+                context.ScheduleLongbowArrow(dmg, wasFull, aim);
                 context.LightAttackInProgress = true;
                 context.LightFallbackExecuteAt = Time.time + Mathf.Max(0.03f, context.LightImpactFallbackDelay);
                 context.NextAttackTime = Time.time + context.LightAttackRate;
@@ -35,21 +35,21 @@ public class ArcherState : PlayerState
             return;
         }
 
-        _isBowCharging = Input.GetButton("Fire2");
+        _isLongbowCharging = Input.GetButton("Fire2");
 
-        if (!_isBowCharging && _bowCharge <= 0f)
+        if (!_isLongbowCharging && _longbowCharge <= 0f)
         {
             context.SetState(new IdleState());
             return;
         }
 
-        if (_isBowCharging)
+        if (_isLongbowCharging)
         {
-            if (context.BowMeterCanvas != null) context.BowMeterCanvas.SetActive(true);
-            _bowCharge += Time.deltaTime;
-            _bowCharge = Mathf.Clamp(_bowCharge, 0f, context.MaxBowChargeTime);
-            if (context.BowChargeMeter != null)
-                context.BowChargeMeter.value = _bowCharge / Mathf.Max(0.0001f, context.MaxBowChargeTime);
+            if (context.LongbowMeterCanvas != null) context.LongbowMeterCanvas.SetActive(true);
+            _longbowCharge += Time.deltaTime;
+            _longbowCharge = Mathf.Clamp(_longbowCharge, 0f, context.MaxLongbowChargeTime);
+            if (context.LongbowChargeMeter != null)
+                context.LongbowChargeMeter.value = _longbowCharge / Mathf.Max(0.0001f, context.MaxLongbowChargeTime);
         }
 
         UpdateAnimator(context);
@@ -62,10 +62,10 @@ public class ArcherState : PlayerState
 
     private void ResetBowCharge(IPlayerContext context)
     {
-        _isBowCharging = false;
-        _bowCharge = 0f;
-        if (context.BowChargeMeter != null) context.BowChargeMeter.value = 0f;
-        if (context.BowMeterCanvas != null) context.BowMeterCanvas.SetActive(false);
+        _isLongbowCharging = false;
+        _longbowCharge = 0f;
+        if (context.LongbowChargeMeter != null) context.LongbowChargeMeter.value = 0f;
+        if (context.LongbowMeterCanvas != null) context.LongbowMeterCanvas.SetActive(false);
         UpdateAnimator(context);
     }
 
@@ -73,6 +73,6 @@ public class ArcherState : PlayerState
     {
         if (context.Animator == null) return;
         context.Animator.SetBool(IsChargingHash, false);
-        context.Animator.SetBool(BowChargeHash, _isBowCharging);
+        context.Animator.SetBool(LongbowChargeHash, _isLongbowCharging);
     }
 }

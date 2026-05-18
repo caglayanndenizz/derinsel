@@ -25,5 +25,5 @@ public class AugmentDefinition : ScriptableObject
 
     [Header("Mutation / picker")]
     [Tooltip("Oyuncuda otomatik radial ok mutasyonu açılmışsa augment havuzundan çıkar.")]
-    public bool excludeFromAugmentPickerWhenRadialBowMutationComplete;
+    public bool excludeFromAugmentPickerWhenRadialLongbowMutationComplete;
 }

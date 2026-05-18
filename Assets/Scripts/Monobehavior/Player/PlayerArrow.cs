@@ -14,7 +14,7 @@ public class PlayerArrow : MonoBehaviour
     float _spawnTime;
     bool _initialized;
     LayerMask _enemyMask;
-    bool _fullyChargedBowExplosion;
+    bool _fullyChargedLongbowExplosion;
     float _explosionRadius;
     float _freezeDuration;
     bool  _hasFireArrow;
@@ -41,7 +41,7 @@ public class PlayerArrow : MonoBehaviour
         float maxLifetime,
         LayerMask enemyMask,
         Transform ownerRoot,
-        bool fullyChargedBowExplosion = false,
+        bool fullyChargedLongbowExplosion = false,
         float chargedExplosionRadius = 0f,
         DungeonGenerator dungeonGenerator = null,
         CinemachineImpulseSource hitCameraImpulse = null,
@@ -58,7 +58,7 @@ public class PlayerArrow : MonoBehaviour
         _damage = damage;
         _maxLifetime = maxLifetime > 0f ? maxLifetime : defaultMaxLifetime;
         _spawnTime = Time.time;
-        _fullyChargedBowExplosion = fullyChargedBowExplosion;
+        _fullyChargedLongbowExplosion = fullyChargedLongbowExplosion;
         _explosionRadius   = chargedExplosionRadius;
         _freezeDuration    = freezeDuration;
         _hasFireArrow      = hasFireArrow;
@@ -119,7 +119,7 @@ public class PlayerArrow : MonoBehaviour
         {
             PlayHitCameraShake();
 
-            if (_fullyChargedBowExplosion && _explosionRadius > 0f)
+            if (_fullyChargedLongbowExplosion && _explosionRadius > 0f)
             {
                 Vector2 p = hit.point;
                 List<Vector3> brokenWalls = null;

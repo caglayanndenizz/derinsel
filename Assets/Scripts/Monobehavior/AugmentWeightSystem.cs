@@ -295,8 +295,8 @@ public class AugmentWeightSystem : MonoBehaviour
         if (SharesExclusiveGroupWithUsed(aug.id, usedIds)) return false;
         if (controller != null && !controller.CanApplyAugment(aug)) return false;
         if (controller != null
-            && controller.HasRadialBowMutationUnlock
-            && aug.excludeFromAugmentPickerWhenRadialBowMutationComplete) return false;
+            && controller.HasRadialLongbowMutationUnlock
+            && aug.excludeFromAugmentPickerWhenRadialLongbowMutationComplete) return false;
         if (!MeetsFloorRequirement(aug, floor)) return false;
         return true;
     }
@@ -313,12 +313,12 @@ public class AugmentWeightSystem : MonoBehaviour
     {
         switch (id)
         {
-            case AugmentId.ChargedBowAoeUnlock:
+            case AugmentId.ChargedLongbowAoeUnlock:
             case AugmentId.DoubleArrowUnlock:
             case AugmentId.WallLootsUnlock:
             case AugmentId.DashUnluck:
             case AugmentId.HammerChargeDamageReductionUnlock:
-            case AugmentId.BowFreezeUnlock:
+            case AugmentId.LongbowFreezeUnlock:
             case AugmentId.FireArrowUnlock:
             case AugmentId.PoisonArrowUnlock:
                 return true;

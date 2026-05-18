@@ -6,7 +6,7 @@ public class IdleState : PlayerState
     {
         if (context.Animator == null) return;
         context.Animator.SetBool(IsChargingHash, false);
-        context.Animator.SetBool(BowChargeHash, false);
+        context.Animator.SetBool(LongbowChargeHash, false);
     }
 
     public override void Handle(IPlayerContext context)
@@ -19,9 +19,8 @@ public class IdleState : PlayerState
 
         if (Input.GetButton("Fire2"))
         {
-            bool mutationActive = context.AugmentController != null && context.AugmentController.HasRadialBowMutationUnlock;
-            if (!mutationActive)
-                context.SetState(new ArcherState());
+            bool mutationActive = context.AugmentController != null && context.AugmentController.HasRadialLongbowMutationUnlock;
+            context.SetState(mutationActive ? (PlayerState)new CrossbowState() : new ArcherState());
             return;
         }
     }

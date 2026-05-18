@@ -76,6 +76,6 @@ public class HammerState : PlayerState
     {
         if (context.Animator == null) return;
         context.Animator.SetBool(IsChargingHash, _isCharging);
-        context.Animator.SetBool(BowChargeHash, false);
+        context.Animator.SetBool(LongbowChargeHash, false);
     }
 }
