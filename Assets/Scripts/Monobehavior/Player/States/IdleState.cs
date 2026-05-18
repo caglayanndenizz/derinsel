@@ -19,7 +19,9 @@ public class IdleState : PlayerState
 
         if (Input.GetButton("Fire2"))
         {
-            context.SetState(new ArcherState());
+            bool mutationActive = context.AugmentController != null && context.AugmentController.HasRadialBowMutationUnlock;
+            if (!mutationActive)
+                context.SetState(new ArcherState());
             return;
         }
     }

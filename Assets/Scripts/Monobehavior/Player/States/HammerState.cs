@@ -43,6 +43,8 @@ public class HammerState : PlayerState
             _currentCharge = Mathf.Clamp(_currentCharge, 0f, effective);
             if (context.ChargeMeter != null)
                 context.ChargeMeter.value = _currentCharge / Mathf.Max(0.0001f, effective);
+            if (context.Animator != null)
+                context.Animator.speed = context.MaxChargeTime / Mathf.Max(0.0001f, effective);
             UpdateAnimator(context);
         }
 
@@ -66,6 +68,7 @@ public class HammerState : PlayerState
         _currentCharge = 0f;
         if (context.ChargeMeter != null) context.ChargeMeter.value = 0f;
         if (context.MeterCanvas != null) context.MeterCanvas.SetActive(false);
+        if (context.Animator != null) context.Animator.speed = 1f;
         UpdateAnimator(context);
     }
 

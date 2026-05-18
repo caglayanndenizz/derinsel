@@ -84,18 +84,19 @@ public class PlayerAugmentController : MonoBehaviour
     // ── Properties ────────────────────────────────────────────────────────────
 
     public float MovementSpeedBonus          => Mathf.Max(0f, movementSpeedBonus);
-    public bool  HasChargedBowAoe            => hasChargedBowAoe;
-    public bool  HasBowFreezeUnlock          => hasBowFreezeUnlock;
-    public bool  HasFireArrowUnlock          => hasFireArrowUnlock;
-    public bool  HasPoisonArrowUnlock        => hasPoisonArrowUnlock;
+    public bool  HasChargedBowAoe            => hasChargedBowAoe   || mutationAugmentsBow;
+    public bool  HasBowFreezeUnlock          => hasBowFreezeUnlock  || mutationAugmentsBow;
+    public bool  HasFireArrowUnlock          => hasFireArrowUnlock  || mutationAugmentsBow;
+    public bool  HasPoisonArrowUnlock        => hasPoisonArrowUnlock || mutationAugmentsBow;
     public float FireDotDuration             => Mathf.Max(0f, fireDotDuration);
     public float FireDotDamagePerSecond      => Mathf.Max(0f, fireDotDamagePerSecond);
     public float PoisonDotDuration           => Mathf.Max(0f, poisonDotDuration);
     public float PoisonDotDamagePerSecond    => Mathf.Max(0f, poisonDotDamagePerSecond);
+    public float BowFreezeDuration           => (mutationAugmentsBow && bowFreezeDuration <= 0f) ? 1.5f : Mathf.Max(0f, bowFreezeDuration);
 
     public int ArrowShotMultiplier => Mathf.Max(
         1,
-        1 + Mathf.Max(0, arrowShotBonusCount) + (hasDoubleArrowUnlock ? 1 : 0));
+        1 + Mathf.Max(0, arrowShotBonusCount) + ((hasDoubleArrowUnlock || mutationAugmentsBow) ? 1 : 0));
     public float ArrowProjectileSpeedMultiplier => Mathf.Max(0.01f, arrowProjectileSpeedMultiplier);
     public float OutgoingDamageMultiplier       => Mathf.Max(0.01f, outgoingDamageMultiplier);
     public float MaxHealthMultiplier            => Mathf.Max(0.01f, maxHealthMultiplier);
@@ -109,7 +110,6 @@ public class PlayerAugmentController : MonoBehaviour
     public float IncomingDamageReduction        => Mathf.Clamp01(incomingDamageReduction);
     public bool  HasHammerChargeDamageReductionUnlock => hasHammerChargeDamageReductionUnlock;
     public float HammerFreezeDuration           => Mathf.Max(0f, hammerFreezeDuration);
-    public float BowFreezeDuration              => Mathf.Max(0f, bowFreezeDuration);
     public float HammerAoeRadiusMultiplier      => 1f + Mathf.Max(0f, hammerAoeRadiusBonus);
     public float ChargedBowAoeRadius            => Mathf.Max(0f, chargedBowAoeRadius * (1f + Mathf.Max(0f, bowAoeRadiusBonus)));
     public float FlatMaxHealthBonus             => Mathf.Max(0f, flatMaxHealthBonus);
@@ -120,6 +120,7 @@ public class PlayerAugmentController : MonoBehaviour
     {
         get
         {
+            if (mutationAugmentsBow) return CevherObsidyenThreshold;
             int total = 0;
             for (int i = 0; i < BowCevherAugmentIds.Length; i++)
                 total += GetAppliedCount(BowCevherAugmentIds[i]);

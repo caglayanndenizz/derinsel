@@ -91,6 +91,7 @@ public class Enemy : BaseEntity
     private Coroutine _fireCoroutine;
     private bool      _isPoisoned = false;
     private Coroutine _poisonCoroutine;
+    private Coroutine _colorCycleCoroutine;
 
     protected GameObject player;
     private bool _isDead = false;
@@ -585,14 +586,13 @@ public class Enemy : BaseEntity
     {
         _isFrozen = true;
         if (_rb != null) _rb.linearVelocity = Vector2.zero;
-        if (_spriteRenderer != null) _spriteRenderer.color = FreezeColor;
+        RefreshStatusColor();
 
         yield return new WaitForSeconds(duration);
 
         _isFrozen = false;
         _freezeCoroutine = null;
-        if (_spriteRenderer != null)
-            _spriteRenderer.color = GetCurrentStatusColor();
+        RefreshStatusColor();
     }
 
     public void ApplyFireDoT(float duration, float dps)
@@ -617,10 +617,55 @@ public class Enemy : BaseEntity
         return _originalColor;
     }
 
+    private void RefreshStatusColor()
+    {
+        bool allThree = _isFrozen && _isOnFire && _isPoisoned;
+        if (allThree)
+        {
+            if (_colorCycleCoroutine == null)
+                _colorCycleCoroutine = StartCoroutine(TripleStatusColorCycle());
+        }
+        else
+        {
+            if (_colorCycleCoroutine != null)
+            {
+                StopCoroutine(_colorCycleCoroutine);
+                _colorCycleCoroutine = null;
+            }
+            if (_spriteRenderer != null)
+                _spriteRenderer.color = GetCurrentStatusColor();
+        }
+    }
+
+    private IEnumerator TripleStatusColorCycle()
+    {
+        Color[] colors = { FreezeColor, FireColor, PoisonColor };
+        float stepDuration = 0.35f;
+        int index = 0;
+
+        while (_isFrozen && _isOnFire && _isPoisoned)
+        {
+            Color from = colors[index % 3];
+            Color to   = colors[(index + 1) % 3];
+            float elapsed = 0f;
+            while (elapsed < stepDuration && _isFrozen && _isOnFire && _isPoisoned)
+            {
+                elapsed += Time.deltaTime;
+                if (_spriteRenderer != null)
+                    _spriteRenderer.color = Color.Lerp(from, to, elapsed / stepDuration);
+                yield return null;
+            }
+            index++;
+        }
+
+        _colorCycleCoroutine = null;
+        RefreshStatusColor();
+    }
+
     private IEnumerator FireDoTRoutine(float duration, float dps)
     {
         _isOnFire = true;
-        if (_spriteRenderer != null) _spriteRenderer.color = FireColor;
+        RefreshStatusColor();
 
         float elapsed = 0f;
         float tickInterval = 0.5f;
@@ -636,15 +681,13 @@ public class Enemy : BaseEntity
 
         _isOnFire = false;
         _fireCoroutine = null;
-        if (_spriteRenderer != null)
-            _spriteRenderer.color = GetCurrentStatusColor();
+        RefreshStatusColor();
     }
 
     private IEnumerator PoisonDoTRoutine(float duration, float dps)
     {
         _isPoisoned = true;
-        if (_spriteRenderer != null && !_isOnFire)
-            _spriteRenderer.color = PoisonColor;
+        RefreshStatusColor();
 
         float elapsed = 0f;
         float tickInterval = 1f;
@@ -660,15 +703,14 @@ public class Enemy : BaseEntity
 
         _isPoisoned = false;
         _poisonCoroutine = null;
-        if (_spriteRenderer != null)
-            _spriteRenderer.color = GetCurrentStatusColor();
+        RefreshStatusColor();
     }
 
     private IEnumerator HitFlashRoutine()
     {
         _spriteRenderer.color = flashColor;
         yield return new WaitForSeconds(0.1f);
-        _spriteRenderer.color = GetCurrentStatusColor();
+        RefreshStatusColor();
     }
 
     private IEnumerator KnockbackRoutine(float force) {
@@ -727,9 +769,10 @@ public class Enemy : BaseEntity
         _isFrozen   = false;
         _isOnFire   = false;
         _isPoisoned = false;
-        if (_fireCoroutine   != null) { StopCoroutine(_fireCoroutine);   _fireCoroutine   = null; }
-        if (_poisonCoroutine != null) { StopCoroutine(_poisonCoroutine); _poisonCoroutine = null; }
-        if (_freezeCoroutine != null) { StopCoroutine(_freezeCoroutine); _freezeCoroutine = null; }
+        if (_fireCoroutine        != null) { StopCoroutine(_fireCoroutine);        _fireCoroutine        = null; }
+        if (_poisonCoroutine     != null) { StopCoroutine(_poisonCoroutine);     _poisonCoroutine     = null; }
+        if (_freezeCoroutine     != null) { StopCoroutine(_freezeCoroutine);     _freezeCoroutine     = null; }
+        if (_colorCycleCoroutine != null) { StopCoroutine(_colorCycleCoroutine); _colorCycleCoroutine = null; }
         if (cd != null) cd.enabled = true;
         if (_rb != null) _rb.linearVelocity = Vector2.zero;
         if (stats != null) _currentHealth = stats.maxHealth;

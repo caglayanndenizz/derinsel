@@ -11,7 +11,7 @@ public class Player : BaseEntity, IPlayerContext
     public DungeonGenerator generator;
 
     [Header("Hammer Settings (Heavy)")]
-    public float maxChargeTime = 0.5f;
+    public float maxChargeTime = 1.5f;
     public float hammerAOE = 2.5f;
     public float hammerCooldown = 3f;
     [SerializeField] private float heavyImpactFallbackDelay = 0.2f;
@@ -505,6 +505,7 @@ public class Player : BaseEntity, IPlayerContext
         float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;
         float useSpeed = arrowSpeed * arrowSpdMult;
         float useDamage = lightDamage * dmgMult;
+        bool chargedExplosion = playerAugmentController != null && playerAugmentController.HasChargedBowAoe;
 
         Vector2 radialOrigin = transform.position;
         float targetDistance = Mathf.Max(0.5f, radialBowAutoVolleyTravelDistance);
@@ -517,7 +518,7 @@ public class Player : BaseEntity, IPlayerContext
             float forward = Mathf.Max(0f, radialBowSpawnInset);
             Vector2 spawnPos = radialOrigin + radialDir * forward;
             Vector2 shotTarget = radialOrigin + radialDir * Mathf.Max(forward + 0.3f, targetDistance);
-            TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, useDamage, false);
+            TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, useDamage, chargedExplosion);
         }
     }
 
