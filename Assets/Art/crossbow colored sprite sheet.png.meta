@@ -1,0 +1,1339 @@
+fileFormatVersion: 2
+guid: aee5ab46ebc464d50b3273ab53e59d15
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6156904555856570030
+    second: crossbow colored sprite sheet_0
+  - first:
+      213: 6358239421758904635
+    second: crossbow colored sprite sheet_1
+  - first:
+      213: -6798357595142608830
+    second: crossbow colored sprite sheet_2
+  - first:
+      213: 5449198293904214947
+    second: crossbow colored sprite sheet_3
+  - first:
+      213: 4103447178685992099
+    second: crossbow colored sprite sheet_4
+  - first:
+      213: 2940331517435984788
+    second: crossbow colored sprite sheet_5
+  - first:
+      213: 3624734725494610036
+    second: crossbow colored sprite sheet_6
+  - first:
+      213: -3442782112374906091
+    second: crossbow colored sprite sheet_7
+  - first:
+      213: -1780327999439652868
+    second: crossbow colored sprite sheet_8
+  - first:
+      213: -6289874054666305610
+    second: crossbow colored sprite sheet_9
+  - first:
+      213: -5654447467317813961
+    second: crossbow colored sprite sheet_10
+  - first:
+      213: 820694643490551924
+    second: crossbow colored sprite sheet_11
+  - first:
+      213: 3794712435848772207
+    second: crossbow colored sprite sheet_12
+  - first:
+      213: 3013515091806034502
+    second: crossbow colored sprite sheet_13
+  - first:
+      213: -7164220026385340117
+    second: crossbow colored sprite sheet_14
+  - first:
+      213: 3415414806049357282
+    second: crossbow colored sprite sheet_15
+  - first:
+      213: 4811560713991805193
+    second: crossbow colored sprite sheet_16
+  - first:
+      213: 4185773204531824067
+    second: crossbow colored sprite sheet_17
+  - first:
+      213: -5120357287276726645
+    second: crossbow colored sprite sheet_18
+  - first:
+      213: 637764607513056634
+    second: crossbow colored sprite sheet_19
+  - first:
+      213: 4440068522749745703
+    second: crossbow colored sprite sheet_20
+  - first:
+      213: -3229014932995005182
+    second: crossbow colored sprite sheet_21
+  - first:
+      213: 3868064930001713770
+    second: crossbow colored sprite sheet_22
+  - first:
+      213: 6856677338326794583
+    second: crossbow colored sprite sheet_23
+  - first:
+      213: -3198405498607523731
+    second: crossbow colored sprite sheet_24
+  - first:
+      213: 7191318919615693981
+    second: crossbow colored sprite sheet_25
+  - first:
+      213: -3986203924758093098
+    second: crossbow colored sprite sheet_26
+  - first:
+      213: -1545854350892753725
+    second: crossbow colored sprite sheet_27
+  - first:
+      213: 2587118190459223798
+    second: crossbow colored sprite sheet_28
+  - first:
+      213: -5229266793213419585
+    second: crossbow colored sprite sheet_29
+  - first:
+      213: -7048129072104400712
+    second: crossbow colored sprite sheet_30
+  - first:
+      213: -5803036043093427233
+    second: crossbow colored sprite sheet_31
+  - first:
+      213: 5253571271882117991
+    second: crossbow colored sprite sheet_32
+  - first:
+      213: -2547009221574075310
+    second: crossbow colored sprite sheet_33
+  - first:
+      213: 8831238417470615413
+    second: crossbow colored sprite sheet_34
+  - first:
+      213: -8023342185659980171
+    second: crossbow colored sprite sheet_35
+  - first:
+      213: 1453170050146563617
+    second: crossbow colored sprite sheet_36
+  - first:
+      213: 5808714283842064507
+    second: crossbow colored sprite sheet_37
+  - first:
+      213: 6618042307080296487
+    second: crossbow colored sprite sheet_38
+  - first:
+      213: -4056940964046335758
+    second: crossbow colored sprite sheet_39
+  - first:
+      213: -5871073501306061694
+    second: crossbow colored sprite sheet_40
+  - first:
+      213: -6821896481473325636
+    second: crossbow colored sprite sheet_41
+  - first:
+      213: 574830463579371259
+    second: crossbow colored sprite sheet_42
+  - first:
+      213: -7833670140185105078
+    second: crossbow colored sprite sheet_43
+  - first:
+      213: -1364653759449738168
+    second: crossbow colored sprite sheet_44
+  - first:
+      213: -6273674709046148603
+    second: crossbow colored sprite sheet_45
+  - first:
+      213: -6905330158846523295
+    second: crossbow colored sprite sheet_46
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_0
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 839
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea6a0d7a218b17550800000000000000
+      internalID: 6156904555856570030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_1
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 839
+        width: 17
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3913d211110d3850800000000000000
+      internalID: 6358239421758904635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_2
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 775
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 248227559c167a1a0800000000000000
+      internalID: -6798357595142608830
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_3
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 775
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ab43da2af07f9b40800000000000000
+      internalID: 5449198293904214947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_4
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 711
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ac4820d77f52f830800000000000000
+      internalID: 4103447178685992099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_5
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 711
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49b38a2cfe72ec820800000000000000
+      internalID: 2940331517435984788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_6
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 711
+        width: 20
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47811263705ad4230800000000000000
+      internalID: 3624734725494610036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_7
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 711
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51323d0d8e7c830d0800000000000000
+      internalID: -3442782112374906091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_8
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 647
+        width: 20
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf7b7b9fd110b47e0800000000000000
+      internalID: -1780327999439652868
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_9
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 644
+        width: 21
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bf3ba95fd0e5b8a0800000000000000
+      internalID: -6289874054666305610
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_10
+      rect:
+        serializedVersion: 2
+        x: 156
+        y: 644
+        width: 21
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73d1a6dacfd5781b0800000000000000
+      internalID: -5654447467317813961
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_11
+      rect:
+        serializedVersion: 2
+        x: 219
+        y: 644
+        width: 22
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 478f1561e61b36b00800000000000000
+      internalID: 820694643490551924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_12
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 583
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6af58bead689a430800000000000000
+      internalID: 3794712435848772207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_13
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 583
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64a906c720822d920800000000000000
+      internalID: 3013515091806034502
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_14
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 518
+        width: 20
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b29ef8af7d3939c90800000000000000
+      internalID: -7164220026385340117
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_15
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 519
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ed7e23abadf56f20800000000000000
+      internalID: 3415414806049357282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_16
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 519
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 909d4b40af816c240800000000000000
+      internalID: 4811560713991805193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_17
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 455
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c5c7766d8ad61a30800000000000000
+      internalID: 4185773204531824067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_18
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 455
+        width: 18
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b86b9c01d26d0f8b0800000000000000
+      internalID: -5120357287276726645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_19
+      rect:
+        serializedVersion: 2
+        x: 153
+        y: 455
+        width: 18
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a75d121188bc9d800800000000000000
+      internalID: 637764607513056634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_20
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 391
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72a54e40cca4e9d30800000000000000
+      internalID: 4440068522749745703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_21
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 391
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 205a668c60c3033d0800000000000000
+      internalID: -3229014932995005182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_22
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 391
+        width: 21
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6af5e85f802ea530800000000000000
+      internalID: 3868064930001713770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_23
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 327
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 751807206bfc72f50800000000000000
+      internalID: 6856677338326794583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_24
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 327
+        width: 18
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d68a7d7152bfc93d0800000000000000
+      internalID: -3198405498607523731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_25
+      rect:
+        serializedVersion: 2
+        x: 153
+        y: 327
+        width: 20
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d944d36c472bcc360800000000000000
+      internalID: 7191318919615693981
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_26
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 326
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d2a68676a82ea8c0800000000000000
+      internalID: -3986203924758093098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_27
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 263
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3cc9b8c78a50c8ae0800000000000000
+      internalID: -1545854350892753725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_28
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 263
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fef54e794a47e320800000000000000
+      internalID: 2587118190459223798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_29
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 263
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbf94c2be89ed67b0800000000000000
+      internalID: -5229266793213419585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_30
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 263
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b81d1693f3003e90800000000000000
+      internalID: -7048129072104400712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_31
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 199
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fdbb0a0f679777fa0800000000000000
+      internalID: -5803036043093427233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_32
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 199
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7631bb6bc3f68e840800000000000000
+      internalID: 5253571271882117991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_33
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 135
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25cde6c8b9437acd0800000000000000
+      internalID: -2547009221574075310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_34
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 135
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57f6e100d8cde8a70800000000000000
+      internalID: 8831238417470615413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_35
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 71
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 576a458aacc57a090800000000000000
+      internalID: -8023342185659980171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_36
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 71
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 126f83d1672ba2410800000000000000
+      internalID: 1453170050146563617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_37
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 71
+        width: 18
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b70d4228dd2bc9050800000000000000
+      internalID: 5808714283842064507
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_38
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 7
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72817061a6208db50800000000000000
+      internalID: 6618042307080296487
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_39
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 7
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f0994310b9d2b7c0800000000000000
+      internalID: -4056940964046335758
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_40
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 9
+        width: 23
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28c7170c1c1c58ea0800000000000000
+      internalID: -5871073501306061694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_41
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 11
+        width: 24
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb59b474b41c351a0800000000000000
+      internalID: -6821896481473325636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_42
+      rect:
+        serializedVersion: 2
+        x: 285
+        y: 7
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf6b8b3d2453af700800000000000000
+      internalID: 574830463579371259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_43
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 7
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4daea61386394390800000000000000
+      internalID: -7833670140185105078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_44
+      rect:
+        serializedVersion: 2
+        x: 409
+        y: 7
+        width: 15
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 844d892d2a6cf0de0800000000000000
+      internalID: -1364653759449738168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_45
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 7
+        width: 21
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 502c3fa671e6fe8a0800000000000000
+      internalID: -6273674709046148603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: crossbow colored sprite sheet_46
+      rect:
+        serializedVersion: 2
+        x: 535
+        y: 7
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16849297ec65b20a0800000000000000
+      internalID: -6905330158846523295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      crossbow colored sprite sheet_0: 6156904555856570030
+      crossbow colored sprite sheet_1: 6358239421758904635
+      crossbow colored sprite sheet_10: -5654447467317813961
+      crossbow colored sprite sheet_11: 820694643490551924
+      crossbow colored sprite sheet_12: 3794712435848772207
+      crossbow colored sprite sheet_13: 3013515091806034502
+      crossbow colored sprite sheet_14: -7164220026385340117
+      crossbow colored sprite sheet_15: 3415414806049357282
+      crossbow colored sprite sheet_16: 4811560713991805193
+      crossbow colored sprite sheet_17: 4185773204531824067
+      crossbow colored sprite sheet_18: -5120357287276726645
+      crossbow colored sprite sheet_19: 637764607513056634
+      crossbow colored sprite sheet_2: -6798357595142608830
+      crossbow colored sprite sheet_20: 4440068522749745703
+      crossbow colored sprite sheet_21: -3229014932995005182
+      crossbow colored sprite sheet_22: 3868064930001713770
+      crossbow colored sprite sheet_23: 6856677338326794583
+      crossbow colored sprite sheet_24: -3198405498607523731
+      crossbow colored sprite sheet_25: 7191318919615693981
+      crossbow colored sprite sheet_26: -3986203924758093098
+      crossbow colored sprite sheet_27: -1545854350892753725
+      crossbow colored sprite sheet_28: 2587118190459223798
+      crossbow colored sprite sheet_29: -5229266793213419585
+      crossbow colored sprite sheet_3: 5449198293904214947
+      crossbow colored sprite sheet_30: -7048129072104400712
+      crossbow colored sprite sheet_31: -5803036043093427233
+      crossbow colored sprite sheet_32: 5253571271882117991
+      crossbow colored sprite sheet_33: -2547009221574075310
+      crossbow colored sprite sheet_34: 8831238417470615413
+      crossbow colored sprite sheet_35: -8023342185659980171
+      crossbow colored sprite sheet_36: 1453170050146563617
+      crossbow colored sprite sheet_37: 5808714283842064507
+      crossbow colored sprite sheet_38: 6618042307080296487
+      crossbow colored sprite sheet_39: -4056940964046335758
+      crossbow colored sprite sheet_4: 4103447178685992099
+      crossbow colored sprite sheet_40: -5871073501306061694
+      crossbow colored sprite sheet_41: -6821896481473325636
+      crossbow colored sprite sheet_42: 574830463579371259
+      crossbow colored sprite sheet_43: -7833670140185105078
+      crossbow colored sprite sheet_44: -1364653759449738168
+      crossbow colored sprite sheet_45: -6273674709046148603
+      crossbow colored sprite sheet_46: -6905330158846523295
+      crossbow colored sprite sheet_5: 2940331517435984788
+      crossbow colored sprite sheet_6: 3624734725494610036
+      crossbow colored sprite sheet_7: -3442782112374906091
+      crossbow colored sprite sheet_8: -1780327999439652868
+      crossbow colored sprite sheet_9: -6289874054666305610
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
