@@ -6,6 +6,7 @@ public class PlayerAugmentController : MonoBehaviour
 {
     // ── Cevher Sistemi ────────────────────────────────────────────────────────
 
+    public const int CevherKomurThreshold    = 1;
     public const int CevherAltinThreshold    = 2;
     public const int CevherElmasThreshold    = 4;
     public const int CevherObsidyenThreshold = 6;
@@ -67,10 +68,10 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float outgoingDamageMultiplier       = 1f;
     [SerializeField] private float maxHealthMultiplier            = 1f;
 
-    [Header("Motor / hızlı test")]
+    [Header("MutationAugmentsBow")]
     [SerializeField]
-    [Tooltip("Play modunda işaretle: Obsidyen kademesine ulaşmadan mutasyon açılmış gider.")]
-    private bool cheatForceRadialArrowMutation;
+    [Tooltip("İşaretlenince 6 bow augment varmış gibi Obsidyen mutasyonu tetiklenir (test).")]
+    private bool mutationAugmentsBow;
 
     [Header("Motor test (Play Mode'da güncellenir)")]
     [SerializeField] private int      bowCevherCountMotor;
@@ -139,7 +140,7 @@ public class PlayerAugmentController : MonoBehaviour
     }
 
     public bool HasRadialBowMutationUnlock =>
-        cheatForceRadialArrowMutation || BowCevherTier == CevherTier.Obsidyen;
+        mutationAugmentsBow || BowCevherTier == CevherTier.Obsidyen;
 
     public bool MutatedArrowShots => HasRadialBowMutationUnlock;
 
