@@ -71,6 +71,9 @@ public class PlayerAugmentController : MonoBehaviour
 
     [Header("Crossbow Bolt Bleed")]
     [SerializeField] private bool  hasCrossbowBoltBleed;
+
+    [Header("Crossbow Grapple Hook")]
+    [SerializeField] private bool  hasCrossbowGrappleBolt;
     [Tooltip("Her stack'in bolt hasarına oranı (0.01 = %1). Max stack'te toplam hasar = maxStacks * oran.")]
     [SerializeField] private float crossbowBleedDamageRatioPerStack = 0.01f;
     [Tooltip("Maksimum stack sayısı (varsayılan 5 → toplam %5).")]
@@ -119,6 +122,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float CrossbowBleedDamageRatioPerStack => Mathf.Max(0f, crossbowBleedDamageRatioPerStack);
     public int   CrossbowBleedMaxStacks          => Mathf.Max(1, crossbowBleedMaxStacks);
     public float CrossbowBleedExpireSeconds      => Mathf.Max(0f, crossbowBleedExpireSeconds);
+    public bool  HasCrossbowGrappleBolt          => hasCrossbowGrappleBolt;
 
     public int ArrowShotMultiplier => Mathf.Max(
         1,
@@ -370,6 +374,9 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.CrossbowBoltBleed:
                 hasCrossbowBoltBleed = true;
                 break;
+            case AugmentId.CrossbowGrappleBolt:
+                hasCrossbowGrappleBolt = true;
+                break;
         }
 
         _appliedAugmentCounts[augment.id] = GetAppliedCount(augment.id) + 1;
@@ -410,6 +417,7 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.PoisonArrowUnlock:
             case AugmentId.CrossbowBoltPierce:
             case AugmentId.CrossbowBoltBleed:
+            case AugmentId.CrossbowGrappleBolt:
                 return true;
             default:
                 return false;

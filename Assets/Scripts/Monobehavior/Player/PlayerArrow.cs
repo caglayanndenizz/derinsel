@@ -13,6 +13,7 @@ public class PlayerArrow : MonoBehaviour
     float _maxLifetime;
     float _spawnTime;
     bool _initialized;
+    bool _wasVisibleSinceSpawn;
     LayerMask _enemyMask;
     bool _fullyChargedLongbowExplosion;
     float _explosionRadius;
@@ -33,6 +34,10 @@ public class PlayerArrow : MonoBehaviour
         foreach (var col in GetComponentsInChildren<Collider2D>(true))
             col.isTrigger = true;
     }
+
+    void OnEnable()  => _wasVisibleSinceSpawn = false;
+    void OnBecameVisible()   { _wasVisibleSinceSpawn = true; }
+    void OnBecameInvisible() { if (_initialized && _wasVisibleSinceSpawn) ReturnToPool(); }
 
     public void Initialize(
         Vector2 targetWorldPosition,
@@ -70,17 +75,20 @@ public class PlayerArrow : MonoBehaviour
         _dungeonGenerator  = dungeonGenerator;
         _hitCameraImpulse = hitCameraImpulse;
 
+        _initialized = false;
+
         Vector2 origin = transform.position;
         Vector2 to = targetWorldPosition - origin;
         if (to.sqrMagnitude < 0.0001f)
         {
-            Destroy(gameObject);
+            ReturnToPool();
             return;
         }
 
         _direction = to.normalized;
         float angle = Mathf.Atan2(_direction.y, _direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        _wasVisibleSinceSpawn = true;
         _initialized = true;
         _previousFramePosition = transform.position;
 
@@ -108,7 +116,7 @@ public class PlayerArrow : MonoBehaviour
 
         if (Time.time - _spawnTime >= _maxLifetime)
         {
-            Destroy(gameObject);
+            ReturnToPool();
             return;
         }
 
@@ -131,7 +139,7 @@ public class PlayerArrow : MonoBehaviour
             else
                 TryApplyDirectArrowDamage(hit.collider);
 
-            Destroy(gameObject);
+            ReturnToPool();
             return;
         }
 
@@ -191,6 +199,15 @@ public class PlayerArrow : MonoBehaviour
             if (_hasFireArrow   && _fireDotDps   > 0f) enemy.ApplyFireDoT(_fireDotDuration, _fireDotDps);
             if (_hasPoisonArrow && _poisonDotDps > 0f) enemy.ApplyPoisonDoT(_poisonDotDuration, _poisonDotDps);
         }
+    }
+
+    void ReturnToPool()
+    {
+        _initialized = false;
+        if (PlayerArrowPooler.Instance != null)
+            PlayerArrowPooler.Instance.ReturnArrow(gameObject);
+        else
+            Destroy(gameObject);
     }
 
     static float GetLethalDamageForTarget(IDamageable target)

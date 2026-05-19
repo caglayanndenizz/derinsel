@@ -13,6 +13,7 @@ public class PlayerBolt : MonoBehaviour
     float     _maxLifetime;
     float     _spawnTime;
     bool      _initialized;
+    bool      _wasVisibleSinceSpawn;
     LayerMask _enemyMask;
 
     bool  _hasPierce;
@@ -34,6 +35,10 @@ public class PlayerBolt : MonoBehaviour
         foreach (var col in GetComponentsInChildren<Collider2D>(true))
             col.isTrigger = true;
     }
+
+    void OnEnable()  => _wasVisibleSinceSpawn = false;
+    void OnBecameVisible()   { _wasVisibleSinceSpawn = true; }
+    void OnBecameInvisible() { if (_initialized && _wasVisibleSinceSpawn) ReturnToPool(); }
 
     public void Initialize(
         Vector2   targetWorldPosition,
@@ -75,6 +80,7 @@ public class PlayerBolt : MonoBehaviour
         _direction = to.normalized;
         float angle = Mathf.Atan2(_direction.y, _direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle + spriteRotationOffset);
+        _wasVisibleSinceSpawn = true;
         _initialized = true;
         _previousFramePosition = transform.position;
 
@@ -160,8 +166,8 @@ public class PlayerBolt : MonoBehaviour
     void ReturnToPool()
     {
         _initialized = false;
-        if (CrossbowBoltPooler.Instance != null)
-            CrossbowBoltPooler.Instance.ReturnBolt(gameObject);
+        if (PlayerArrowPooler.Instance != null)
+            PlayerArrowPooler.Instance.ReturnBolt(gameObject);
         else
             Destroy(gameObject);
     }

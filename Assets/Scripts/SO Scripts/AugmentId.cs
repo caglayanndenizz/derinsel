@@ -55,6 +55,7 @@ public enum AugmentId
     HalfHealthBonusDamage = 54,
     FireArrowUnlock = 55,
     PoisonArrowUnlock = 56,
-    CrossbowBoltPierce = 57,
-    CrossbowBoltBleed  = 58,
+    CrossbowBoltPierce     = 57,
+    CrossbowBoltBleed      = 58,
+    CrossbowGrappleBolt    = 59,
 }

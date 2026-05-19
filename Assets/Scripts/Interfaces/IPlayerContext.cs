@@ -40,9 +40,16 @@ public interface IPlayerContext
     bool LightAttackInProgress { get; set; }
     float LightFallbackExecuteAt { get; set; }
 
+    // Rigidbody (required by GrappleSwingState)
+    Rigidbody2D Rb { get; }
+
     // Methods
     void ScheduleLongbowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput);
     void ScheduleCrossbowBolt(float damage, Vector2 aimWorldAtFireInput);
     Vector2 GetLongbowAimWorldPointAtCurrentMouse();
     void TriggerHeavyAttack();
+
+    // Grapple hook
+    void SpawnGrappleBolt(Vector2 aimWorldPoint);
+    void EnterGrappleSwing(Vector2 anchorPoint, float ropeLength, GrappleBolt bolt);
 }

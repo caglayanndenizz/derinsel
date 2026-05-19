@@ -535,6 +535,7 @@ Transform:
   - {fileID: 1679956770}
   - {fileID: 1730437412}
   - {fileID: 562320327}
+  - {fileID: 2005061928}
   m_Father: {fileID: 1295312150}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &286397888
@@ -5101,63 +5102,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 945801766}
   m_CullTransparentMesh: 1
---- !u!1001 &977212426
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 5542564570128086864, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.70277
-      objectReference: {fileID: 0}
-    - target: {fileID: 5542564570128086864, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -2.3973
-      objectReference: {fileID: 0}
-    - target: {fileID: 5542564570128086864, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5542564570128086864, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5542564570128086864, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5542564570128086864, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5542564570128086864, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5542564570128086864, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5542564570128086864, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5542564570128086864, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7915370314391698887, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-      propertyPath: m_Name
-      value: Arrow
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
 --- !u!1 &984786565
 GameObject:
   m_ObjectHideFlags: 0
@@ -6908,63 +6852,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1295312150}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1457465715
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2482262364273775424, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-      propertyPath: m_Name
-      value: Bolt
-      objectReference: {fileID: 0}
-    - target: {fileID: 5658671914849279088, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.70277
-      objectReference: {fileID: 0}
-    - target: {fileID: 5658671914849279088, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -2.3973
-      objectReference: {fileID: 0}
-    - target: {fileID: 5658671914849279088, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5658671914849279088, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5658671914849279088, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5658671914849279088, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5658671914849279088, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5658671914849279088, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5658671914849279088, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5658671914849279088, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
 --- !u!1 &1474071074
 GameObject:
   m_ObjectHideFlags: 0
@@ -7970,6 +7857,7 @@ MonoBehaviour:
   crossbowPierceDamageFloor: 0.3
   crossbowPierceFalloffCount: 3
   hasCrossbowBoltBleed: 0
+  hasCrossbowGrappleBolt: 0
   crossbowBleedDamageRatioPerStack: 0.01
   crossbowBleedMaxStacks: 5
   crossbowBleedExpireSeconds: 5
@@ -7977,7 +7865,7 @@ MonoBehaviour:
   arrowProjectileSpeedMultiplier: 1
   outgoingDamageMultiplier: 1
   maxHealthMultiplier: 1
-  mutationAugmentsLongbow: 1
+  mutationAugmentsLongbow: 0
   longbowCevherCountMotor: 0
   longbowCevherTierMotor: 
 --- !u!114 &1700128204
@@ -8231,6 +8119,58 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &2005061927
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2005061928}
+  - component: {fileID: 2005061929}
+  m_Layer: 0
+  m_Name: ArrowPooler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2005061928
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005061927}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 273267496}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2005061929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005061927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cf4c82b9cf6044b18bdb6882045bd36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerArrowPooler
+  arrowPrefab: {fileID: 7915370314391698887, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
+  arrowPoolSize: 80
+  boltPrefab: {fileID: 2482262364273775424, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
+  boltPoolSize: 40
+  canExpandPool: 1
+  overflowBatchSize: 20
+  overflowTTL: 10
+  poolParent: {fileID: 273267496}
 --- !u!1 &2015469570
 GameObject:
   m_ObjectHideFlags: 0
@@ -9417,6 +9357,10 @@ PrefabInstance:
       value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: grappleBoltPrefab
+      value: 
+      objectReference: {fileID: 2411174373936254785, guid: 03501f1792e2a4d3493b51a3cd1c991e, type: 3}
+    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: hammerCooldownBar
       value: 
       objectReference: {fileID: 456458915}
@@ -9526,5 +9470,3 @@ SceneRoots:
   - {fileID: 1134197084}
   - {fileID: 2137899507}
   - {fileID: 214915947830347461}
-  - {fileID: 1457465715}
-  - {fileID: 977212426}

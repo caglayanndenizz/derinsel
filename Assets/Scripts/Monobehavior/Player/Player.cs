@@ -37,6 +37,8 @@ public class Player : BaseEntity, IPlayerContext
     [Header("─── CROSSBOW ───────────────────────────")]
     [Tooltip("Crossbow bolt prefab (PlayerBolt component'i olmali).")]
     public GameObject crossbowBoltPrefab;
+    [Tooltip("Grapple hook bolt prefab (GrappleBolt component'i olmali).")]
+    public GameObject grappleBoltPrefab;
 
     [Header("Crossbow — Atış")]
     [Tooltip("Iki atis arasindaki sure (saniye). Animasyon suresiyle esit tutulmasi onerilir.")]
@@ -187,6 +189,14 @@ public class Player : BaseEntity, IPlayerContext
 
     void IPlayerContext.TriggerHeavyAttack()
         => TriggerHeavyAttack();
+
+    Rigidbody2D IPlayerContext.Rb => _rb;
+
+    void IPlayerContext.SpawnGrappleBolt(Vector2 aimWorldPoint)
+        => SpawnGrappleBolt(aimWorldPoint);
+
+    void IPlayerContext.EnterGrappleSwing(Vector2 anchorPoint, float ropeLength, GrappleBolt bolt)
+        => SetState(new GrappleSwingState(anchorPoint, ropeLength, bolt));
 
     // ─── MaxHealth ────────────────────────────────────────────────────────────
 
@@ -562,18 +572,20 @@ public class Player : BaseEntity, IPlayerContext
         float useDamage,
         bool chargedExplosionEnabled)
     {
-        if (arrowPrefab == null) return;
-
         float explosionRadius = chargedExplosionEnabled && playerAugmentController != null
             ? playerAugmentController.ChargedLongbowAoeRadius
             : 0f;
 
-        GameObject arrow = Instantiate(arrowPrefab, spawnWorldPosition, Quaternion.identity);
-        PlayerArrow mover = arrow.GetComponent<PlayerArrow>();
+        PlayerArrow mover = null;
+        if (PlayerArrowPooler.Instance != null)
+            PlayerArrowPooler.Instance.GetArrow(spawnWorldPosition, Quaternion.identity, a => mover = a);
+
         if (mover == null)
         {
-            Destroy(arrow);
-            return;
+            if (arrowPrefab == null) return;
+            GameObject go = Instantiate(arrowPrefab, spawnWorldPosition, Quaternion.identity);
+            mover = go.GetComponent<PlayerArrow>();
+            if (mover == null) { Destroy(go); return; }
         }
 
         mover.Initialize(
@@ -641,8 +653,8 @@ public class Player : BaseEntity, IPlayerContext
         if (offset.sqrMagnitude < 0.0001f) offset = Vector2.right * 0.01f;
 
         PlayerBolt bolt = null;
-        if (CrossbowBoltPooler.Instance != null)
-            CrossbowBoltPooler.Instance.GetBolt(origin, Quaternion.identity, b => bolt = b);
+        if (PlayerArrowPooler.Instance != null)
+            PlayerArrowPooler.Instance.GetBolt(origin, Quaternion.identity, b => bolt = b);
 
         if (bolt == null && crossbowBoltPrefab != null)
         {
@@ -669,6 +681,20 @@ public class Player : BaseEntity, IPlayerContext
             bleedMaxStacks:           aug != null ? aug.CrossbowBleedMaxStacks          : 5,
             bleedExpireSeconds:       aug != null ? aug.CrossbowBleedExpireSeconds      : 5f
         );
+    }
+
+    private void SpawnGrappleBolt(Vector2 aimWorld)
+    {
+        if (grappleBoltPrefab == null || attackPoint == null) return;
+
+        Vector2 origin = attackPoint.position;
+        if ((aimWorld - origin).sqrMagnitude < 0.0001f) return;
+
+        GameObject go = Instantiate(grappleBoltPrefab, origin, Quaternion.identity);
+        GrappleBolt bolt = go.GetComponent<GrappleBolt>();
+        if (bolt == null) { Destroy(go); return; }
+
+        bolt.Initialize(aimWorld, transform, this, enemyLayers);
     }
 
     // ─── Dash ────────────────────────────────────────────────────────────────
