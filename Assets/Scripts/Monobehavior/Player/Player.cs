@@ -34,18 +34,22 @@ public class Player : BaseEntity, IPlayerContext
     [Tooltip("Boşsa yay şarj UI kanvası açılmaz.")]
     public GameObject longbowMeterCanvas;
 
-    [Header("Crossbow / Bolt")]
-    [Tooltip("Bolt hızı = arrowSpeed * bu çarpan.")]
-    public float crossbowBoltSpeedMultiplier = 2f;
-    [Tooltip("Bolt hasarı = lightAttackDamage * bu çarpan.")]
-    public float crossbowBoltDamageMultiplier = 2f;
-    [Tooltip("Crossbow ateş aralığı (saniye). Longbow'dan (lightAttackRate) daha kısa tutulur.")]
-    public float crossbowAttackRate = 0.1f;
-    [Tooltip("Bolt instantiate gecikme süresi (saniye).")]
-    public float crossbowBoltReleaseDelay = 0.05f;
-    [Tooltip("Üzerinde CrossbowBolt bileşeni olan bolt prefabı.")]
+    [Header("─── CROSSBOW ───────────────────────────")]
+    [Tooltip("Crossbow bolt prefab (PlayerBolt component'i olmali).")]
     public GameObject crossbowBoltPrefab;
-    [Tooltip("Bolt maksimum hayat süresi (saniye).")]
+
+    [Header("Crossbow — Atış")]
+    [Tooltip("Iki atis arasindaki sure (saniye). Animasyon suresiyle esit tutulmasi onerilir.")]
+    public float crossbowAttackRate = 0.5f;
+    [Tooltip("Trigger'dan bolt spawn'a kadar gecen sure (saniye). Genellikle: animasyonSuresi - 0.2")]
+    public float crossbowBoltReleaseDelay = 0.3f;
+
+    [Header("Crossbow — Bolt İstatistikleri")]
+    [Tooltip("Bolt hizi = arrowSpeed x bu carpan.")]
+    public float crossbowBoltSpeedMultiplier = 2f;
+    [Tooltip("Bolt hasari = lightAttackDamage x bu carpan.")]
+    public float crossbowBoltDamageMultiplier = 2f;
+    [Tooltip("Bolt sahnede kaldigi maksimum sure (saniye).")]
     public float crossbowBoltMaxLifetime = 5f;
 
     [Header("Longbow radial mutation (auto)")]
@@ -625,10 +629,9 @@ public class Player : BaseEntity, IPlayerContext
 
     private void SpawnCrossbowBolt(float damage, Vector2 aimWorld)
     {
-        if (crossbowBoltPrefab == null || attackPoint == null) return;
+        if (attackPoint == null) return;
 
         PlayerAugmentController aug = playerAugmentController;
-        // Sadece genel çarpan (glass cannon vb.) uygulanır — longbow augmentleri uygulanmaz.
         float dmgMult   = aug != null ? aug.OutgoingDamageMultiplier : 1f;
         float useSpeed  = arrowSpeed * crossbowBoltSpeedMultiplier;
         float useDamage = damage * dmgMult;
@@ -637,9 +640,18 @@ public class Player : BaseEntity, IPlayerContext
         Vector2 offset = aimWorld - origin;
         if (offset.sqrMagnitude < 0.0001f) offset = Vector2.right * 0.01f;
 
-        GameObject boltGO = Instantiate(crossbowBoltPrefab, origin, Quaternion.identity);
-        CrossbowBolt bolt = boltGO.GetComponent<CrossbowBolt>();
-        if (bolt == null) { Destroy(boltGO); return; }
+        PlayerBolt bolt = null;
+        if (CrossbowBoltPooler.Instance != null)
+            CrossbowBoltPooler.Instance.GetBolt(origin, Quaternion.identity, b => bolt = b);
+
+        if (bolt == null && crossbowBoltPrefab != null)
+        {
+            GameObject boltGO = Instantiate(crossbowBoltPrefab, origin, Quaternion.identity);
+            bolt = boltGO.GetComponent<PlayerBolt>();
+            if (bolt == null) { Destroy(boltGO); return; }
+        }
+
+        if (bolt == null) return;
 
         bolt.Initialize(
             aimWorld,
@@ -652,13 +664,6 @@ public class Player : BaseEntity, IPlayerContext
             pierceFalloff:            aug != null ? aug.CrossbowPierceDamageFalloff    : 0.20f,
             pierceFloor:              aug != null ? aug.CrossbowPierceDamageFloor      : 0.30f,
             pierceFalloffCount:       aug != null ? aug.CrossbowPierceFalloffCount     : 3,
-            freezeDuration:           0f,   // longbow augmenti — crossbow'a uygulanmaz
-            hasFireArrow:             false, // longbow augmenti — crossbow'a uygulanmaz
-            fireDotDuration:          0f,
-            fireDotDps:               0f,
-            hasPoisonArrow:           false, // longbow augmenti — crossbow'a uygulanmaz
-            poisonDotDuration:        0f,
-            poisonDotDps:             0f,
             hasBleed:                 aug != null && aug.HasCrossbowBoltBleed,
             bleedDamageRatioPerStack: aug != null ? aug.CrossbowBleedDamageRatioPerStack : 0.01f,
             bleedMaxStacks:           aug != null ? aug.CrossbowBleedMaxStacks          : 5,

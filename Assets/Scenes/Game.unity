@@ -7863,7 +7863,7 @@ MonoBehaviour:
   arrowProjectileSpeedMultiplier: 1
   outgoingDamageMultiplier: 1
   maxHealthMultiplier: 1
-  mutationAugmentsLongbow: 0
+  mutationAugmentsLongbow: 1
   longbowCevherCountMotor: 0
   longbowCevherTierMotor: 
 --- !u!114 &1700128204
@@ -9268,15 +9268,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1445455240794291464, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1445455240794291464, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1445455240794291464, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1445455240794291464, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -9306,6 +9306,10 @@ PrefabInstance:
       propertyPath: hammerCooldownBar
       value: 
       objectReference: {fileID: 456458915}
+    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: crossbowBoltPrefab
+      value: 
+      objectReference: {fileID: 2482262364273775424, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: hammerCooldownCanvas
       value: 

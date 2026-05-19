@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: 2a81580f295ea49acb08401431ef43eb
+guid: 410b657c73b7e4f02a647b6e433093a9
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3831919214725226432
-    second: pixellab-a-crosbow-bolt--longer-and-thi-1779123086240_0
+      213: -3497705377561342267
+    second: Arrow 1_0
+  - first:
+      213: -1191263263317170387
+    second: Arrow 1_1
+  - first:
+      213: -3668210950830319501
+    second: Arrow 1_2
+  - first:
+      213: -7287198646468951555
+    second: Arrow 1_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +55,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 48
+  spritePixelsToUnits: 20
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -100,13 +109,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pixellab-a-crosbow-bolt--longer-and-thi-1779123086240_0
+      name: Arrow 1_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 32
-        height: 32
+        x: 8
+        y: 45
+        width: 25
+        height: 6
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +124,74 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0cfd0b13936bd2530800000000000000
-      internalID: 3831919214725226432
+      spriteID: 5ce8b71ad77a57fc0800000000000000
+      internalID: -3497705377561342267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Arrow 1_1
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 44
+        width: 24
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d27e104af58c77fe0800000000000000
+      internalID: -1191263263317170387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Arrow 1_2
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 11
+        width: 25
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3789f824395e71dc0800000000000000
+      internalID: -3668210950830319501
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Arrow 1_3
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 13
+        width: 24
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df1c285b07baeda90800000000000000
+      internalID: -7287198646468951555
       vertices: []
       indices: 
       edges: []
@@ -125,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +210,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      pixellab-a-crosbow-bolt--longer-and-thi-1779123086240_0: 3831919214725226432
+      Arrow 1_0: -3497705377561342267
+      Arrow 1_1: -1191263263317170387
+      Arrow 1_2: -3668210950830319501
+      Arrow 1_3: -7287198646468951555
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

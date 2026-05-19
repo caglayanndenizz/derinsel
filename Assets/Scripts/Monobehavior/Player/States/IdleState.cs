@@ -20,7 +20,7 @@ public class IdleState : PlayerState
         if (Input.GetButton("Fire2"))
         {
             bool mutationActive = context.AugmentController != null && context.AugmentController.HasRadialLongbowMutationUnlock;
-            context.SetState(mutationActive ? (PlayerState)new CrossbowState() : new ArcherState());
+            context.SetState(mutationActive ? (PlayerState)new CrossbowState() : new LongbowState());
             return;
         }
     }

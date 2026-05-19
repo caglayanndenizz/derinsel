@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ArcherState : PlayerState
+public class LongbowState : PlayerState
 {
     private float _longbowCharge;
     private bool _isLongbowCharging;
