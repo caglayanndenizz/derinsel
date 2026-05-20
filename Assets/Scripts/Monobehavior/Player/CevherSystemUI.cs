@@ -26,6 +26,7 @@ public class CevherSystemUI : MonoBehaviour
 
     private CevherTier _cachedTier  = (CevherTier)(-1);
     private int        _cachedCount = -1;
+    private bool       _subscribed;
 
     private void Awake()
     {
@@ -34,30 +35,38 @@ public class CevherSystemUI : MonoBehaviour
 
     private void Start()
     {
-        if (augmentController != null) return;
         TryFindController();
-        if (augmentController != null)
-            augmentController.AugmentApplied += HandleAugmentApplied;
+        EnsureSubscribed();
         RefreshUI();
     }
 
     private void TryFindController()
     {
         if (augmentController != null) return;
-        augmentController = Object.FindAnyObjectByType<PlayerAugmentController>();
+        augmentController = Object.FindAnyObjectByType<PlayerAugmentController>(FindObjectsInactive.Include);
+    }
+
+    private void EnsureSubscribed()
+    {
+        if (_subscribed || augmentController == null) return;
+        augmentController.AugmentApplied += HandleAugmentApplied;
+        _subscribed = true;
     }
 
     private void OnEnable()
     {
-        if (augmentController != null)
-            augmentController.AugmentApplied += HandleAugmentApplied;
+        TryFindController();
+        EnsureSubscribed();
         RefreshUI();
     }
 
     private void OnDisable()
     {
-        if (augmentController != null)
+        if (_subscribed && augmentController != null)
+        {
             augmentController.AugmentApplied -= HandleAugmentApplied;
+            _subscribed = false;
+        }
     }
 
     private void HandleAugmentApplied(AugmentDefinition _) => RefreshUI();
@@ -73,7 +82,10 @@ public class CevherSystemUI : MonoBehaviour
         _cachedTier  = tier;
         _cachedCount = count;
 
-        if (longbowTrait != null) longbowTrait.SetActive(count > 0);
+        if (longbowTrait != null)
+            longbowTrait.SetActive(count > 0);
+        else
+            Debug.LogWarning("[CevherSystemUI] longbowTrait is not assigned in the Inspector!", this);
 
         Color c = TierColor(tier);
         if (badgeImage != null) badgeImage.color = c;
