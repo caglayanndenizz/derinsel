@@ -321,6 +321,8 @@ public class AugmentWeightSystem : MonoBehaviour
             case AugmentId.LongbowFreezeUnlock:
             case AugmentId.FireArrowUnlock:
             case AugmentId.PoisonArrowUnlock:
+            case AugmentId.CrossbowBoltPierce:
+            case AugmentId.CrossbowBoltBleed:
                 return true;
             default:
                 return false;

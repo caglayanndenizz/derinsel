@@ -19,7 +19,7 @@ public class DungeonEntrance : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerNearby = true;
-            interactionUI.SetActive(true); 
+            if (interactionUI != null) interactionUI.SetActive(true);
         }
     }
 
@@ -28,7 +28,7 @@ public class DungeonEntrance : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerNearby = false;
-            interactionUI.SetActive(false); 
+            if (interactionUI != null) interactionUI.SetActive(false);
         }
     }
 

@@ -102,6 +102,8 @@ public class Enemy : BaseEntity
     private int       _bleedMaxStacks;
     private float     _bleedExpireSeconds;
 
+    public bool IsDead => _isDead || _currentHealth <= 0f;
+
     protected GameObject player;
     private bool _isDead = false;
     private Vector2 _lastKnownPlayerWorld;
@@ -543,6 +545,7 @@ public class Enemy : BaseEntity
 
     public override void TakeDamage(float amount, bool isHeavy)
     {
+        if (IsDead) return;
         _currentHealth -= amount;
         StartCoroutine(HitFlashRoutine());
         float force = (isHeavy ? heavyKnockbackForce : lightKnockbackForce) * 0.5f;
@@ -751,7 +754,7 @@ public class Enemy : BaseEntity
 
     private IEnumerator HitFlashRoutine()
     {
-        _spriteRenderer.color = flashColor;
+        if (_spriteRenderer != null) _spriteRenderer.color = flashColor;
         yield return new WaitForSeconds(0.1f);
         RefreshStatusColor();
     }

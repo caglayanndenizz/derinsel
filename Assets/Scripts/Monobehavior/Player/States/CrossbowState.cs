@@ -2,17 +2,10 @@ using UnityEngine;
 
 public class CrossbowState : PlayerState
 {
-    bool _grappleFired;
-
     public override void Enter(IPlayerContext context)
     {
         ResetAnimator(context);
-        _grappleFired = false;
-
-        if (HasGrappleAugment(context))
-            FireGrappleBolt(context);
-        else
-            TryFireBolt(context);
+        TryFireBolt(context);
     }
 
     public override void Handle(IPlayerContext context)
@@ -23,34 +16,12 @@ public class CrossbowState : PlayerState
             return;
         }
 
-        if (HasGrappleAugment(context))
-        {
-            if (!_grappleFired)
-                FireGrappleBolt(context);
-            // else: bolt is in flight, waiting for anchor → do nothing
-            return;
-        }
-
         TryFireBolt(context);
     }
 
     public override void Exit(IPlayerContext context)
     {
         ResetAnimator(context);
-    }
-
-    static bool HasGrappleAugment(IPlayerContext context) =>
-        context.AugmentController != null && context.AugmentController.HasCrossbowGrappleBolt;
-
-    void FireGrappleBolt(IPlayerContext context)
-    {
-        Vector2 aim = context.GetLongbowAimWorldPointAtCurrentMouse();
-        context.SpawnGrappleBolt(aim);
-
-        if (context.Animator != null)
-            context.Animator.SetTrigger(CrossbowShootHash);
-
-        _grappleFired = true;
     }
 
     void TryFireBolt(IPlayerContext context)

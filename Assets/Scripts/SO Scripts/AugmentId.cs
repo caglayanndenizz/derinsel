@@ -57,5 +57,4 @@ public enum AugmentId
     PoisonArrowUnlock = 56,
     CrossbowBoltPierce     = 57,
     CrossbowBoltBleed      = 58,
-    CrossbowGrappleBolt    = 59,
 }

@@ -49,6 +49,7 @@ public class AugmentSelectionUI : MonoBehaviour
     private bool _isSubscribed;
     private CanvasGroup _panelCanvasGroup;
     private bool _isPanelOpen;
+    private int _pendingSelections;
     private List<AugmentDefinition> _currentOffer;
     private DungeonGenerator _dungeonGenerator;
 
@@ -151,6 +152,7 @@ public class AugmentSelectionUI : MonoBehaviour
 
     private void ShowPanel()
     {
+        if (_isPanelOpen) { _pendingSelections++; return; }
         ShowPanel(PanelSource.LevelUp);
     }
 
@@ -516,6 +518,12 @@ public class AugmentSelectionUI : MonoBehaviour
 
         if (pauseGameWhenPanelOpen)
             Time.timeScale = _previousTimeScale > 0f ? _previousTimeScale : 1f;
+
+        if (_pendingSelections > 0)
+        {
+            _pendingSelections--;
+            ShowPanel(PanelSource.LevelUp);
+        }
     }
 
     private void TryResolvePlayer()

@@ -10,11 +10,9 @@ public class Lootable : MonoBehaviour, ICollectable
 
     [Header("Magnet Settings")]
     public float moveSpeed = 6f;
-    public float goldHomingDelay = 5f;
 
     bool _isCollected;
     Transform _playerTransform;
-    bool _goldHomingUnlocked;
 
     void Awake()
     {
@@ -24,19 +22,7 @@ public class Lootable : MonoBehaviour, ICollectable
     void OnEnable()
     {
         _isCollected = false;
-        _goldHomingUnlocked = !isGold;
         ResolvePlayerTransform();
-        CancelInvoke(nameof(EnableGoldHoming));
-    }
-
-    void OnDisable()
-    {
-        CancelInvoke(nameof(EnableGoldHoming));
-    }
-
-    void EnableGoldHoming()
-    {
-        _goldHomingUnlocked = true;
     }
 
     void ResolvePlayerTransform()
@@ -48,14 +34,13 @@ public class Lootable : MonoBehaviour, ICollectable
 
     void Update()
     {
-        if (_isCollected) return;
+        if (_isCollected || isGold) return;
 
         if (_playerTransform == null)
             ResolvePlayerTransform();
 
         if (_playerTransform == null) return;
 
-        if (isGold && !_goldHomingUnlocked) return;
         transform.position = Vector2.MoveTowards(transform.position, _playerTransform.position, moveSpeed * Time.deltaTime);
     }
 

@@ -171,6 +171,7 @@ public class PlayerArrow : MonoBehaviour
             if (IsOwnCollider(h.collider)) continue;
             if (h.collider.GetComponentInParent<Player>() != null) continue;
             if (h.collider.GetComponentInParent<PlayerArrow>() != null) continue;
+            if (h.collider.isTrigger) continue;
 
             hit = h;
             return true;
@@ -210,15 +211,6 @@ public class PlayerArrow : MonoBehaviour
             Destroy(gameObject);
     }
 
-    static float GetLethalDamageForTarget(IDamageable target)
-    {
-        if (target is BaseEntity entity)
-            return Mathf.Max(0f, entity.CurrentHealth);
-        if (target is DestructibleObject destructible)
-            return Mathf.Max(0f, destructible.health);
-        return 1e6f;
-    }
-
     void ApplyChargedExplosionDamage(Vector2 center)
     {
         Collider2D[] overlaps = Physics2D.OverlapCircleAll(center, _explosionRadius);
@@ -240,9 +232,7 @@ public class PlayerArrow : MonoBehaviour
             int id = mb.gameObject.GetInstanceID();
             if (!processedDamageables.Add(id)) continue;
 
-            float amount = GetLethalDamageForTarget(dmg);
-            if (amount <= 0f) continue;
-            dmg.TakeDamage(amount, false);
+            dmg.TakeDamage(_damage, false);
         }
     }
 }

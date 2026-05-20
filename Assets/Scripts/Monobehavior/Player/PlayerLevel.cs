@@ -47,13 +47,11 @@ public class PlayerLevel : MonoBehaviour
             requiredExperienceForNextLevel = ComputeRequiredXp(currentLevel);
             leveledUp = true;
             LevelUp?.Invoke();
+            LevelUpAugmentSelectionRequested?.Invoke();
         }
 
         if (leveledUp)
-        {
             LevelChanged?.Invoke(currentLevel);
-            LevelUpAugmentSelectionRequested?.Invoke();
-        }
 
         ExperienceChanged?.Invoke(experienceCount, requiredExperienceForNextLevel);
     }

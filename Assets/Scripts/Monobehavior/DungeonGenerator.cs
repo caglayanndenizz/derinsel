@@ -314,8 +314,10 @@ public class DungeonGenerator : MonoBehaviour
         if (enemyPooler != null)
             SyncEnemyCountWithPoolSize();
 
+        player.GetComponent<WallLootHandler>()?.ResetWallLootDropCounterForRoom();
+
         List<Vector2Int> availableFloors = floorPositions.ToList();
-        player.transform.position = new Vector3(0.5f, 0.5f, 0); 
+        player.transform.position = new Vector3(0.5f, 0.5f, 0);
         _exitDoorsSpawnedForCurrentFloor = false;
 
         int enemiesPlaced = 0;
