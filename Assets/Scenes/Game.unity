@@ -178,6 +178,7 @@ MonoBehaviour:
   commonColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
   rareColor: {r: 0.4, g: 0.7, b: 1, a: 1}
   extraordinaryColor: {r: 0.4, g: 0, b: 0.6, a: 1}
+  unlockColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
 --- !u!114 &66581340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -753,6 +754,7 @@ MonoBehaviour:
   panelThemeTargetImage: {fileID: 0}
   levelUpPanelThemeColor: {r: 1, g: 1, b: 1, a: 1}
   wallLootGiftPanelThemeColor: {r: 0.35, g: 0.35, b: 0.35, a: 1}
+  unlockOfferPanelThemeColor: {r: 1, g: 0.84, b: 0, a: 1}
 --- !u!1 &314556255
 GameObject:
   m_ObjectHideFlags: 0
@@ -3637,6 +3639,7 @@ MonoBehaviour:
   - {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
   exitPrefab: {fileID: 1031347285994503552, guid: e8e1f7b624480ad4bb4d5f1810e05f5a, type: 3}
   enemyPooler: {fileID: 1679956769}
+  roomWaveController: {fileID: 1764338250}
   transitionFader: {fileID: 816801429}
   vcam: {fileID: 1626974882}
   destructableWallTile: {fileID: 11400000, guid: 291ed0377b0ae0043bc543a711ad8d26, type: 2}
@@ -5864,6 +5867,7 @@ Transform:
   - {fileID: 711965915}
   - {fileID: 619394802}
   - {fileID: 1451887778}
+  - {fileID: 1764338251}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1318843553
@@ -5925,6 +5929,7 @@ MonoBehaviour:
   commonColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
   rareColor: {r: 0.4, g: 0.7, b: 1, a: 1}
   extraordinaryColor: {r: 0.4, g: 0, b: 0.6, a: 1}
+  unlockColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
 --- !u!114 &1318843556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6821,22 +6826,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AugmentWeightSystem
   augmentDatabase: {fileID: 11400000, guid: ee11eeb5a1811f94bbbaddd1c3ab4613, type: 2}
+  unlockDatabase: {fileID: 11400000, guid: 8a4b742d450e24d66b2b1249d1692152, type: 2}
   t1BaseWeight: 100
   t2BaseWeight: 35
   t3BaseWeight: 8
-  t2UnlockFloor: 2
-  t2SlotChancePerInterval: 0.35
-  t3UnlockFloor: 8
-  t2UnlockPlayerLevel: 5
-  t3UnlockPlayerLevel: 10
-  pityThresholdRounds: 5
-  pityIncrementPerRound: 0.2
+  unlockOfferInterval: 3
+  t2UnlockAfterOffers: 3
+  t3UnlockAfterOffers: 8
+  pityThresholdOffers: 4
   rejectionStartMultiplier: 0.3
   rejectionRecoveryPerRound: 0.14
-  t3FloorScalePerFloor: 0.05
-  milestoneFloorInterval: 5
-  offersWithoutT3: 0
-  totalOffers: 0
+  _totalOfferCount: 0
+  _regularOfferCount: 0
+  _offersSinceLastT3: 0
 --- !u!4 &1451887778
 Transform:
   m_ObjectHideFlags: 0
@@ -7589,6 +7591,13 @@ MonoBehaviour:
   initialPoolSize: 40
   canExpandPool: 1
   poolParent: {fileID: 273267496}
+  typedPrefabs:
+  - enemyType: 0
+    prefab: {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}
+  - enemyType: 1
+    prefab: {fileID: 4369630054169769414, guid: 6af5b04e133e80f448d9a8dd9c90f4c1, type: 3}
+  - enemyType: 2
+    prefab: {fileID: 9054262178047731215, guid: f63ecbfb4afa04446aa4013cbf460301, type: 3}
   linkedGoldLootPooler: {fileID: 562320326}
   linkedExperienceLootPooler: {fileID: 1592173275}
   linkedProjectilePooler: {fileID: 1730437411}
@@ -7831,7 +7840,6 @@ MonoBehaviour:
   hasChargedLongbowAoe: 0
   chargedLongbowAoeRadius: 3
   hasDoubleArrowUnlock: 0
-  hasWallLootsUnlock: 0
   hasExtraAugmentSlotUnlock: 0
   hasDashUnluck: 0
   dashCooldownMultiplier: 1
@@ -7857,14 +7865,14 @@ MonoBehaviour:
   crossbowPierceDamageFloor: 0.3
   crossbowPierceFalloffCount: 3
   hasCrossbowBoltBleed: 0
-  hasCrossbowGrappleBolt: 0
   crossbowBleedDamageRatioPerStack: 0.01
   crossbowBleedMaxStacks: 5
   crossbowBleedExpireSeconds: 5
-  arrowShotBonusCount: 0
+  projectileShotBonusCount: 0
   arrowProjectileSpeedMultiplier: 1
   outgoingDamageMultiplier: 1
   maxHealthMultiplier: 1
+  unlockDatabase: {fileID: 11400000, guid: 8a4b742d450e24d66b2b1249d1692152, type: 2}
   mutationAugmentsLongbow: 0
   longbowCevherCountMotor: 0
   longbowCevherTierMotor: 
@@ -7937,6 +7945,59 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 273267496}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1764338249
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1764338251}
+  - component: {fileID: 1764338250}
+  m_Layer: 0
+  m_Name: WaveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1764338250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1764338249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d119757b1cb64bc2b587d4d679c0f79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoomWaveController
+  dungeonGenerator: {fileID: 465123767}
+  enemyPooler: {fileID: 1679956769}
+  floorConfigs:
+  - {fileID: 11400000, guid: ece3f20be4b1e4f5ead122146edb58d5, type: 2}
+  - {fileID: 11400000, guid: 8b3e27cbbcb8141bfa4d75cb4b584861, type: 2}
+  - {fileID: 11400000, guid: 688dba18e2b2c4d7e8673cd3f7ba0fbd, type: 2}
+  - {fileID: 11400000, guid: 9a404593f55644830b985cdc5572c5ec, type: 2}
+  delayBetweenWaves: 1.5
+  fallbackEnemyCount: 8
+--- !u!4 &1764338251
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1764338249}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 32.006752, y: -17.33153, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1295312150}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1765558567
 GameObject:
@@ -8553,6 +8614,7 @@ MonoBehaviour:
   commonColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
   rareColor: {r: 0.4, g: 0.7, b: 1, a: 1}
   extraordinaryColor: {r: 0.4, g: 0, b: 0.6, a: 1}
+  unlockColor: {r: 0.2, g: 0.8, b: 0.3, a: 1}
 --- !u!114 &2072830268
 MonoBehaviour:
   m_ObjectHideFlags: 0

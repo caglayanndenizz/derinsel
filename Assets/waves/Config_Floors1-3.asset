@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8a5d6671698b4a88a72dbb2b35f5ce5, type: 3}
+  m_Name: Config_Floors1-3
+  m_EditorClassIdentifier: Assembly-CSharp::FloorWaveConfig
+  fromFloor: 1
+  toFloor: 3
+  waves:
+  - {fileID: 11400000, guid: 649d68b39b20042c3b77a818dc5a1967, type: 2}
+  - {fileID: 11400000, guid: b430a4001777a4bac8ef1a07a458fc8f, type: 2}
+  - {fileID: 11400000, guid: 965b5bd3631a14e659177405d69e2f36, type: 2}

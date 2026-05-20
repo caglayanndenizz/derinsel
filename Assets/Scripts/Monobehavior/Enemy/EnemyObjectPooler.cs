@@ -13,6 +13,17 @@ public class EnemyObjectPooler : MonoBehaviour
     public bool canExpandPool = true;
     public Transform poolParent;
 
+    [System.Serializable]
+    public struct EnemyTypePrefabEntry
+    {
+        public Enemy.EnemyType enemyType;
+        public GameObject prefab;
+    }
+
+    [Header("Wave System — Tipe Göre Prefablar")]
+    [Tooltip("Wave sistemi için her enemy tipine karşılık gelen prefab. Boş bırakılırsa random pool'dan çekilir.")]
+    [SerializeField] private List<EnemyTypePrefabEntry> typedPrefabs = new List<EnemyTypePrefabEntry>();
+
     [Header("Baglantili pooler'lar")]
     [Tooltip("Bos birakilirsa Gold / Experience / Projectile pooler sahne icinde (kapali dahil) aranir.")]
     [SerializeField] private GoldLootPooler linkedGoldLootPooler;
@@ -123,6 +134,36 @@ public class EnemyObjectPooler : MonoBehaviour
         _leasedActiveEnemyCount++;
 
         enemy.SetActive(true);
+        return enemy;
+    }
+
+    /// <summary>
+    /// Wave sistemi için type-specific spawn. typedPrefabs'ta eşleşme yoksa generic GetEnemy() fallback'i kullanılır.
+    /// </summary>
+    public GameObject GetEnemyOfType(Enemy.EnemyType type, Vector3 worldPosition, Quaternion rotation)
+    {
+        GameObject prefab = null;
+        if (typedPrefabs != null)
+        {
+            foreach (EnemyTypePrefabEntry entry in typedPrefabs)
+            {
+                if (entry.prefab != null && entry.enemyType == type)
+                {
+                    prefab = entry.prefab;
+                    break;
+                }
+            }
+        }
+
+        if (prefab == null)
+            return GetEnemy(worldPosition, rotation);
+
+        GameObject enemy = Instantiate(prefab, worldPosition, rotation);
+
+        if (_leasedActiveEnemyCount == 0)
+            SetLinkedPoolersActive(true);
+        _leasedActiveEnemyCount++;
+
         return enemy;
     }
 

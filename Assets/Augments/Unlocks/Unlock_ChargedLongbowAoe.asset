@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnlockAugmentDefinition
   id: 4
   displayName: Charged Explosion
-  description: "Your charged arrows explode on impact, dealing area damage. Also enables Wall Loot — enemies near walls drop bonus loot."
+  description: "Your charged arrows explode on impact, dealing area damage. Also
+    enables Wall Loot \u2014 enemies near walls drop bonus loot."
   icon: {fileID: 0}
   rarity: 1
   tier: 1

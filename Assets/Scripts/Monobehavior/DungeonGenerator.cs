@@ -21,16 +21,25 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject exitUI;
 
     [Header("Zindan Ayarlari")]
-    public int minSteps = 100; 
+    [Tooltip("Wave sistemi aktifse bu değerler enemy sayısına göre otomatik ölçeklenir.")]
+    public int minSteps = 100;
     public int maxSteps = 250;
+    [Tooltip("Her enemy için minimum tile sayısı (wave sistemi aktifken geçerli).")]
+    public int minStepsPerEnemy = 8;
+    [Tooltip("Her enemy için maksimum tile sayısı (wave sistemi aktifken geçerli).")]
+    public int maxStepsPerEnemy = 12;
 
     [Header("Spawn Ayarlari")]
-    public GameObject player;       
+    public GameObject player;
     [FormerlySerializedAs("enemyPrefab")]
     public List<GameObject> enemyPrefabs = new List<GameObject>();
-    public GameObject exitPrefab; 
+    public GameObject exitPrefab;
     private int enemyCount = 10;
     public EnemyObjectPooler enemyPooler;
+
+    [Header("Wave System")]
+    [Tooltip("Atanırsa wave sistemi devreye girer; boş bırakılırsa eski sabit spawn davranışı korunur.")]
+    public RoomWaveController roomWaveController;
 
     [Header("Transition Ayarlari")]
     public TransitionFader transitionFader;
@@ -43,6 +52,7 @@ public class DungeonGenerator : MonoBehaviour
     private HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
     private readonly List<GameObject> currentExitInstances = new List<GameObject>();
     private bool _exitDoorsSpawnedForCurrentFloor;
+    private bool _waveSystemActive;
     private float _nextRoomClearCheckTime;
     private const float RoomClearCheckInterval = 0.35f;
     private const float TargetDoorSpawnDistanceFromPlayer = 2f;
@@ -153,9 +163,19 @@ public class DungeonGenerator : MonoBehaviour
 
         if (_currentDungeonFloor < 1) _currentDungeonFloor = 1;
 
-        float floorMultiplier = GetFloorSizeMultiplier(_currentDungeonFloor);
-        int scaledMinSteps = Mathf.FloorToInt(minSteps * floorMultiplier);
-        int scaledMaxSteps = Mathf.FloorToInt(maxSteps * floorMultiplier);
+        int scaledMinSteps, scaledMaxSteps;
+        if (roomWaveController != null)
+        {
+            int enemyCount = roomWaveController.GetTotalEnemyCountForFloor(_currentDungeonFloor);
+            scaledMinSteps = enemyCount * minStepsPerEnemy;
+            scaledMaxSteps = enemyCount * maxStepsPerEnemy;
+        }
+        else
+        {
+            float floorMultiplier = GetFloorSizeMultiplier(_currentDungeonFloor);
+            scaledMinSteps = Mathf.FloorToInt(minSteps * floorMultiplier);
+            scaledMaxSteps = Mathf.FloorToInt(maxSteps * floorMultiplier);
+        }
         if (scaledMaxSteps < scaledMinSteps) scaledMaxSteps = scaledMinSteps;
 
         int randomTotalSteps = Random.Range(scaledMinSteps, scaledMaxSteps + 1);
@@ -311,15 +331,28 @@ public class DungeonGenerator : MonoBehaviour
         if (enemyPooler == null)
             enemyPooler = EnemyObjectPooler.Instance;
 
-        if (enemyPooler != null)
-            SyncEnemyCountWithPoolSize();
-
         player.GetComponent<WallLootHandler>()?.ResetWallLootDropCounterForRoom();
-
-        List<Vector2Int> availableFloors = floorPositions.ToList();
         player.transform.position = new Vector3(0.5f, 0.5f, 0);
         _exitDoorsSpawnedForCurrentFloor = false;
 
+        List<Vector2Int> availableFloors = floorPositions.ToList();
+
+        if (roomWaveController != null)
+        {
+            _waveSystemActive = true;
+            roomWaveController.StartFloor(availableFloors, _currentDungeonFloor);
+        }
+        else
+        {
+            if (enemyPooler != null)
+                SyncEnemyCountWithPoolSize();
+            SpawnLegacyEnemies(availableFloors);
+            TrySpawnExitDoorsIfRoomCleared();
+        }
+    }
+
+    private void SpawnLegacyEnemies(List<Vector2Int> availableFloors)
+    {
         int enemiesPlaced = 0;
         int attempts = 0;
         int maxAttempts = Mathf.Max(enemyCount * 20, availableFloors.Count * 3);
@@ -350,10 +383,13 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         if (enemiesPlaced < enemyCount)
-        {
-            Debug.LogWarning($"DungeonGenerator: Istek {enemyCount}, olusturulan {enemiesPlaced}. Uygun tile veya havuz kapasitesi yetersiz olabilir.");
-        }
+            Debug.LogWarning($"DungeonGenerator: Istek {enemyCount}, olusturulan {enemiesPlaced}.");
+    }
 
+    /// <summary>Called by RoomWaveController when all waves for this floor are cleared.</summary>
+    public void OnAllWavesCleared()
+    {
+        _waveSystemActive = false;
         TrySpawnExitDoorsIfRoomCleared();
     }
 
@@ -391,6 +427,9 @@ public class DungeonGenerator : MonoBehaviour
 
     public void MoveToNextFloor()
     {
+        roomWaveController?.ResetForNewFloor();
+        _waveSystemActive = false;
+
         ClearActiveLoot();
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
         if (enemyPooler == null)
@@ -410,6 +449,9 @@ public class DungeonGenerator : MonoBehaviour
 
     public void ExitDungeon()
     {
+        roomWaveController?.ResetForNewFloor();
+        _waveSystemActive = false;
+
         ClearActiveLoot();
         player.GetComponent<Player>()?.ResetForDungeonExit();
         floorTilemap.ClearAllTiles();
@@ -449,6 +491,7 @@ public class DungeonGenerator : MonoBehaviour
     private void TrySpawnExitDoorsIfRoomCleared()
     {
         if (_exitDoorsSpawnedForCurrentFloor || exitPrefab == null || floorPositions.Count < 2) return;
+        if (_waveSystemActive) return;
 
         GameObject[] aliveEnemies = GameObject.FindGameObjectsWithTag("Enemy");
         if (aliveEnemies.Length > 0) return;

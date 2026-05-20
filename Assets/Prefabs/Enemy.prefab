@@ -253,7 +253,7 @@ MonoBehaviour:
   mageProjectilePrefab: {fileID: 6304853734587583923, guid: 85829922e17f94981a185366d6919300, type: 3}
   mageRangedFireInterval: 4
   mageProjectileSpeed: 10
-  mageUseAttackPowerForProjectile: 1
+  mageUseAttackPowerForProjectile: 0
   mageProjectileDamageOverride: 5
   mageProjectileMaxLifetime: 12
   attackCloseMaxDistance: 10
