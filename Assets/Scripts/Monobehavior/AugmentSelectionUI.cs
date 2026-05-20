@@ -7,7 +7,8 @@ public class AugmentSelectionUI : MonoBehaviour
     private enum PanelSource
     {
         LevelUp,
-        WallLootGift
+        WallLootGift,
+        UnlockOffer
     }
 
     [Header("References")]
@@ -39,8 +40,9 @@ public class AugmentSelectionUI : MonoBehaviour
 
     [Header("Visual theme")]
     [SerializeField] private Image panelThemeTargetImage;
-    [SerializeField] private Color levelUpPanelThemeColor = Color.white;
+    [SerializeField] private Color levelUpPanelThemeColor    = Color.white;
     [SerializeField] private Color wallLootGiftPanelThemeColor = new Color(0.35f, 0.35f, 0.35f, 1f);
+    [SerializeField] private Color unlockOfferPanelThemeColor  = new Color(1f, 0.84f, 0.0f, 1f);
 
     private const string AutoCardsRowName = "AugmentCards";
     private readonly List<AugmentOptionButton> _runtimeButtons = new();
@@ -51,7 +53,7 @@ public class AugmentSelectionUI : MonoBehaviour
     private bool _isPanelOpen;
     private int _pendingSelections;
     private List<AugmentDefinition> _currentOffer;
-    private DungeonGenerator _dungeonGenerator;
+
 
     private bool UsesPrefabAugmentCards =>
         optionButtonPrefab != null && panelRoot != null;
@@ -153,7 +155,11 @@ public class AugmentSelectionUI : MonoBehaviour
     private void ShowPanel()
     {
         if (_isPanelOpen) { _pendingSelections++; return; }
-        ShowPanel(PanelSource.LevelUp);
+        TryResolveWeightSystem();
+        PanelSource source = (weightSystem != null && weightSystem.IsNextOfferUnlock)
+            ? PanelSource.UnlockOffer
+            : PanelSource.LevelUp;
+        ShowPanel(source);
     }
 
     public bool TryShowWallLootGiftPanel()
@@ -416,7 +422,7 @@ public class AugmentSelectionUI : MonoBehaviour
     {
         TryResolveWeightSystem();
         if (weightSystem != null)
-            return weightSystem.BuildOffer(playerAugmentController, slotCount, GetCurrentFloor(), GetCurrentPlayerLevel());
+            return weightSystem.BuildOffer(playerAugmentController, slotCount);
         return BuildRandomAugmentOptions(slotCount);
     }
 
@@ -426,19 +432,6 @@ public class AugmentSelectionUI : MonoBehaviour
         weightSystem = AugmentWeightSystem.Instance;
         if (weightSystem == null)
             weightSystem = Object.FindAnyObjectByType<AugmentWeightSystem>();
-    }
-
-    private int GetCurrentFloor()
-    {
-        if (_dungeonGenerator == null)
-            _dungeonGenerator = Object.FindAnyObjectByType<DungeonGenerator>();
-        return _dungeonGenerator != null ? _dungeonGenerator.CurrentFloor : 0;
-    }
-
-    private int GetCurrentPlayerLevel()
-    {
-        TryResolvePlayerLevel();
-        return playerLevel != null ? playerLevel.CurrentLevel : 1;
     }
 
     private List<AugmentDefinition> BuildRandomAugmentOptions(int maxOptions)
@@ -459,18 +452,18 @@ public class AugmentSelectionUI : MonoBehaviour
     private List<AugmentDefinition> BuildAvailableAugmentOptions()
     {
         List<AugmentDefinition> opts = new List<AugmentDefinition>(
-            augmentDatabase != null && augmentDatabase.allAugments != null
-                ? augmentDatabase.allAugments.Count
+            augmentDatabase != null && augmentDatabase.regularAugments != null
+                ? augmentDatabase.regularAugments.Count
                 : 0);
-        if (augmentDatabase == null || augmentDatabase.allAugments == null)
+        if (augmentDatabase == null || augmentDatabase.regularAugments == null)
         {
             Debug.LogWarning("AugmentSelectionUI: augmentDatabase is not assigned.");
             return opts;
         }
 
-        for (int i = 0; i < augmentDatabase.allAugments.Count; i++)
+        for (int i = 0; i < augmentDatabase.regularAugments.Count; i++)
         {
-            AugmentDefinition definition = augmentDatabase.allAugments[i];
+            AugmentDefinition definition = augmentDatabase.regularAugments[i];
             if (definition == null || definition.id == AugmentId.None)
                 continue;
             if (playerAugmentController != null && !playerAugmentController.CanApplyAugment(definition))
@@ -499,9 +492,12 @@ public class AugmentSelectionUI : MonoBehaviour
     private void ApplyPanelTheme(PanelSource source)
     {
         if (panelThemeTargetImage == null) return;
-        panelThemeTargetImage.color = source == PanelSource.WallLootGift
-            ? wallLootGiftPanelThemeColor
-            : levelUpPanelThemeColor;
+        switch (source)
+        {
+            case PanelSource.WallLootGift: panelThemeTargetImage.color = wallLootGiftPanelThemeColor; break;
+            case PanelSource.UnlockOffer:  panelThemeTargetImage.color = unlockOfferPanelThemeColor;  break;
+            default:                       panelThemeTargetImage.color = levelUpPanelThemeColor;       break;
+        }
     }
 
     private void HandleAugmentSelected(AugmentDefinition selectedAugment)

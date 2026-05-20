@@ -489,7 +489,7 @@ public class Player : BaseEntity, IPlayerContext
         if (offset.sqrMagnitude < 0.0001f) offset = Vector2.right * 0.01f;
         Vector2 dir = offset.normalized;
         float targetDistance = Mathf.Max(0.5f, offset.magnitude);
-        int arrowCount = playerAugmentController != null ? Mathf.Max(1, playerAugmentController.ArrowShotMultiplier) : 1;
+        int arrowCount = playerAugmentController != null ? Mathf.Max(1, playerAugmentController.ProjectileShotMultiplier) : 1;
         float spreadStepDegrees = GetArrowSpreadStepDegrees(arrowCount);
         float centerOffset = (arrowCount - 1) * 0.5f;
 
@@ -641,7 +641,23 @@ public class Player : BaseEntity, IPlayerContext
         Vector2 origin = attackPoint.position;
         Vector2 offset = aimWorld - origin;
         if (offset.sqrMagnitude < 0.0001f) offset = Vector2.right * 0.01f;
+        Vector2 dir = offset.normalized;
+        float targetDistance = Mathf.Max(0.5f, offset.magnitude);
+        int boltCount = aug != null ? Mathf.Max(1, aug.ProjectileShotMultiplier) : 1;
+        float spreadStepDegrees = GetArrowSpreadStepDegrees(boltCount);
+        float centerOffset = (boltCount - 1) * 0.5f;
 
+        for (int i = 0; i < boltCount; i++)
+        {
+            float angleOffset = (i - centerOffset) * spreadStepDegrees;
+            Vector2 shotDir = Quaternion.Euler(0f, 0f, angleOffset) * dir;
+            TrySpawnSingleCrossbowBolt(origin, origin + shotDir * targetDistance, useSpeed, useDamage);
+        }
+    }
+
+    private void TrySpawnSingleCrossbowBolt(Vector2 origin, Vector2 aimWorld, float useSpeed, float useDamage)
+    {
+        PlayerAugmentController aug = playerAugmentController;
         PlayerBolt bolt = null;
         if (PlayerArrowPooler.Instance != null)
             PlayerArrowPooler.Instance.GetBolt(origin, Quaternion.identity, b => bolt = b);

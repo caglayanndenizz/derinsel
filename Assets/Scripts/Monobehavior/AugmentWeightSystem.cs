@@ -2,154 +2,131 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Runtime augment weight system.
-/// effective_weight = base_weight × pity_multiplier × rejection_multiplier × floor_multiplier
+/// Offer cycle (each level-up is one offer):
+///   Every unlockOfferInterval-th offer → unlock-only offer (UnlockAugmentDatabase pool).
+///   All other offers                   → regular stat offer (AugmentDatabase.regularAugments).
 ///
-/// Floor gates:
-///   T1 only    : floors 1 … (t2UnlockFloor - 1)
-///   T2 enters  : floor t2UnlockFloor+ with slot probability = (floor/t2UnlockFloor) × t2SlotChancePerInterval
-///   T3 enters  : floor t3UnlockFloor+  (milestone composition fully active)
-///   Unlock augments bypass ALL floor gates.
+/// Regular offer tier progression — gated by regular offer count, NOT floor or player level:
+///   0 .. t2UnlockAfterOffers-1               → all T1
+///   t2UnlockAfterOffers .. t3UnlockAfterOffers-1 → T1 + T2
+///   t3UnlockAfterOffers+                     → T1 + T2 + T3
 ///
-/// Pity      — T3 only. After pityThresholdRounds offers without a T3 in the pool, T3 weight
-///             increases by pityIncrementPerRound each subsequent offer. Resets when T3 appears.
-/// Rejection — Per augment ID. When skipped, multiplier drops to rejectionStartMultiplier
-///             and recovers by rejectionRecoveryPerRound per offer back towards 1.0.
-/// Floor     — T3 only. Soft linear scale: 1 + floor * t3FloorScalePerFloor.
+/// Pity: after pityThresholdOffers total level-up offers without any T3 AND T3 pool is open,
+///       the next regular offer forces ALL slots to T3.
+/// Rejection: per-ID weight multiplier that drops on skip and recovers over subsequent offers.
 /// </summary>
 public class AugmentWeightSystem : MonoBehaviour
 {
     public static AugmentWeightSystem Instance { get; private set; }
 
     [Header("References")]
-    [SerializeField] private AugmentDatabase augmentDatabase;
+    [SerializeField] private AugmentDatabase      augmentDatabase;
+    [Tooltip("Direct override for the unlock pool. Falls back to augmentDatabase.unlockDatabase when null.")]
+    [SerializeField] private UnlockAugmentDatabase unlockDatabase;
 
-    [Header("Tier Base Weights (rarity fallback)")]
+    [Header("Tier Base Weights")]
     [SerializeField] private float t1BaseWeight = 100f;
     [SerializeField] private float t2BaseWeight = 35f;
     [SerializeField] private float t3BaseWeight = 8f;
 
-    [Header("Floor Gates")]
-    [Tooltip("First floor where T2 augments can appear.")]
-    [SerializeField] private int t2UnlockFloor = 2;
-    [Tooltip("Probability that a T2 slot is granted per interval above t2UnlockFloor. 0.35 = +35% per interval of 5 floors.")]
-    [SerializeField] private float t2SlotChancePerInterval = 0.35f;
-    [Tooltip("First floor where T3 augments can appear. Milestone composition fully active from here.")]
-    [SerializeField] private int t3UnlockFloor = 8;
+    [Header("Offer Cycle")]
+    [Tooltip("Every Nth level-up is an unlock-only offer. 3 = offers 3, 6, 9... show only unlocks.")]
+    [SerializeField] private int unlockOfferInterval = 3;
 
-    [Header("Player Level Gates (secondary unlock — bypasses floor gates)")]
-    [Tooltip("Player level at which T2 augments can appear regardless of floor.")]
-    [SerializeField] private int t2UnlockPlayerLevel = 5;
-    [Tooltip("Player level at which T3 augments can appear regardless of floor.")]
-    [SerializeField] private int t3UnlockPlayerLevel = 10;
+    [Header("Tier Unlock (by regular offer count — floor/level independent)")]
+    [Tooltip("T2 augments enter the pool after this many regular (non-unlock) offers.")]
+    [SerializeField] private int t2UnlockAfterOffers = 3;
+    [Tooltip("T3 augments enter the pool after this many regular offers.")]
+    [SerializeField] private int t3UnlockAfterOffers = 8;
 
-    [Header("Pity (T3 only)")]
-    [Tooltip("Offers without any T3 in pool before pity activates.")]
-    [SerializeField] private int pityThresholdRounds = 5;
-    [Tooltip("Pity multiplier added per offer after threshold. +0.20 = +20% each offer.")]
-    [SerializeField] private float pityIncrementPerRound = 0.20f;
+    [Header("Pity")]
+    [Tooltip("After this many level-up offers (regular + unlock) without a T3, the next regular offer forces all slots to T3.")]
+    [SerializeField] private int pityThresholdOffers = 4;
 
     [Header("Rejection (per augment ID)")]
-    [Tooltip("Multiplier immediately after rejection.")]
+    [Tooltip("Weight multiplier immediately after the augment is skipped.")]
     [SerializeField] private float rejectionStartMultiplier = 0.30f;
-    [Tooltip("Recovery per offer back toward 1.0. At 0.14 with start=0.30 → full in 5 offers.")]
+    [Tooltip("Multiplier recovery per offer back toward 1.0. At 0.14 with start=0.30 → full in ~5 offers.")]
     [SerializeField] private float rejectionRecoveryPerRound = 0.14f;
 
-    [Header("Floor Scaling (T3 only)")]
-    [Tooltip("Per-floor linear bonus on T3 weight. 0.05 = +5% per floor.")]
-    [SerializeField] private float t3FloorScalePerFloor = 0.05f;
-
-    [Header("Milestone Floors")]
-    [SerializeField] private int milestoneFloorInterval = 5;
-
-    // ── Runtime State (visible in Inspector for in-editor monitoring) ──────
     [Header("Runtime State (Read-Only)")]
-    [SerializeField] private int offersWithoutT3;
-    [SerializeField] private int totalOffers;
+    [SerializeField] private int _totalOfferCount;
+    [SerializeField] private int _regularOfferCount;
+    [SerializeField] private int _offersSinceLastT3;
 
     private readonly Dictionary<AugmentId, float> _rejectionMult   = new Dictionary<AugmentId, float>();
     private readonly Dictionary<AugmentId, int>   _rejectedAtOffer = new Dictionary<AugmentId, int>();
 
-    // ── Public Read Access ─────────────────────────────────────────────────
+    // ── Public Read ────────────────────────────────────────────────────────────
+
     public IReadOnlyList<AugmentDefinition> AllAugments =>
-        (IReadOnlyList<AugmentDefinition>)(augmentDatabase?.allAugments) ??
+        (IReadOnlyList<AugmentDefinition>)(augmentDatabase?.regularAugments) ??
         System.Array.Empty<AugmentDefinition>();
 
-    public int OffersWithoutT3 => offersWithoutT3;
-    public int TotalOffers     => totalOffers;
+    public int  TotalOfferCount   => _totalOfferCount;
+    public int  RegularOfferCount => _regularOfferCount;
+    public int  OffersSinceLastT3 => _offersSinceLastT3;
+    public int  PityThreshold     => pityThresholdOffers;
+    public bool IsPityActive      => _offersSinceLastT3 >= pityThresholdOffers
+                                     && _regularOfferCount >= t3UnlockAfterOffers;
 
-    public float CurrentPityMultiplier
-    {
-        get
-        {
-            if (offersWithoutT3 < pityThresholdRounds) return 1f;
-            int excess = offersWithoutT3 - pityThresholdRounds + 1;
-            return 1f + excess * pityIncrementPerRound;
-        }
-    }
+    /// <summary>True if the NEXT call to BuildOffer will produce an unlock offer.</summary>
+    public bool IsNextOfferUnlock =>
+        unlockOfferInterval > 0 && (_totalOfferCount + 1) % unlockOfferInterval == 0;
 
-    // ── Unity ──────────────────────────────────────────────────────────────
+    // ── Unity ──────────────────────────────────────────────────────────────────
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
-    // ── Main API ───────────────────────────────────────────────────────────
-
-    public bool IsMilestoneFloor(int floor) =>
-        floor > 0 && milestoneFloorInterval > 0 && floor % milestoneFloorInterval == 0;
+    // ── Main API ───────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Builds a weighted augment offer following composition rules.
-    /// Updates pity state after building (current offer uses pre-update state).
-    /// playerLevel is used as a secondary unlock condition — bypasses floor gates when high enough.
+    /// Builds a weighted augment offer for one level-up selection.
+    /// Automatically decides whether this is an unlock offer or a regular tier offer.
     /// </summary>
-    public List<AugmentDefinition> BuildOffer(
-        PlayerAugmentController controller,
-        int slotCount,
-        int currentFloor,
-        int playerLevel = 1)
+    public List<AugmentDefinition> BuildOffer(PlayerAugmentController controller, int slotCount)
     {
         if (slotCount <= 0) return new List<AugmentDefinition>();
 
-        int effectiveFloor = EffectiveFloor(currentFloor, playerLevel);
-        List<int> tierSlots = GetTierSlotComposition(slotCount, IsMilestoneFloor(effectiveFloor), effectiveFloor);
-        var result  = new List<AugmentDefinition>(slotCount);
-        var usedIds = new HashSet<AugmentId>();
+        _totalOfferCount++;
+        bool isUnlockOffer = unlockOfferInterval > 0 && _totalOfferCount % unlockOfferInterval == 0;
 
-        foreach (int tier in tierSlots)
+        List<AugmentDefinition> result;
+        if (isUnlockOffer)
         {
-            AugmentDefinition pick = PickFromTier(tier, controller, usedIds, effectiveFloor);
-            if (pick == null) break;
-            result.Add(pick);
-            usedIds.Add(pick.id);
+            result = BuildUnlockOffer(controller, slotCount);
+            if (result.Count == 0)
+            {
+                // No eligible unlocks — fall back to regular offer
+                _regularOfferCount++;
+                result = BuildRegularOffer(controller, slotCount, pityActive: false);
+            }
+        }
+        else
+        {
+            _regularOfferCount++;
+            result = BuildRegularOffer(controller, slotCount, pityActive: IsPityActive);
         }
 
-        bool hadT3 = false;
-        foreach (AugmentDefinition a in result)
+        // Pity counter only advances on regular offers — unlock offers can never contain T3
+        if (!isUnlockOffer)
         {
-            if (a != null && a.rarity == 3) { hadT3 = true; break; }
+            bool hadT3 = false;
+            foreach (AugmentDefinition a in result)
+                if (a != null && a.rarity == 3) { hadT3 = true; break; }
+            _offersSinceLastT3 = hadT3 ? 0 : _offersSinceLastT3 + 1;
         }
-        offersWithoutT3 = hadT3 ? 0 : offersWithoutT3 + 1;
-        totalOffers++;
 
         return result;
     }
 
-    // Player level yeterliyse floor'u minimum unlock eşiğine yükselt
-    private int EffectiveFloor(int floor, int playerLevel)
-    {
-        int effective = floor;
-        if (playerLevel >= t2UnlockPlayerLevel && effective < t2UnlockFloor)
-            effective = t2UnlockFloor;
-        if (playerLevel >= t3UnlockPlayerLevel && effective < t3UnlockFloor)
-            effective = t3UnlockFloor;
-        return effective;
-    }
-
     /// <summary>
-    /// Call when player selects an augment. All other augments in the offer are marked rejected.
+    /// Call after the player selects an augment. All other augments in the offer receive a
+    /// temporary weight penalty.
     /// </summary>
     public void NotifySelection(AugmentDefinition selected, List<AugmentDefinition> fullOffer)
     {
@@ -159,126 +136,154 @@ public class AugmentWeightSystem : MonoBehaviour
             if (aug == null || aug.id == AugmentId.None) continue;
             if (selected != null && aug.id == selected.id) continue;
             _rejectionMult[aug.id]   = rejectionStartMultiplier;
-            _rejectedAtOffer[aug.id] = totalOffers;
+            _rejectedAtOffer[aug.id] = _totalOfferCount;
         }
     }
 
-    /// <summary>effective_weight = base × pity × rejection × floor</summary>
-    public float GetEffectiveWeight(AugmentDefinition augment, int currentFloor)
+    /// <summary>effective_weight = base_weight × rejection_multiplier</summary>
+    public float GetEffectiveWeight(AugmentDefinition augment)
     {
         if (augment == null || augment.id == AugmentId.None) return 0f;
-        return GetBaseWeight(augment)
-            * PityMultiplier(augment.rarity)
-            * CurrentRejectionMultiplier(augment.id)
-            * FloorMultiplier(augment.rarity, currentFloor);
+        return GetBaseWeight(augment) * CurrentRejectionMultiplier(augment.id);
     }
 
-    // ── Private Helpers ────────────────────────────────────────────────────
+    /// <summary>Resets all offer counters and rejection state. Call at the start of a new run.</summary>
+    public void Reset()
+    {
+        _totalOfferCount   = 0;
+        _regularOfferCount = 0;
+        _offersSinceLastT3 = 0;
+        _rejectionMult.Clear();
+        _rejectedAtOffer.Clear();
+    }
+
+    // ── Offer Builders ─────────────────────────────────────────────────────────
+
+    private List<AugmentDefinition> BuildUnlockOffer(PlayerAugmentController controller, int slotCount)
+    {
+        var result     = new List<AugmentDefinition>();
+        var candidates = new List<AugmentDefinition>();
+        var usedIds    = new HashSet<AugmentId>();
+
+        UnlockAugmentDatabase db = unlockDatabase != null ? unlockDatabase : augmentDatabase?.unlockDatabase;
+        if (db == null) return result;
+
+        foreach (UnlockAugmentDefinition aug in db.GetAllUnlocks())
+        {
+            if (!IsEligible(aug, controller, usedIds)) continue;
+            candidates.Add(aug);
+        }
+
+        while (result.Count < slotCount && candidates.Count > 0)
+        {
+            AugmentDefinition pick = WeightedRandom(candidates);
+            result.Add(pick);
+            candidates.Remove(pick);
+            usedIds.Add(pick.id);
+        }
+        return result;
+    }
+
+    private List<AugmentDefinition> BuildRegularOffer(
+        PlayerAugmentController controller,
+        int slotCount,
+        bool pityActive)
+    {
+        var result  = new List<AugmentDefinition>(slotCount);
+        var usedIds = new HashSet<AugmentId>();
+
+        List<int> tierSlots = pityActive
+            ? BuildAllT3Slots(slotCount)
+            : GetRegularTierSlots(slotCount);
+
+        foreach (int tier in tierSlots)
+        {
+            AugmentDefinition pick = PickFromTier(tier, controller, usedIds);
+            if (pick == null) break;
+            result.Add(pick);
+            usedIds.Add(pick.id);
+        }
+        return result;
+    }
 
     /// <summary>
-    /// Returns slot tier list respecting floor gates.
-    ///   Floor  1 – (t2UnlockFloor-1) : all T1
-    ///   Floor  t2UnlockFloor+        : T2 slots gated by probability (15% per 5-floor interval)
-    ///   Floor  t3UnlockFloor+        : full milestone / normal composition
-    /// Unlock augments bypass floor gates via IsEligible, so they can appear in any slot.
+    /// Slot tier composition by regular offer count.
+    /// Slot 0 → T1 always.
+    /// Slot 1 → T2 once t2UnlockAfterOffers passed, else T1.
+    /// Slot 2 → T3 once t3UnlockAfterOffers passed, else T2 (or T1).
+    /// Extra  → T1.
     /// </summary>
-    private List<int> GetTierSlotComposition(int slotCount, bool isMilestone, int floor)
+    private List<int> GetRegularTierSlots(int slotCount)
     {
+        bool t2 = _regularOfferCount >= t2UnlockAfterOffers;
+        bool t3 = _regularOfferCount >= t3UnlockAfterOffers;
+
         var slots = new List<int>(slotCount);
-
-        bool t2Available = floor >= t2UnlockFloor;
-        bool t3Available = floor >= t3UnlockFloor;
-
-        if (!t2Available)
+        for (int i = 0; i < slotCount; i++)
         {
-            for (int i = 0; i < slotCount; i++) slots.Add(1);
-            return slots;
-        }
-
-        if (t3Available)
-        {
-            // Full composition rules
-            if (isMilestone)
+            switch (i)
             {
-                slots.Add(1); slots.Add(2); slots.Add(3);
-                for (int i = 3; i < slotCount; i++) slots.Add(1);
+                case 0:  slots.Add(1); break;
+                case 1:  slots.Add(t2 ? 2 : 1); break;
+                case 2:  slots.Add(t3 ? 3 : (t2 ? 2 : 1)); break;
+                default: slots.Add(1); break;
             }
-            else
-            {
-                slots.Add(1); slots.Add(1); slots.Add(2);
-                for (int i = 3; i < slotCount; i++) slots.Add(2);
-            }
-            return slots;
         }
-
-        // T2 available, T3 gated: T2 slots determined by probability roll
-        // First two slots always T1; remaining slots probabilistically T2
-        slots.Add(1);
-        if (slotCount >= 2) slots.Add(1);
-        for (int i = 2; i < slotCount; i++)
-            slots.Add(RollT2Slot(floor) ? 2 : 1);
-
         return slots;
     }
 
-    // floor=5 → interval=1 → 15%, floor=10 → interval=2 → 30%, etc.
-    private bool RollT2Slot(int floor)
+    private static List<int> BuildAllT3Slots(int slotCount)
     {
-        int interval = floor / t2UnlockFloor;
-        float probability = Mathf.Clamp01(interval * t2SlotChancePerInterval);
-        return Random.value < probability;
+        var slots = new List<int>(slotCount);
+        for (int i = 0; i < slotCount; i++) slots.Add(3);
+        return slots;
     }
+
+    // ── Tier Picking ───────────────────────────────────────────────────────────
 
     private AugmentDefinition PickFromTier(
         int tier,
         PlayerAugmentController controller,
-        HashSet<AugmentId> usedIds,
-        int currentFloor)
+        HashSet<AugmentId> usedIds)
     {
-        List<AugmentDefinition> candidates = CandidatesForTier(tier, controller, usedIds, currentFloor);
+        List<AugmentDefinition> candidates = BuildTierCandidates(tier, controller, usedIds);
 
-        // Fallback cascade: adjacent tier → any available
+        // Fallback: step down a tier, then accept any eligible regular augment
+        if (candidates.Count == 0 && tier > 1)
+            candidates = BuildTierCandidates(tier - 1, controller, usedIds);
         if (candidates.Count == 0)
-        {
-            int fallback = tier < 3 ? tier + 1 : tier - 1;
-            candidates = CandidatesForTier(fallback, controller, usedIds, currentFloor);
-        }
-        if (candidates.Count == 0)
-            candidates = AllCandidates(controller, usedIds, currentFloor);
+            candidates = BuildAllRegularCandidates(controller, usedIds);
         if (candidates.Count == 0)
             return null;
 
-        return WeightedRandom(candidates, currentFloor);
+        return WeightedRandom(candidates);
     }
 
-    private List<AugmentDefinition> CandidatesForTier(
+    private List<AugmentDefinition> BuildTierCandidates(
         int tier,
         PlayerAugmentController controller,
-        HashSet<AugmentId> usedIds,
-        int floor)
+        HashSet<AugmentId> usedIds)
     {
         var list = new List<AugmentDefinition>();
-        if (augmentDatabase?.allAugments == null) return list;
-        foreach (AugmentDefinition aug in augmentDatabase.allAugments)
+        if (augmentDatabase?.regularAugments == null) return list;
+        foreach (AugmentDefinition aug in augmentDatabase.regularAugments)
         {
-            if (!IsEligible(aug, controller, usedIds, floor)) continue;
-            // Accept exact tier match OR unlock augments (they bypass tier-slot restriction)
-            if (aug.rarity == tier || IsUnlockAugment(aug.id))
-                list.Add(aug);
+            if (aug.rarity != tier) continue;
+            if (!IsEligible(aug, controller, usedIds)) continue;
+            list.Add(aug);
         }
         return list;
     }
 
-    private List<AugmentDefinition> AllCandidates(
+    private List<AugmentDefinition> BuildAllRegularCandidates(
         PlayerAugmentController controller,
-        HashSet<AugmentId> usedIds,
-        int floor)
+        HashSet<AugmentId> usedIds)
     {
         var list = new List<AugmentDefinition>();
-        if (augmentDatabase?.allAugments == null) return list;
-        foreach (AugmentDefinition aug in augmentDatabase.allAugments)
+        if (augmentDatabase?.regularAugments == null) return list;
+        foreach (AugmentDefinition aug in augmentDatabase.regularAugments)
         {
-            if (!IsEligible(aug, controller, usedIds, floor)) continue;
+            if (!IsEligible(aug, controller, usedIds)) continue;
             list.Add(aug);
         }
         return list;
@@ -287,8 +292,7 @@ public class AugmentWeightSystem : MonoBehaviour
     private bool IsEligible(
         AugmentDefinition aug,
         PlayerAugmentController controller,
-        HashSet<AugmentId> usedIds,
-        int floor)
+        HashSet<AugmentId> usedIds)
     {
         if (aug == null || aug.id == AugmentId.None) return false;
         if (usedIds.Contains(aug.id)) return false;
@@ -297,39 +301,65 @@ public class AugmentWeightSystem : MonoBehaviour
         if (controller != null
             && controller.HasRadialLongbowMutationUnlock
             && aug.excludeFromAugmentPickerWhenRadialLongbowMutationComplete) return false;
-        if (!MeetsFloorRequirement(aug, floor)) return false;
         return true;
     }
 
-    private bool MeetsFloorRequirement(AugmentDefinition aug, int floor)
-    {
-        if (IsUnlockAugment(aug.id)) return true;
-        if (aug.rarity >= 3 && floor < t3UnlockFloor) return false;
-        if (aug.rarity >= 2 && floor < t2UnlockFloor) return false;
-        return true;
-    }
+    // ── Weighted Random ────────────────────────────────────────────────────────
 
-    private static bool IsUnlockAugment(AugmentId id)
+    private AugmentDefinition WeightedRandom(List<AugmentDefinition> candidates)
     {
-        switch (id)
+        if (candidates.Count == 1) return candidates[0];
+
+        float total = 0f;
+        var weights = new float[candidates.Count];
+        for (int i = 0; i < candidates.Count; i++)
         {
-            case AugmentId.ChargedLongbowAoeUnlock:
-            case AugmentId.DoubleArrowUnlock:
-            case AugmentId.WallLootsUnlock:
-            case AugmentId.DashUnluck:
-            case AugmentId.HammerChargeDamageReductionUnlock:
-            case AugmentId.LongbowFreezeUnlock:
-            case AugmentId.FireArrowUnlock:
-            case AugmentId.PoisonArrowUnlock:
-            case AugmentId.CrossbowBoltPierce:
-            case AugmentId.CrossbowBoltBleed:
-                return true;
-            default:
-                return false;
+            weights[i] = Mathf.Max(0f, GetEffectiveWeight(candidates[i]));
+            total += weights[i];
+        }
+
+        if (total <= 0f) return candidates[Random.Range(0, candidates.Count)];
+
+        float roll       = Random.value * total;
+        float cumulative = 0f;
+        for (int i = 0; i < candidates.Count; i++)
+        {
+            cumulative += weights[i];
+            if (roll <= cumulative) return candidates[i];
+        }
+        return candidates[candidates.Count - 1];
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+
+    private float GetBaseWeight(AugmentDefinition aug)
+    {
+        if (aug.baseWeight > 0f) return aug.baseWeight;
+        switch (aug.rarity)
+        {
+            case 1:  return t1BaseWeight;
+            case 2:  return t2BaseWeight;
+            case 3:  return t3BaseWeight;
+            default: return t1BaseWeight;
         }
     }
 
-    // Augments in the same group cannot appear together in a single offer.
+    private float CurrentRejectionMultiplier(AugmentId id)
+    {
+        if (!_rejectionMult.TryGetValue(id, out float startMult)) return 1f;
+        if (!_rejectedAtOffer.TryGetValue(id, out int rejectedAt))  return 1f;
+
+        int   offersSince = _totalOfferCount - rejectedAt;
+        float recovered   = startMult + offersSince * rejectionRecoveryPerRound;
+        if (recovered >= 1f)
+        {
+            _rejectionMult.Remove(id);
+            _rejectedAtOffer.Remove(id);
+            return 1f;
+        }
+        return recovered;
+    }
+
     private static readonly AugmentId[][] ExclusiveOfferGroups =
     {
         new[] { AugmentId.LuckIncrease_Common_I, AugmentId.LuckIncrease_Common_II, AugmentId.LuckIncrease_Common_III },
@@ -338,11 +368,11 @@ public class AugmentWeightSystem : MonoBehaviour
         new[] { AugmentId.DashDistanceIncrease_Uncommon_I, AugmentId.DashDistanceIncrease_Uncommon_II, AugmentId.DashDistanceIncrease_Uncommon_III },
         new[]
         {
-            AugmentId.ArrowCount_IncreaseNumberOfArrowsBy1,
-            AugmentId.ArrowCount_PlusOneArrows,
-            AugmentId.ArrowCount_PlusOneAndSpeed10Percent,
-            AugmentId.ArrowCount_PlusOneAndSpeed15Percent,
-            AugmentId.ArrowCount_IncreaseYourArrowsBy1,
+            AugmentId.ProjectileCount_IncreaseNumberOfProjectilesBy1,
+            AugmentId.ProjectileCount_PlusOneProjectiles,
+            AugmentId.ProjectileCount_PlusOneAndSpeed10Percent,
+            AugmentId.ProjectileCount_PlusOneAndSpeed15Percent,
+            AugmentId.ProjectileCount_IncreaseYourProjectilesBy1,
         },
         new[]
         {
@@ -366,66 +396,4 @@ public class AugmentWeightSystem : MonoBehaviour
         }
         return false;
     }
-
-    private AugmentDefinition WeightedRandom(List<AugmentDefinition> candidates, int currentFloor)
-    {
-        if (candidates.Count == 1) return candidates[0];
-
-        float total = 0f;
-        var weights = new float[candidates.Count];
-        for (int i = 0; i < candidates.Count; i++)
-        {
-            weights[i] = Mathf.Max(0f, GetEffectiveWeight(candidates[i], currentFloor));
-            total += weights[i];
-        }
-
-        if (total <= 0f) return candidates[Random.Range(0, candidates.Count)];
-
-        float roll = Random.value * total;
-        float cumulative = 0f;
-        for (int i = 0; i < candidates.Count; i++)
-        {
-            cumulative += weights[i];
-            if (roll <= cumulative) return candidates[i];
-        }
-        return candidates[candidates.Count - 1];
-    }
-
-    private float GetBaseWeight(AugmentDefinition aug)
-    {
-        if (aug.baseWeight > 0f) return aug.baseWeight;
-        switch (aug.rarity)
-        {
-            case 1:  return t1BaseWeight;
-            case 2:  return t2BaseWeight;
-            case 3:  return t3BaseWeight;
-            default: return t1BaseWeight;
-        }
-    }
-
-    private float PityMultiplier(int rarity)
-    {
-        if (rarity != 3 || offersWithoutT3 < pityThresholdRounds) return 1f;
-        int excess = offersWithoutT3 - pityThresholdRounds + 1;
-        return 1f + excess * pityIncrementPerRound;
-    }
-
-    private float CurrentRejectionMultiplier(AugmentId id)
-    {
-        if (!_rejectionMult.TryGetValue(id, out float startMult)) return 1f;
-        if (!_rejectedAtOffer.TryGetValue(id, out int rejectedAt))  return 1f;
-
-        int offersSince = totalOffers - rejectedAt;
-        float recovered = startMult + offersSince * rejectionRecoveryPerRound;
-        if (recovered >= 1f)
-        {
-            _rejectionMult.Remove(id);
-            _rejectedAtOffer.Remove(id);
-            return 1f;
-        }
-        return recovered;
-    }
-
-    private float FloorMultiplier(int rarity, int currentFloor) =>
-        rarity == 3 ? 1f + Mathf.Max(0, currentFloor) * t3FloorScalePerFloor : 1f;
 }

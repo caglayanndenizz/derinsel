@@ -21,11 +21,11 @@ public class PlayerAugmentController : MonoBehaviour
         AugmentId.LongbowAoeRadius_Common,
         AugmentId.LongbowAoeRadius_Rare,
         AugmentId.LongbowAoeRadius_Extraordinary,
-        AugmentId.ArrowCount_IncreaseNumberOfArrowsBy1,
-        AugmentId.ArrowCount_PlusOneArrows,
-        AugmentId.ArrowCount_PlusOneAndSpeed10Percent,
-        AugmentId.ArrowCount_PlusOneAndSpeed15Percent,
-        AugmentId.ArrowCount_IncreaseYourArrowsBy1,
+        AugmentId.ProjectileCount_IncreaseNumberOfProjectilesBy1,
+        AugmentId.ProjectileCount_PlusOneProjectiles,
+        AugmentId.ProjectileCount_PlusOneAndSpeed10Percent,
+        AugmentId.ProjectileCount_PlusOneAndSpeed15Percent,
+        AugmentId.ProjectileCount_IncreaseYourProjectilesBy1,
     };
 
     // ── Runtime stats ─────────────────────────────────────────────────────────
@@ -34,7 +34,6 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private bool  hasChargedLongbowAoe;
     [SerializeField] private float chargedLongbowAoeRadius = 3f;
     [SerializeField] private bool  hasDoubleArrowUnlock;
-    [SerializeField] private bool  hasWallLootsUnlock;
     [SerializeField] private bool  hasExtraAugmentSlotUnlock;
     [SerializeField] private bool  hasDashUnluck;
     [SerializeField] private float dashCooldownMultiplier  = 1f;
@@ -82,15 +81,24 @@ public class PlayerAugmentController : MonoBehaviour
     private float _initialChargedLongbowAoeRadius;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
 
-    [SerializeField] private int   arrowShotBonusCount;
+    [SerializeField] private int   projectileShotBonusCount;
     [SerializeField] private float arrowProjectileSpeedMultiplier = 1f;
     [SerializeField] private float outgoingDamageMultiplier       = 1f;
     [SerializeField] private float maxHealthMultiplier            = 1f;
+
+    [Header("Unlock Augment Database")]
+    [Tooltip("Silaha göre unlock augmentleri takip etmek için. Mutation kontrolünde kullanılır.")]
+    [SerializeField] private UnlockAugmentDatabase unlockDatabase;
 
     [Header("MutationAugmentsLongbow")]
     [SerializeField]
     [Tooltip("İşaretlenince 6 longbow augment varmış gibi Obsidyen mutasyonu tetiklenir (test).")]
     private bool mutationAugmentsLongbow;
+
+    // Weapon mutation flags — set automatically when all unlock augments for a weapon are obtained
+    private bool _longbowMutated;
+    private bool _crossbowMutated;
+    private bool _hammerMutated;
 
     [Header("Motor test (Play Mode'da güncellenir)")]
     [SerializeField] private int      longbowCevherCountMotor;
@@ -121,13 +129,18 @@ public class PlayerAugmentController : MonoBehaviour
     public int   CrossbowBleedMaxStacks          => Mathf.Max(1, crossbowBleedMaxStacks);
     public float CrossbowBleedExpireSeconds      => Mathf.Max(0f, crossbowBleedExpireSeconds);
 
-    public int ArrowShotMultiplier => Mathf.Max(
+    public int ProjectileShotMultiplier => Mathf.Max(
         1,
-        1 + Mathf.Max(0, arrowShotBonusCount) + ((hasDoubleArrowUnlock || mutationAugmentsLongbow) ? 1 : 0));
+        1 + Mathf.Max(0, projectileShotBonusCount) + ((hasDoubleArrowUnlock || mutationAugmentsLongbow) ? 1 : 0));
     public float ArrowProjectileSpeedMultiplier => Mathf.Max(0.01f, arrowProjectileSpeedMultiplier);
     public float OutgoingDamageMultiplier       => Mathf.Max(0.01f, outgoingDamageMultiplier);
     public float MaxHealthMultiplier            => Mathf.Max(0.01f, maxHealthMultiplier);
-    public bool  HasWallLootsUnlock             => hasWallLootsUnlock;
+    /// <summary>
+    /// Passive — automatically active when the player has Charged Longbow AoE OR any Hammer Slam AoE upgrade.
+    /// No augment slot is consumed; wall-loot behaviour triggers whenever this returns true.
+    /// </summary>
+    [Tooltip("Read-only at runtime. True when the player has Charged Longbow AoE or any Hammer AoE radius bonus.")]
+    public bool  HasWallLootsUnlock             => hasChargedLongbowAoe || hammerAoeRadiusBonus > 0f;
     public bool  HasExtraAugmentSlotUnlock      => hasExtraAugmentSlotUnlock;
     public bool  HasDashUnluck                  => hasDashUnluck;
     public float DashCooldownMultiplier         => Mathf.Max(0.01f, dashCooldownMultiplier);
@@ -167,8 +180,12 @@ public class PlayerAugmentController : MonoBehaviour
         }
     }
 
+    public bool HasLongbowMutation  => _longbowMutated;
+    public bool HasCrossbowMutation => _crossbowMutated;
+    public bool HasHammerMutation   => _hammerMutated;
+
     public bool HasRadialLongbowMutationUnlock =>
-        mutationAugmentsLongbow || LongbowCevherTier == CevherTier.Obsidyen;
+        mutationAugmentsLongbow || LongbowCevherTier == CevherTier.Obsidyen || _longbowMutated;
 
     public bool MutatedArrowShots => HasRadialLongbowMutationUnlock;
 
@@ -196,7 +213,6 @@ public class PlayerAugmentController : MonoBehaviour
         hasChargedLongbowAoe                    = false;
         chargedLongbowAoeRadius                 = _initialChargedLongbowAoeRadius;
         hasDoubleArrowUnlock                = false;
-        hasWallLootsUnlock                  = false;
         hasExtraAugmentSlotUnlock           = false;
         hasDashUnluck                       = false;
         dashCooldownMultiplier              = 1f;
@@ -213,12 +229,15 @@ public class PlayerAugmentController : MonoBehaviour
         hammerAoeRadiusBonus                = 0f;
         longbowAoeRadiusBonus                   = 0f;
         flatMaxHealthBonus                  = 0f;
-        arrowShotBonusCount                 = 0;
+        projectileShotBonusCount            = 0;
         arrowProjectileSpeedMultiplier      = 1f;
         outgoingDamageMultiplier            = 1f;
         maxHealthMultiplier                 = 1f;
         hasCrossbowBoltPierce               = false;
         hasCrossbowBoltBleed                = false;
+        _longbowMutated                     = false;
+        _crossbowMutated                    = false;
+        _hammerMutated                      = false;
         _appliedAugmentCounts.Clear();
     }
 
@@ -268,9 +287,6 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.DoubleArrowUnlock:
                 hasDoubleArrowUnlock = true;
-                break;
-            case AugmentId.WallLootsUnlock:
-                hasWallLootsUnlock = true;
                 break;
             case AugmentId.ExtraAugmentSlotUnlock:
                 hasExtraAugmentSlotUnlock = true;
@@ -355,14 +371,14 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.MaxHealthIncreasePercent:
                 maxHealthMultiplier *= 1f + Mathf.Max(0f, augment.value);
                 break;
-            case AugmentId.ArrowCount_IncreaseNumberOfArrowsBy1:
-            case AugmentId.ArrowCount_PlusOneArrows:
-            case AugmentId.ArrowCount_IncreaseYourArrowsBy1:
-                arrowShotBonusCount++;
+            case AugmentId.ProjectileCount_IncreaseNumberOfProjectilesBy1:
+            case AugmentId.ProjectileCount_PlusOneProjectiles:
+            case AugmentId.ProjectileCount_IncreaseYourProjectilesBy1:
+                projectileShotBonusCount++;
                 break;
-            case AugmentId.ArrowCount_PlusOneAndSpeed10Percent:
-            case AugmentId.ArrowCount_PlusOneAndSpeed15Percent:
-                arrowShotBonusCount++;
+            case AugmentId.ProjectileCount_PlusOneAndSpeed10Percent:
+            case AugmentId.ProjectileCount_PlusOneAndSpeed15Percent:
+                projectileShotBonusCount++;
                 arrowProjectileSpeedMultiplier *= 1f + Mathf.Max(0f, augment.value);
                 break;
             case AugmentId.CrossbowBoltPierce:
@@ -378,6 +394,9 @@ public class PlayerAugmentController : MonoBehaviour
 
         if (!Mathf.Approximately(prevMaxHpMult, maxHealthMultiplier))
             _player?.OnMaxHealthMultiplierChanged(prevMaxHpMult, maxHealthMultiplier);
+
+        if (augment is UnlockAugmentDefinition unlockDef)
+            CheckWeaponMutation(unlockDef.weaponType);
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
@@ -385,7 +404,7 @@ public class PlayerAugmentController : MonoBehaviour
     private static int GetMaxApplyCount(AugmentDefinition augment)
     {
         if (augment == null) return 0;
-        if (IsUnlockAugment(augment.id)) return 1;
+        if (augment is UnlockAugmentDefinition) return 1; // one-time unlock
 
         switch (augment.id)
         {
@@ -395,25 +414,6 @@ public class PlayerAugmentController : MonoBehaviour
                 return GetMovementSpeedMaxApplyCountFromRarity(augment.rarity);
             default:
                 return 1;
-        }
-    }
-
-    private static bool IsUnlockAugment(AugmentId id)
-    {
-        switch (id)
-        {
-            case AugmentId.ChargedLongbowAoeUnlock:
-            case AugmentId.WallLootsUnlock:
-            case AugmentId.DashUnluck:
-            case AugmentId.HammerChargeDamageReductionUnlock:
-            case AugmentId.LongbowFreezeUnlock:
-            case AugmentId.FireArrowUnlock:
-            case AugmentId.PoisonArrowUnlock:
-            case AugmentId.CrossbowBoltPierce:
-            case AugmentId.CrossbowBoltBleed:
-                return true;
-            default:
-                return false;
         }
     }
 
@@ -428,12 +428,44 @@ public class PlayerAugmentController : MonoBehaviour
         }
     }
 
+    // ── Weapon Mutation ───────────────────────────────────────────────────────
+
+    private void CheckWeaponMutation(WeaponType weaponType)
+    {
+        if (unlockDatabase == null) return;
+
+        System.Collections.Generic.List<UnlockAugmentDefinition> pool;
+        switch (weaponType)
+        {
+            case WeaponType.Longbow:   pool = unlockDatabase.longbowUnlocks;   break;
+            case WeaponType.Crossbow:  pool = unlockDatabase.crossbowUnlocks;  break;
+            case WeaponType.Hammer:    pool = unlockDatabase.hammerUnlocks;    break;
+            case WeaponType.Universal: pool = unlockDatabase.universalUnlocks; break;
+            default: return;
+        }
+
+        if (pool == null || pool.Count == 0) return;
+
+        foreach (UnlockAugmentDefinition u in pool)
+            if (u == null || GetAppliedCount(u.id) == 0) return;
+
+        GrantWeaponMutation(weaponType);
+    }
+
+    private void GrantWeaponMutation(WeaponType weaponType)
+    {
+        switch (weaponType)
+        {
+            case WeaponType.Longbow:  _longbowMutated  = true; break;
+            case WeaponType.Crossbow: _crossbowMutated = true; break;
+            case WeaponType.Hammer:   _hammerMutated   = true; break;
+        }
+    }
+
     private bool MeetsAugmentPrerequisites(AugmentId id)
     {
         switch (id)
         {
-            case AugmentId.WallLootsUnlock:
-                return hasChargedLongbowAoe;
             case AugmentId.DashCooldownReduce_Common_I:
             case AugmentId.DashCooldownReduce_Common_II:
             case AugmentId.DashCooldownReduce_Rare:

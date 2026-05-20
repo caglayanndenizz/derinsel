@@ -12,20 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b588b867ad500e489e4ffc14ad4479a, type: 3}
   m_Name: AugmentDatabase
   m_EditorClassIdentifier: Assembly-CSharp::AugmentDatabase
-  allAugments:
+  regularAugments:
   - {fileID: 11400000, guid: d6cc1b740c8d46a08b34f86e5d77de79, type: 2}
   - {fileID: 11400000, guid: 074bf7d84e174b5399708b2fe39a9f7c, type: 2}
   - {fileID: 11400000, guid: 951241ff84454c4b878d431818f97e6b, type: 2}
-  - {fileID: 11400000, guid: ce404143737df463b97896e0a1221ebe, type: 2}
-  - {fileID: 11400000, guid: f8cb72d4efef84979993481657f1512a, type: 2}
-  - {fileID: 11400000, guid: 47dc563dce0d243b598ceade1c6801e0, type: 2}
   - {fileID: 11400000, guid: a3f9012b4e5f6a708b91c234d567e890, type: 2}
   - {fileID: 11400000, guid: 7ab24360611c43f1a764a7631494928e, type: 2}
   - {fileID: 11400000, guid: d48bad69c94644988797c210ba27d80f, type: 2}
   - {fileID: 11400000, guid: 4f5025ea90e8444aad819b13c824eda5, type: 2}
   - {fileID: 11400000, guid: 5b172504bbc94f1ea0594b569f64e6cd, type: 2}
   - {fileID: 11400000, guid: 2ccb107a89c94eea9155ce767ca1747b, type: 2}
-  - {fileID: 11400000, guid: e7c9f4a2d3b6851f0e2c4a8d7b5f3e1a, type: 2}
   - {fileID: 11400000, guid: 3f8e2a1b4c7d9065e3f1a2b4c8d7e0fa, type: 2}
   - {fileID: 11400000, guid: 7b4a9e2d1c5f8306e4d8f1a3b7c9e2f5, type: 2}
   - {fileID: 11400000, guid: 1d6e3a8c4f2b9507d5e9f2a4b8c6e1d3, type: 2}
@@ -47,7 +43,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: da01234567890abcdef01234567890a1, type: 2}
   - {fileID: 11400000, guid: da01234567890abcdef01234567890b1, type: 2}
   - {fileID: 11400000, guid: da01234567890abcdef01234567890c1, type: 2}
-  - {fileID: 11400000, guid: c401234567890abcdef01234567890a1, type: 2}
   - {fileID: 11400000, guid: f401234567890abcdef01234567890a1, type: 2}
   - {fileID: 11400000, guid: f401234567890abcdef01234567890b1, type: 2}
   - {fileID: 11400000, guid: f401234567890abcdef01234567890c1, type: 2}
@@ -62,9 +57,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e401234567890abcdef01234567890a2, type: 2}
   - {fileID: 11400000, guid: e401234567890abcdef01234567890a3, type: 2}
   - {fileID: 11400000, guid: e401234567890abcdef01234567890a4, type: 2}
-  - {fileID: 11400000, guid: bf73dc0924d3b4d1fb55f5c1a3bb0abf, type: 2}
-  - {fileID: 11400000, guid: 495800bbdc2824c9fb180896690d339d, type: 2}
-  - {fileID: 11400000, guid: c543b12b1d9d445ff86bcec5f9a00044, type: 2}
-  - {fileID: 11400000, guid: cb04e7a91d3f506eb7c1a4d9f2b5e803, type: 2}
-  - {fileID: 11400000, guid: cb07c3f18d2b5a946d3e7f0b4c8a1e6d, type: 2}
-  - {fileID: 11400000, guid: cb11f5a32b7e904d6c8a1f3b5d7e9a0b, type: 2}
+  unlockDatabase: {fileID: 0}

@@ -8,7 +8,6 @@ public class AugmentWeightDebugUI : MonoBehaviour
     [SerializeField] private float refreshInterval = 0.5f;
 
     private AugmentWeightSystem _weightSystem;
-    private DungeonGenerator _dungeonGenerator;
     private float _nextRefresh;
 
     private void Awake()
@@ -28,16 +27,14 @@ public class AugmentWeightDebugUI : MonoBehaviour
         TryResolveReferences();
         if (outputText == null || _weightSystem == null) return;
 
-        int floor = _dungeonGenerator != null ? _dungeonGenerator.CurrentFloor : 0;
-        bool milestone = _weightSystem.IsMilestoneFloor(floor);
-
         var sb = new StringBuilder(512);
-        sb.Append("<b>Floor: ").Append(floor);
-        if (milestone) sb.Append(" [MILESTONE]");
-        sb.AppendLine("</b>");
-        sb.Append("Pity: ").Append(_weightSystem.OffersWithoutT3).Append(" offers w/o T3")
-          .Append("  |  x").AppendFormat("{0:F2}", _weightSystem.CurrentPityMultiplier).AppendLine();
-        sb.Append("Total Offers: ").AppendLine(_weightSystem.TotalOffers.ToString());
+        sb.Append("<b>Total Offers: ").Append(_weightSystem.TotalOfferCount)
+          .Append("  |  Regular: ").Append(_weightSystem.RegularOfferCount).AppendLine("</b>");
+        sb.Append("Next offer: ").AppendLine(_weightSystem.IsNextOfferUnlock ? "[UNLOCK]" : "[REGULAR]");
+        sb.Append("Since last T3: ").Append(_weightSystem.OffersSinceLastT3)
+          .Append(" / ").Append(_weightSystem.PityThreshold);
+        if (_weightSystem.IsPityActive) sb.Append("  <color=red>[PITY ACTIVE]</color>");
+        sb.AppendLine();
         sb.AppendLine("─────────────────────────────");
 
         var all = _weightSystem.AllAugments;
@@ -45,7 +42,7 @@ public class AugmentWeightDebugUI : MonoBehaviour
         {
             AugmentDefinition aug = all[i];
             if (aug == null) continue;
-            float w = _weightSystem.GetEffectiveWeight(aug, floor);
+            float w = _weightSystem.GetEffectiveWeight(aug);
             sb.Append("[T").Append(aug.rarity).Append("] ")
               .Append(aug.displayName).Append(": ")
               .AppendFormat("{0:F1}", w).AppendLine();
@@ -56,13 +53,9 @@ public class AugmentWeightDebugUI : MonoBehaviour
 
     private void TryResolveReferences()
     {
+        if (_weightSystem != null) return;
+        _weightSystem = AugmentWeightSystem.Instance;
         if (_weightSystem == null)
-        {
-            _weightSystem = AugmentWeightSystem.Instance;
-            if (_weightSystem == null)
-                _weightSystem = Object.FindAnyObjectByType<AugmentWeightSystem>();
-        }
-        if (_dungeonGenerator == null)
-            _dungeonGenerator = Object.FindAnyObjectByType<DungeonGenerator>();
+            _weightSystem = Object.FindAnyObjectByType<AugmentWeightSystem>();
     }
 }
