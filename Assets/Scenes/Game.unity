@@ -3632,6 +3632,8 @@ MonoBehaviour:
   exitUI: {fileID: 1267362878}
   minSteps: 150
   maxSteps: 250
+  minStepsPerEnemy: 8
+  maxStepsPerEnemy: 12
   player: {fileID: 1700128186}
   enemyPrefabs:
   - {fileID: 9054262178047731215, guid: f63ecbfb4afa04446aa4013cbf460301, type: 3}
@@ -4895,9 +4897,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f01d83f117822490095b93f34ef0295b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CevherSystemUI
-  longbowTrait: {fileID: 0}
+  longbowTrait: {fileID: 1481143875}
   badgeImage: {fileID: 2017166911}
-  longbowIcon: {fileID: 0}
+  longbowIcon: {fileID: 772821797}
   countText: {fileID: 2097224907}
   inactiveColor: {r: 0.18, g: 0.18, b: 0.18, a: 0.55}
   komurColor: {r: 0.45, g: 0.4, b: 0.35, a: 1}

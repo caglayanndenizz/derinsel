@@ -5,7 +5,7 @@ public class Lootable : MonoBehaviour, ICollectable
     [Header("Basic Settings")]
     public int value = 1;
     [Tooltip("isGold kapaliysa (XP orb) verilecek deneyim miktari.")]
-    public int experienceValue = 10;
+    public int experienceValue = 12;
     public bool isGold = true;
 
     [Header("Magnet Settings")]

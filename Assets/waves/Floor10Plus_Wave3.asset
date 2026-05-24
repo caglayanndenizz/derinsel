@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveDefinition
   entries:
   - enemyType: 1
-    count: 3
+    count: 5
   - enemyType: 2
-    count: 4
+    count: 6
   - enemyType: 0
-    count: 4
+    count: 6
   spawnDelayBetweenEnemies: 0.15
   expMultiplier: 2.5
   goldMultiplier: 2.5

@@ -19,73 +19,74 @@ public static class WaveConfigSeeder
         // ── Wave Definition'ları oluştur ──────────────────────────────────────
 
         // FLOORS 1-3 ─ Tutorial feel: önce ranged baskı, sonra melee
+        // Sayılar 1.5x artırıldı (erken oyun hızlandırma)
         WaveDefinition f1_w1 = MakeWave("Floor1-3_Wave1",
-            (Enemy.EnemyType.Mage,    4),
+            (Enemy.EnemyType.Mage,    6),
             spawnDelay: 0.5f, exp: 1.0f, gold: 1.0f);
 
         WaveDefinition f1_w2 = MakeWave("Floor1-3_Wave2",
-            (Enemy.EnemyType.Warrior, 2),
-            (Enemy.EnemyType.Mage,    2),
+            (Enemy.EnemyType.Warrior, 3),
+            (Enemy.EnemyType.Mage,    3),
             spawnDelay: 0.4f, exp: 1.2f, gold: 1.2f);
 
         WaveDefinition f1_w3 = MakeWave("Floor1-3_Wave3",
-            (Enemy.EnemyType.Warrior, 2),
-            (Enemy.EnemyType.Tanky,   1),
-            (Enemy.EnemyType.Mage,    2),
+            (Enemy.EnemyType.Warrior, 3),
+            (Enemy.EnemyType.Tanky,   2),
+            (Enemy.EnemyType.Mage,    3),
             spawnDelay: 0.4f, exp: 1.5f, gold: 1.5f);
 
         // FLOORS 4-6 ─ Baskı artar: Tanky'ler çoğalıyor, Warrior tehlikeli
         WaveDefinition f4_w1 = MakeWave("Floor4-6_Wave1",
-            (Enemy.EnemyType.Warrior, 2),
-            (Enemy.EnemyType.Mage,    3),
+            (Enemy.EnemyType.Warrior, 3),
+            (Enemy.EnemyType.Mage,    5),
             spawnDelay: 0.35f, exp: 1.3f, gold: 1.3f);
 
         WaveDefinition f4_w2 = MakeWave("Floor4-6_Wave2",
-            (Enemy.EnemyType.Warrior, 3),
-            (Enemy.EnemyType.Tanky,   1),
-            (Enemy.EnemyType.Mage,    2),
+            (Enemy.EnemyType.Warrior, 5),
+            (Enemy.EnemyType.Tanky,   2),
+            (Enemy.EnemyType.Mage,    3),
             spawnDelay: 0.35f, exp: 1.5f, gold: 1.5f);
 
         WaveDefinition f4_w3 = MakeWave("Floor4-6_Wave3",
-            (Enemy.EnemyType.Tanky,   2),
-            (Enemy.EnemyType.Warrior, 2),
-            (Enemy.EnemyType.Mage,    3),
+            (Enemy.EnemyType.Tanky,   3),
+            (Enemy.EnemyType.Warrior, 3),
+            (Enemy.EnemyType.Mage,    5),
             spawnDelay: 0.3f, exp: 1.8f, gold: 1.8f);
 
         // FLOORS 7-9 ─ Yüksek baskı: her wave kaotik, dopamin yüksek
         WaveDefinition f7_w1 = MakeWave("Floor7-9_Wave1",
-            (Enemy.EnemyType.Warrior, 3),
-            (Enemy.EnemyType.Mage,    4),
+            (Enemy.EnemyType.Warrior, 5),
+            (Enemy.EnemyType.Mage,    6),
             spawnDelay: 0.25f, exp: 1.6f, gold: 1.6f);
 
         WaveDefinition f7_w2 = MakeWave("Floor7-9_Wave2",
-            (Enemy.EnemyType.Tanky,   2),
-            (Enemy.EnemyType.Warrior, 3),
-            (Enemy.EnemyType.Mage,    2),
+            (Enemy.EnemyType.Tanky,   3),
+            (Enemy.EnemyType.Warrior, 5),
+            (Enemy.EnemyType.Mage,    3),
             spawnDelay: 0.25f, exp: 1.8f, gold: 1.8f);
 
         WaveDefinition f7_w3 = MakeWave("Floor7-9_Wave3",
-            (Enemy.EnemyType.Tanky,   2),
-            (Enemy.EnemyType.Warrior, 3),
-            (Enemy.EnemyType.Mage,    4),
+            (Enemy.EnemyType.Tanky,   3),
+            (Enemy.EnemyType.Warrior, 5),
+            (Enemy.EnemyType.Mage,    6),
             spawnDelay: 0.2f, exp: 2.2f, gold: 2.2f);
 
         // FLOORS 10+ ─ Boss antesi: maksimum kaos, yüksek ödül
         WaveDefinition f10_w1 = MakeWave("Floor10Plus_Wave1",
-            (Enemy.EnemyType.Warrior, 3),
-            (Enemy.EnemyType.Mage,    5),
+            (Enemy.EnemyType.Warrior, 5),
+            (Enemy.EnemyType.Mage,    8),
             spawnDelay: 0.2f, exp: 2.0f, gold: 2.0f);
 
         WaveDefinition f10_w2 = MakeWave("Floor10Plus_Wave2",
-            (Enemy.EnemyType.Tanky,   2),
-            (Enemy.EnemyType.Warrior, 4),
-            (Enemy.EnemyType.Mage,    3),
+            (Enemy.EnemyType.Tanky,   3),
+            (Enemy.EnemyType.Warrior, 6),
+            (Enemy.EnemyType.Mage,    5),
             spawnDelay: 0.2f, exp: 2.2f, gold: 2.2f);
 
         WaveDefinition f10_w3 = MakeWave("Floor10Plus_Wave3",
-            (Enemy.EnemyType.Tanky,   3),
-            (Enemy.EnemyType.Warrior, 4),
-            (Enemy.EnemyType.Mage,    4),
+            (Enemy.EnemyType.Tanky,   5),
+            (Enemy.EnemyType.Warrior, 6),
+            (Enemy.EnemyType.Mage,    6),
             spawnDelay: 0.15f, exp: 2.5f, gold: 2.5f);
 
         // ── FloorWaveConfig'leri oluştur ──────────────────────────────────────
