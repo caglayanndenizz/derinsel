@@ -7,6 +7,11 @@ public class PlayerArrow : MonoBehaviour
 {
     [SerializeField] float defaultMaxLifetime = 8f;
 
+    [Header("Element Particle Effects")]
+    [SerializeField] ParticleSystem fireParticles;
+    [SerializeField] ParticleSystem poisonParticles;
+    [SerializeField] ParticleSystem iceParticles;
+
     float _speed;
     float _damage;
     Vector2 _direction;
@@ -35,7 +40,11 @@ public class PlayerArrow : MonoBehaviour
             col.isTrigger = true;
     }
 
-    void OnEnable()  => _wasVisibleSinceSpawn = false;
+    void OnEnable()
+    {
+        _wasVisibleSinceSpawn = false;
+        StopAllElementParticles();
+    }
     void OnBecameVisible()   { _wasVisibleSinceSpawn = true; }
     void OnBecameInvisible() { if (_initialized && _wasVisibleSinceSpawn) ReturnToPool(); }
 
@@ -75,6 +84,7 @@ public class PlayerArrow : MonoBehaviour
         _dungeonGenerator  = dungeonGenerator;
         _hitCameraImpulse = hitCameraImpulse;
 
+        RefreshElementParticles();
         _initialized = false;
 
         Vector2 origin = transform.position;
@@ -205,10 +215,40 @@ public class PlayerArrow : MonoBehaviour
     void ReturnToPool()
     {
         _initialized = false;
+        StopAllElementParticles();
         if (PlayerArrowPooler.Instance != null)
             PlayerArrowPooler.Instance.ReturnArrow(gameObject);
         else
             Destroy(gameObject);
+    }
+
+    // ── Element Particles ─────────────────────────────────────────────────────
+
+    void RefreshElementParticles()
+    {
+        SetParticle(fireParticles,   _hasFireArrow);
+        SetParticle(poisonParticles, _hasPoisonArrow);
+        SetParticle(iceParticles,    _freezeDuration > 0f);
+    }
+
+    void StopAllElementParticles()
+    {
+        SetParticle(fireParticles,   false);
+        SetParticle(poisonParticles, false);
+        SetParticle(iceParticles,    false);
+    }
+
+    static void SetParticle(ParticleSystem ps, bool active)
+    {
+        if (ps == null) return;
+        if (active)
+        {
+            if (!ps.isPlaying) ps.Play();
+        }
+        else
+        {
+            if (ps.isPlaying) ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
     }
 
     void ApplyChargedExplosionDamage(Vector2 center)
