@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -175,7 +174,10 @@ public class PlayerArrow : MonoBehaviour
         RaycastHit2D[] hits = Physics2D.LinecastAll(from, to);
         if (hits == null || hits.Length == 0) return false;
 
-        foreach (RaycastHit2D h in hits.OrderBy(x => x.distance))
+        // LINQ yerine manuel sort — her frame GC allocation önlenir
+        System.Array.Sort(hits, 0, hits.Length, _raycastComparer);
+
+        foreach (RaycastHit2D h in hits)
         {
             if (h.collider == null) continue;
             if (IsOwnCollider(h.collider)) continue;
@@ -188,6 +190,13 @@ public class PlayerArrow : MonoBehaviour
         }
 
         return false;
+    }
+
+    // Statik comparer — lambda yerine kullanılır, her frame allocation yaratmaz
+    private static readonly RaycastDistanceComparer _raycastComparer = new RaycastDistanceComparer();
+    private class RaycastDistanceComparer : System.Collections.Generic.IComparer<RaycastHit2D>
+    {
+        public int Compare(RaycastHit2D a, RaycastHit2D b) => a.distance.CompareTo(b.distance);
     }
 
     void TryApplyDirectArrowDamage(Collider2D other)

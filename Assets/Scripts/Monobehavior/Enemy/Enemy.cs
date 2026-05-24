@@ -342,6 +342,12 @@ public class Enemy : BaseEntity
         return currentDir;
     }
 
+    private static readonly LosComparer _losComparer = new LosComparer();
+    private class LosComparer : System.Collections.Generic.IComparer<RaycastHit2D>
+    {
+        public int Compare(RaycastHit2D a, RaycastHit2D b) => a.distance.CompareTo(b.distance);
+    }
+
     private static Vector2 RotateVector(Vector2 v, float deg)
     {
         float s = Mathf.Sin(deg * Mathf.Deg2Rad);
@@ -475,7 +481,7 @@ public class Enemy : BaseEntity
         }
 
         RaycastHit2D[] hits = Physics2D.LinecastAll(start, end, blockingEnvironmentMask);
-        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        System.Array.Sort(hits, 0, hits.Length, _losComparer);
         foreach (var hit in hits)
         {
             if (hit.collider == null) continue;

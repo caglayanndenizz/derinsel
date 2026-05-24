@@ -32,6 +32,11 @@ public class EnemyObjectPooler : MonoBehaviour
 
     private readonly Queue<GameObject> _availableEnemies = new Queue<GameObject>();
     private readonly HashSet<GameObject> _queuedEnemies = new HashSet<GameObject>();
+
+    // Typed pool: her EnemyType için ayrı queue — GetEnemyOfType artık Instantiate yapmaz
+    private readonly Dictionary<Enemy.EnemyType, Queue<GameObject>>   _typedAvailable = new();
+    private readonly Dictionary<Enemy.EnemyType, HashSet<GameObject>> _typedQueued    = new();
+
     private List<GameObject> _validPrefabCache;
     private int _leasedActiveEnemyCount;
 
@@ -139,32 +144,55 @@ public class EnemyObjectPooler : MonoBehaviour
 
     /// <summary>
     /// Wave sistemi için type-specific spawn. typedPrefabs'ta eşleşme yoksa generic GetEnemy() fallback'i kullanılır.
+    /// Per-type pool kullanır — her spawn'da Instantiate YAPILMAZ.
     /// </summary>
     public GameObject GetEnemyOfType(Enemy.EnemyType type, Vector3 worldPosition, Quaternion rotation)
     {
-        GameObject prefab = null;
-        if (typedPrefabs != null)
-        {
-            foreach (EnemyTypePrefabEntry entry in typedPrefabs)
-            {
-                if (entry.prefab != null && entry.enemyType == type)
-                {
-                    prefab = entry.prefab;
-                    break;
-                }
-            }
-        }
+        GameObject prefab = GetTypedPrefab(type);
 
         if (prefab == null)
             return GetEnemy(worldPosition, rotation);
 
-        GameObject enemy = Instantiate(prefab, worldPosition, rotation);
+        // Per-type queue'yu getir veya oluştur
+        if (!_typedAvailable.TryGetValue(type, out Queue<GameObject> available))
+            _typedAvailable[type] = available = new Queue<GameObject>();
+        if (!_typedQueued.TryGetValue(type, out HashSet<GameObject> queued))
+            _typedQueued[type] = queued = new HashSet<GameObject>();
+
+        // Pool boşsa genişlet
+        if (available.Count == 0)
+        {
+            if (!canExpandPool)
+            {
+                Debug.LogWarning($"EnemyObjectPooler: {type} typed pool tükendi, genişletme kapalı.");
+                return null;
+            }
+            Transform parent = poolParent != null ? poolParent : transform;
+            GameObject newEnemy = Instantiate(prefab, parent);
+            newEnemy.SetActive(false);
+            available.Enqueue(newEnemy);
+            queued.Add(newEnemy);
+        }
+
+        GameObject enemy = available.Dequeue();
+        queued.Remove(enemy);
+        enemy.transform.SetPositionAndRotation(worldPosition, rotation);
 
         if (_leasedActiveEnemyCount == 0)
             SetLinkedPoolersActive(true);
         _leasedActiveEnemyCount++;
 
+        enemy.SetActive(true);
         return enemy;
+    }
+
+    private GameObject GetTypedPrefab(Enemy.EnemyType type)
+    {
+        if (typedPrefabs == null) return null;
+        foreach (EnemyTypePrefabEntry entry in typedPrefabs)
+            if (entry.prefab != null && entry.enemyType == type)
+                return entry.prefab;
+        return null;
     }
 
     public void ReturnEnemy(GameObject enemy)
@@ -176,6 +204,23 @@ public class EnemyObjectPooler : MonoBehaviour
         enemy.SetActive(false);
         enemy.transform.SetParent(poolParent != null ? poolParent : transform);
 
+        // Typed pool'a mı ait? → doğru queue'ya geri dön
+        Enemy enemyComp = enemy.GetComponent<Enemy>();
+        if (enemyComp != null
+            && _typedQueued.TryGetValue(enemyComp.enemyType, out HashSet<GameObject> typedQSet)
+            && _typedAvailable.TryGetValue(enemyComp.enemyType, out Queue<GameObject> typedQ))
+        {
+            if (typedQSet.Add(enemy))
+            {
+                typedQ.Enqueue(enemy);
+                if (wasActiveInWorld)
+                    _leasedActiveEnemyCount = Mathf.Max(0, _leasedActiveEnemyCount - 1);
+            }
+            if (_leasedActiveEnemyCount == 0) SetLinkedPoolersActive(false);
+            return;
+        }
+
+        // Generic pool
         if (_queuedEnemies.Add(enemy))
         {
             _availableEnemies.Enqueue(enemy);

@@ -106,7 +106,7 @@ public class PlayerBolt : MonoBehaviour
 
         bool destroyBolt = false;
         RaycastHit2D[] hits = Physics2D.LinecastAll(prev, next);
-        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        System.Array.Sort(hits, 0, hits.Length, _raycastComparer);
 
         foreach (RaycastHit2D h in hits)
         {
@@ -138,6 +138,12 @@ public class PlayerBolt : MonoBehaviour
 
     bool IsOwnCollider(Collider2D c) =>
         c != null && (c.transform == transform || c.transform.IsChildOf(transform));
+
+    private static readonly RaycastDistanceComparer _raycastComparer = new RaycastDistanceComparer();
+    private class RaycastDistanceComparer : System.Collections.Generic.IComparer<RaycastHit2D>
+    {
+        public int Compare(RaycastHit2D a, RaycastHit2D b) => a.distance.CompareTo(b.distance);
+    }
 
     void TryHitEnemy(Collider2D col)
     {

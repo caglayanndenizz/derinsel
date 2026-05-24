@@ -83,9 +83,13 @@ public class PlayerImpactFeedback : MonoBehaviour
         hitAudioSource.pitch = previousPitch;
     }
 
+    [Tooltip("hitVfxPrefab'ın sahnede kalacağı süre (saniye). Sonra otomatik yok edilir.")]
+    [SerializeField] private float hitVfxLifetime = 2f;
+
     private void SpawnHitVfx(Vector3 worldPos)
     {
         if (hitVfxPrefab == null) return;
-        Instantiate(hitVfxPrefab, worldPos, Quaternion.identity);
+        GameObject vfx = Instantiate(hitVfxPrefab, worldPos, Quaternion.identity);
+        Destroy(vfx, hitVfxLifetime);
     }
 }
