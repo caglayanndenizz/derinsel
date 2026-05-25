@@ -590,6 +590,7 @@ public class Player : BaseEntity, IPlayerContext
             generator,
             chargedExplosionEnabled ? _defaultImpulseSource : null,
             playerAugmentController != null ? playerAugmentController.LongbowFreezeDuration : 0f,
+            playerAugmentController != null && playerAugmentController.HasLongbowFreezeUnlock,  // hasIceArrow
             playerAugmentController != null && playerAugmentController.HasFireArrowUnlock,
             playerAugmentController != null ? playerAugmentController.FireDotDuration : 0f,
             playerAugmentController != null ? playerAugmentController.FireDotDamagePerSecond : 0f,

@@ -23,6 +23,7 @@ public class PlayerArrow : MonoBehaviour
     bool _fullyChargedLongbowExplosion;
     float _explosionRadius;
     float _freezeDuration;
+    bool  _hasIceArrow;   // true when the ice/freeze unlock is active — drives ice particles
     bool  _hasFireArrow;
     float _fireDotDuration;
     float _fireDotDps;
@@ -60,6 +61,7 @@ public class PlayerArrow : MonoBehaviour
         DungeonGenerator dungeonGenerator = null,
         CinemachineImpulseSource hitCameraImpulse = null,
         float freezeDuration = 0f,
+        bool hasIceArrow = false,
         bool hasFireArrow = false,
         float fireDotDuration = 0f,
         float fireDotDps = 0f,
@@ -75,6 +77,7 @@ public class PlayerArrow : MonoBehaviour
         _fullyChargedLongbowExplosion = fullyChargedLongbowExplosion;
         _explosionRadius   = chargedExplosionRadius;
         _freezeDuration    = freezeDuration;
+        _hasIceArrow       = hasIceArrow;
         _hasFireArrow      = hasFireArrow;
         _fireDotDuration   = fireDotDuration;
         _fireDotDps        = fireDotDps;
@@ -241,7 +244,10 @@ public class PlayerArrow : MonoBehaviour
     {
         bool hasFire   = _hasFireArrow;
         bool hasPoison = _hasPoisonArrow;
-        bool hasIce    = _freezeDuration > 0f;
+        // _hasIceArrow is the authoritative bool (mirrors HasLongbowFreezeUnlock).
+        // _freezeDuration > 0f is kept as a fallback for any edge-case path that
+        // sets the freeze value but forgets the bool.
+        bool hasIce    = _hasIceArrow || _freezeDuration > 0f;
         bool chaos     = hasFire && hasPoison && hasIce; // All three unlocked → Chaos mode
 
         if (chaos)
