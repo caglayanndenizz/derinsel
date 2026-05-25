@@ -10,6 +10,7 @@ public class PlayerArrow : MonoBehaviour
     [SerializeField] ParticleSystem fireParticles;
     [SerializeField] ParticleSystem poisonParticles;
     [SerializeField] ParticleSystem iceParticles;
+    [SerializeField] ParticleSystem chaosParticles; // Active only when all three elements are unlocked
 
     float _speed;
     float _damage;
@@ -168,17 +169,20 @@ public class PlayerArrow : MonoBehaviour
         return c.transform == transform || c.transform.IsChildOf(transform);
     }
 
+    // Pre-allocated buffer — eliminates per-frame RaycastHit2D[] heap allocation
+    private static readonly RaycastHit2D[] _hitBuffer = new RaycastHit2D[32];
+
     bool TryResolveMovementHit(Vector2 from, Vector2 to, out RaycastHit2D hit)
     {
         hit = default;
-        RaycastHit2D[] hits = Physics2D.LinecastAll(from, to);
-        if (hits == null || hits.Length == 0) return false;
+        int count = Physics2D.LinecastNonAlloc(from, to, _hitBuffer);
+        if (count == 0) return false;
 
-        // LINQ yerine manuel sort — her frame GC allocation önlenir
-        System.Array.Sort(hits, 0, hits.Length, _raycastComparer);
+        System.Array.Sort(_hitBuffer, 0, count, _raycastComparer);
 
-        foreach (RaycastHit2D h in hits)
+        for (int i = 0; i < count; i++)
         {
+            RaycastHit2D h = _hitBuffer[i];
             if (h.collider == null) continue;
             if (IsOwnCollider(h.collider)) continue;
             if (h.collider.GetComponentInParent<Player>() != null) continue;
@@ -235,9 +239,26 @@ public class PlayerArrow : MonoBehaviour
 
     void RefreshElementParticles()
     {
-        SetParticle(fireParticles,   _hasFireArrow);
-        SetParticle(poisonParticles, _hasPoisonArrow);
-        SetParticle(iceParticles,    _freezeDuration > 0f);
+        bool hasFire   = _hasFireArrow;
+        bool hasPoison = _hasPoisonArrow;
+        bool hasIce    = _freezeDuration > 0f;
+        bool chaos     = hasFire && hasPoison && hasIce; // All three unlocked → Chaos mode
+
+        if (chaos)
+        {
+            // Chaos mode: suppress individual effects, show chaos particle only
+            SetParticle(fireParticles,   false);
+            SetParticle(poisonParticles, false);
+            SetParticle(iceParticles,    false);
+            SetParticle(chaosParticles,  true);
+        }
+        else
+        {
+            SetParticle(chaosParticles,  false);
+            SetParticle(fireParticles,   hasFire);
+            SetParticle(poisonParticles, hasPoison);
+            SetParticle(iceParticles,    hasIce);
+        }
     }
 
     void StopAllElementParticles()
@@ -245,6 +266,7 @@ public class PlayerArrow : MonoBehaviour
         SetParticle(fireParticles,   false);
         SetParticle(poisonParticles, false);
         SetParticle(iceParticles,    false);
+        SetParticle(chaosParticles,  false);
     }
 
     static void SetParticle(ParticleSystem ps, bool active)
