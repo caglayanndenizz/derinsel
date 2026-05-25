@@ -480,6 +480,11 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.LongbowAoeRadius_Rare:
             case AugmentId.LongbowAoeRadius_Extraordinary:
                 return hasChargedLongbowAoe;
+            case AugmentId.CrossbowBoltPierce:
+            case AugmentId.CrossbowBoltBleed:
+                // Crossbow augments are only relevant once the crossbow is active
+                // (Obsidyen cevher tier / radial longbow mutation unlocked)
+                return HasRadialLongbowMutationUnlock;
             default:
                 return true;
         }
