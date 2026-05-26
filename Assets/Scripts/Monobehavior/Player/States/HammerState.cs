@@ -32,8 +32,10 @@ public class HammerState : PlayerState
         float effective = context.MaxChargeTime *
             (context.AugmentController != null ? context.AugmentController.HammerChargeMultiplier : 1f);
 
-        // Tuş basılıysa hold süresini say; heavy cooldown hazırsa charge'a geçiş eşiğini dene.
-        if (Input.GetButton("Fire1") && heavyReady)
+        bool canCharge = context.AugmentController != null && context.AugmentController.HasHammerChargeUnlock;
+
+        // Tuş basılıysa hold süresini say; heavy cooldown hazırsa ve augment varsa charge'a geç.
+        if (Input.GetButton("Fire1") && heavyReady && canCharge)
         {
             _holdTime += Time.deltaTime;
 

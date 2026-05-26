@@ -407,7 +407,8 @@ public class Player : BaseEntity, IPlayerContext
 
     private void TriggerHeavyAttack()
     {
-        _nextHammerUseTime = Time.time + hammerCooldown;
+        float slamCooldownMult = playerAugmentController != null ? playerAugmentController.HammerSlamCooldownMultiplier : 1f;
+        _nextHammerUseTime = Time.time + hammerCooldown * slamCooldownMult;
         UpdateHammerCooldownUI();
         if (animator != null)
             animator.SetTrigger(Animator.StringToHash("HeavyAttack"));
@@ -464,7 +465,8 @@ public class Player : BaseEntity, IPlayerContext
     private void TriggerHammerLightAttack()
     {
         if (Time.time < _nextAttackTime) return;
-        _nextAttackTime = Time.time + Mathf.Max(0.05f, hammerLightAttackRate);
+        float lightRateMult = playerAugmentController != null ? playerAugmentController.HammerLightRateMultiplier : 1f;
+        _nextAttackTime = Time.time + Mathf.Max(0.05f, hammerLightAttackRate * lightRateMult);
 
         if (animator != null)
             animator.SetTrigger(HammerLightAttackHash);
@@ -499,9 +501,10 @@ public class Player : BaseEntity, IPlayerContext
         IDamageable target = col.GetComponent<IDamageable>() ?? col.GetComponentInParent<IDamageable>();
         if (target == null) return;
 
-        float lightDmg = stats != null ? stats.hammerLightDamage : 0f;
-        float dmgMult  = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
-        target.TakeDamage(lightDmg * dmgMult, false);
+        float lightDmg      = stats != null ? stats.hammerLightDamage : 0f;
+        float dmgMult       = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
+        float lightDmgMult  = playerAugmentController != null ? playerAugmentController.HammerLightDamageMultiplier : 1f;
+        target.TakeDamage(lightDmg * dmgMult * lightDmgMult, false);
 
         impactFeedback?.PlayLightHit(col.ClosestPoint(attackPoint.position), _defaultImpulseSource);
     }
@@ -871,7 +874,8 @@ public class Player : BaseEntity, IPlayerContext
     private void UpdateHammerCooldownUI()
     {
         if (hammerCooldownBar == null) return;
-        float cooldown = Mathf.Max(0f, hammerCooldown);
+        float slamCooldownMult = playerAugmentController != null ? playerAugmentController.HammerSlamCooldownMultiplier : 1f;
+        float cooldown = Mathf.Max(0f, hammerCooldown * slamCooldownMult);
         if (cooldown <= 0f)
         {
             hammerCooldownBar.value = 1f;

@@ -44,21 +44,26 @@ public static class UnlockAugmentSeeder
         db.crossbowUnlocks.Add(Make("CrossbowBoltBleed",               "Unlock_CrossbowBoltBleed",        AugmentId.CrossbowBoltBleed,                 WeaponType.Crossbow));
 
         // ── Hammer ────────────────────────────────────────────────────────────
+        db.hammerUnlocks.Add(Make("HammerChargeUnlock",                "Unlock_HammerCharge",             AugmentId.HammerChargeUnlock,                WeaponType.Hammer));
         db.hammerUnlocks.Add(Make("HammerChargeDamageReductionUnlock", "Unlock_HammerChargeBarrier",      AugmentId.HammerChargeDamageReductionUnlock, WeaponType.Hammer));
+        db.hammerUnlocks.Add(Make("HammerChargeReduce_Extraordinary",  "Unlock_HammerChargeReduce",       AugmentId.HammerChargeReduceUnlock,          WeaponType.Hammer));
+        db.hammerUnlocks.Add(Make("HammerFreeze_Extraordinary",        "Unlock_HammerFreeze",             AugmentId.HammerFreezeUnlock,                WeaponType.Hammer));
+        db.hammerUnlocks.Add(Make("HammerAoeRadius_Extraordinary",     "Unlock_HammerAoeRadius",          AugmentId.HammerAoeRadiusUnlock,             WeaponType.Hammer));
+        db.hammerUnlocks.Add(Make("HammerSlamCooldownReduceUnlock",    "Unlock_HammerSlamCooldown",       AugmentId.HammerSlamCooldownReduceUnlock,    WeaponType.Hammer));
 
         // ── Universal ─────────────────────────────────────────────────────────
         db.universalUnlocks.Add(Make("DashUnlock",                     "Unlock_Dash",                     AugmentId.DashUnluck,                        WeaponType.Universal));
 
         EditorUtility.SetDirty(db);
 
-        // Remove unlock augments from AugmentDatabase.regularAugments so they don't appear
-        // in regular tier offers. Also removes the leftover CrossbowGrappleBolt entry.
+        // Remove unlock augments from AugmentDatabase.regularAugments so they
+        // don't appear in regular tier offers.
         CleanRegularAugmentDatabase();
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        Debug.Log("[UnlockAugmentSeeder] Done — 9 unlock augment assets created/updated and database populated.");
+        Debug.Log("[UnlockAugmentSeeder] Done — unlock augment assets created/updated and database populated.");
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -129,22 +134,26 @@ public static class UnlockAugmentSeeder
             AugmentId.WallLootsUnlock,
             AugmentId.CrossbowBoltPierce,
             AugmentId.CrossbowBoltBleed,
+            AugmentId.HammerChargeUnlock,
             AugmentId.HammerChargeDamageReductionUnlock,
+            AugmentId.HammerChargeReduceUnlock,
+            AugmentId.HammerFreezeUnlock,
+            AugmentId.HammerAoeRadiusUnlock,
+            AugmentId.HammerSlamCooldownReduceUnlock,
             AugmentId.DashUnluck,
         };
 
         int removed = augDb.regularAugments.RemoveAll(a =>
         {
-            if (a == null) return true;                         // remove nulls
-            if (unlockIds.Contains(a.id)) return true;          // remove unlock entries
-            if ((int)a.id == 59) return true;                   // remove stale CrossbowGrappleBolt (id=59, removed from enum)
+            if (a == null) return true;
+            if (unlockIds.Contains(a.id)) return true;
             return false;
         });
 
         if (removed > 0)
         {
             EditorUtility.SetDirty(augDb);
-            Debug.Log($"[UnlockAugmentSeeder] Removed {removed} unlock/stale entries from AugmentDatabase.regularAugments.");
+            Debug.Log($"[UnlockAugmentSeeder] Removed {removed} unlock entries from AugmentDatabase.regularAugments.");
         }
     }
 

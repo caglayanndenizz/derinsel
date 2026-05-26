@@ -35,7 +35,8 @@ public class LongbowState : PlayerState
             return;
         }
 
-        _isLongbowCharging = Input.GetButton("Fire2");
+        bool canCharge = context.AugmentController != null && context.AugmentController.HasChargedLongbowAoe;
+        _isLongbowCharging = canCharge && Input.GetButton("Fire2");
 
         if (!_isLongbowCharging && _longbowCharge <= 0f)
         {

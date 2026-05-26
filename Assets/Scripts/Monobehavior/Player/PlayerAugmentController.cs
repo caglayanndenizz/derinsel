@@ -21,11 +21,9 @@ public class PlayerAugmentController : MonoBehaviour
         AugmentId.LongbowAoeRadius_Common,
         AugmentId.LongbowAoeRadius_Rare,
         AugmentId.LongbowAoeRadius_Extraordinary,
-        AugmentId.ProjectileCount_IncreaseNumberOfProjectilesBy1,
         AugmentId.ProjectileCount_PlusOneProjectiles,
         AugmentId.ProjectileCount_PlusOneAndSpeed10Percent,
         AugmentId.ProjectileCount_PlusOneAndSpeed15Percent,
-        AugmentId.ProjectileCount_IncreaseYourProjectilesBy1,
     };
 
     // ── Runtime stats ─────────────────────────────────────────────────────────
@@ -41,6 +39,7 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float hammerChargeMultiplier  = 1f;
     [SerializeField] private float dashDistanceMultiplier  = 1f;
     [SerializeField] private float incomingDamageReduction = 0f;
+    [SerializeField] private bool  hasHammerChargeUnlock;
     [SerializeField] private bool  hasHammerChargeDamageReductionUnlock;
     [SerializeField] private float hammerFreezeDuration    = 0f;
     [SerializeField] private float longbowFreezeDuration       = 0f;
@@ -48,18 +47,26 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private bool  hasFireArrowUnlock;
     [SerializeField] private bool  hasPoisonArrowUnlock;
     [SerializeField] private float hammerAoeRadiusBonus    = 0f;
-    [SerializeField] private float longbowAoeRadiusBonus       = 0f;
-    [SerializeField] private float flatMaxHealthBonus      = 0f;
 
-    [Header("Fire Arrow DoT")]
+    [Header("Hammer — Light Attack Stats")]
+    [SerializeField] private float hammerLightDamageMultiplier  = 1f;
+    [SerializeField] private float hammerLightRateMultiplier    = 1f;
+
+    [Header("Hammer — Slam Cooldown")]
+    [SerializeField] private float hammerSlamCooldownMultiplier = 1f;
+
+    [Header("Longbow — AoE & DoT")]
+    [SerializeField] private float longbowAoeRadiusBonus            = 0f;
+
+    [Header("Longbow — Fire Arrow DoT")]
     [SerializeField] private float fireDotDuration         = 3f;
     [SerializeField] private float fireDotDamagePerSecond  = 2f;
 
-    [Header("Poison Arrow DoT")]
-    [SerializeField] private float poisonDotDuration          = 5f;
-    [SerializeField] private float poisonDotDamagePerSecond   = 1.5f;
+    [Header("Longbow — Poison Arrow DoT")]
+    [SerializeField] private float poisonDotDuration       = 5f;
+    [SerializeField] private float poisonDotDamagePerSecond= 1.5f;
 
-    [Header("Crossbow Bolt Pierce")]
+    [Header("Crossbow — Bolt Pierce")]
     [SerializeField] private bool  hasCrossbowBoltPierce;
     [Tooltip("Her düşman başına hasarın yüzde kaçı düşer (0.20 = %20).")]
     [SerializeField] private float crossbowPierceDamageFalloff = 0.20f;
@@ -68,15 +75,16 @@ public class PlayerAugmentController : MonoBehaviour
     [Tooltip("Kaç düşman sonrası floor'a düşülür (varsayılan 3 → 4. düşmandan itibaren %30).")]
     [SerializeField] private int   crossbowPierceFalloffCount  = 3;
 
-    [Header("Crossbow Bolt Bleed")]
+    [Header("Crossbow — Bolt Bleed")]
     [SerializeField] private bool  hasCrossbowBoltBleed;
-
     [Tooltip("Her stack'in bolt hasarına oranı (0.01 = %1). Max stack'te toplam hasar = maxStacks * oran.")]
     [SerializeField] private float crossbowBleedDamageRatioPerStack = 0.01f;
     [Tooltip("Maksimum stack sayısı (varsayılan 5 → toplam %5).")]
     [SerializeField] private int   crossbowBleedMaxStacks           = 5;
     [Tooltip("Son vuruştan bu süre geçerse (saniye) kanama sona erer.")]
     [SerializeField] private float crossbowBleedExpireSeconds       = 5f;
+
+    [SerializeField] private float flatMaxHealthBonus = 0f;
 
     private float _initialChargedLongbowAoeRadius;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
@@ -128,7 +136,6 @@ public class PlayerAugmentController : MonoBehaviour
     public float CrossbowBleedDamageRatioPerStack => Mathf.Max(0f, crossbowBleedDamageRatioPerStack);
     public int   CrossbowBleedMaxStacks          => Mathf.Max(1, crossbowBleedMaxStacks);
     public float CrossbowBleedExpireSeconds      => Mathf.Max(0f, crossbowBleedExpireSeconds);
-
     public int ProjectileShotMultiplier => Mathf.Max(
         1,
         1 + Mathf.Max(0, projectileShotBonusCount) + ((hasDoubleArrowUnlock || mutationAugmentsLongbow) ? 1 : 0));
@@ -148,9 +155,13 @@ public class PlayerAugmentController : MonoBehaviour
     public float HammerChargeMultiplier         => Mathf.Max(0.01f, hammerChargeMultiplier);
     public float DashDistanceMultiplier         => Mathf.Max(0.01f, dashDistanceMultiplier);
     public float IncomingDamageReduction        => Mathf.Clamp01(incomingDamageReduction);
+    public bool  HasHammerChargeUnlock                => hasHammerChargeUnlock;
     public bool  HasHammerChargeDamageReductionUnlock => hasHammerChargeDamageReductionUnlock;
     public float HammerFreezeDuration           => Mathf.Max(0f, hammerFreezeDuration);
     public float HammerAoeRadiusMultiplier      => 1f + Mathf.Max(0f, hammerAoeRadiusBonus);
+    public float HammerLightDamageMultiplier    => Mathf.Max(0.01f, hammerLightDamageMultiplier);
+    public float HammerLightRateMultiplier      => Mathf.Max(0.01f, hammerLightRateMultiplier);
+    public float HammerSlamCooldownMultiplier   => Mathf.Max(0.01f, hammerSlamCooldownMultiplier);
     public float ChargedLongbowAoeRadius            => Mathf.Max(0f, chargedLongbowAoeRadius * (1f + Mathf.Max(0f, longbowAoeRadiusBonus)));
     public float FlatMaxHealthBonus             => Mathf.Max(0f, flatMaxHealthBonus);
 
@@ -220,8 +231,12 @@ public class PlayerAugmentController : MonoBehaviour
         hammerChargeMultiplier              = 1f;
         dashDistanceMultiplier              = 1f;
         incomingDamageReduction             = 0f;
+        hasHammerChargeUnlock                = false;
         hasHammerChargeDamageReductionUnlock = false;
         hammerFreezeDuration                = 0f;
+        hammerLightDamageMultiplier         = 1f;
+        hammerLightRateMultiplier           = 1f;
+        hammerSlamCooldownMultiplier        = 1f;
         longbowFreezeDuration                   = 0f;
         hasLongbowFreezeUnlock                  = false;
         hasFireArrowUnlock                  = false;
@@ -317,10 +332,7 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.LuckIncrease_Extraordinary:
                 luckMultiplier *= 1f + Mathf.Max(0f, augment.value);
                 break;
-            case AugmentId.HammerChargeReduce_Common_I:
-            case AugmentId.HammerChargeReduce_Common_II:
-            case AugmentId.HammerChargeReduce_Rare:
-            case AugmentId.HammerChargeReduce_Extraordinary:
+            case AugmentId.HammerChargeReduceUnlock:
                 hammerChargeMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
                 break;
             case AugmentId.DashDistanceIncrease_Uncommon_I:
@@ -335,17 +347,16 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.DamageReduction_Extraordinary:
                 incomingDamageReduction = Mathf.Clamp01(incomingDamageReduction + augment.value);
                 break;
+            case AugmentId.HammerChargeUnlock:
+                hasHammerChargeUnlock = true;
+                break;
             case AugmentId.HammerChargeDamageReductionUnlock:
                 hasHammerChargeDamageReductionUnlock = true;
                 break;
-            case AugmentId.HammerFreeze_Common:
-            case AugmentId.HammerFreeze_Rare:
-            case AugmentId.HammerFreeze_Extraordinary:
+            case AugmentId.HammerFreezeUnlock:
                 hammerFreezeDuration += Mathf.Max(0f, augment.value);
                 break;
-            case AugmentId.HammerAoeRadius_Common:
-            case AugmentId.HammerAoeRadius_Rare:
-            case AugmentId.HammerAoeRadius_Extraordinary:
+            case AugmentId.HammerAoeRadiusUnlock:
                 hammerAoeRadiusBonus += Mathf.Max(0f, augment.value);
                 break;
             case AugmentId.LongbowAoeRadius_Common:
@@ -371,9 +382,7 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.MaxHealthIncreasePercent:
                 maxHealthMultiplier *= 1f + Mathf.Max(0f, augment.value);
                 break;
-            case AugmentId.ProjectileCount_IncreaseNumberOfProjectilesBy1:
             case AugmentId.ProjectileCount_PlusOneProjectiles:
-            case AugmentId.ProjectileCount_IncreaseYourProjectilesBy1:
                 projectileShotBonusCount++;
                 break;
             case AugmentId.ProjectileCount_PlusOneAndSpeed10Percent:
@@ -386,6 +395,22 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.CrossbowBoltBleed:
                 hasCrossbowBoltBleed = true;
+                break;
+
+            // ── Hammer Light Attack ───────────────────────────────────────────
+            case AugmentId.HammerLightDamageIncrease_Common:
+            case AugmentId.HammerLightDamageIncrease_Rare:
+            case AugmentId.HammerLightDamageIncrease_Extraordinary:
+                hammerLightDamageMultiplier *= 1f + Mathf.Max(0f, augment.value);
+                break;
+            case AugmentId.HammerLightAttackSpeedIncrease_Common:
+            case AugmentId.HammerLightAttackSpeedIncrease_Rare:
+                hammerLightRateMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
+                break;
+
+            // ── Hammer Slam Cooldown ──────────────────────────────────────────
+            case AugmentId.HammerSlamCooldownReduceUnlock:
+                hammerSlamCooldownMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
                 break;
         }
 
@@ -476,6 +501,12 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.DashDistanceIncrease_Rare:
             case AugmentId.DashDistanceIncrease_Extraordinary:
                 return hasDashUnluck;
+            case AugmentId.HammerChargeReduceUnlock:
+            case AugmentId.HammerChargeDamageReductionUnlock:
+            case AugmentId.HammerFreezeUnlock:
+            case AugmentId.HammerAoeRadiusUnlock:
+            case AugmentId.HammerSlamCooldownReduceUnlock:
+                return hasHammerChargeUnlock;
             case AugmentId.LongbowAoeRadius_Common:
             case AugmentId.LongbowAoeRadius_Rare:
             case AugmentId.LongbowAoeRadius_Extraordinary:

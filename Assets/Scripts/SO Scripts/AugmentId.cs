@@ -10,11 +10,9 @@ public enum AugmentId
     ExtraAugmentSlotUnlock = 7,
     GlassCannonDoubleDamageHalveMaxHealth = 8,
     MaxHealthIncreasePercent = 9,
-    ProjectileCount_IncreaseNumberOfProjectilesBy1 = 10,
     ProjectileCount_PlusOneProjectiles = 11,
     ProjectileCount_PlusOneAndSpeed10Percent = 12,
     ProjectileCount_PlusOneAndSpeed15Percent = 13,
-    ProjectileCount_IncreaseYourProjectilesBy1 = 14,
     DashUnluck = 15,
     DashCooldownReduce_Common_I = 16,
     DashCooldownReduce_Common_II = 17,
@@ -25,10 +23,7 @@ public enum AugmentId
     LuckIncrease_Common_III = 22,
     LuckIncrease_Rare = 23,
     LuckIncrease_Extraordinary = 24,
-    HammerChargeReduce_Common_I = 25,
-    HammerChargeReduce_Common_II = 26,
-    HammerChargeReduce_Rare = 27,
-    HammerChargeReduce_Extraordinary = 28,
+    HammerChargeReduceUnlock = 28,
     DashDistanceIncrease_Uncommon_I = 29,
     DashDistanceIncrease_Uncommon_II = 30,
     DashDistanceIncrease_Uncommon_III = 31,
@@ -38,13 +33,9 @@ public enum AugmentId
     DamageReduction_Rare = 35,
     DamageReduction_Extraordinary = 36,
     HammerChargeDamageReductionUnlock = 37,
-    HammerFreeze_Common = 38,
-    HammerFreeze_Rare = 39,
-    HammerFreeze_Extraordinary = 40,
+    HammerFreezeUnlock = 40,
     LongbowFreezeUnlock = 41,
-    HammerAoeRadius_Common = 44,
-    HammerAoeRadius_Rare = 45,
-    HammerAoeRadius_Extraordinary = 46,
+    HammerAoeRadiusUnlock = 46,
     LongbowAoeRadius_Common = 47,
     LongbowAoeRadius_Rare = 48,
     LongbowAoeRadius_Extraordinary = 49,
@@ -57,4 +48,32 @@ public enum AugmentId
     PoisonArrowUnlock = 56,
     CrossbowBoltPierce     = 57,
     CrossbowBoltBleed      = 58,
+    HammerChargeUnlock              = 59,
+
+    // ── Hammer Light Attack ───────────────────────────────────────────────────
+    HammerLightDamageIncrease_Common        = 60,
+    HammerLightDamageIncrease_Rare          = 61,
+    HammerLightDamageIncrease_Extraordinary = 62,
+    HammerLightAttackSpeedIncrease_Common   = 63,
+    HammerLightAttackSpeedIncrease_Rare     = 64,
+
+    // ── Hammer Slam (Heavy) ───────────────────────────────────────────────────
+    HammerSlamCooldownReduceUnlock          = 65,
+
+    // ── Crossbow Stat ─────────────────────────────────────────────────────────
+    CrossbowAttackSpeedIncrease_Common        = 66,
+    CrossbowAttackSpeedIncrease_Rare          = 67,
+    CrossbowAttackSpeedIncrease_Extraordinary = 68,
+    CrossbowDamageIncrease_Common             = 69,
+    CrossbowDamageIncrease_Rare               = 70,
+    CrossbowDamageIncrease_Extraordinary      = 71,
+
+    // ── Crossbow Unlock ───────────────────────────────────────────────────────
+    CrossbowBoltFireUnlock   = 72,
+    CrossbowBoltPoisonUnlock = 73,
+
+    // ── Genel Hasar ───────────────────────────────────────────────────────────
+    OutgoingDamageIncrease_Common        = 74,
+    OutgoingDamageIncrease_Rare          = 75,
+    OutgoingDamageIncrease_Extraordinary = 76,
 }
