@@ -8,5 +8,6 @@ public class EntityStats : ScriptableObject
     public float moveSpeed;
     public float attackPower;
     public float lightAttackDamage;
+    public float hammerLightDamage;
     public float heavyAttackDamage;
 }

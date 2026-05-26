@@ -11,7 +11,7 @@ public class IdleState : PlayerState
 
     public override void Handle(IPlayerContext context)
     {
-        if (Input.GetButton("Fire1") && Time.time >= context.NextHammerUseTime)
+        if (Input.GetButton("Fire1"))
         {
             context.SetState(new HammerState());
             return;

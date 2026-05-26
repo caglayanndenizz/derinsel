@@ -173,12 +173,14 @@ public class PlayerArrow : MonoBehaviour
     }
 
     // Pre-allocated buffer — eliminates per-frame RaycastHit2D[] heap allocation
-    private static readonly RaycastHit2D[] _hitBuffer = new RaycastHit2D[32];
+    private static readonly RaycastHit2D[]  _hitBuffer      = new RaycastHit2D[32];
+    // ContactFilter2D.noFilter: tüm layer ve trigger'ları kapsar — LinecastNonAlloc ile birebir aynı davranış
+    private static readonly ContactFilter2D _linecastFilter = ContactFilter2D.noFilter;
 
     bool TryResolveMovementHit(Vector2 from, Vector2 to, out RaycastHit2D hit)
     {
         hit = default;
-        int count = Physics2D.LinecastNonAlloc(from, to, _hitBuffer);
+        int count = Physics2D.Linecast(from, to, _linecastFilter, _hitBuffer);
         if (count == 0) return false;
 
         System.Array.Sort(_hitBuffer, 0, count, _raycastComparer);

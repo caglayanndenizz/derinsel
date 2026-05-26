@@ -15,6 +15,16 @@ public class Player : BaseEntity, IPlayerContext
     public float hammerAOE = 2.5f;
     public float hammerCooldown = 3f;
     [SerializeField] private float heavyImpactFallbackDelay = 0.2f;
+    [Tooltip("Sol tuş bu kadar süre basılı tutulursa charge modu başlar (saniye). Altında kalırsa hafif saldırı.")]
+    [SerializeField] private float hammerChargeStartDelay = 0.5f;
+
+    [Header("Hammer Settings (Light)")]
+    [Tooltip("İki hafif hammer saldırısı arasındaki minimum süre (saniye).")]
+    [SerializeField] private float hammerLightAttackRate = 0.4f;
+    [Tooltip("Hafif hammer salvo yarıçapı. Genellikle ağır hammerın yarısı kadar.")]
+    [SerializeField] private float hammerLightAoe = 1.5f;
+    [Tooltip("Animasyon event'i gelmezse fallback tetiklenme gecikmesi (saniye).")]
+    [SerializeField] private float hammerLightFallbackDelay = 0.15f;
 
     [Header("Longbow / Arrow")]
     [Tooltip("Üzerinde PlayerArrow bileşeni olan ok prefabı.")]
@@ -112,6 +122,9 @@ public class Player : BaseEntity, IPlayerContext
 
     private float _nextHammerUseTime = 0f;
     private float _nextDashTime = 0f;
+    private bool  _hammerLightInProgress = false;
+    private float _hammerLightFallbackAt  = -1f;
+    private float _lastHammerLightResolveTime = -999f;
     private bool _hadRadialLongbowMutationLastFrame;
     private float _nextRadialLongbowAutoVolleyTime;
     private Rigidbody2D _rb;
@@ -119,7 +132,8 @@ public class Player : BaseEntity, IPlayerContext
     private float _invulnerableUntil = 0f;
     private PlayerState _currentState;
 
-    private static readonly int SpeedHash = Animator.StringToHash("Speed");
+    private static readonly int SpeedHash                = Animator.StringToHash("Speed");
+    private static readonly int HammerLightAttackHash    = Animator.StringToHash("HammerLightAttack");
 
     public event Action<float, float> HealthChanged;
     public event Action Died;
@@ -140,6 +154,7 @@ public class Player : BaseEntity, IPlayerContext
     EntityStats IPlayerContext.Stats => stats;
     PlayerAugmentController IPlayerContext.AugmentController => playerAugmentController;
     float IPlayerContext.MaxChargeTime => maxChargeTime;
+    float IPlayerContext.HammerChargeStartDelay => hammerChargeStartDelay;
     Slider IPlayerContext.ChargeMeter => chargeMeter;
     GameObject IPlayerContext.MeterCanvas => meterCanvas;
     float IPlayerContext.MaxLongbowChargeTime => maxLongbowChargeTime;
@@ -187,6 +202,9 @@ public class Player : BaseEntity, IPlayerContext
 
     void IPlayerContext.TriggerHeavyAttack()
         => TriggerHeavyAttack();
+
+    void IPlayerContext.TriggerHammerLightAttack()
+        => TriggerHammerLightAttack();
 
     // ─── MaxHealth ────────────────────────────────────────────────────────────
 
@@ -275,6 +293,7 @@ public class Player : BaseEntity, IPlayerContext
         _currentState.Handle(this);
         HandleLightImpactFallback();
         HandleHeavyImpactFallback();
+        HandleHammerLightFallback();
         HandleDash();
         UpdateHammerCooldownUI();
         UpdateDashCooldownUI();
@@ -438,6 +457,53 @@ public class Player : BaseEntity, IPlayerContext
 
         if (successfulHits > 0)
             impactFeedback?.PlayHeavyHit(firstHitPosition, _defaultImpulseSource);
+    }
+
+    // ─── Hammer Light Attack ─────────────────────────────────────────────────────
+
+    private void TriggerHammerLightAttack()
+    {
+        if (Time.time < _nextAttackTime) return;
+        _nextAttackTime = Time.time + Mathf.Max(0.05f, hammerLightAttackRate);
+
+        if (animator != null)
+            animator.SetTrigger(HammerLightAttackHash);
+
+        _hammerLightInProgress = true;
+        _hammerLightFallbackAt = Time.time + Mathf.Max(0.05f, hammerLightFallbackDelay);
+    }
+
+    private void HandleHammerLightFallback()
+    {
+        if (!_hammerLightInProgress) return;
+        if (Time.time < _hammerLightFallbackAt) return;
+        HammerLightSlam();
+    }
+
+    /// <summary>
+    /// Hafif hammer saldırısı hasar uygulama. Tek hedef — AoE yok.
+    /// Animasyon event veya fallback timer tarafından çağrılır.
+    /// </summary>
+    public void HammerLightSlam()
+    {
+        if (Time.time - _lastHammerLightResolveTime < 0.05f) return;
+        _lastHammerLightResolveTime = Time.time;
+        _hammerLightInProgress = false;
+        _hammerLightFallbackAt = -1f;
+
+        if (attackPoint == null) return;
+
+        Collider2D col = Physics2D.OverlapCircle(attackPoint.position, hammerLightAoe, enemyLayers);
+        if (col == null) return;
+
+        IDamageable target = col.GetComponent<IDamageable>() ?? col.GetComponentInParent<IDamageable>();
+        if (target == null) return;
+
+        float lightDmg = stats != null ? stats.hammerLightDamage : 0f;
+        float dmgMult  = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
+        target.TakeDamage(lightDmg * dmgMult, false);
+
+        impactFeedback?.PlayLightHit(col.ClosestPoint(attackPoint.position), _defaultImpulseSource);
     }
 
     // ─── Longbow / arrow ──────────────────────────────────────────────────────────

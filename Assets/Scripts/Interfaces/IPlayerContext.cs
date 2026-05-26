@@ -11,6 +11,7 @@ public interface IPlayerContext
 
     // Hammer charge settings & UI
     float MaxChargeTime { get; }
+    float HammerChargeStartDelay { get; }
     Slider ChargeMeter { get; }
     GameObject MeterCanvas { get; }
 
@@ -45,4 +46,5 @@ public interface IPlayerContext
     void ScheduleCrossbowBolt(float damage, Vector2 aimWorldAtFireInput);
     Vector2 GetLongbowAimWorldPointAtCurrentMouse();
     void TriggerHeavyAttack();
+    void TriggerHammerLightAttack();
 }
