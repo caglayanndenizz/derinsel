@@ -15,4 +15,4 @@ MonoBehaviour:
   enemyName: Warrior
   maxHealth: 20
   moveSpeed: 3
-  enemyAP: 9
+  enemyAP: 7

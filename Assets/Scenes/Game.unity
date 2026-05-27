@@ -5870,6 +5870,7 @@ Transform:
   - {fileID: 619394802}
   - {fileID: 1451887778}
   - {fileID: 1764338251}
+  - {fileID: 2061067775}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1318843553
@@ -7859,6 +7860,8 @@ MonoBehaviour:
   hasFireArrowUnlock: 0
   hasPoisonArrowUnlock: 0
   hammerAoeRadiusBonus: 0
+  hasArrowSizeUnlock: 0
+  hasVampiricArrowUnlock: 0
   hammerLightDamageMultiplier: 1
   hammerLightRateMultiplier: 1
   hammerSlamCooldownMultiplier: 1
@@ -8566,6 +8569,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2033181777}
   m_CullTransparentMesh: 1
+--- !u!1 &2061067774
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2061067775}
+  - component: {fileID: 2061067776}
+  m_Layer: 0
+  m_Name: MutationChecker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2061067775
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061067774}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1295312150}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2061067776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061067774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba95dad210c447d79dc66a8ef36fbd91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponMutationChecker
+  longbowMutationThreshold: 6
+  crossbowMutationThreshold: 0
+  hammerMutationThreshold: 0
+  _longbowUnlocksApplied: 0
+  _crossbowUnlocksApplied: 0
+  _hammerUnlocksApplied: 0
 --- !u!1 &2072830265
 GameObject:
   m_ObjectHideFlags: 0

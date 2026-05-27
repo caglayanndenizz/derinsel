@@ -155,6 +155,9 @@ public class AugmentWeightSystem : MonoBehaviour
         _offersSinceLastT3 = 0;
         _rejectionMult.Clear();
         _rejectedAtOffer.Clear();
+
+        // Silah mutasyon sayaçlarını da sıfırla
+        WeaponMutationChecker.Instance?.ResetAll();
     }
 
     // ── Offer Builders ─────────────────────────────────────────────────────────
@@ -301,6 +304,15 @@ public class AugmentWeightSystem : MonoBehaviour
         if (controller != null
             && controller.HasRadialLongbowMutationUnlock
             && aug.excludeFromAugmentPickerWhenRadialLongbowMutationComplete) return false;
+
+        // Weapon mutation check — eşik dolmuşsa o silahın tüm unlock augmentlerini havuzdan çıkar
+        if (aug is UnlockAugmentDefinition unlockAug)
+        {
+            WeaponMutationChecker checker = WeaponMutationChecker.Instance;
+            if (checker != null && checker.ShouldExcludeWeaponUnlocks(unlockAug.weaponType))
+                return false;
+        }
+
         return true;
     }
 
