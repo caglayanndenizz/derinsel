@@ -23,6 +23,7 @@ public class PlayerArrow : MonoBehaviour
     bool _fullyChargedLongbowExplosion;
     float _explosionRadius;
     float _freezeDuration;
+    float _frozenVulnerabilityMult; // Resonance: donmuş düşmana uygulanan hasar çarpanı
     bool  _hasIceArrow;   // true when the ice/freeze unlock is active — drives ice particles
     bool  _hasFireArrow;
     float _fireDotDuration;
@@ -67,7 +68,8 @@ public class PlayerArrow : MonoBehaviour
         float fireDotDps = 0f,
         bool hasPoisonArrow = false,
         float poisonDotDuration = 0f,
-        float poisonDotDps = 0f)
+        float poisonDotDps = 0f,
+        float frozenVulnerabilityMult = 1f)
     {
         _enemyMask = enemyMask;
         _speed = speed;
@@ -76,8 +78,9 @@ public class PlayerArrow : MonoBehaviour
         _spawnTime = Time.time;
         _fullyChargedLongbowExplosion = fullyChargedLongbowExplosion;
         _explosionRadius   = chargedExplosionRadius;
-        _freezeDuration    = freezeDuration;
-        _hasIceArrow       = hasIceArrow;
+        _freezeDuration           = freezeDuration;
+        _frozenVulnerabilityMult  = Mathf.Max(1f, frozenVulnerabilityMult);
+        _hasIceArrow              = hasIceArrow;
         _hasFireArrow      = hasFireArrow;
         _fireDotDuration   = fireDotDuration;
         _fireDotDps        = fireDotDps;
@@ -221,7 +224,7 @@ public class PlayerArrow : MonoBehaviour
         Enemy enemy = other.GetComponent<Enemy>() ?? other.GetComponentInParent<Enemy>();
 
         if (_freezeDuration > 0f && enemy != null && enemy.CurrentHealth > 0f)
-            enemy.Freeze(_freezeDuration);
+            enemy.Freeze(_freezeDuration, _frozenVulnerabilityMult);
 
         if (enemy != null && enemy.CurrentHealth > 0f)
         {

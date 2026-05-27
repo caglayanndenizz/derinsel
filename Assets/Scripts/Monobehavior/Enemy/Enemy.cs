@@ -46,7 +46,7 @@ public class Enemy : BaseEntity
     [Tooltip("Attack state iken iki projectile arası süre (saniye).")]
     public float mageRangedFireInterval = 4f;
     public float mageProjectileSpeed = 10f;
-    [Tooltip("EntityStats.attackPower ile aynı anlamda kullanılır.")]
+    [Tooltip("EntityStats.enemyAP ile aynı anlamda kullanılır.")]
     public bool mageUseAttackPowerForProjectile = true;
     public float mageProjectileDamageOverride = 5f;
     public float mageProjectileMaxLifetime = 12f;
@@ -87,7 +87,14 @@ public class Enemy : BaseEntity
     private static readonly Color BleedColor   = new Color(0.65f, 0.05f, 0.1f);
 
     private bool      _isFrozen = false;
+    private float     _frozenVulnerabilityMultiplier = 1f; // Resonance: LongbowFreezeUnlock ile artar
     private Coroutine _freezeCoroutine;
+
+    // Hammer Charge Magnet — Player tarafından her frame set edilir, kısa sürede auto-expire olur
+    private bool    _isMagnetPulled      = false;
+    private Vector2 _magnetTargetPos     = Vector2.zero;
+    private float   _magnetPullSpeed     = 0f;
+    private float   _magnetPullExpireTime = 0f;
     private bool      _isOnFire = false;
     private Coroutine _fireCoroutine;
     private bool      _isPoisoned = false;
@@ -102,7 +109,8 @@ public class Enemy : BaseEntity
     private int       _bleedMaxStacks;
     private float     _bleedExpireSeconds;
 
-    public bool IsDead => _isDead || _currentHealth <= 0f;
+    public bool IsDead    => _isDead || _currentHealth <= 0f;
+    public bool IsFrozen  => _isFrozen;
 
     protected GameObject player;
     private bool _isDead = false;
@@ -155,7 +163,19 @@ public class Enemy : BaseEntity
     void FixedUpdate()
     {
         if (_isDead || _isKnockedBack || _isFrozen) return;
+
+        // Magnet pull auto-expire
+        if (_isMagnetPulled && Time.time >= _magnetPullExpireTime)
+            _isMagnetPulled = false;
+
         TrackLastSafePosition();
+
+        if (_isMagnetPulled)
+        {
+            ApplyMagnetMovement();
+            return; // Normal hareketi override eder
+        }
+
         Move();
     }
 
@@ -432,7 +452,7 @@ public class Enemy : BaseEntity
 
         IDamageable target = player.GetComponent<IDamageable>();
         if (target != null)
-            target.TakeDamage(stats != null ? stats.attackPower : 0f, false);
+            target.TakeDamage(stats != null ? stats.enemyAP : 0f, false);
 
         _nextTypeAttackTime = Time.time + meleeAttackInterval;
     }
@@ -521,7 +541,7 @@ public class Enemy : BaseEntity
 
         float dmg = mageProjectileDamageOverride;
         if (mageUseAttackPowerForProjectile && stats != null)
-            dmg = stats.attackPower;
+            dmg = stats.enemyAP;
         if (dmg <= 0f)
             dmg = Mathf.Max(0.0001f, mageProjectileDamageOverride);
 
@@ -552,6 +572,11 @@ public class Enemy : BaseEntity
     public override void TakeDamage(float amount, bool isHeavy)
     {
         if (IsDead) return;
+
+        // Resonance: donmuş düşmanlar daha kırılgandır
+        if (_isFrozen && _frozenVulnerabilityMultiplier > 1f)
+            amount *= _frozenVulnerabilityMultiplier;
+
         _currentHealth -= amount;
         StartCoroutine(HitFlashRoutine());
         float force = (isHeavy ? heavyKnockbackForce : lightKnockbackForce) * 0.5f;
@@ -592,25 +617,59 @@ public class Enemy : BaseEntity
         gameObject.SetActive(false);
     }
 
-    public void Freeze(float duration)
+    /// <summary>
+    /// Düşmanı dondurur. vulnerabilityMultiplier > 1f ise (Resonance unlock),
+    /// donma süresince alınan hasar çarpılır.
+    /// </summary>
+    public void Freeze(float duration, float vulnerabilityMultiplier = 1f)
     {
         if (_isDead) return;
         if (_freezeCoroutine != null)
             StopCoroutine(_freezeCoroutine);
-        _freezeCoroutine = StartCoroutine(FreezeRoutine(duration));
+        _freezeCoroutine = StartCoroutine(FreezeRoutine(duration, vulnerabilityMultiplier));
     }
 
-    private IEnumerator FreezeRoutine(float duration)
+    private IEnumerator FreezeRoutine(float duration, float vulnerabilityMultiplier)
     {
         _isFrozen = true;
+        _isMagnetPulled = false; // Freeze başlayınca magnet sıfırlanır
+        _frozenVulnerabilityMultiplier = Mathf.Max(1f, vulnerabilityMultiplier);
         if (_rb != null) _rb.linearVelocity = Vector2.zero;
         RefreshStatusColor();
 
         yield return new WaitForSeconds(duration);
 
         _isFrozen = false;
+        _frozenVulnerabilityMultiplier = 1f;
         _freezeCoroutine = null;
         RefreshStatusColor();
+    }
+
+    /// <summary>
+    /// Hammer Charge Magnet tarafından çağrılır. Çağrı kesilirse auto-expire ile sıfırlanır.
+    /// </summary>
+    public void SetMagnetPull(Vector2 targetPos, float speed, float expireDuration = 0.15f)
+    {
+        if (_isDead || _isFrozen) return;
+        _isMagnetPulled       = true;
+        _magnetTargetPos      = targetPos;
+        _magnetPullSpeed      = speed;
+        _magnetPullExpireTime = Time.time + expireDuration;
+    }
+
+    private void ApplyMagnetMovement()
+    {
+        Vector2 current = _rb != null ? _rb.position : (Vector2)transform.position;
+        Vector2 toTarget = _magnetTargetPos - current;
+        if (toTarget.sqrMagnitude < 0.04f) return; // Zaten çok yakın
+
+        Vector2 dir = toTarget.normalized;
+        FaceByHorizontal(dir.x);
+
+        if (_rb != null)
+            _rb.linearVelocity = dir * _magnetPullSpeed;
+        else
+            transform.Translate(dir * _magnetPullSpeed * Time.fixedDeltaTime, Space.World);
     }
 
     public void ApplyFireDoT(float duration, float dps)
@@ -828,6 +887,9 @@ public class Enemy : BaseEntity
         if (_bleedCoroutine      != null) { StopCoroutine(_bleedCoroutine);      _bleedCoroutine      = null; }
         _isBleeding  = false;
         _bleedStacks = 0;
+        _frozenVulnerabilityMultiplier = 1f;
+        _isMagnetPulled  = false;
+        _magnetPullSpeed = 0f;
         if (cd != null) cd.enabled = true;
         if (_rb != null) _rb.linearVelocity = Vector2.zero;
         if (stats != null) _currentHealth = stats.maxHealth;

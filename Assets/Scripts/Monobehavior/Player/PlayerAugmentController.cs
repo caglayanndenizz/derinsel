@@ -44,6 +44,11 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float hammerFreezeDuration    = 0f;
     [SerializeField] private float longbowFreezeDuration       = 0f;
     [SerializeField] private bool  hasLongbowFreezeUnlock;
+    /// <summary>
+    /// Resonance — LongbowFreezeUnlock alındığında 1.5f olur.
+    /// Donmuş düşmanlara verilen hasara çarpılır (Enemy.TakeDamage içinde uygulanır).
+    /// </summary>
+    [SerializeField] private float frozenEnemyVulnerabilityMultiplier = 1f;
     [SerializeField] private bool  hasFireArrowUnlock;
     [SerializeField] private bool  hasPoisonArrowUnlock;
     [SerializeField] private float hammerAoeRadiusBonus    = 0f;
@@ -54,6 +59,14 @@ public class PlayerAugmentController : MonoBehaviour
 
     [Header("Hammer — Slam Cooldown")]
     [SerializeField] private float hammerSlamCooldownMultiplier = 1f;
+
+    [Header("Hammer — Charge Magnet")]
+    [Tooltip("Charge sırasında düşmanları çeken mıknatıs yarıçapı (birim).")]
+    [SerializeField] private float hammerMagnetRadius = 6f;
+    [Tooltip("Mıknatıs çekim hızı (birim/saniye).")]
+    [SerializeField] private float hammerMagnetPullSpeed = 7f;
+    [Tooltip("Charge dolunca düşmanlara uygulanacak freeze süresi (saniye).")]
+    [SerializeField] private float hammerChargeFullStopDuration = 1.2f;
 
     [Header("Longbow — AoE & DoT")]
     [SerializeField] private float longbowAoeRadiusBonus            = 0f;
@@ -157,7 +170,12 @@ public class PlayerAugmentController : MonoBehaviour
     public float IncomingDamageReduction        => Mathf.Clamp01(incomingDamageReduction);
     public bool  HasHammerChargeUnlock                => hasHammerChargeUnlock;
     public bool  HasHammerChargeDamageReductionUnlock => hasHammerChargeDamageReductionUnlock;
-    public float HammerFreezeDuration           => Mathf.Max(0f, hammerFreezeDuration);
+    public float HammerFreezeDuration                => Mathf.Max(0f, hammerFreezeDuration);
+    /// <summary>Resonance çarpanı — donmuş düşmanlara vurulacak hasar bu değerle çarpılır.</summary>
+    public float FrozenEnemyVulnerabilityMultiplier  => Mathf.Max(1f, frozenEnemyVulnerabilityMultiplier);
+    public float HammerMagnetRadius                  => Mathf.Max(0f, hammerMagnetRadius);
+    public float HammerMagnetPullSpeed               => Mathf.Max(0f, hammerMagnetPullSpeed);
+    public float HammerChargeFullStopDuration        => Mathf.Max(0f, hammerChargeFullStopDuration);
     public float HammerAoeRadiusMultiplier      => 1f + Mathf.Max(0f, hammerAoeRadiusBonus);
     public float HammerLightDamageMultiplier    => Mathf.Max(0.01f, hammerLightDamageMultiplier);
     public float HammerLightRateMultiplier      => Mathf.Max(0.01f, hammerLightRateMultiplier);
@@ -234,6 +252,7 @@ public class PlayerAugmentController : MonoBehaviour
         hasHammerChargeUnlock                = false;
         hasHammerChargeDamageReductionUnlock = false;
         hammerFreezeDuration                = 0f;
+        frozenEnemyVulnerabilityMultiplier   = 1f;
         hammerLightDamageMultiplier         = 1f;
         hammerLightRateMultiplier           = 1f;
         hammerSlamCooldownMultiplier        = 1f;
@@ -312,6 +331,8 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.LongbowFreezeUnlock:
                 hasLongbowFreezeUnlock = true;
                 longbowFreezeDuration  = augment.value > 0f ? augment.value : 1.5f;
+                // Resonance: freeze unlock alınınca donmuş düşmanlar %50 daha kırılgan olur
+                frozenEnemyVulnerabilityMultiplier = Mathf.Max(frozenEnemyVulnerabilityMultiplier, 1.5f);
                 break;
             case AugmentId.FireArrowUnlock:
                 hasFireArrowUnlock = true;

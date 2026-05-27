@@ -123,6 +123,7 @@ public class Player : BaseEntity, IPlayerContext
     private float _nextHammerUseTime = 0f;
     private float _nextDashTime = 0f;
     private bool  _hammerLightInProgress = false;
+    private bool  _prevChargeFullState = false; // Charge'ın tam dolduğu anı tespit etmek için
     private float _hammerLightFallbackAt  = -1f;
     private float _lastHammerLightResolveTime = -999f;
     private bool _hadRadialLongbowMutationLastFrame;
@@ -298,6 +299,7 @@ public class Player : BaseEntity, IPlayerContext
         UpdateHammerCooldownUI();
         UpdateDashCooldownUI();
         UpdateRadialLongbowAutoVolley();
+        UpdateHammerMagnet();
     }
 
     void FixedUpdate()
@@ -665,7 +667,8 @@ public class Player : BaseEntity, IPlayerContext
             playerAugmentController != null ? playerAugmentController.FireDotDamagePerSecond : 0f,
             playerAugmentController != null && playerAugmentController.HasPoisonArrowUnlock,
             playerAugmentController != null ? playerAugmentController.PoisonDotDuration : 0f,
-            playerAugmentController != null ? playerAugmentController.PoisonDotDamagePerSecond : 0f);
+            playerAugmentController != null ? playerAugmentController.PoisonDotDamagePerSecond : 0f,
+            playerAugmentController != null ? playerAugmentController.FrozenEnemyVulnerabilityMultiplier : 1f); // Resonance
     }
 
     private static float GetArrowSpreadStepDegrees(int arrowCount)
@@ -757,6 +760,55 @@ public class Player : BaseEntity, IPlayerContext
             bleedMaxStacks:           aug != null ? aug.CrossbowBleedMaxStacks          : 5,
             bleedExpireSeconds:       aug != null ? aug.CrossbowBleedExpireSeconds      : 5f
         );
+    }
+
+    // ─── Hammer Charge Magnet ────────────────────────────────────────────────
+
+    /// <summary>
+    /// Charge aktifken yakın düşmanları player'a çeker (mıknatıs).
+    /// Charge tam dolunca çekim durur, düşmanlar kısa süre freeze alır (oldukları yerde kalırlar).
+    /// </summary>
+    private void UpdateHammerMagnet()
+    {
+        // Charge unlock yoksa mıknatıs çalışmaz
+        if (playerAugmentController == null || !playerAugmentController.HasHammerChargeUnlock) return;
+
+        bool isCharging   = _currentState.IsChargingForMovement;
+        bool isChargeFull = _currentState.IsChargeMeterFull(this);
+
+        if (isCharging && !isChargeFull)
+        {
+            // Charge dolmadıysa: yakın düşmanları çek
+            float radius    = playerAugmentController.HammerMagnetRadius;
+            float pullSpeed = playerAugmentController.HammerMagnetPullSpeed;
+            Vector2 playerPos = transform.position;
+
+            Collider2D[] nearby = Physics2D.OverlapCircleAll(playerPos, radius, enemyLayers);
+            foreach (Collider2D col in nearby)
+            {
+                Enemy e = col.GetComponent<Enemy>() ?? col.GetComponentInParent<Enemy>();
+                if (e == null || e.IsDead) continue;
+                e.SetMagnetPull(playerPos, pullSpeed);
+            }
+        }
+
+        // Charge tam doldu (bu frame ilk kez dolu): düşmanları dondur (oldukları yerde bırak)
+        if (isChargeFull && !_prevChargeFullState)
+        {
+            float radius       = playerAugmentController.HammerMagnetRadius;
+            float stopDuration = playerAugmentController.HammerChargeFullStopDuration;
+            Vector2 playerPos  = transform.position;
+
+            Collider2D[] nearby = Physics2D.OverlapCircleAll(playerPos, radius, enemyLayers);
+            foreach (Collider2D col in nearby)
+            {
+                Enemy e = col.GetComponent<Enemy>() ?? col.GetComponentInParent<Enemy>();
+                if (e == null || e.IsDead) continue;
+                e.Freeze(stopDuration); // Mıknatıs tamamlandı → olduğu yerde kal
+            }
+        }
+
+        _prevChargeFullState = isChargeFull;
     }
 
     // ─── Dash ────────────────────────────────────────────────────────────────
