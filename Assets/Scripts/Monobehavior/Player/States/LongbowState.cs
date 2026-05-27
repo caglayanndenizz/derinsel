@@ -24,7 +24,9 @@ public class LongbowState : PlayerState
             {
                 context.Animator?.SetTrigger(LightAttackHash);
                 Vector2 aim = context.GetLongbowAimWorldPointAtCurrentMouse();
-                float dmg = context.Stats != null ? context.Stats.lightAttackDamage : 0f;
+                float dmg = context.Stats != null
+                    ? (wasFull ? context.Stats.bowHeavyAp : context.Stats.bowLightAp)
+                    : 0f;
                 context.ScheduleLongbowArrow(dmg, wasFull, aim);
                 context.LightAttackInProgress = true;
                 context.LightFallbackExecuteAt = Time.time + Mathf.Max(0.03f, context.LightImpactFallbackDelay);
@@ -38,7 +40,11 @@ public class LongbowState : PlayerState
         bool canCharge = context.AugmentController != null && context.AugmentController.HasChargedLongbowAoe;
         _isLongbowCharging = canCharge && Input.GetButton("Fire2");
 
-        if (!_isLongbowCharging && _longbowCharge <= 0f)
+        // Tuş bırakıldıysa ve charge yoksa Idle'a dön.
+        // NOT: "!_isLongbowCharging" kullanılmamalı — HasChargedLongbowAoe yokken bile
+        //      Fire2 basılı tutulurken bu state'te kalmalıyız; yoksa GetButtonUp kaçar
+        //      ve yay animasyonu hiç tetiklenmez (LongbowState↔IdleState titreşimi).
+        if (!Input.GetButton("Fire2") && _longbowCharge <= 0f)
         {
             context.SetState(new IdleState());
             return;

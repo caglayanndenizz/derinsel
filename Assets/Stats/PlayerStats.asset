@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37576f05c4897404996640c68f8f6068, type: 3}
   m_Name: PlayerStats
   m_EditorClassIdentifier: Assembly-CSharp::EntityStats
-  entityName: Player
   maxHealth: 100
   moveSpeed: 5
-  attackPower: 5
-  lightAttackDamage: 10
+  bowLightAp: 5
+  bowHeavyAp: 20
+  crossbowAp: 0
+  hammerLightDamage: 5
   heavyAttackDamage: 20

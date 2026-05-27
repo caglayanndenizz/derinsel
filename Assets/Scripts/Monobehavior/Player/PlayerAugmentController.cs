@@ -53,6 +53,10 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private bool  hasPoisonArrowUnlock;
     [SerializeField] private float hammerAoeRadiusBonus    = 0f;
 
+    [Header("Arrow — Unlock")]
+    [SerializeField] private bool hasArrowSizeUnlock;
+    [SerializeField] private bool hasVampiricArrowUnlock;
+
     [Header("Hammer — Light Attack Stats")]
     [SerializeField] private float hammerLightDamageMultiplier  = 1f;
     [SerializeField] private float hammerLightRateMultiplier    = 1f;
@@ -136,6 +140,8 @@ public class PlayerAugmentController : MonoBehaviour
     public bool  HasLongbowFreezeUnlock          => hasLongbowFreezeUnlock  || mutationAugmentsLongbow;
     public bool  HasFireArrowUnlock          => hasFireArrowUnlock  || mutationAugmentsLongbow;
     public bool  HasPoisonArrowUnlock        => hasPoisonArrowUnlock || mutationAugmentsLongbow;
+    public bool  HasArrowSizeUnlock          => hasArrowSizeUnlock;
+    public bool  HasVampiricArrowUnlock      => hasVampiricArrowUnlock;
     public float FireDotDuration             => Mathf.Max(0f, fireDotDuration);
     public float FireDotDamagePerSecond      => Mathf.Max(0f, fireDotDamagePerSecond);
     public float PoisonDotDuration           => Mathf.Max(0f, poisonDotDuration);
@@ -260,6 +266,8 @@ public class PlayerAugmentController : MonoBehaviour
         hasLongbowFreezeUnlock                  = false;
         hasFireArrowUnlock                  = false;
         hasPoisonArrowUnlock                = false;
+        hasArrowSizeUnlock                  = false;
+        hasVampiricArrowUnlock              = false;
         hammerAoeRadiusBonus                = 0f;
         longbowAoeRadiusBonus                   = 0f;
         flatMaxHealthBonus                  = 0f;
@@ -339,6 +347,12 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.PoisonArrowUnlock:
                 hasPoisonArrowUnlock = true;
+                break;
+            case AugmentId.ArrowSizeUnlock:
+                hasArrowSizeUnlock = true;
+                break;
+            case AugmentId.VampiricArrowUnlock:
+                hasVampiricArrowUnlock = true;
                 break;
             case AugmentId.DashCooldownReduce_Common_I:
             case AugmentId.DashCooldownReduce_Common_II:

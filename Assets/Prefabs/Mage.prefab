@@ -76,7 +76,7 @@ GameObject:
   - component: {fileID: 4578505465515028023}
   - component: {fileID: 3924341414968054820}
   m_Layer: 6
-  m_Name: Enemy
+  m_Name: Mage
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -232,7 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2eb609b86791b74ab921e076ca59a6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  stats: {fileID: 11400000, guid: cbf15654484a16c4c9c0e6ffb7a85e6c, type: 2}
+  stats: {fileID: 11400000, guid: bd848fb3a85ab4e13b43cc3518574a00, type: 2}
   currentState: 0
   enemyType: 0
   detectionRange: 10

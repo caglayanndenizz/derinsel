@@ -35,6 +35,8 @@ public class PlayerArrow : MonoBehaviour
     CinemachineImpulseSource _hitCameraImpulse;
     Vector2 _previousFramePosition;
     WallLootHandler _wallLootHandler;
+    Player _player;
+    bool   _hasVampiricArrow;
 
     void Awake()
     {
@@ -45,6 +47,7 @@ public class PlayerArrow : MonoBehaviour
     void OnEnable()
     {
         _wasVisibleSinceSpawn = false;
+        transform.localScale  = Vector3.one; // ArrowSizeUnlock sonrası pool'a döndüğünde scale sıfırlanır
         StopAllElementParticles();
     }
     void OnBecameVisible()   { _wasVisibleSinceSpawn = true; }
@@ -69,7 +72,8 @@ public class PlayerArrow : MonoBehaviour
         bool hasPoisonArrow = false,
         float poisonDotDuration = 0f,
         float poisonDotDps = 0f,
-        float frozenVulnerabilityMult = 1f)
+        float frozenVulnerabilityMult = 1f,
+        bool hasVampiricArrow = false)
     {
         _enemyMask = enemyMask;
         _speed = speed;
@@ -87,8 +91,9 @@ public class PlayerArrow : MonoBehaviour
         _hasPoisonArrow    = hasPoisonArrow;
         _poisonDotDuration = poisonDotDuration;
         _poisonDotDps      = poisonDotDps;
-        _dungeonGenerator  = dungeonGenerator;
-        _hitCameraImpulse = hitCameraImpulse;
+        _dungeonGenerator    = dungeonGenerator;
+        _hitCameraImpulse    = hitCameraImpulse;
+        _hasVampiricArrow    = hasVampiricArrow;
 
         RefreshElementParticles();
         _initialized = false;
@@ -111,6 +116,7 @@ public class PlayerArrow : MonoBehaviour
         if (ownerRoot != null)
         {
             _wallLootHandler = ownerRoot.GetComponent<WallLootHandler>();
+            _player          = ownerRoot.GetComponent<Player>();
 
             var arrowCols = GetComponentsInChildren<Collider2D>(true);
             var ownerCols = ownerRoot.GetComponentsInChildren<Collider2D>(true);
@@ -222,6 +228,11 @@ public class PlayerArrow : MonoBehaviour
         dmg.TakeDamage(_damage, false);
 
         Enemy enemy = other.GetComponent<Enemy>() ?? other.GetComponentInParent<Enemy>();
+
+        // Vampiric Arrow: düşmanın max HP'sinin %5'i kadar player'ı iyileştirir.
+        // Düşmanın hayatta olup olmadığına bakılmaz — darbe isabet etti mi, o yeterli.
+        if (_hasVampiricArrow && enemy != null && _player != null)
+            _player.Heal(enemy.MaxHealth * 0.05f);
 
         if (_freezeDuration > 0f && enemy != null && enemy.CurrentHealth > 0f)
             enemy.Freeze(_freezeDuration, _frozenVulnerabilityMult);

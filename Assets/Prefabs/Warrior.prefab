@@ -105,7 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2eb609b86791b74ab921e076ca59a6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  stats: {fileID: 11400000, guid: 6b1c68f11ee273342a6a093313c120ef, type: 2}
+  stats: {fileID: 11400000, guid: d6bc173d4eb0e4e8e90519dbabfc7dfa, type: 2}
   currentState: 0
   enemyType: 2
   detectionRange: 10

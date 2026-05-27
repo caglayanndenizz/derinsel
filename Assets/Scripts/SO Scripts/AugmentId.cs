@@ -76,4 +76,8 @@ public enum AugmentId
     OutgoingDamageIncrease_Common        = 74,
     OutgoingDamageIncrease_Rare          = 75,
     OutgoingDamageIncrease_Extraordinary = 76,
+
+    // ── Arrow Unlock ──────────────────────────────────────────────────────────
+    ArrowSizeUnlock     = 77, // Ok boyutunu 2x yapar (sadece görsel, run süresince)
+    VampiricArrowUnlock = 78, // Her ok isabetinde düşmanın max HP'sinin %5'i kadar can çek
 }

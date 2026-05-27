@@ -7813,6 +7813,7 @@ MonoBehaviour:
   heavyHitSfx: {fileID: 0}
   lightHitPitch: 0.92
   heavyHitPitch: 0.82
+  hitVfxLifetime: 2
 --- !u!114 &1700128198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7849,15 +7850,22 @@ MonoBehaviour:
   hammerChargeMultiplier: 1
   dashDistanceMultiplier: 1
   incomingDamageReduction: 0
+  hasHammerChargeUnlock: 0
   hasHammerChargeDamageReductionUnlock: 0
   hammerFreezeDuration: 0
   longbowFreezeDuration: 0
   hasLongbowFreezeUnlock: 0
+  frozenEnemyVulnerabilityMultiplier: 1
   hasFireArrowUnlock: 0
   hasPoisonArrowUnlock: 0
   hammerAoeRadiusBonus: 0
+  hammerLightDamageMultiplier: 1
+  hammerLightRateMultiplier: 1
+  hammerSlamCooldownMultiplier: 1
+  hammerMagnetRadius: 6
+  hammerMagnetPullSpeed: 7
+  hammerChargeFullStopDuration: 1.2
   longbowAoeRadiusBonus: 0
-  flatMaxHealthBonus: 0
   fireDotDuration: 3
   fireDotDamagePerSecond: 2
   poisonDotDuration: 5
@@ -7870,6 +7878,7 @@ MonoBehaviour:
   crossbowBleedDamageRatioPerStack: 0.01
   crossbowBleedMaxStacks: 5
   crossbowBleedExpireSeconds: 5
+  flatMaxHealthBonus: 0
   projectileShotBonusCount: 0
   arrowProjectileSpeedMultiplier: 1
   outgoingDamageMultiplier: 1

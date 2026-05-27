@@ -7,6 +7,11 @@ public class Enemy : BaseEntity
     public enum State { Patrol, Chase, Attack, Dead }
     public enum EnemyType { Mage, Tanky, Warrior }
 
+    [Header("Data Reference")]
+    [SerializeField] private EnemyEntityStats stats;
+
+    public override float MaxHealth => stats != null ? stats.maxHealth : 0f;
+
     [Header("State Settings")]
     public State currentState = State.Patrol;
     public EnemyType enemyType = EnemyType.Mage;
@@ -46,7 +51,7 @@ public class Enemy : BaseEntity
     [Tooltip("Attack state iken iki projectile arası süre (saniye).")]
     public float mageRangedFireInterval = 4f;
     public float mageProjectileSpeed = 10f;
-    [Tooltip("EntityStats.enemyAP ile aynı anlamda kullanılır.")]
+    [Tooltip("EnemyEntityStats.enemyAP ile aynı anlamda kullanılır.")]
     public bool mageUseAttackPowerForProjectile = true;
     public float mageProjectileDamageOverride = 5f;
     public float mageProjectileMaxLifetime = 12f;
@@ -57,8 +62,6 @@ public class Enemy : BaseEntity
     public Transform mageProjectileSpawnPoint;
     public Vector3 mageProjectileSpawnOffset = Vector3.zero;
     public EnemyProjectilePooler mageProjectilePooler;
-    public GoldLootPooler goldPooler;
-    public ExperienceLootPooler experiencePooler;
     [Tooltip("Chase sırasında player'a yaklaşırken hız çarpanı.")]
     public float chaseApproachSpeedMultiplier = 1.6f;
     [Tooltip("Projectile atış hız çarpanı. 1.5 => %50 daha hızlı atış.")]
@@ -128,9 +131,6 @@ public class Enemy : BaseEntity
         player = GameObject.FindGameObjectWithTag("Player");
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _generator = UnityEngine.Object.FindAnyObjectByType<DungeonGenerator>();
-        if (goldPooler == null) goldPooler = GoldLootPooler.Instance;
-        if (experiencePooler == null) experiencePooler = ExperienceLootPooler.Instance;
-        
         _originalColor = _spriteRenderer.color;
 
         if (_rb != null)
@@ -586,9 +586,7 @@ public class Enemy : BaseEntity
 
     private void PrepareToDie() { _isDead = true; if (cd != null) cd.enabled = false; Invoke("Die", knockbackDuration + 0.05f); }
     
-    protected override void Die() { 
-        if (goldPooler == null) goldPooler = GoldLootPooler.Instance;
-        if (experiencePooler == null) experiencePooler = ExperienceLootPooler.Instance;
+    protected override void Die() {
         Vector2 deathPosition = GetEnemyReferencePosition();
 
         Player playerComponent = player != null ? player.GetComponent<Player>() : null;
@@ -596,14 +594,14 @@ public class Enemy : BaseEntity
         if (UnityEngine.Random.value <= goldDropChance * luckMult)
         {
             Vector2 goldSpawnPosition = GetValidGoldSpawnPosition(deathPosition);
-            if (goldPooler != null)
-                goldPooler.GetGold(goldSpawnPosition, Quaternion.identity);
+            if (GoldLootPooler.Instance != null)
+                GoldLootPooler.Instance.GetGold(goldSpawnPosition, Quaternion.identity);
             else if (goldPrefab != null)
                 Instantiate(goldPrefab, goldSpawnPosition, Quaternion.identity);
         }
 
-        if (experiencePooler != null)
-            experiencePooler.GetExperience((Vector3)deathPosition + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
+        if (ExperienceLootPooler.Instance != null)
+            ExperienceLootPooler.Instance.GetExperience((Vector3)deathPosition + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
         else if (experiencePrefab != null)
             Instantiate(experiencePrefab, (Vector3)deathPosition + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
 

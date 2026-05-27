@@ -18,6 +18,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1f0377d74f1f54fe495511754434ad05, type: 2}
   - {fileID: 11400000, guid: fc416b2a4f55a4f2c9810c166f9abd70, type: 2}
   - {fileID: 11400000, guid: a9301ccaf345340849e762556689ce87, type: 2}
+  - {fileID: 11400000, guid: 293fe91fe555466c865f60830181c978, type: 2}
+  - {fileID: 11400000, guid: 08d6a6f7fd87422385936fafe932b6c8, type: 2}
   crossbowUnlocks:
   - {fileID: 11400000, guid: f5a7a6931dbc7402fa063d33ef01cea1, type: 2}
   - {fileID: 11400000, guid: 60ed3717adc7847e9992e757e73b809d, type: 2}

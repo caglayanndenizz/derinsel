@@ -7,6 +7,9 @@ using Unity.Cinemachine;
 
 public class Player : BaseEntity, IPlayerContext
 {
+    [Header("Data Reference")]
+    [SerializeField] private EntityStats stats;
+
     [Header("External References")]
     public DungeonGenerator generator;
 
@@ -35,7 +38,7 @@ public class Player : BaseEntity, IPlayerContext
     public Camera aimCamera;
     [Tooltip("Yay animasyonu bittikten sonra ok instantiate edilir. Ok çıkarken imleç bu süre sonunda tekrar okunur (Time.timeScale ile).")]
     public float longbowArrowReleaseDelay = 0.4f;
-    [Tooltip("Tam şarjlı sağ-tık yayda ok hızı ve hasarı bu çarpanla çarpılır.")]
+    [Tooltip("Tam şarjlı sağ-tık yayda ok HIZI bu çarpanla çarpılır. Hasar EntityStats.bowHeavyAp'tan gelir.")]
     public float longbowChargedSpeedDamageMultiplier = 3f;
     [Tooltip("Sağ tık basılı tutma süresi (saniye); dolunca yay tam şarj sayılır.")]
     public float maxLongbowChargeTime = 0.5f;
@@ -57,8 +60,6 @@ public class Player : BaseEntity, IPlayerContext
     [Header("Crossbow — Bolt İstatistikleri")]
     [Tooltip("Bolt hizi = arrowSpeed x bu carpan.")]
     public float crossbowBoltSpeedMultiplier = 2f;
-    [Tooltip("Bolt hasari = lightAttackDamage x bu carpan.")]
-    public float crossbowBoltDamageMultiplier = 2f;
     [Tooltip("Bolt sahnede kaldigi maksimum sure (saniye).")]
     public float crossbowBoltMaxLifetime = 5f;
 
@@ -164,7 +165,6 @@ public class Player : BaseEntity, IPlayerContext
     Slider IPlayerContext.LongbowChargeMeter => longbowChargeMeter;
     GameObject IPlayerContext.LongbowMeterCanvas => longbowMeterCanvas;
     float IPlayerContext.CrossbowBoltSpeedMultiplier => crossbowBoltSpeedMultiplier;
-    float IPlayerContext.CrossbowBoltDamageMultiplier => crossbowBoltDamageMultiplier;
     float IPlayerContext.CrossbowAttackRate => crossbowAttackRate;
     float IPlayerContext.CrossbowBoltReleaseDelay => crossbowBoltReleaseDelay;
     GameObject IPlayerContext.CrossbowBoltPrefab => crossbowBoltPrefab;
@@ -258,7 +258,8 @@ public class Player : BaseEntity, IPlayerContext
         if (playerCurrency == null)
             playerCurrency = GetComponent<PlayerCurrency>();
         if (playerAugmentController == null)
-            playerAugmentController = GetComponent<PlayerAugmentController>();
+            playerAugmentController = GetComponent<PlayerAugmentController>()
+                ?? GetComponentInChildren<PlayerAugmentController>(true);
         if (wallLootHandler == null)
             wallLootHandler = GetComponent<WallLootHandler>();
         if (impactFeedback == null)
@@ -549,11 +550,14 @@ public class Player : BaseEntity, IPlayerContext
         bool chargedExplosionEnabled = useBowChargedMultiplier &&
                                        playerAugmentController != null &&
                                        playerAugmentController.HasChargedLongbowAoe;
-        float m = useBowChargedMultiplier ? Mathf.Max(1f, longbowChargedSpeedDamageMultiplier) : 1f;
-        float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
+        // Hız çarpanı: charged atışta ok daha hızlı uçar.
+        // Hasar çarpanı uygulanmaz — damage parametresi zaten doğru değeri taşır
+        // (light → bowLightAp, heavy/charged → bowHeavyAp, LongbowState tarafından seçilir).
+        float spdMult  = useBowChargedMultiplier ? Mathf.Max(1f, longbowChargedSpeedDamageMultiplier) : 1f;
+        float dmgMult  = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
         float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;
-        float useSpeed = arrowSpeed * m * arrowSpdMult;
-        float useDamage = damage * m * dmgMult;
+        float useSpeed  = arrowSpeed * spdMult * arrowSpdMult;
+        float useDamage = damage * dmgMult;
 
         Vector2 origin = attackPoint.position;
         Vector2 offset = targetWorld - origin;
@@ -592,7 +596,7 @@ public class Player : BaseEntity, IPlayerContext
 
         if (Time.time < _nextRadialLongbowAutoVolleyTime) return;
 
-        float baseDamage = stats != null ? stats.lightAttackDamage : 0f;
+        float baseDamage = stats != null ? stats.bowLightAp : 0f;
         FireRadialLongbowMutationAutoVolley(baseDamage);
         _nextRadialLongbowAutoVolleyTime = Time.time + Mathf.Max(0.05f, radialLongbowAutoVolleyIntervalSeconds);
     }
@@ -649,6 +653,11 @@ public class Player : BaseEntity, IPlayerContext
             if (mover == null) { Destroy(go); return; }
         }
 
+        // Arrow Size Unlock: ok boyutunu 2x yapar (OnEnable her seferinde Vector3.one'a sıfırlar)
+        mover.transform.localScale = (playerAugmentController != null && playerAugmentController.HasArrowSizeUnlock)
+            ? Vector3.one * 2f
+            : Vector3.one;
+
         mover.Initialize(
             targetWorldPoint,
             useSpeed,
@@ -668,7 +677,8 @@ public class Player : BaseEntity, IPlayerContext
             playerAugmentController != null && playerAugmentController.HasPoisonArrowUnlock,
             playerAugmentController != null ? playerAugmentController.PoisonDotDuration : 0f,
             playerAugmentController != null ? playerAugmentController.PoisonDotDamagePerSecond : 0f,
-            playerAugmentController != null ? playerAugmentController.FrozenEnemyVulnerabilityMultiplier : 1f); // Resonance
+            playerAugmentController != null ? playerAugmentController.FrozenEnemyVulnerabilityMultiplier : 1f, // Resonance
+            playerAugmentController != null && playerAugmentController.HasVampiricArrowUnlock);               // Vampiric
     }
 
     private static float GetArrowSpreadStepDegrees(int arrowCount)
@@ -770,8 +780,9 @@ public class Player : BaseEntity, IPlayerContext
     /// </summary>
     private void UpdateHammerMagnet()
     {
-        // Charge unlock yoksa mıknatıs çalışmaz
+        // Charge unlock yoksa ya da aktif state HammerState değilse mıknatıs çalışmaz
         if (playerAugmentController == null || !playerAugmentController.HasHammerChargeUnlock) return;
+        if (!(_currentState is HammerState)) return;
 
         bool isCharging   = _currentState.IsChargingForMovement;
         bool isChargeFull = _currentState.IsChargeMeterFull(this);

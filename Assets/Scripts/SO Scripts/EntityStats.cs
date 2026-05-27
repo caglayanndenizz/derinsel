@@ -3,11 +3,18 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EntityStats", menuName = "Scriptable Objects/EntityStats")]
 public class EntityStats : ScriptableObject
 {
-    public string entityName;
+    [Header("Base")]
     public float maxHealth;
     public float moveSpeed;
-    public float enemyAP;
-    public float lightAttackDamage;
+
+    [Header("Bow")]
+    public float bowLightAp;
+    public float bowHeavyAp;
+
+    [Header("Crossbow")]
+    public float crossbowAp;
+
+    [Header("Hammer")]
     public float hammerLightDamage;
     public float heavyAttackDamage;
 }

@@ -24,7 +24,6 @@ public interface IPlayerContext
 
     // Crossbow / bolt settings
     float CrossbowBoltSpeedMultiplier { get; }
-    float CrossbowBoltDamageMultiplier { get; }
     float CrossbowAttackRate { get; }
     float CrossbowBoltReleaseDelay { get; }
     GameObject CrossbowBoltPrefab { get; }

@@ -29,7 +29,7 @@ public class CrossbowState : PlayerState
         if (Time.time < context.NextAttackTime) return;
 
         float dmg = context.Stats != null
-            ? context.Stats.lightAttackDamage * context.CrossbowBoltDamageMultiplier
+            ? context.Stats.crossbowAp
             : 0f;
 
         Vector2 aim = context.GetLongbowAimWorldPointAtCurrentMouse();
