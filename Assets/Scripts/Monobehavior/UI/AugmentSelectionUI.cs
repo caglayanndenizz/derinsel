@@ -37,6 +37,8 @@ public class AugmentSelectionUI : MonoBehaviour
     [Header("Behavior")]
     [SerializeField] private bool pauseGameWhenPanelOpen = true;
     [SerializeField] private bool deactivatePanelRootWhenHidden = true;
+    [Tooltip("Panel açıldıktan kaç saniye (gerçek zaman) sonra butonlar tıklanabilir olur. Yanlışlıkla seçimi önler.")]
+    [SerializeField][Range(0.5f, 2f)] private float buttonActivationDelay = 1f;
 
     [Header("Visual theme")]
     [SerializeField] private Image panelThemeTargetImage;
@@ -48,6 +50,7 @@ public class AugmentSelectionUI : MonoBehaviour
     private readonly List<AugmentOptionButton> _runtimeButtons = new();
     private RectTransform _runtimeCardsParent;
     private float _previousTimeScale = 1f;
+    private float _panelOpenedAt = -999f;
     private bool _isSubscribed;
     private CanvasGroup _panelCanvasGroup;
     private bool _isPanelOpen;
@@ -502,6 +505,8 @@ public class AugmentSelectionUI : MonoBehaviour
 
     private void HandleAugmentSelected(AugmentDefinition selectedAugment)
     {
+        if (Time.unscaledTime - _panelOpenedAt < buttonActivationDelay) return;
+
         if (playerAugmentController != null)
             playerAugmentController.ApplyAugment(selectedAugment);
 
@@ -578,6 +583,7 @@ public class AugmentSelectionUI : MonoBehaviour
         _panelCanvasGroup.alpha = 1f;
         _panelCanvasGroup.interactable = true;
         _panelCanvasGroup.blocksRaycasts = true;
+        _panelOpenedAt = Time.unscaledTime;
     }
 
     private void EnsurePanelCanvasGroup()
