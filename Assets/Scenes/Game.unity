@@ -751,6 +751,7 @@ MonoBehaviour:
   forceAugmentRowToCenterViewport: 1
   pauseGameWhenPanelOpen: 1
   deactivatePanelRootWhenHidden: 1
+  buttonActivationDelay: 1
   panelThemeTargetImage: {fileID: 0}
   levelUpPanelThemeColor: {r: 1, g: 1, b: 1, a: 1}
   wallLootGiftPanelThemeColor: {r: 0.35, g: 0.35, b: 0.35, a: 1}
