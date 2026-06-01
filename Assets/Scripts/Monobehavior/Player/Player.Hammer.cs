@@ -164,9 +164,10 @@ public partial class Player
 
         if (attackPoint == null) return;
 
-        Vector2 facing  = transform.localScale.x >= 0f ? Vector2.right : Vector2.left;
-        Vector2 boxSize = new Vector2(hammerLightAoe * 2f, hammerLightAoe);
-        RaycastHit2D[] hits = Physics2D.BoxCastAll(attackPoint.position, boxSize, 0f, facing, 0f, enemyLayers);
+        Vector2 facing    = transform.localScale.x >= 0f ? Vector2.right : Vector2.left;
+        Vector2 boxSize   = new Vector2(hammerLightAoe * 2f, hammerLightAoe);
+        Vector2 boxCenter = (Vector2)attackPoint.position + facing * hammerLightAoe;
+        RaycastHit2D[] hits = Physics2D.BoxCastAll(boxCenter, boxSize, 0f, facing, 0f, enemyLayers);
         if (hits.Length == 0) return;
 
         float lightDmg     = stats != null ? stats.hammerLightDamage : 0f;
