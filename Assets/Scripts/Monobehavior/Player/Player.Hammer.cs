@@ -139,10 +139,11 @@ public partial class Player
     {
         if (Time.time < _nextAttackTime) return;
         float lightRateMult = playerAugmentController != null ? playerAugmentController.HammerLightRateMultiplier : 1f;
-        _nextAttackTime = Time.time + Mathf.Max(0.05f, hammerLightAttackRate * lightRateMult);
+        float effectiveRate = Mathf.Max(0.05f, hammerLightAttackRate * lightRateMult);
+        _nextAttackTime = Time.time + effectiveRate;
 
         if (animator != null)
-            animator.SetTrigger(HammerLightAttackHash);
+            animator.CrossFade(HammerLightAttackHash, 0.05f, 0, 0f);
 
         _hammerLightInProgress = true;
         _hammerLightFallbackAt = Time.time + Mathf.Max(0.05f, hammerLightFallbackDelay);
@@ -267,5 +268,29 @@ public partial class Player
             bool isReady = remaining <= 0f;
             hammerCooldownCanvas.SetActive(!isReady || showCooldownBarWhenReady);
         }
+    }
+
+    // ─── Gizmos ──────────────────────────────────────────────────────────────
+
+    private void OnDrawGizmosSelected()
+    {
+        if (attackPoint == null) return;
+
+        Vector2 facing    = transform.localScale.x >= 0f ? Vector2.right : Vector2.left;
+        Vector2 boxSize   = new Vector2(hammerLightAoe * 2f, hammerLightAoe);
+        Vector2 boxCenter = (Vector2)attackPoint.position + facing * hammerLightAoe;
+
+        // Light attack — yönlü kutu (turuncu)
+        Gizmos.color = new Color(1f, 0.6f, 0f, 0.25f);
+        Gizmos.DrawCube(boxCenter, boxSize);
+        Gizmos.color = new Color(1f, 0.6f, 0f, 1f);
+        Gizmos.DrawWireCube(boxCenter, boxSize);
+
+        // Heavy slam — radyal daire (kırmızı)
+        float effectiveHeavyAoe = hammerAOE * (playerAugmentController != null ? playerAugmentController.HammerAoeRadiusMultiplier : 1f);
+        Gizmos.color = new Color(1f, 0.1f, 0.1f, 0.15f);
+        Gizmos.DrawSphere(attackPoint.position, effectiveHeavyAoe);
+        Gizmos.color = new Color(1f, 0.1f, 0.1f, 1f);
+        Gizmos.DrawWireSphere(attackPoint.position, effectiveHeavyAoe);
     }
 }
