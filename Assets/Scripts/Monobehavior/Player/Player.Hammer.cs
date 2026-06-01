@@ -164,18 +164,33 @@ public partial class Player
 
         if (attackPoint == null) return;
 
-        Collider2D col = Physics2D.OverlapCircle(attackPoint.position, hammerLightAoe, enemyLayers);
-        if (col == null) return;
-
-        IDamageable target = col.GetComponent<IDamageable>() ?? col.GetComponentInParent<IDamageable>();
-        if (target == null) return;
+        Vector2 facing  = transform.localScale.x >= 0f ? Vector2.right : Vector2.left;
+        Vector2 boxSize = new Vector2(hammerLightAoe * 2f, hammerLightAoe);
+        RaycastHit2D[] hits = Physics2D.BoxCastAll(attackPoint.position, boxSize, 0f, facing, 0f, enemyLayers);
+        if (hits.Length == 0) return;
 
         float lightDmg     = stats != null ? stats.hammerLightDamage : 0f;
         float dmgMult      = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
         float lightDmgMult = playerAugmentController != null ? playerAugmentController.HammerLightDamageMultiplier : 1f;
-        target.TakeDamage(lightDmg * dmgMult * lightDmgMult, false);
+        float useDamage    = lightDmg * dmgMult * lightDmgMult;
 
-        impactFeedback?.PlayLightHit(col.ClosestPoint(attackPoint.position), _defaultImpulseSource);
+        Vector2 firstHitPoint = attackPoint.position;
+        bool anyHit = false;
+
+        foreach (RaycastHit2D hit in hits)
+        {
+            IDamageable target = hit.collider.GetComponent<IDamageable>() ?? hit.collider.GetComponentInParent<IDamageable>();
+            if (target == null) continue;
+            target.TakeDamage(useDamage, false);
+            if (!anyHit)
+            {
+                firstHitPoint = hit.collider.ClosestPoint(attackPoint.position);
+                anyHit = true;
+            }
+        }
+
+        if (anyHit)
+            impactFeedback?.PlayLightHit(firstHitPoint, _defaultImpulseSource);
     }
 
     // ─── Hammer Charge Magnet ────────────────────────────────────────────────
