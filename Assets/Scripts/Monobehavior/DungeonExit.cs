@@ -12,16 +12,14 @@ public class DungeonExit : MonoBehaviour
     [Tooltip("Oyuncu bu kapıya kardeş kapıdan belirgin şekilde daha yakın olmalı; arada yanlış tetiklenmeyi azaltır.")]
     public float closerThanSiblingEpsilon = 0.05f;
 
-    private GameObject interactionUI;
     private DungeonGenerator dungeonGenerator;
     private ExitAction exitAction = ExitAction.NextFloor;
     private bool _isTriggered;
     private GameObject _siblingExit;
     private Collider2D _triggerCollider;
 
-    public void Setup(GameObject ui, DungeonGenerator generator, ExitAction action, GameObject siblingExit)
+    public void Setup(DungeonGenerator generator, ExitAction action, GameObject siblingExit)
     {
-        interactionUI = ui;
         dungeonGenerator = generator != null ? generator : Object.FindAnyObjectByType<DungeonGenerator>();
         exitAction = action;
         _siblingExit = siblingExit;
@@ -78,8 +76,6 @@ public class DungeonExit : MonoBehaviour
         if (_triggerCollider != null)
             _triggerCollider.enabled = false;
 
-        if (interactionUI != null) interactionUI.SetActive(false);
-
         if (dungeonGenerator == null)
         {
             Debug.LogWarning("DungeonExit: DungeonGenerator bulunamadi.");
@@ -92,12 +88,4 @@ public class DungeonExit : MonoBehaviour
             dungeonGenerator.StartExitTransition();
     }
 
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (_isTriggered) return;
-        if (other.CompareTag("Player"))
-        {
-            if (interactionUI != null) interactionUI.SetActive(false);
-        }
-    }
 }

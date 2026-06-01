@@ -550,9 +550,9 @@ public class DungeonGenerator : MonoBehaviour
         DungeonExit exitA = doorA.GetComponent<DungeonExit>();
         DungeonExit exitB = doorB.GetComponent<DungeonExit>();
         if (exitA != null)
-            exitA.Setup(exitUI, this, actionA, doorB);
+            exitA.Setup(this, actionA, doorB);
         if (exitB != null)
-            exitB.Setup(exitUI, this, actionB, doorA);
+            exitB.Setup(this, actionB, doorA);
     }
 
     private void GetSideBySideDoorPositions(out Vector2Int firstDoorPos, out Vector2Int secondDoorPos)

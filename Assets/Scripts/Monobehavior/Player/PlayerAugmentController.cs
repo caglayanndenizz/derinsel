@@ -28,41 +28,31 @@ public class PlayerAugmentController : MonoBehaviour
 
     // ── Runtime stats ─────────────────────────────────────────────────────────
 
+    [Header("General")]
     [SerializeField] private float movementSpeedBonus;
-    [SerializeField] private bool  hasChargedLongbowAoe;
-    [SerializeField] private float chargedLongbowAoeRadius = 3f;
-    [SerializeField] private bool  hasDoubleArrowUnlock;
+    [SerializeField] private float luckMultiplier          = 1f;
+    [SerializeField] private float incomingDamageReduction = 0f;
+    [SerializeField] private float outgoingDamageMultiplier       = 1f;
+    [SerializeField] private float maxHealthMultiplier            = 1f;
+    [SerializeField] private float flatMaxHealthBonus = 0f;
     [SerializeField] private bool  hasExtraAugmentSlotUnlock;
+
+    [Header("Dash — Unlock")]
     [SerializeField] private bool  hasDashUnluck;
     [SerializeField] private float dashCooldownMultiplier  = 1f;
-    [SerializeField] private float luckMultiplier          = 1f;
-    [SerializeField] private float hammerChargeMultiplier  = 1f;
     [SerializeField] private float dashDistanceMultiplier  = 1f;
-    [SerializeField] private float incomingDamageReduction = 0f;
+
+    [Header("Hammer — Unlock")]
     [SerializeField] private bool  hasHammerChargeUnlock;
     [SerializeField] private bool  hasHammerChargeDamageReductionUnlock;
-    [SerializeField] private float hammerFreezeDuration    = 0f;
-    [SerializeField] private float longbowFreezeDuration       = 0f;
-    [SerializeField] private bool  hasLongbowFreezeUnlock;
-    /// <summary>
-    /// Resonance — LongbowFreezeUnlock alındığında 1.5f olur.
-    /// Donmuş düşmanlara verilen hasara çarpılır (Enemy.TakeDamage içinde uygulanır).
-    /// </summary>
-    [SerializeField] private float frozenEnemyVulnerabilityMultiplier = 1f;
-    [SerializeField] private bool  hasFireArrowUnlock;
-    [SerializeField] private bool  hasPoisonArrowUnlock;
+    [SerializeField] private float hammerChargeMultiplier  = 1f;
     [SerializeField] private float hammerAoeRadiusBonus    = 0f;
+    [SerializeField] private float hammerFreezeDuration    = 0f;
+    [SerializeField] private float hammerSlamCooldownMultiplier = 1f;
 
-    [Header("Arrow — Unlock")]
-    [SerializeField] private bool hasArrowSizeUnlock;
-    [SerializeField] private bool hasVampiricArrowUnlock;
-
-    [Header("Hammer — Light Attack Stats")]
+    [Header("Hammer — Light Attack")]
     [SerializeField] private float hammerLightDamageMultiplier  = 1f;
     [SerializeField] private float hammerLightRateMultiplier    = 1f;
-
-    [Header("Hammer — Slam Cooldown")]
-    [SerializeField] private float hammerSlamCooldownMultiplier = 1f;
 
     [Header("Hammer — Charge Magnet")]
     [Tooltip("Charge sırasında düşmanları çeken mıknatıs yarıçapı (birim).")]
@@ -72,18 +62,33 @@ public class PlayerAugmentController : MonoBehaviour
     [Tooltip("Charge dolunca düşmanlara uygulanacak freeze süresi (saniye).")]
     [SerializeField] private float hammerChargeFullStopDuration = 1.2f;
 
-    [Header("Longbow — AoE & DoT")]
-    [SerializeField] private float longbowAoeRadiusBonus            = 0f;
+    [Header("Longbow — Unlock")]
+    [SerializeField] private bool  hasChargedLongbowAoe;
+    [SerializeField] private float chargedLongbowAoeRadius = 3f;
+    [SerializeField] private bool  hasDoubleArrowUnlock;
+    [SerializeField] private float longbowAoeRadiusBonus   = 0f;
+    [SerializeField] private bool  hasArrowSizeUnlock;
+    [SerializeField] private bool  hasVampiricArrowUnlock;
+    [SerializeField] private int   projectileShotBonusCount;
+    [SerializeField] private float arrowProjectileSpeedMultiplier = 1f;
 
-    [Header("Longbow — Fire Arrow DoT")]
+    [Header("Longbow — Freeze")]
+    [SerializeField] private bool  hasLongbowFreezeUnlock;
+    [SerializeField] private float longbowFreezeDuration   = 0f;
+    [Tooltip("Resonance — donmuş düşmanlara verilen hasara çarpılır. LongbowFreezeUnlock alınınca 1.5f olur.")]
+    [SerializeField] private float frozenEnemyVulnerabilityMultiplier = 1f;
+
+    [Header("Longbow — Fire Arrow")]
+    [SerializeField] private bool  hasFireArrowUnlock;
     [SerializeField] private float fireDotDuration         = 3f;
     [SerializeField] private float fireDotDamagePerSecond  = 2f;
 
-    [Header("Longbow — Poison Arrow DoT")]
-    [SerializeField] private float poisonDotDuration       = 5f;
-    [SerializeField] private float poisonDotDamagePerSecond= 1.5f;
+    [Header("Longbow — Poison Arrow")]
+    [SerializeField] private bool  hasPoisonArrowUnlock;
+    [SerializeField] private float poisonDotDuration        = 5f;
+    [SerializeField] private float poisonDotDamagePerSecond = 1.5f;
 
-    [Header("Crossbow — Bolt Pierce")]
+    [Header("Crossbow — Pierce")]
     [SerializeField] private bool  hasCrossbowBoltPierce;
     [Tooltip("Her düşman başına hasarın yüzde kaçı düşer (0.20 = %20).")]
     [SerializeField] private float crossbowPierceDamageFalloff = 0.20f;
@@ -92,7 +97,7 @@ public class PlayerAugmentController : MonoBehaviour
     [Tooltip("Kaç düşman sonrası floor'a düşülür (varsayılan 3 → 4. düşmandan itibaren %30).")]
     [SerializeField] private int   crossbowPierceFalloffCount  = 3;
 
-    [Header("Crossbow — Bolt Bleed")]
+    [Header("Crossbow — Bleed")]
     [SerializeField] private bool  hasCrossbowBoltBleed;
     [Tooltip("Her stack'in bolt hasarına oranı (0.01 = %1). Max stack'te toplam hasar = maxStacks * oran.")]
     [SerializeField] private float crossbowBleedDamageRatioPerStack = 0.01f;
@@ -101,31 +106,23 @@ public class PlayerAugmentController : MonoBehaviour
     [Tooltip("Son vuruştan bu süre geçerse (saniye) kanama sona erer.")]
     [SerializeField] private float crossbowBleedExpireSeconds       = 5f;
 
-    [SerializeField] private float flatMaxHealthBonus = 0f;
-
     private float _initialChargedLongbowAoeRadius;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
-
-    [SerializeField] private int   projectileShotBonusCount;
-    [SerializeField] private float arrowProjectileSpeedMultiplier = 1f;
-    [SerializeField] private float outgoingDamageMultiplier       = 1f;
-    [SerializeField] private float maxHealthMultiplier            = 1f;
 
     [Header("Unlock Augment Database")]
     [Tooltip("Silaha göre unlock augmentleri takip etmek için. Mutation kontrolünde kullanılır.")]
     [SerializeField] private UnlockAugmentDatabase unlockDatabase;
 
-    [Header("MutationAugmentsLongbow")]
-    [SerializeField]
-    [Tooltip("İşaretlenince 6 longbow augment varmış gibi Obsidyen mutasyonu tetiklenir (test).")]
-    private bool mutationAugmentsLongbow;
+    [Header("Test")]
+    [Tooltip("İşaretlenince 6 longbow augment varmış gibi Obsidyen mutasyonu tetiklenir.")]
+    [SerializeField] private bool mutationAugmentsLongbow;
 
     // Weapon mutation flags — set automatically when all unlock augments for a weapon are obtained
     private bool _longbowMutated;
     private bool _crossbowMutated;
     private bool _hammerMutated;
 
-    [Header("Motor test (Play Mode'da güncellenir)")]
+    [Header("Motor (Play Mode'da güncellenir)")]
     [SerializeField] private int      longbowCevherCountMotor;
     [SerializeField] private string   longbowCevherTierMotor;
 
