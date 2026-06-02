@@ -41,6 +41,22 @@ public class DungeonGenerator : MonoBehaviour
     [Tooltip("Atanırsa wave sistemi devreye girer; boş bırakılırsa eski sabit spawn davranışı korunur.")]
     public RoomWaveController roomWaveController;
 
+    [Header("Kirilabilir Objeler")]
+    public BreakableSpawner breakableSpawner;
+    [Tooltip("Her odada spawn edilecek kirilabilir obje sayisi.")]
+    public int breakablesPerRoom = 5;
+    [Tooltip("Oyuncunun baslangic noktasina minimum mesafe (tile).")]
+    public float minBreakableDistanceFromPlayer = 5f;
+
+    [Header("Chest Sistemi")]
+    public GameObject woodenChestPrefab;
+    public GameObject silverChestPrefab;
+    public GameObject goldenChestPrefab;
+    [Tooltip("Bu kata kadar (dahil) wooden chest cikar.")]
+    public int woodenChestMaxFloor = 5;
+    [Tooltip("Bu kata kadar (dahil) silver chest cikar.")]
+    public int silverChestMaxFloor = 15;
+
     [Header("Transition Ayarlari")]
     public TransitionFader transitionFader;
     public CinemachineCamera vcam; // Sahnedeki sanal kamera
@@ -51,6 +67,8 @@ public class DungeonGenerator : MonoBehaviour
 
     private HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
     private readonly List<GameObject> currentExitInstances = new List<GameObject>();
+    private readonly List<GameObject> _activeBreakables = new List<GameObject>();
+    private GameObject _activeChest;
     private bool _exitDoorsSpawnedForCurrentFloor;
     private bool _waveSystemActive;
     private float _nextRoomClearCheckTime;
@@ -349,6 +367,39 @@ public class DungeonGenerator : MonoBehaviour
             SpawnLegacyEnemies(availableFloors);
             TrySpawnExitDoorsIfRoomCleared();
         }
+
+        SpawnBreakables(availableFloors);
+    }
+
+    private void SpawnBreakables(List<Vector2Int> availableFloors)
+    {
+        if (breakableSpawner == null || breakablesPerRoom <= 0) return;
+
+        _activeBreakables.RemoveAll(b => b == null);
+
+        List<Vector2Int> candidates = availableFloors
+            .Where(p => Vector2.Distance(Vector2.zero, p) >= minBreakableDistanceFromPlayer)
+            .ToList();
+
+        int spawned = 0;
+        int attempts = 0;
+        int maxAttempts = breakablesPerRoom * 10;
+
+        while (spawned < breakablesPerRoom && candidates.Count > 0 && attempts < maxAttempts)
+        {
+            attempts++;
+            int idx = Random.Range(0, candidates.Count);
+            Vector2Int tile = candidates[idx];
+            candidates.RemoveAt(idx);
+
+            Vector3 worldPos = new Vector3(tile.x + 0.5f, tile.y + 0.5f, 0f);
+            GameObject obj = breakableSpawner.SpawnRandom(worldPos);
+            if (obj != null)
+            {
+                _activeBreakables.Add(obj);
+                spawned++;
+            }
+        }
     }
 
     private void SpawnLegacyEnemies(List<Vector2Int> availableFloors)
@@ -526,6 +577,38 @@ public class DungeonGenerator : MonoBehaviour
         LinkExitDoorPair(doorA, doorB, firstAction, secondAction);
 
         _exitDoorsSpawnedForCurrentFloor = true;
+        SpawnChestNearDoors(firstDoorPos);
+    }
+
+    private void SpawnChestNearDoors(Vector2Int doorPos)
+    {
+        GameObject prefab = GetChestPrefabForFloor(_currentDungeonFloor);
+        if (prefab == null) return;
+
+        if (_activeChest != null)
+            Destroy(_activeChest);
+
+        Vector2Int chestPos = FindNearbyFloorTile(doorPos, 2, 5);
+        _activeChest = Instantiate(prefab, new Vector3(chestPos.x + 0.5f, chestPos.y + 0.5f, 0f), Quaternion.identity);
+    }
+
+    private GameObject GetChestPrefabForFloor(int floor)
+    {
+        if (floor <= woodenChestMaxFloor) return woodenChestPrefab;
+        if (floor <= silverChestMaxFloor) return silverChestPrefab;
+        return goldenChestPrefab;
+    }
+
+    private Vector2Int FindNearbyFloorTile(Vector2Int center, int minDist, int maxDist)
+    {
+        var candidates = new List<Vector2Int>();
+        foreach (Vector2Int pos in floorPositions)
+        {
+            int dist = Mathf.Abs(pos.x - center.x) + Mathf.Abs(pos.y - center.y);
+            if (dist >= minDist && dist <= maxDist)
+                candidates.Add(pos);
+        }
+        return candidates.Count > 0 ? candidates[Random.Range(0, candidates.Count)] : center;
     }
 
     private GameObject CreateExitDoorInstance(Vector2Int tilePos, DungeonExit.ExitAction action)
@@ -646,6 +729,18 @@ public class DungeonGenerator : MonoBehaviour
         {
             if (loot != null && loot.gameObject.activeInHierarchy)
                 loot.ReturnToPool();
+        }
+
+        foreach (GameObject b in _activeBreakables)
+        {
+            if (b != null) Destroy(b);
+        }
+        _activeBreakables.Clear();
+
+        if (_activeChest != null)
+        {
+            Destroy(_activeChest);
+            _activeChest = null;
         }
     }
 

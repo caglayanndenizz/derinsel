@@ -85,6 +85,26 @@ public class AugmentWeightSystem : MonoBehaviour
     // ── Main API ───────────────────────────────────────────────────────────────
 
     /// <summary>
+    /// Builds a weighted offer containing only augments of the given rarity tier.
+    /// Used by the chest system — does not advance offer counters.
+    /// </summary>
+    public List<AugmentDefinition> BuildChestOffer(int rarity, PlayerAugmentController controller, int slotCount)
+    {
+        var result  = new List<AugmentDefinition>(slotCount);
+        var usedIds = new HashSet<AugmentId>();
+
+        for (int i = 0; i < slotCount; i++)
+        {
+            List<AugmentDefinition> candidates = BuildTierCandidates(rarity, controller, usedIds);
+            if (candidates.Count == 0) break;
+            AugmentDefinition pick = WeightedRandom(candidates);
+            result.Add(pick);
+            usedIds.Add(pick.id);
+        }
+        return result;
+    }
+
+    /// <summary>
     /// Builds a weighted augment offer for one level-up selection.
     /// Automatically decides whether this is an unlock offer or a regular tier offer.
     /// </summary>
@@ -271,6 +291,7 @@ public class AugmentWeightSystem : MonoBehaviour
         if (augmentDatabase?.regularAugments == null) return list;
         foreach (AugmentDefinition aug in augmentDatabase.regularAugments)
         {
+            if (aug is UnlockAugmentDefinition) continue;
             if (aug.rarity != tier) continue;
             if (!IsEligible(aug, controller, usedIds)) continue;
             list.Add(aug);
@@ -286,6 +307,7 @@ public class AugmentWeightSystem : MonoBehaviour
         if (augmentDatabase?.regularAugments == null) return list;
         foreach (AugmentDefinition aug in augmentDatabase.regularAugments)
         {
+            if (aug is UnlockAugmentDefinition) continue;
             if (!IsEligible(aug, controller, usedIds)) continue;
             list.Add(aug);
         }

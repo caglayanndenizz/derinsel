@@ -756,6 +756,10 @@ MonoBehaviour:
   levelUpPanelThemeColor: {r: 1, g: 1, b: 1, a: 1}
   wallLootGiftPanelThemeColor: {r: 0.35, g: 0.35, b: 0.35, a: 1}
   unlockOfferPanelThemeColor: {r: 1, g: 0.84, b: 0, a: 1}
+  chestWoodenPanelThemeColor: {r: 0.55, g: 0.35, b: 0.15, a: 1}
+  chestSilverPanelThemeColor: {r: 0.75, g: 0.75, b: 0.8, a: 1}
+  chestGoldPanelThemeColor: {r: 1, g: 0.84, b: 0, a: 1}
+  levelUpAugmentSelectionEnabled: 0
 --- !u!1 &314556255
 GameObject:
   m_ObjectHideFlags: 0
@@ -3643,6 +3647,14 @@ MonoBehaviour:
   exitPrefab: {fileID: 1031347285994503552, guid: e8e1f7b624480ad4bb4d5f1810e05f5a, type: 3}
   enemyPooler: {fileID: 1679956769}
   roomWaveController: {fileID: 1764338250}
+  breakableSpawner: {fileID: 1490300119}
+  breakablesPerRoom: 5
+  minBreakableDistanceFromPlayer: 5
+  woodenChestPrefab: {fileID: 8874947118399667921, guid: 000de5a339504d64bae8aada1510ac3b, type: 3}
+  silverChestPrefab: {fileID: 1736526625652122930, guid: 1bbe4049603690b4881f8088d635340f, type: 3}
+  goldenChestPrefab: {fileID: 2738283523011843055, guid: 04c5faea53272d54a85121e4923bd001, type: 3}
+  woodenChestMaxFloor: 5
+  silverChestMaxFloor: 15
   transitionFader: {fileID: 816801429}
   vcam: {fileID: 1626974882}
   destructableWallTile: {fileID: 11400000, guid: 291ed0377b0ae0043bc543a711ad8d26, type: 2}
@@ -5872,6 +5884,7 @@ Transform:
   - {fileID: 1451887778}
   - {fileID: 1764338251}
   - {fileID: 2061067775}
+  - {fileID: 1490300118}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1318843553
@@ -6932,6 +6945,55 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1490300117
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1490300118}
+  - component: {fileID: 1490300119}
+  m_Layer: 0
+  m_Name: BreakableGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1490300118
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1490300117}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1295312150}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1490300119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1490300117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 979b8354293d601409636b04200efd4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BreakableSpawner
+  urnPrefab: {fileID: 9186374096056388030, guid: f9521b63285b0474d9fa8eff01f89bb8, type: 3}
+  vasePrefab: {fileID: 4087467330738506173, guid: ad659235ba24170418119dc0a6aa760e, type: 3}
+  jugPrefab: {fileID: 119843567230476205, guid: 0f518160b4df69240a76c43137de71e1, type: 3}
+  explosivePrefab: {fileID: 3841284370773036939, guid: 7a406ef3b70ca7147bbd805673699974, type: 3}
+  explosiveChance: 0.25
 --- !u!1 &1510183400
 GameObject:
   m_ObjectHideFlags: 0
@@ -9427,10 +9489,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 213991786953616355, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 254655886362368020, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 800428578735404159, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: -1408436710, guid: ae0a268378c197a40836013dcaa951b9, type: 3}
+    - target: {fileID: 826531781291267238, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1332627934314262385, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1445455240794291464, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -9471,6 +9549,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2397508272434322654, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: aimCamera
       value: 
@@ -9500,6 +9582,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2482262364273775424, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: enemyLayers.m_Bits
+      value: 320
+      objectReference: {fileID: 0}
+    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: hammerCooldownCanvas
       value: 
       objectReference: {fileID: 1767116303}
@@ -9507,9 +9593,45 @@ PrefabInstance:
       propertyPath: hammerLightAnimClipDuration
       value: 0.4
       objectReference: {fileID: 0}
+    - target: {fileID: 3539615716991133667, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3566996990873359050, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4438358461583920752, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5991273114160866731, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6577081127843540114, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7841788350698203598, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8260866262171227600, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9145245037588279182, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

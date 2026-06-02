@@ -8,7 +8,10 @@ public class AugmentSelectionUI : MonoBehaviour
     {
         LevelUp,
         WallLootGift,
-        UnlockOffer
+        UnlockOffer,
+        ChestWooden,
+        ChestSilver,
+        ChestGold,
     }
 
     [Header("References")]
@@ -42,9 +45,16 @@ public class AugmentSelectionUI : MonoBehaviour
 
     [Header("Visual theme")]
     [SerializeField] private Image panelThemeTargetImage;
-    [SerializeField] private Color levelUpPanelThemeColor    = Color.white;
+    [SerializeField] private Color levelUpPanelThemeColor      = Color.white;
     [SerializeField] private Color wallLootGiftPanelThemeColor = new Color(0.35f, 0.35f, 0.35f, 1f);
     [SerializeField] private Color unlockOfferPanelThemeColor  = new Color(1f, 0.84f, 0.0f, 1f);
+    [SerializeField] private Color chestWoodenPanelThemeColor  = new Color(0.55f, 0.35f, 0.15f, 1f);
+    [SerializeField] private Color chestSilverPanelThemeColor  = new Color(0.75f, 0.75f, 0.80f, 1f);
+    [SerializeField] private Color chestGoldPanelThemeColor    = new Color(1f, 0.84f, 0.0f, 1f);
+
+    [Header("Level-Up Augment Selection")]
+    [Tooltip("Utility augmentler hazir olana kadar kapali tut.")]
+    [SerializeField] private bool levelUpAugmentSelectionEnabled = false;
 
     private const string AutoCardsRowName = "AugmentCards";
     private readonly List<AugmentOptionButton> _runtimeButtons = new();
@@ -57,6 +67,8 @@ public class AugmentSelectionUI : MonoBehaviour
     private int _pendingSelections;
     private List<AugmentDefinition> _currentOffer;
 
+
+    private int _chestRarityFilter;
 
     private bool UsesPrefabAugmentCards =>
         optionButtonPrefab != null && panelRoot != null;
@@ -168,6 +180,17 @@ public class AugmentSelectionUI : MonoBehaviour
     public bool TryShowWallLootGiftPanel()
     {
         return ShowPanel(PanelSource.WallLootGift);
+    }
+
+    public bool ShowChestPanel(int rarity)
+    {
+        _chestRarityFilter = rarity;
+        PanelSource source = rarity == 3 ? PanelSource.ChestGold
+                           : rarity == 2 ? PanelSource.ChestSilver
+                           : PanelSource.ChestWooden;
+        bool result = ShowPanel(source);
+        _chestRarityFilter = 0;
+        return result;
     }
 
     private void HidePanel()
@@ -424,6 +447,8 @@ public class AugmentSelectionUI : MonoBehaviour
     private List<AugmentDefinition> BuildOfferOptions(int slotCount)
     {
         TryResolveWeightSystem();
+        if (_chestRarityFilter > 0 && weightSystem != null)
+            return weightSystem.BuildChestOffer(_chestRarityFilter, playerAugmentController, slotCount);
         if (weightSystem != null)
             return weightSystem.BuildOffer(playerAugmentController, slotCount);
         return BuildRandomAugmentOptions(slotCount);
@@ -499,6 +524,9 @@ public class AugmentSelectionUI : MonoBehaviour
         {
             case PanelSource.WallLootGift: panelThemeTargetImage.color = wallLootGiftPanelThemeColor; break;
             case PanelSource.UnlockOffer:  panelThemeTargetImage.color = unlockOfferPanelThemeColor;  break;
+            case PanelSource.ChestWooden:  panelThemeTargetImage.color = chestWoodenPanelThemeColor;  break;
+            case PanelSource.ChestSilver:  panelThemeTargetImage.color = chestSilverPanelThemeColor;  break;
+            case PanelSource.ChestGold:    panelThemeTargetImage.color = chestGoldPanelThemeColor;    break;
             default:                       panelThemeTargetImage.color = levelUpPanelThemeColor;       break;
         }
     }
@@ -554,6 +582,7 @@ public class AugmentSelectionUI : MonoBehaviour
     private void TrySubscribeToPlayer()
     {
         if (_isSubscribed) return;
+        if (!levelUpAugmentSelectionEnabled) return;
 
         TryResolvePlayer();
         TryResolvePlayerLevel();
