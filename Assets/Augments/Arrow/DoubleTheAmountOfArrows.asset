@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: DoubleTheAmountOfArrows
   m_EditorClassIdentifier: Assembly-CSharp::AugmentDefinition
   id: 5
-  displayName: Double Arrow
-  description: Double the amount of your arrows
+  displayName: Triple Arrow
+  description: Triple the amount of your arrows
   icon: {fileID: 0}
   rarity: 2
   tier: 1

@@ -21,9 +21,11 @@ public class PlayerAugmentController : MonoBehaviour
         AugmentId.LongbowAoeRadius_Common,
         AugmentId.LongbowAoeRadius_Rare,
         AugmentId.LongbowAoeRadius_Extraordinary,
+        AugmentId.ProjectileCount_ExtraArrow,
         AugmentId.ProjectileCount_PlusOneProjectiles,
         AugmentId.ProjectileCount_PlusOneAndSpeed10Percent,
         AugmentId.ProjectileCount_PlusOneAndSpeed15Percent,
+        AugmentId.ProjectileCount_ExtraArrowPlus,
     };
 
     // ── Runtime stats ─────────────────────────────────────────────────────────
@@ -154,7 +156,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float CrossbowBleedExpireSeconds      => Mathf.Max(0f, crossbowBleedExpireSeconds);
     public int ProjectileShotMultiplier => Mathf.Max(
         1,
-        1 + Mathf.Max(0, projectileShotBonusCount) + ((hasDoubleArrowUnlock || mutationAugmentsLongbow) ? 1 : 0));
+        1 + Mathf.Max(0, projectileShotBonusCount) + ((hasDoubleArrowUnlock || mutationAugmentsLongbow) ? 2 : 0));
     public float ArrowProjectileSpeedMultiplier => Mathf.Max(0.01f, arrowProjectileSpeedMultiplier);
     public float OutgoingDamageMultiplier       => Mathf.Max(0.01f, outgoingDamageMultiplier);
     public float MaxHealthMultiplier            => Mathf.Max(0.01f, maxHealthMultiplier);
@@ -414,6 +416,8 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.MaxHealthIncreasePercent:
                 maxHealthMultiplier *= 1f + Mathf.Max(0f, augment.value);
                 break;
+            case AugmentId.ProjectileCount_ExtraArrow:
+            case AugmentId.ProjectileCount_ExtraArrowPlus:
             case AugmentId.ProjectileCount_PlusOneProjectiles:
                 projectileShotBonusCount++;
                 break;
