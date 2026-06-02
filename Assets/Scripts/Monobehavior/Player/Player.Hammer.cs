@@ -15,7 +15,7 @@ public partial class Player
     [Tooltip("İki hafif hammer saldırısı arasındaki minimum süre (saniye).")]
     [SerializeField] private float hammerLightAttackRate = 0.4f;
     [Tooltip("Hafif hammer salvo yarıçapı. Genellikle ağır hammerın yarısı kadar.")]
-    [SerializeField] private float hammerLightAoe = 1.5f;
+    [SerializeField] private float hammerLightAoe;
     [Tooltip("Animasyon event'i gelmezse fallback tetiklenme gecikmesi (saniye).")]
     [SerializeField] private float hammerLightFallbackDelay = 0.15f;
 

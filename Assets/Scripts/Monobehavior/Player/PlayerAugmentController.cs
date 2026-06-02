@@ -14,7 +14,7 @@ public class PlayerAugmentController : MonoBehaviour
     private static readonly AugmentId[] LongbowCevherAugmentIds =
     {
         AugmentId.ChargedLongbowAoeUnlock,
-        AugmentId.DoubleArrowUnlock,
+        AugmentId.TripleArrowUnlock,
         AugmentId.LongbowFreezeUnlock,
         AugmentId.FireArrowUnlock,
         AugmentId.PoisonArrowUnlock,
@@ -67,7 +67,7 @@ public class PlayerAugmentController : MonoBehaviour
     [Header("Longbow — Unlock")]
     [SerializeField] private bool  hasChargedLongbowAoe;
     [SerializeField] private float chargedLongbowAoeRadius = 3f;
-    [SerializeField] private bool  hasDoubleArrowUnlock;
+    [SerializeField] private bool  hasTripleArrowUnlock;
     [SerializeField] private float longbowAoeRadiusBonus   = 0f;
     [SerializeField] private bool  hasArrowSizeUnlock;
     [SerializeField] private bool  hasVampiricArrowUnlock;
@@ -156,7 +156,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float CrossbowBleedExpireSeconds      => Mathf.Max(0f, crossbowBleedExpireSeconds);
     public int ProjectileShotMultiplier => Mathf.Max(
         1,
-        1 + Mathf.Max(0, projectileShotBonusCount) + ((hasDoubleArrowUnlock || mutationAugmentsLongbow) ? 2 : 0));
+        1 + Mathf.Max(0, projectileShotBonusCount) + ((hasTripleArrowUnlock || mutationAugmentsLongbow) ? 2 : 0));
     public float ArrowProjectileSpeedMultiplier => Mathf.Max(0.01f, arrowProjectileSpeedMultiplier);
     public float OutgoingDamageMultiplier       => Mathf.Max(0.01f, outgoingDamageMultiplier);
     public float MaxHealthMultiplier            => Mathf.Max(0.01f, maxHealthMultiplier);
@@ -246,7 +246,7 @@ public class PlayerAugmentController : MonoBehaviour
         movementSpeedBonus                  = 0f;
         hasChargedLongbowAoe                    = false;
         chargedLongbowAoeRadius                 = _initialChargedLongbowAoeRadius;
-        hasDoubleArrowUnlock                = false;
+        hasTripleArrowUnlock                = false;
         hasExtraAugmentSlotUnlock           = false;
         hasDashUnluck                       = false;
         dashCooldownMultiplier              = 1f;
@@ -326,8 +326,8 @@ public class PlayerAugmentController : MonoBehaviour
                 if (augment.value > 0f)
                     chargedLongbowAoeRadius = Mathf.Max(chargedLongbowAoeRadius, augment.value);
                 break;
-            case AugmentId.DoubleArrowUnlock:
-                hasDoubleArrowUnlock = true;
+            case AugmentId.TripleArrowUnlock:
+                hasTripleArrowUnlock = true;
                 break;
             case AugmentId.ExtraAugmentSlotUnlock:
                 hasExtraAugmentSlotUnlock = true;

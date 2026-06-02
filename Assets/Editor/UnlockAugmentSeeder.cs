@@ -34,7 +34,7 @@ public static class UnlockAugmentSeeder
 
         // ── Longbow ───────────────────────────────────────────────────────────
         db.longbowUnlocks.Add(Make("ChargedBowAoeUnlock",              "Unlock_ChargedLongbowAoe",        AugmentId.ChargedLongbowAoeUnlock,           WeaponType.Longbow));
-        db.longbowUnlocks.Add(Make("DoubleTheAmountOfArrows",          "Unlock_DoubleArrow",              AugmentId.DoubleArrowUnlock,                 WeaponType.Longbow));
+        db.longbowUnlocks.Add(Make("TripleTheAmountOfArrows",          "Unlock_TripleArrow",              AugmentId.TripleArrowUnlock,                 WeaponType.Longbow));
         db.longbowUnlocks.Add(Make("ArrowFreezeUnlock",                "Unlock_LongbowFreeze",            AugmentId.LongbowFreezeUnlock,               WeaponType.Longbow));
         db.longbowUnlocks.Add(Make("FireArrowUnlock",                  "Unlock_FireArrow",                AugmentId.FireArrowUnlock,                   WeaponType.Longbow));
         db.longbowUnlocks.Add(Make("PoisonArrowUnlock",                "Unlock_PoisonArrow",              AugmentId.PoisonArrowUnlock,                 WeaponType.Longbow));
@@ -127,7 +127,7 @@ public static class UnlockAugmentSeeder
         var unlockIds = new System.Collections.Generic.HashSet<AugmentId>
         {
             AugmentId.ChargedLongbowAoeUnlock,
-            AugmentId.DoubleArrowUnlock,
+            AugmentId.TripleArrowUnlock,
             AugmentId.LongbowFreezeUnlock,
             AugmentId.FireArrowUnlock,
             AugmentId.PoisonArrowUnlock,

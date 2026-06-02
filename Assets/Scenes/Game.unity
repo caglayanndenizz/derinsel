@@ -7864,7 +7864,7 @@ MonoBehaviour:
   hammerChargeFullStopDuration: 1.2
   hasChargedLongbowAoe: 0
   chargedLongbowAoeRadius: 3
-  hasDoubleArrowUnlock: 0
+  hasTripleArrowUnlock: 0
   longbowAoeRadiusBonus: 0
   hasArrowSizeUnlock: 0
   hasVampiricArrowUnlock: 0

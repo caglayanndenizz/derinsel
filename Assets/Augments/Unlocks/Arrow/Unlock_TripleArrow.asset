@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f098bd9752714d23aacd572dae8ea8a, type: 3}
-  m_Name: Unlock_DoubleArrow
+  m_Name: Unlock_TripleArrow
   m_EditorClassIdentifier: Assembly-CSharp::UnlockAugmentDefinition
   id: 5
-  displayName: Double Arrow
-  description: Double the amount of your arrows
+  displayName: Triple Arrow
+  description: Triple the amount of your arrows
   icon: {fileID: 0}
   rarity: 1
   tier: 1
