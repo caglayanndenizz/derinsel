@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
@@ -24,24 +25,12 @@ public class ExplosiveObject : MonoBehaviour, IDamageable
 
     private Animator _animator;
     private bool _exploded;
-    private DungeonGenerator _generator;
 
     void Start()
     {
         _animator = GetComponent<Animator>();
         if (_animator != null)
             _animator.SetBool(idleBoolName, true);
-
-        _generator = Object.FindAnyObjectByType<DungeonGenerator>();
-    }
-
-    void Update()
-    {
-        if (!_exploded || _animator == null) return;
-
-        AnimatorStateInfo info = _animator.GetCurrentAnimatorStateInfo(0);
-        if (info.IsName(explodeBoolName) && info.normalizedTime >= 1f)
-            Destroy(gameObject);
     }
 
     public void TakeDamage(float amount, bool isHeavy)
@@ -58,10 +47,29 @@ public class ExplosiveObject : MonoBehaviour, IDamageable
         {
             _animator.SetBool(idleBoolName, false);
             _animator.SetBool(explodeBoolName, true);
+            StartCoroutine(WaitForDestroyAnimation());
+        }
+        else
+        {
+            Destroy(gameObject);
         }
 
         TriggerExplosionFeedback();
         ApplyExplosionDamage();
+    }
+
+    private IEnumerator WaitForDestroyAnimation()
+    {
+        while (true)
+        {
+            yield return null;
+            AnimatorStateInfo info = _animator.GetCurrentAnimatorStateInfo(0);
+            if (info.IsName(explodeBoolName) && info.normalizedTime >= 1f)
+            {
+                Destroy(gameObject);
+                yield break;
+            }
+        }
     }
 
     private void TriggerExplosionFeedback()
@@ -75,8 +83,8 @@ public class ExplosiveObject : MonoBehaviour, IDamageable
 
     private void ApplyExplosionDamage()
     {
-        if (_generator != null)
-            _generator.BreakWallsInArea(transform.position, explosionRadius);
+        if (DungeonGenerator.Instance != null)
+            DungeonGenerator.Instance.BreakWallsInArea(transform.position, explosionRadius);
 
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
         HashSet<int> processed = new HashSet<int>();

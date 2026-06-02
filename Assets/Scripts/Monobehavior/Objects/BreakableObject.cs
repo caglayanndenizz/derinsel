@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class BreakableObject : MonoBehaviour, IDamageable, IBreakable
@@ -27,15 +28,6 @@ public class BreakableObject : MonoBehaviour, IDamageable, IBreakable
             _animator.SetBool(idleBoolName, true);
     }
 
-    void Update()
-    {
-        if (!_broken || _animator == null) return;
-
-        AnimatorStateInfo info = _animator.GetCurrentAnimatorStateInfo(0);
-        if (info.IsName(destroyBoolName) && info.normalizedTime >= 1f)
-            Destroy(gameObject);
-    }
-
     public void TakeDamage(float amount, bool isHeavy)
     {
         Break();
@@ -50,9 +42,28 @@ public class BreakableObject : MonoBehaviour, IDamageable, IBreakable
         {
             _animator.SetBool(idleBoolName, false);
             _animator.SetBool(destroyBoolName, true);
+            StartCoroutine(WaitForDestroyAnimation());
+        }
+        else
+        {
+            Destroy(gameObject);
         }
 
         SpawnLoot();
+    }
+
+    private IEnumerator WaitForDestroyAnimation()
+    {
+        while (true)
+        {
+            yield return null;
+            AnimatorStateInfo info = _animator.GetCurrentAnimatorStateInfo(0);
+            if (info.IsName(destroyBoolName) && info.normalizedTime >= 1f)
+            {
+                Destroy(gameObject);
+                yield break;
+            }
+        }
     }
 
     private void SpawnLoot()

@@ -8,6 +8,8 @@ using UnityEngine.Serialization;
 
 public class DungeonGenerator : MonoBehaviour
 {
+    public static DungeonGenerator Instance { get; private set; }
+
     [Header("Tile Ayarlari")]
     public Tilemap floorTilemap;
     public Tilemap wallTilemap;
@@ -80,6 +82,7 @@ public class DungeonGenerator : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
         if (!ValidateConfiguration())
             enabled = false;
     }

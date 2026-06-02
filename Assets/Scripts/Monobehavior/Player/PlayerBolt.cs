@@ -152,7 +152,6 @@ public class PlayerBolt : MonoBehaviour
 
         Enemy enemy = col.GetComponent<Enemy>() ?? col.GetComponentInParent<Enemy>();
 
-        // Enemy component'i olmayan IDamageable nesneler (BreakableObject, ExplosiveObject vb.)
         if (enemy == null)
         {
             dmg.TakeDamage(_damage, false);

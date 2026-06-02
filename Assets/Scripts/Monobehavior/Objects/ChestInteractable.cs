@@ -5,14 +5,21 @@ public class ChestInteractable : MonoBehaviour
     [Tooltip("1 = Wooden (Common), 2 = Silver (Rare), 3 = Gold (Extraordinary)")]
     [SerializeField] private int rarity = 1;
 
+    [Header("Animation")]
+    [SerializeField] private string idleBoolName = "Idle";
+    [SerializeField] private string openBoolName = "Open";
+
     private Animator _animator;
+    private AugmentSelectionUI _augmentUI;
     private bool _opened;
 
     void Start()
     {
         _animator = GetComponent<Animator>();
         if (_animator != null)
-            _animator.SetBool("Idle", true);
+            _animator.SetBool(idleBoolName, true);
+
+        _augmentUI = Object.FindAnyObjectByType<AugmentSelectionUI>();
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -28,11 +35,10 @@ public class ChestInteractable : MonoBehaviour
 
         if (_animator != null)
         {
-            _animator.SetBool("Idle", false);
-            _animator.SetBool("Open", true);
+            _animator.SetBool(idleBoolName, false);
+            _animator.SetBool(openBoolName, true);
         }
 
-        AugmentSelectionUI ui = Object.FindAnyObjectByType<AugmentSelectionUI>();
-        ui?.ShowChestPanel(rarity);
+        _augmentUI?.ShowChestPanel(rarity);
     }
 }
