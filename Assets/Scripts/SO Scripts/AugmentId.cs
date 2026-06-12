@@ -15,22 +15,12 @@ public enum AugmentId
     ProjectileCount_PlusOneAndSpeed10Percent = 12,
     ProjectileCount_PlusOneAndSpeed15Percent = 13,
     ProjectileCount_ExtraArrowPlus = 14,
-    DashUnluck = 15,
-    DashCooldownReduce_Common_I = 16,
-    DashCooldownReduce_Common_II = 17,
-    DashCooldownReduce_Rare = 18,
-    DashCooldownReduce_Extraordinary = 19,
     LuckIncrease_Common_I = 20,
     LuckIncrease_Common_II = 21,
     LuckIncrease_Common_III = 22,
     LuckIncrease_Rare = 23,
     LuckIncrease_Extraordinary = 24,
     HammerChargeReduceUnlock = 28,
-    DashDistanceIncrease_Uncommon_I = 29,
-    DashDistanceIncrease_Uncommon_II = 30,
-    DashDistanceIncrease_Uncommon_III = 31,
-    DashDistanceIncrease_Rare = 32,
-    DashDistanceIncrease_Extraordinary = 33,
     DamageReduction_Common = 34,
     DamageReduction_Rare = 35,
     DamageReduction_Extraordinary = 36,
@@ -61,23 +51,6 @@ public enum AugmentId
 
     // ── Hammer Slam (Heavy) ───────────────────────────────────────────────────
     HammerSlamCooldownReduceUnlock          = 65,
-
-    // ── Crossbow Stat ─────────────────────────────────────────────────────────
-    CrossbowAttackSpeedIncrease_Common        = 66,
-    CrossbowAttackSpeedIncrease_Rare          = 67,
-    CrossbowAttackSpeedIncrease_Extraordinary = 68,
-    CrossbowDamageIncrease_Common             = 69,
-    CrossbowDamageIncrease_Rare               = 70,
-    CrossbowDamageIncrease_Extraordinary      = 71,
-
-    // ── Crossbow Unlock ───────────────────────────────────────────────────────
-    CrossbowBoltFireUnlock   = 72,
-    CrossbowBoltPoisonUnlock = 73,
-
-    // ── Genel Hasar ───────────────────────────────────────────────────────────
-    OutgoingDamageIncrease_Common        = 74,
-    OutgoingDamageIncrease_Rare          = 75,
-    OutgoingDamageIncrease_Extraordinary = 76,
 
     // ── Arrow Unlock ──────────────────────────────────────────────────────────
     ArrowSizeUnlock     = 77, // Ok boyutunu 2x yapar (sadece görsel, run süresince)

@@ -39,11 +39,6 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float flatMaxHealthBonus = 0f;
     [SerializeField] private bool  hasExtraAugmentSlotUnlock;
 
-    [Header("Dash — Unlock")]
-    [SerializeField] private bool  hasDashUnluck;
-    [SerializeField] private float dashCooldownMultiplier  = 1f;
-    [SerializeField] private float dashDistanceMultiplier  = 1f;
-
     [Header("Hammer — Unlock")]
     [SerializeField] private bool  hasHammerChargeUnlock;
     [SerializeField] private bool  hasHammerChargeDamageReductionUnlock;
@@ -167,11 +162,8 @@ public class PlayerAugmentController : MonoBehaviour
     [Tooltip("Read-only at runtime. True when the player has Charged Longbow AoE or any Hammer AoE radius bonus.")]
     public bool  HasWallLootsUnlock             => hasChargedLongbowAoe || hammerAoeRadiusBonus > 0f;
     public bool  HasExtraAugmentSlotUnlock      => hasExtraAugmentSlotUnlock;
-    public bool  HasDashUnluck                  => hasDashUnluck;
-    public float DashCooldownMultiplier         => Mathf.Max(0.01f, dashCooldownMultiplier);
     public float LuckMultiplier                 => Mathf.Max(0.01f, luckMultiplier);
     public float HammerChargeMultiplier         => Mathf.Max(0.01f, hammerChargeMultiplier);
-    public float DashDistanceMultiplier         => Mathf.Max(0.01f, dashDistanceMultiplier);
     public float IncomingDamageReduction        => Mathf.Clamp01(incomingDamageReduction);
     public bool  HasHammerChargeUnlock                => hasHammerChargeUnlock;
     public bool  HasHammerChargeDamageReductionUnlock => hasHammerChargeDamageReductionUnlock;
@@ -248,11 +240,8 @@ public class PlayerAugmentController : MonoBehaviour
         chargedLongbowAoeRadius                 = _initialChargedLongbowAoeRadius;
         hasTripleArrowUnlock                = false;
         hasExtraAugmentSlotUnlock           = false;
-        hasDashUnluck                       = false;
-        dashCooldownMultiplier              = 1f;
         luckMultiplier                      = 1f;
         hammerChargeMultiplier              = 1f;
-        dashDistanceMultiplier              = 1f;
         incomingDamageReduction             = 0f;
         hasHammerChargeUnlock                = false;
         hasHammerChargeDamageReductionUnlock = false;
@@ -332,9 +321,6 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.ExtraAugmentSlotUnlock:
                 hasExtraAugmentSlotUnlock = true;
                 break;
-            case AugmentId.DashUnluck:
-                hasDashUnluck = true;
-                break;
             case AugmentId.LongbowFreezeUnlock:
                 hasLongbowFreezeUnlock = true;
                 longbowFreezeDuration  = augment.value > 0f ? augment.value : 1.5f;
@@ -353,12 +339,6 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.VampiricArrowUnlock:
                 hasVampiricArrowUnlock = true;
                 break;
-            case AugmentId.DashCooldownReduce_Common_I:
-            case AugmentId.DashCooldownReduce_Common_II:
-            case AugmentId.DashCooldownReduce_Rare:
-            case AugmentId.DashCooldownReduce_Extraordinary:
-                dashCooldownMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
-                break;
             case AugmentId.LuckIncrease_Common_I:
             case AugmentId.LuckIncrease_Common_II:
             case AugmentId.LuckIncrease_Common_III:
@@ -368,13 +348,6 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.HammerChargeReduceUnlock:
                 hammerChargeMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
-                break;
-            case AugmentId.DashDistanceIncrease_Uncommon_I:
-            case AugmentId.DashDistanceIncrease_Uncommon_II:
-            case AugmentId.DashDistanceIncrease_Uncommon_III:
-            case AugmentId.DashDistanceIncrease_Rare:
-            case AugmentId.DashDistanceIncrease_Extraordinary:
-                dashDistanceMultiplier *= 1f + Mathf.Max(0f, augment.value);
                 break;
             case AugmentId.DamageReduction_Common:
             case AugmentId.DamageReduction_Rare:
@@ -527,16 +500,6 @@ public class PlayerAugmentController : MonoBehaviour
     {
         switch (id)
         {
-            case AugmentId.DashCooldownReduce_Common_I:
-            case AugmentId.DashCooldownReduce_Common_II:
-            case AugmentId.DashCooldownReduce_Rare:
-            case AugmentId.DashCooldownReduce_Extraordinary:
-            case AugmentId.DashDistanceIncrease_Uncommon_I:
-            case AugmentId.DashDistanceIncrease_Uncommon_II:
-            case AugmentId.DashDistanceIncrease_Uncommon_III:
-            case AugmentId.DashDistanceIncrease_Rare:
-            case AugmentId.DashDistanceIncrease_Extraordinary:
-                return hasDashUnluck;
             case AugmentId.HammerChargeReduceUnlock:
             case AugmentId.HammerChargeDamageReductionUnlock:
             case AugmentId.HammerFreezeUnlock:

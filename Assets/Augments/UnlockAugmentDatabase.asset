@@ -30,5 +30,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 40200000000000000000000000000001, type: 2}
   - {fileID: 11400000, guid: 46200000000000000000000000000001, type: 2}
   - {fileID: 11400000, guid: 65200000000000000000000000000001, type: 2}
-  universalUnlocks:
-  - {fileID: 11400000, guid: de49951b47d4e4586876bacdaeeac1b8, type: 2}
+  universalUnlocks: []

@@ -6,7 +6,7 @@ public partial class Player
 {
     [Header("Dash Settings")]
     [Tooltip("Dash mesafesi (birim). Duvara çarparsa öncesinde durur.")]
-    public float dashDistance = 4f;
+    public float dashDistance = 3f;
     public float dashCooldown = 10f;
     [SerializeField] private float dashAlphaFlashDuration = 0.1f;
     [Tooltip("Boşsa root/child'dan otomatik aranır.")]
@@ -24,14 +24,13 @@ public partial class Player
     private void HandleDash()
     {
         if (!Input.GetKeyDown(KeyCode.Space)) return;
-        if (playerAugmentController == null || !playerAugmentController.HasDashUnluck) return;
         if (Time.time < _nextDashTime) return;
 
         Vector2 dashDir = GetDashDirection();
         if (dashDir.sqrMagnitude < 0.0001f) return;
 
         Vector2 from = _rb.position;
-        float closestBlockingDist = Mathf.Max(0f, dashDistance * (playerAugmentController != null ? playerAugmentController.DashDistanceMultiplier : 1f));
+        float closestBlockingDist = dashDistance;
 
         RaycastHit2D[] hits = Physics2D.RaycastAll(from, dashDir, closestBlockingDist);
         for (int i = 0; i < hits.Length; i++)
@@ -46,8 +45,7 @@ public partial class Player
 
         float actualDistance = Mathf.Max(0f, closestBlockingDist - 0.3f);
         _rb.position = from + dashDir * actualDistance;
-        float effectiveCooldown = dashCooldown * (playerAugmentController != null ? playerAugmentController.DashCooldownMultiplier : 1f);
-        _nextDashTime = Time.time + Mathf.Max(0f, effectiveCooldown);
+        _nextDashTime = Time.time + Mathf.Max(0f, dashCooldown);
         StartCoroutine(DashAlphaFlash());
     }
 
@@ -86,7 +84,7 @@ public partial class Player
     private void UpdateDashCooldownUI()
     {
         if (dashCooldownBar == null) return;
-        float cooldown = Mathf.Max(0f, dashCooldown * (playerAugmentController != null ? playerAugmentController.DashCooldownMultiplier : 1f));
+        float cooldown = Mathf.Max(0f, dashCooldown);
         if (cooldown <= 0f)
         {
             dashCooldownBar.value = 1f;
