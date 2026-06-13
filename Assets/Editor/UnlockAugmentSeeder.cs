@@ -51,9 +51,6 @@ public static class UnlockAugmentSeeder
         db.hammerUnlocks.Add(Make("HammerAoeRadius_Extraordinary",     "Unlock_HammerAoeRadius",          AugmentId.HammerAoeRadiusUnlock,             WeaponType.Hammer));
         db.hammerUnlocks.Add(Make("HammerSlamCooldownReduceUnlock",    "Unlock_HammerSlamCooldown",       AugmentId.HammerSlamCooldownReduceUnlock,    WeaponType.Hammer));
 
-        // ── Universal ─────────────────────────────────────────────────────────
-        db.universalUnlocks.Add(Make("DashUnlock",                     "Unlock_Dash",                     AugmentId.DashUnluck,                        WeaponType.Universal));
-
         EditorUtility.SetDirty(db);
 
         // Remove unlock augments from AugmentDatabase.regularAugments so they
@@ -140,7 +137,6 @@ public static class UnlockAugmentSeeder
             AugmentId.HammerFreezeUnlock,
             AugmentId.HammerAoeRadiusUnlock,
             AugmentId.HammerSlamCooldownReduceUnlock,
-            AugmentId.DashUnluck,
         };
 
         int removed = augDb.regularAugments.RemoveAll(a =>

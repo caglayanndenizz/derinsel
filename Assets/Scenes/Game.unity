@@ -7910,9 +7910,6 @@ MonoBehaviour:
   maxHealthMultiplier: 1
   flatMaxHealthBonus: 0
   hasExtraAugmentSlotUnlock: 0
-  hasDashUnluck: 0
-  dashCooldownMultiplier: 1
-  dashDistanceMultiplier: 1
   hasHammerChargeUnlock: 0
   hasHammerChargeDamageReductionUnlock: 0
   hammerChargeMultiplier: 1
