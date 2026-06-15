@@ -17,9 +17,9 @@ public class PlayerArrowPooler : MonoBehaviour
 
     [Header("Settings")]
     public bool canExpandPool = true;
-    [Tooltip("Havuz bosaldiktan sonra kac adet gecici obje olusturulsun.")]
+    [Tooltip("Number of temporary objects created when the pool runs out.")]
     public int overflowBatchSize = 20;
-    [Tooltip("Gecici objeler kac saniye kullanilmazsa yok edilsin.")]
+    [Tooltip("Seconds of inactivity before temporary overflow objects are destroyed.")]
     public float overflowTTL = 10f;
     public Transform poolParent;
 
@@ -89,11 +89,11 @@ public class PlayerArrowPooler : MonoBehaviour
 
     public void GetArrow(Vector3 worldPosition, Quaternion rotation, Action<PlayerArrow> configure = null)
     {
-        if (arrowPrefab == null) { Debug.LogWarning("PlayerArrowPooler: arrowPrefab atanmamış!"); return; }
+        if (arrowPrefab == null) { Debug.LogWarning("PlayerArrowPooler: arrowPrefab is not assigned!"); return; }
 
         if (_arrowAvailable.Count == 0)
         {
-            if (!canExpandPool) { Debug.LogWarning("PlayerArrowPooler: arrow havuzu dolu, genişletme kapalı."); return; }
+            if (!canExpandPool) { Debug.LogWarning("PlayerArrowPooler: arrow pool is full, expansion is disabled."); return; }
             ExpandArrowPool();
         }
 
@@ -134,11 +134,11 @@ public class PlayerArrowPooler : MonoBehaviour
 
     public void GetBolt(Vector3 worldPosition, Quaternion rotation, Action<PlayerBolt> configure = null)
     {
-        if (boltPrefab == null) { Debug.LogWarning("PlayerArrowPooler: boltPrefab atanmamış!"); return; }
+        if (boltPrefab == null) { Debug.LogWarning("PlayerArrowPooler: boltPrefab is not assigned!"); return; }
 
         if (_boltAvailable.Count == 0)
         {
-            if (!canExpandPool) { Debug.LogWarning("PlayerArrowPooler: bolt havuzu dolu, genişletme kapalı."); return; }
+            if (!canExpandPool) { Debug.LogWarning("PlayerArrowPooler: bolt pool is full, expansion is disabled."); return; }
             ExpandBoltPool();
         }
 

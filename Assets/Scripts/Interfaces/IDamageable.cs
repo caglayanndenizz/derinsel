@@ -1,6 +1,6 @@
 
 public interface IDamageable
 {
-    // Bu arayüzü kullanan her şey bu fonksiyonu içermek ZORUNDA.
+    // Every class implementing this interface MUST include this method.
     void TakeDamage(float amount, bool isHeavy);
 }

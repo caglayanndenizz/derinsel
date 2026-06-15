@@ -105,11 +105,12 @@ public class PlayerBolt : MonoBehaviour
         Vector2 next = (Vector2)transform.position + _direction * _speed * Time.deltaTime;
 
         bool destroyBolt = false;
-        RaycastHit2D[] hits = Physics2D.LinecastAll(prev, next);
-        System.Array.Sort(hits, 0, hits.Length, _raycastComparer);
+        int count = Physics2D.Linecast(prev, next, _linecastFilter, _hitBuffer);
+        System.Array.Sort(_hitBuffer, 0, count, _raycastComparer);
 
-        foreach (RaycastHit2D h in hits)
+        for (int i = 0; i < count; i++)
         {
+            RaycastHit2D h = _hitBuffer[i];
             if (h.collider == null)                                  continue;
             if (IsOwnCollider(h.collider))                           continue;
             if (h.collider.GetComponentInParent<Player>() != null)   continue;
@@ -139,6 +140,11 @@ public class PlayerBolt : MonoBehaviour
     bool IsOwnCollider(Collider2D c) =>
         c != null && (c.transform == transform || c.transform.IsChildOf(transform));
 
+    // Non-allocating raycast pattern: use Physics2D.Linecast with a static buffer + ContactFilter2D.noFilter
+    // instead of LinecastAll. No new array is allocated each frame → zero GC pressure.
+    // All frequently triggered projectile, enemy sensor, and overlap queries should use this pattern.
+    private static readonly RaycastHit2D[]  _hitBuffer      = new RaycastHit2D[32];
+    private static readonly ContactFilter2D _linecastFilter = ContactFilter2D.noFilter;
     private static readonly RaycastDistanceComparer _raycastComparer = new RaycastDistanceComparer();
     private class RaycastDistanceComparer : System.Collections.Generic.IComparer<RaycastHit2D>
     {

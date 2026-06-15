@@ -6,9 +6,9 @@ public class HitStopManager : MonoBehaviour
     public static HitStopManager Instance { get; private set; }
 
     [Header("Stacking")]
-    [Tooltip("Aynı anda gelen ek vuruşlar bu kadar (sn) uzatır.")]
+    [Tooltip("Additional duration added by simultaneous hits (seconds).")]
     [SerializeField] private float stackDurationBonus = 0.004f;
-    [Tooltip("Toplam uzatma tavanı (sn).")]
+    [Tooltip("Maximum total extension (seconds).")]
     [SerializeField] private float maxStackedBonus = 0.012f;
 
     private Coroutine _hitStopRoutine;

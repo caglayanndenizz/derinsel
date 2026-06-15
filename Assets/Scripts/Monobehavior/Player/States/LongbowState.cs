@@ -40,10 +40,10 @@ public class LongbowState : PlayerState
         bool canCharge = context.AugmentController != null && context.AugmentController.HasChargedLongbowAoe;
         _isLongbowCharging = canCharge && Input.GetButton("Fire2");
 
-        // Tuş bırakıldıysa ve charge yoksa Idle'a dön.
-        // NOT: "!_isLongbowCharging" kullanılmamalı — HasChargedLongbowAoe yokken bile
-        //      Fire2 basılı tutulurken bu state'te kalmalıyız; yoksa GetButtonUp kaçar
-        //      ve yay animasyonu hiç tetiklenmez (LongbowState↔IdleState titreşimi).
+        // Return to Idle if button is released and charge is zero.
+        // NOTE: do not use "!_isLongbowCharging" here — even without HasChargedLongbowAoe,
+        //       we must stay in this state while Fire2 is held; otherwise GetButtonUp is missed
+        //       and the bow animation never fires (LongbowState↔IdleState oscillation).
         if (!Input.GetButton("Fire2") && _longbowCharge <= 0f)
         {
             context.SetState(new IdleState());

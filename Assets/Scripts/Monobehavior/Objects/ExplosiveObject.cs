@@ -10,13 +10,13 @@ public class ExplosiveObject : MonoBehaviour, IDamageable
 
     [Header("Screen Shake")]
     [SerializeField] private CinemachineImpulseSource impulseSource;
-    [Tooltip("GenerateImpulse'a verilen kuvvet büyüklüğü. Normal heavy = 1, patlama için 3-5 arası önerilir.")]
+    [Tooltip("Force magnitude passed to GenerateImpulse. Normal heavy = 1, recommended 3-5 for explosions.")]
     [SerializeField] private float impulseForce = 4f;
 
     [Header("Hit Stop")]
-    [Tooltip("Patlamada zaman ölçeği. Normal heavy = 0.08. Daha düşük = daha sert hiss.")]
+    [Tooltip("Time scale during explosion hit stop. Normal heavy = 0.08. Lower = harder feel.")]
     [SerializeField] private float hitStopTimeScale = 0.02f;
-    [Tooltip("Patlamada dondurma süresi (saniye). Normal heavy = 0.045.")]
+    [Tooltip("Freeze duration during explosion hit stop (seconds). Normal heavy = 0.045.")]
     [SerializeField] private float hitStopDuration = 0.12f;
 
     [Header("Animation")]

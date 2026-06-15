@@ -13,11 +13,13 @@ public class Enemy : BaseEntity
     public override float MaxHealth => stats != null ? stats.maxHealth : 0f;
 
     [Header("State Settings")]
-    public State currentState = State.Patrol;
+    [SerializeField] private State currentState = State.Patrol;
     public EnemyType enemyType = EnemyType.Mage;
-    public float detectionRange = 10f; 
-    public float expandedDetectionRange = 22f; 
-    public CircleCollider2D cd;
+    public float detectionRange = 10f;
+    public float expandedDetectionRange = 22f;
+    [SerializeField] private CircleCollider2D detectionCollider;
+
+    public State CurrentState => currentState;
 
     [Header("Knockback Settings")]
     public float lightKnockbackForce = 5f;  
@@ -31,12 +33,12 @@ public class Enemy : BaseEntity
     [Tooltip("Layers with Collider2D that block LOS. Exclude Enemy; Player is ignored in code.")]
     public LayerMask blockingEnvironmentMask = Physics2D.DefaultRaycastLayers;
 
-    [Header("Patrol Route (spawn tabanlı)")]
-    [Tooltip("Spawn noktasından sola (world -X).")]
+    [Header("Patrol Route (spawn-based)")]
+    [Tooltip("Left leg from spawn point (world -X).")]
     public float patrolLegLeft = 2f;
-    [Tooltip("İkinci bacak: ileri yön (varsayılan world +Y).")]
+    [Tooltip("Second leg: forward direction (default world +Y).")]
     public float patrolLegForward = 2f;
-    [Tooltip("Üçüncü bacak: sağa (world +X).")]
+    [Tooltip("Third leg: right (world +X).")]
     public float patrolLegRight = 4f;
     public Vector2 patrolForwardWorld = Vector2.up;
     public float patrolWaypointReachDistance = 0.22f;
@@ -46,30 +48,30 @@ public class Enemy : BaseEntity
     private int _patrolLegIndex;
 
     [Header("Mage Ranged Attack")]
-    [Tooltip("Bu prefab üzerinde EnemyProjectile scripti olmalı.")]
+    [Tooltip("Prefab must have an EnemyProjectile script.")]
     public GameObject mageProjectilePrefab;
-    [Tooltip("Attack state iken iki projectile arası süre (saniye).")]
+    [Tooltip("Time between projectiles while in Attack state (seconds).")]
     public float mageRangedFireInterval = 4f;
     public float mageProjectileSpeed = 10f;
-    [Tooltip("EnemyEntityStats.enemyAP ile aynı anlamda kullanılır.")]
+    [Tooltip("Uses EnemyEntityStats.enemyAP as damage when enabled.")]
     public bool mageUseAttackPowerForProjectile = true;
     public float mageProjectileDamageOverride = 5f;
     public float mageProjectileMaxLifetime = 12f;
-    [Tooltip("Player bu kadar yakınsa (birim) Chase → Attack; daha uzaktaysa Attack → Chase.")]
+    [Tooltip("Chase → Attack when player is within this distance (units); Attack → Chase when farther.")]
     public float attackCloseMaxDistance = 5f;
-    [Tooltip("Projectile bu child empty'den çıkar (boşsa child adı projectilePivot aranır).")]
+    [Tooltip("Projectile spawns from this child transform (searches for 'projectilePivot' child if empty).")]
     public Transform mageProjectilePivot;
     public Transform mageProjectileSpawnPoint;
     public Vector3 mageProjectileSpawnOffset = Vector3.zero;
     public EnemyProjectilePooler mageProjectilePooler;
-    [Tooltip("Chase sırasında player'a yaklaşırken hız çarpanı.")]
+    [Tooltip("Speed multiplier when chasing the player.")]
     public float chaseApproachSpeedMultiplier = 1.6f;
-    [Tooltip("Projectile atış hız çarpanı. 1.5 => %50 daha hızlı atış.")]
+    [Tooltip("Fire rate multiplier for projectiles. 1.5 => 50% faster fire rate.")]
     public float mageProjectileFireRateMultiplier = 1.5f;
     
     [Header("Melee Attack")]
     public float meleeAttackInterval = 2f;
-    [Tooltip("Melee hasarının uygulanması için gerçek temas/yakınlık menzili.")]
+    [Tooltip("Actual contact/proximity range for melee damage to be applied.")]
     public float meleeHitRange = 1.6f;
 
     [Header("Loot Prefabs")]
@@ -93,7 +95,7 @@ public class Enemy : BaseEntity
     private float     _frozenVulnerabilityMultiplier = 1f; // Resonance: LongbowFreezeUnlock ile artar
     private Coroutine _freezeCoroutine;
 
-    // Hammer Charge Magnet — Player tarafından her frame set edilir, kısa sürede auto-expire olur
+    // Hammer Charge Magnet — set by Player every frame, auto-expires after a short duration
     private bool    _isMagnetPulled      = false;
     private Vector2 _magnetTargetPos     = Vector2.zero;
     private float   _magnetPullSpeed     = 0f;
@@ -573,7 +575,7 @@ public class Enemy : BaseEntity
     {
         if (IsDead) return;
 
-        // Resonance: donmuş düşmanlar daha kırılgandır
+        // Resonance: frozen enemies are more vulnerable
         if (_isFrozen && _frozenVulnerabilityMultiplier > 1f)
             amount *= _frozenVulnerabilityMultiplier;
 
@@ -584,7 +586,7 @@ public class Enemy : BaseEntity
         if (_currentHealth <= 0 && !_isDead) PrepareToDie();
     }
 
-    private void PrepareToDie() { _isDead = true; if (cd != null) cd.enabled = false; Invoke("Die", knockbackDuration + 0.05f); }
+    private void PrepareToDie() { _isDead = true; if (detectionCollider != null) detectionCollider.enabled = false; Invoke("Die", knockbackDuration + 0.05f); }
     
     protected override void Die() {
         Vector2 deathPosition = GetEnemyReferencePosition();
@@ -616,8 +618,8 @@ public class Enemy : BaseEntity
     }
 
     /// <summary>
-    /// Düşmanı dondurur. vulnerabilityMultiplier > 1f ise (Resonance unlock),
-    /// donma süresince alınan hasar çarpılır.
+    /// Freezes the enemy. If vulnerabilityMultiplier > 1f (Resonance unlock),
+    /// damage taken during the freeze is multiplied.
     /// </summary>
     public void Freeze(float duration, float vulnerabilityMultiplier = 1f)
     {
@@ -630,7 +632,7 @@ public class Enemy : BaseEntity
     private IEnumerator FreezeRoutine(float duration, float vulnerabilityMultiplier)
     {
         _isFrozen = true;
-        _isMagnetPulled = false; // Freeze başlayınca magnet sıfırlanır
+        _isMagnetPulled = false; // cancel magnet pull when freeze begins
         _frozenVulnerabilityMultiplier = Mathf.Max(1f, vulnerabilityMultiplier);
         if (_rb != null) _rb.linearVelocity = Vector2.zero;
         RefreshStatusColor();
@@ -644,7 +646,7 @@ public class Enemy : BaseEntity
     }
 
     /// <summary>
-    /// Hammer Charge Magnet tarafından çağrılır. Çağrı kesilirse auto-expire ile sıfırlanır.
+    /// Called by the Hammer Charge Magnet. Auto-expires if calls stop.
     /// </summary>
     public void SetMagnetPull(Vector2 targetPos, float speed, float expireDuration = 0.15f)
     {
@@ -659,7 +661,7 @@ public class Enemy : BaseEntity
     {
         Vector2 current = _rb != null ? _rb.position : (Vector2)transform.position;
         Vector2 toTarget = _magnetTargetPos - current;
-        if (toTarget.sqrMagnitude < 0.04f) return; // Zaten çok yakın
+        if (toTarget.sqrMagnitude < 0.04f) return; // already close enough
 
         Vector2 dir = toTarget.normalized;
         FaceByHorizontal(dir.x);
@@ -888,7 +890,7 @@ public class Enemy : BaseEntity
         _frozenVulnerabilityMultiplier = 1f;
         _isMagnetPulled  = false;
         _magnetPullSpeed = 0f;
-        if (cd != null) cd.enabled = true;
+        if (detectionCollider != null) detectionCollider.enabled = true;
         if (_rb != null) _rb.linearVelocity = Vector2.zero;
         if (stats != null) _currentHealth = stats.maxHealth;
         if (_spriteRenderer != null) _spriteRenderer.color = _originalColor;

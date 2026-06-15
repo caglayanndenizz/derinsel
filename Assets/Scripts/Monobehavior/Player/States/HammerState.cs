@@ -4,7 +4,7 @@ public class HammerState : PlayerState
 {
     private float _currentCharge;
     private bool  _isCharging;
-    private float _holdTime;       // Sol tuşun ne kadar süredir basılı olduğunu tutar
+    private float _holdTime;       // tracks how long the left mouse button has been held
 
     public override bool IsChargingForMovement => _isCharging;
 
@@ -34,12 +34,12 @@ public class HammerState : PlayerState
 
         bool canCharge = context.AugmentController != null && context.AugmentController.HasHammerChargeUnlock;
 
-        // Tuş basılıysa hold süresini say; heavy cooldown hazırsa ve augment varsa charge'a geç.
+        // Count hold time while button is pressed; switch to charge mode when cooldown is ready and augment is present.
         if (Input.GetButton("Fire1") && heavyReady && canCharge)
         {
             _holdTime += Time.deltaTime;
 
-            // Eşik geçildi → charge modu aktif.
+            // Threshold exceeded → charge mode active.
             if (_holdTime >= context.HammerChargeStartDelay)
             {
                 _isCharging = true;
@@ -56,7 +56,7 @@ public class HammerState : PlayerState
 
         if (Input.GetButtonUp("Fire1"))
         {
-            // Tam şarjlı + heavy hazır → ağır saldırı; değilse → hafif saldırı.
+            // Fully charged + heavy ready → heavy attack; otherwise → light attack.
             if (_isCharging && _currentCharge >= effective)
                 context.TriggerHeavyAttack();
             else

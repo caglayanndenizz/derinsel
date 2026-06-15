@@ -2,16 +2,15 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Her augment seçiminden sonra silah mutasyonunu kontrol eder.
-/// Bir silah için eşik kadar unlock augment alındığında o silahın
-/// unlock augmentleri bir daha oyuncuya sunulmaz.
+/// Checks weapon mutation after each augment selection.
+/// Once the threshold of unlock augments is reached for a weapon,
+/// that weapon's unlock augments are no longer offered to the player.
 ///
-/// Kullanım:
-///   – Sahnede tek bir objeye yerleştir (singleton).
-///   – Inspector'dan <see cref="longbowMutationThreshold"/> değerini ayarla (varsayılan: 6).
-///   – <see cref="AugmentWeightSystem"/> IsEligible içinde
-///     <see cref="ShouldExcludeWeaponUnlocks"/> sorgular; eşik aşılmışsa
-///     o silahın tüm unlock augmentleri havuzdan çıkar.
+/// Usage:
+///   – Attach to a single object in the scene (singleton).
+///   – Set <see cref="longbowMutationThreshold"/> in the Inspector (default: 6).
+///   – <see cref="AugmentWeightSystem"/> queries <see cref="ShouldExcludeWeaponUnlocks"/> in IsEligible;
+///     all unlock augments for that weapon are removed from the pool once the threshold is exceeded.
 /// </summary>
 public class WeaponMutationChecker : MonoBehaviour
 {
@@ -20,13 +19,13 @@ public class WeaponMutationChecker : MonoBehaviour
     // ── Inspector ─────────────────────────────────────────────────────────────
 
     [Header("Mutation Thresholds")]
-    [Tooltip("Longbow unlock augmentlerinden kaç tanesi alınınca bow unlock augmentleri bir daha sunulmaz. 0 = devre dışı.")]
+    [Tooltip("Number of longbow unlock augments required before bow unlocks stop being offered. 0 = disabled.")]
     [SerializeField] private int longbowMutationThreshold  = 6;
 
-    [Tooltip("Crossbow unlock augmentlerinden kaç tanesi alınınca crossbow unlock augmentleri bir daha sunulmaz. 0 = devre dışı.")]
+    [Tooltip("Number of crossbow unlock augments required before crossbow unlocks stop being offered. 0 = disabled.")]
     [SerializeField] private int crossbowMutationThreshold = 0;
 
-    [Tooltip("Hammer unlock augmentlerinden kaç tanesi alınınca hammer unlock augmentleri bir daha sunulmaz. 0 = devre dışı.")]
+    [Tooltip("Number of hammer unlock augments required before hammer unlocks stop being offered. 0 = disabled.")]
     [SerializeField] private int hammerMutationThreshold   = 0;
 
     [Header("Runtime State (Read-Only)")]
@@ -36,11 +35,11 @@ public class WeaponMutationChecker : MonoBehaviour
 
     // ── Events ────────────────────────────────────────────────────────────────
 
-    /// <summary>Longbow mutasyonu ilk kez tamamlandığında tetiklenir.</summary>
+    /// <summary>Fired the first time the longbow mutation is completed.</summary>
     public event Action OnLongbowMutationComplete;
-    /// <summary>Crossbow mutasyonu ilk kez tamamlandığında tetiklenir.</summary>
+    /// <summary>Fired the first time the crossbow mutation is completed.</summary>
     public event Action OnCrossbowMutationComplete;
-    /// <summary>Hammer mutasyonu ilk kez tamamlandığında tetiklenir.</summary>
+    /// <summary>Fired the first time the hammer mutation is completed.</summary>
     public event Action OnHammerMutationComplete;
 
     // ── Properties ────────────────────────────────────────────────────────────
@@ -85,8 +84,8 @@ public class WeaponMutationChecker : MonoBehaviour
     // ── Public API ────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Verilen silah türünün unlock augmentleri sunulmamalı mı?
-    /// Mutasyon tamamlandıysa <c>true</c> döner.
+    /// Should unlock augments for the given weapon type be excluded from the offer pool?
+    /// Returns <c>true</c> if the mutation for that weapon is complete.
     /// </summary>
     public bool ShouldExcludeWeaponUnlocks(WeaponType weaponType)
     {
@@ -95,12 +94,12 @@ public class WeaponMutationChecker : MonoBehaviour
             case WeaponType.Longbow:  return IsLongbowMutationComplete;
             case WeaponType.Crossbow: return IsCrossbowMutationComplete;
             case WeaponType.Hammer:   return IsHammerMutationComplete;
-            default:                  return false; // Universal asla filtrelenmez
+            default:                  return false; // Universal is never filtered
         }
     }
 
     /// <summary>
-    /// Dışarıdan controller atamak için (örn. yeni run başladığında).
+    /// Assigns the controller from outside (e.g. when a new run starts).
     /// </summary>
     public void RegisterController(PlayerAugmentController controller)
     {
@@ -109,7 +108,7 @@ public class WeaponMutationChecker : MonoBehaviour
         Subscribe();
     }
 
-    /// <summary>Yeni run başında tüm sayaçları sıfırlar.</summary>
+    /// <summary>Resets all counters at the start of a new run.</summary>
     public void ResetAll()
     {
         _longbowUnlocksApplied  = 0;
@@ -146,7 +145,7 @@ public class WeaponMutationChecker : MonoBehaviour
         UnlockAugmentDefinition unlockDef = augment as UnlockAugmentDefinition;
         if (unlockDef == null) return;
 
-        // Eşik geçmeden önce tamamlanma durumunu kaydet
+        // Record completion state before the threshold is crossed
         bool prevLongbow  = IsLongbowMutationComplete;
         bool prevCrossbow = IsCrossbowMutationComplete;
         bool prevHammer   = IsHammerMutationComplete;
@@ -156,10 +155,10 @@ public class WeaponMutationChecker : MonoBehaviour
             case WeaponType.Longbow:  _longbowUnlocksApplied++;  break;
             case WeaponType.Crossbow: _crossbowUnlocksApplied++; break;
             case WeaponType.Hammer:   _hammerUnlocksApplied++;   break;
-            // Universal: sayılmaz
+            // Universal: not counted
         }
 
-        // Eşik yeni aşıldıysa event'i tetikle
+        // Fire event if the threshold was newly crossed
         if (!prevLongbow  && IsLongbowMutationComplete)  OnLongbowMutationComplete?.Invoke();
         if (!prevCrossbow && IsCrossbowMutationComplete) OnCrossbowMutationComplete?.Invoke();
         if (!prevHammer   && IsHammerMutationComplete)   OnHammerMutationComplete?.Invoke();

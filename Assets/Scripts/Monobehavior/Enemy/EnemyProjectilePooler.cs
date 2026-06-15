@@ -83,7 +83,7 @@ public class EnemyProjectilePooler : MonoBehaviour
         {
             if (!canExpandPool)
             {
-                Debug.LogWarning("EnemyProjectilePooler: Havuzdaki projectile tükendi.");
+                Debug.LogWarning("EnemyProjectilePooler: projectile pool is exhausted.");
                 return null;
             }
 

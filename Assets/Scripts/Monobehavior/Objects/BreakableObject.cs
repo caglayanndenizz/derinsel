@@ -15,7 +15,7 @@ public class BreakableObject : MonoBehaviour, IDamageable, IBreakable
     [Header("Animation")]
     [Tooltip("Animator'daki idle bool parametresinin adi.")]
     [SerializeField] private string idleBoolName = "Idle";
-    [Tooltip("Animator'daki kirilma bool parametresinin adi VE state adı.")]
+    [Tooltip("Name of the break bool parameter in the Animator AND the state name.")]
     [SerializeField] private string destroyBoolName = "Destroy";
 
     private Animator _animator;

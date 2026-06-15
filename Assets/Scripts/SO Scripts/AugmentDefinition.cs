@@ -20,10 +20,10 @@ public class AugmentDefinition : ScriptableObject
     public AnimationCurve scalingCurve = AnimationCurve.Linear(0f, 1f, 1f, 1f);
 
     [Header("Weight Override")]
-    [Tooltip("0 = AugmentWeightSystem rarity default'unu kullanır. Pozitif değer bu augment için sabit base weight.")]
+    [Tooltip("0 = uses the AugmentWeightSystem rarity default. Positive value sets a fixed base weight for this augment.")]
     public float baseWeight = 0f;
 
     [Header("Mutation / picker")]
-    [Tooltip("Oyuncuda otomatik radial ok mutasyonu açılmışsa augment havuzundan çıkar.")]
+    [Tooltip("Removed from the augment pool when the player's automatic radial arrow mutation is active.")]
     public bool excludeFromAugmentPickerWhenRadialLongbowMutationComplete;
 }

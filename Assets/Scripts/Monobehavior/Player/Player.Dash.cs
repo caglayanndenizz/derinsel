@@ -5,11 +5,11 @@ using System.Collections;
 public partial class Player
 {
     [Header("Dash Settings")]
-    [Tooltip("Dash mesafesi (birim). Duvara çarparsa öncesinde durur.")]
+    [Tooltip("Dash distance (units). Stops early if a wall is hit.")]
     public float dashDistance = 3f;
     public float dashCooldown = 10f;
     [SerializeField] private float dashAlphaFlashDuration = 0.1f;
-    [Tooltip("Boşsa root/child'dan otomatik aranır.")]
+    [Tooltip("If empty, auto-detected from root or children.")]
     [SerializeField] private SpriteRenderer dashFlashTarget;
 
     [Header("Dash Cooldown UI")]

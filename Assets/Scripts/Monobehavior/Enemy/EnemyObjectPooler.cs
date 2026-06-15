@@ -20,12 +20,12 @@ public class EnemyObjectPooler : MonoBehaviour
         public GameObject prefab;
     }
 
-    [Header("Wave System — Tipe Göre Prefablar")]
-    [Tooltip("Wave sistemi için her enemy tipine karşılık gelen prefab. Boş bırakılırsa random pool'dan çekilir.")]
+    [Header("Wave System — Prefabs by Type")]
+    [Tooltip("Prefab per enemy type for the wave system. Falls back to the random pool if empty.")]
     [SerializeField] private List<EnemyTypePrefabEntry> typedPrefabs = new List<EnemyTypePrefabEntry>();
 
-    [Header("Baglantili pooler'lar")]
-    [Tooltip("Bos birakilirsa Gold / Experience / Projectile pooler sahne icinde (kapali dahil) aranir.")]
+    [Header("Linked Poolers")]
+    [Tooltip("If empty, Gold / Experience / Projectile poolers are searched in the scene (including inactive).")]
     [SerializeField] private GoldLootPooler linkedGoldLootPooler;
     [SerializeField] private ExperienceLootPooler linkedExperienceLootPooler;
     [SerializeField] private EnemyProjectilePooler linkedProjectilePooler;
@@ -33,7 +33,7 @@ public class EnemyObjectPooler : MonoBehaviour
     private readonly Queue<GameObject> _availableEnemies = new Queue<GameObject>();
     private readonly HashSet<GameObject> _queuedEnemies = new HashSet<GameObject>();
 
-    // Typed pool: her EnemyType için ayrı queue — GetEnemyOfType artık Instantiate yapmaz
+    // Typed pool: separate queue per EnemyType — GetEnemyOfType no longer calls Instantiate
     private readonly Dictionary<Enemy.EnemyType, Queue<GameObject>>   _typedAvailable = new();
     private readonly Dictionary<Enemy.EnemyType, HashSet<GameObject>> _typedQueued    = new();
 
@@ -89,7 +89,7 @@ public class EnemyObjectPooler : MonoBehaviour
     {
         if (!HasValidPrefabs())
         {
-            Debug.LogWarning("EnemyObjectPooler: enemyPrefabs listesinde gecerli prefab yok.");
+            Debug.LogWarning("EnemyObjectPooler: no valid prefab found in enemyPrefabs list.");
             return;
         }
 
@@ -105,7 +105,7 @@ public class EnemyObjectPooler : MonoBehaviour
         GameObject prefab = GetRandomEnemyPrefab();
         if (prefab == null)
         {
-            Debug.LogWarning("EnemyObjectPooler: Enemy olusturulamadi, gecerli prefab bulunamadi.");
+            Debug.LogWarning("EnemyObjectPooler: could not create enemy — no valid prefab found.");
             return null;
         }
 
@@ -121,7 +121,7 @@ public class EnemyObjectPooler : MonoBehaviour
         {
             if (!canExpandPool)
             {
-                Debug.LogWarning("EnemyObjectPooler: Havuzdaki enemy tükendi.");
+                Debug.LogWarning("EnemyObjectPooler: enemy pool is exhausted.");
                 return null;
             }
 
@@ -143,8 +143,8 @@ public class EnemyObjectPooler : MonoBehaviour
     }
 
     /// <summary>
-    /// Wave sistemi için type-specific spawn. typedPrefabs'ta eşleşme yoksa generic GetEnemy() fallback'i kullanılır.
-    /// Per-type pool kullanır — her spawn'da Instantiate YAPILMAZ.
+    /// Type-specific spawn for the wave system. Falls back to generic GetEnemy() if no match in typedPrefabs.
+    /// Uses a per-type pool — Instantiate is NOT called on every spawn.
     /// </summary>
     public GameObject GetEnemyOfType(Enemy.EnemyType type, Vector3 worldPosition, Quaternion rotation)
     {
@@ -153,18 +153,18 @@ public class EnemyObjectPooler : MonoBehaviour
         if (prefab == null)
             return GetEnemy(worldPosition, rotation);
 
-        // Per-type queue'yu getir veya oluştur
+        // Get or create the per-type queue
         if (!_typedAvailable.TryGetValue(type, out Queue<GameObject> available))
             _typedAvailable[type] = available = new Queue<GameObject>();
         if (!_typedQueued.TryGetValue(type, out HashSet<GameObject> queued))
             _typedQueued[type] = queued = new HashSet<GameObject>();
 
-        // Pool boşsa genişlet
+        // Expand if pool is empty
         if (available.Count == 0)
         {
             if (!canExpandPool)
             {
-                Debug.LogWarning($"EnemyObjectPooler: {type} typed pool tükendi, genişletme kapalı.");
+                Debug.LogWarning($"EnemyObjectPooler: {type} typed pool is exhausted, expansion is disabled.");
                 return null;
             }
             Transform parent = poolParent != null ? poolParent : transform;
@@ -204,7 +204,7 @@ public class EnemyObjectPooler : MonoBehaviour
         enemy.SetActive(false);
         enemy.transform.SetParent(poolParent != null ? poolParent : transform);
 
-        // Typed pool'a mı ait? → doğru queue'ya geri dön
+        // Belongs to typed pool? → return to the correct queue
         Enemy enemyComp = enemy.GetComponent<Enemy>();
         if (enemyComp != null
             && _typedQueued.TryGetValue(enemyComp.enemyType, out HashSet<GameObject> typedQSet)

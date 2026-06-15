@@ -19,7 +19,7 @@ public class TransitionFader : MonoBehaviour
         if (canvasGroup == null)
             canvasGroup = GetComponent<CanvasGroup>();
 
-        // Canvas aktif kalsın ama oyun başlangıcında görünmesin.
+        // Keep canvas active but invisible at game start.
         SetState(0f, false);
     }
 
@@ -46,7 +46,7 @@ public class TransitionFader : MonoBehaviour
         yield return _runningFadeRoutine;
         _runningFadeRoutine = null;
 
-        // Fade bittikten sonra görünmezse raycast kapalı kalsın.
+        // Keep raycasts disabled when invisible after fade completes.
         if (Mathf.Approximately(targetAlpha, 0f))
             canvasGroup.blocksRaycasts = false;
     }

@@ -8,8 +8,8 @@ public class DungeonExit : MonoBehaviour
         ExitDungeon
     }
 
-    [Header("Iki kapi yan yana")]
-    [Tooltip("Oyuncu bu kapıya kardeş kapıdan belirgin şekilde daha yakın olmalı; arada yanlış tetiklenmeyi azaltır.")]
+    [Header("Side-by-side doors")]
+    [Tooltip("The player must be noticeably closer to this door than its sibling; reduces accidental triggers.")]
     public float closerThanSiblingEpsilon = 0.05f;
 
     private DungeonGenerator dungeonGenerator;
@@ -78,7 +78,7 @@ public class DungeonExit : MonoBehaviour
 
         if (dungeonGenerator == null)
         {
-            Debug.LogWarning("DungeonExit: DungeonGenerator bulunamadi.");
+            Debug.LogWarning("DungeonExit: DungeonGenerator not found.");
             return;
         }
 

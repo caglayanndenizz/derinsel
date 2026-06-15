@@ -176,7 +176,7 @@ public class AugmentWeightSystem : MonoBehaviour
         _rejectionMult.Clear();
         _rejectedAtOffer.Clear();
 
-        // Silah mutasyon sayaçlarını da sıfırla
+        // Also reset weapon mutation counters
         WeaponMutationChecker.Instance?.ResetAll();
     }
 
@@ -327,14 +327,14 @@ public class AugmentWeightSystem : MonoBehaviour
             && controller.HasRadialLongbowMutationUnlock
             && aug.excludeFromAugmentPickerWhenRadialLongbowMutationComplete) return false;
 
-        // Weapon mutation check — eşik dolmuşsa o silahın tüm unlock augmentlerini havuzdan çıkar
+        // Weapon mutation check — remove all unlock augments for the weapon if its threshold is reached
         if (aug is UnlockAugmentDefinition unlockAug)
         {
             WeaponMutationChecker checker = WeaponMutationChecker.Instance;
             if (checker != null && checker.ShouldExcludeWeaponUnlocks(unlockAug.weaponType))
                 return false;
 
-            // Hammer charge unlock'u olmadan charge'a bağlı hammer augmentleri gösterme
+            // Do not show charge-dependent hammer augments without the hammer charge unlock
             if (unlockAug.weaponType == WeaponType.Hammer &&
                 unlockAug.id != AugmentId.HammerChargeUnlock &&
                 controller != null && !controller.HasHammerChargeUnlock)

@@ -3,30 +3,30 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// Tek badge image üzerinden tier rengini günceller.
-/// Eşikler: Kömür≥1 · Altın≥2 · Elmas≥4 · Obsidyen≥6
+/// Updates the tier color on a single badge image.
+/// Thresholds: Coal≥1 · Gold≥2 · Diamond≥4 · Obsidian≥6
 /// </summary>
-public class CevherSystemUI : MonoBehaviour
+public class GemTierUI : MonoBehaviour
 {
-    [Header("UI Elemanları")]
+    [Header("UI Elements")]
     [SerializeField] private GameObject      longbowTrait;
     [SerializeField] private Image           badgeImage;
     [SerializeField] private Image           longbowIcon;
     [SerializeField] private TextMeshProUGUI countText;
 
-    [Header("Renkler")]
-    [SerializeField] private Color inactiveColor  = new Color(0.22f, 0.22f, 0.22f, 1.00f);
-    [SerializeField] private Color komurColor     = new Color(0.45f, 0.40f, 0.35f, 1.00f);
-    [SerializeField] private Color altinColor     = new Color(1.00f, 0.84f, 0.00f, 1.00f);
-    [SerializeField] private Color elmasColor     = new Color(0.00f, 0.75f, 1.00f, 1.00f);
-    [SerializeField] private Color obsidyenColor  = new Color(0.55f, 0.00f, 1.00f, 1.00f);
+    [Header("Colors")]
+    [SerializeField] private Color inactiveColor = new Color(0.22f, 0.22f, 0.22f, 1.00f);
+    [SerializeField] private Color coalColor     = new Color(0.45f, 0.40f, 0.35f, 1.00f);
+    [SerializeField] private Color goldColor     = new Color(1.00f, 0.84f, 0.00f, 1.00f);
+    [SerializeField] private Color diamondColor  = new Color(0.00f, 0.75f, 1.00f, 1.00f);
+    [SerializeField] private Color obsidianColor = new Color(0.55f, 0.00f, 1.00f, 1.00f);
 
-    [Header("Referans")]
+    [Header("References")]
     [SerializeField] private PlayerAugmentController augmentController;
 
-    private CevherTier _cachedTier  = (CevherTier)(-1);
-    private int        _cachedCount = -1;
-    private bool       _subscribed;
+    private GemTier _cachedTier  = (GemTier)(-1);
+    private int     _cachedCount = -1;
+    private bool    _subscribed;
 
     private void Awake()
     {
@@ -75,8 +75,8 @@ public class CevherSystemUI : MonoBehaviour
     {
         if (augmentController == null) return;
 
-        CevherTier tier  = augmentController.LongbowCevherTier;
-        int        count = augmentController.LongbowCevherAugmentCount;
+        GemTier tier  = augmentController.LongbowGemTier;
+        int     count = augmentController.LongbowGemAugmentCount;
 
         if (tier == _cachedTier && count == _cachedCount) return;
         _cachedTier  = tier;
@@ -85,23 +85,23 @@ public class CevherSystemUI : MonoBehaviour
         if (longbowTrait != null)
             longbowTrait.SetActive(count > 0);
         else
-            Debug.LogWarning("[CevherSystemUI] longbowTrait is not assigned in the Inspector!", this);
+            Debug.LogWarning("[GemTierUI] longbowTrait is not assigned in the Inspector!", this);
 
         Color c = TierColor(tier);
-        if (badgeImage != null) badgeImage.color = c;
-        if (longbowIcon    != null) longbowIcon.color    = c;
-        if (countText  != null) countText.text   = $"{count}/{PlayerAugmentController.CevherObsidyenThreshold}";
+        if (badgeImage  != null) badgeImage.color  = c;
+        if (longbowIcon != null) longbowIcon.color  = c;
+        if (countText   != null) countText.text     = $"{count}/{PlayerAugmentController.GemObsidianThreshold}";
     }
 
-    private Color TierColor(CevherTier tier)
+    private Color TierColor(GemTier tier)
     {
         switch (tier)
         {
-            case CevherTier.Komur:    return komurColor;
-            case CevherTier.Altin:    return altinColor;
-            case CevherTier.Elmas:    return elmasColor;
-            case CevherTier.Obsidyen: return obsidyenColor;
-            default:                  return inactiveColor;
+            case GemTier.Coal:     return coalColor;
+            case GemTier.Gold:     return goldColor;
+            case GemTier.Diamond:  return diamondColor;
+            case GemTier.Obsidian: return obsidianColor;
+            default:               return inactiveColor;
         }
     }
 }

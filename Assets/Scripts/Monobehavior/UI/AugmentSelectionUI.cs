@@ -40,7 +40,7 @@ public class AugmentSelectionUI : MonoBehaviour
     [Header("Behavior")]
     [SerializeField] private bool pauseGameWhenPanelOpen = true;
     [SerializeField] private bool deactivatePanelRootWhenHidden = true;
-    [Tooltip("Panel açıldıktan kaç saniye (gerçek zaman) sonra butonlar tıklanabilir olur. Yanlışlıkla seçimi önler.")]
+    [Tooltip("Seconds of real time after the panel opens before buttons become clickable. Prevents accidental selection.")]
     [SerializeField][Range(0.5f, 2f)] private float buttonActivationDelay = 1f;
 
     [Header("Visual theme")]

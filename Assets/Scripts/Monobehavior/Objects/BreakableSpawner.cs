@@ -9,7 +9,7 @@ public class BreakableSpawner : MonoBehaviour
 
     [Header("Explosive")]
     [SerializeField] private GameObject explosivePrefab;
-    [Tooltip("Her spawn'da patlayıcı çıkma şansı (0 = hiç, 1 = hep).")]
+    [Tooltip("Chance to spawn an explosive object per call (0 = never, 1 = always).")]
     [Range(0f, 1f)]
     [SerializeField] private float explosiveChance = 0.15f;
 

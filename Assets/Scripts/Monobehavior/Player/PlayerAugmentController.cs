@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class PlayerAugmentController : MonoBehaviour
 {
-    // ── Cevher Sistemi ────────────────────────────────────────────────────────
+    // ── Gem Tier System ───────────────────────────────────────────────────────
 
-    public const int CevherKomurThreshold    = 1;
-    public const int CevherAltinThreshold    = 2;
-    public const int CevherElmasThreshold    = 4;
-    public const int CevherObsidyenThreshold = 6;
+    public const int GemCoalThreshold     = 1;
+    public const int GemGoldThreshold     = 2;
+    public const int GemDiamondThreshold  = 4;
+    public const int GemObsidianThreshold = 6;
 
-    private static readonly AugmentId[] LongbowCevherAugmentIds =
+    private static readonly AugmentId[] LongbowGemAugmentIds =
     {
         AugmentId.ChargedLongbowAoeUnlock,
         AugmentId.TripleArrowUnlock,
@@ -52,11 +52,11 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float hammerLightRateMultiplier    = 1f;
 
     [Header("Hammer — Charge Magnet")]
-    [Tooltip("Charge sırasında düşmanları çeken mıknatıs yarıçapı (birim).")]
+    [Tooltip("Magnet pull radius during charge (units).")]
     [SerializeField] private float hammerMagnetRadius = 6f;
-    [Tooltip("Mıknatıs çekim hızı (birim/saniye).")]
+    [Tooltip("Magnet pull speed (units/second).")]
     [SerializeField] private float hammerMagnetPullSpeed = 7f;
-    [Tooltip("Charge dolunca düşmanlara uygulanacak freeze süresi (saniye).")]
+    [Tooltip("Freeze duration applied to enemies when charge is full (seconds).")]
     [SerializeField] private float hammerChargeFullStopDuration = 1.2f;
 
     [Header("Longbow — Unlock")]
@@ -72,7 +72,7 @@ public class PlayerAugmentController : MonoBehaviour
     [Header("Longbow — Freeze")]
     [SerializeField] private bool  hasLongbowFreezeUnlock;
     [SerializeField] private float longbowFreezeDuration   = 0f;
-    [Tooltip("Resonance — donmuş düşmanlara verilen hasara çarpılır. LongbowFreezeUnlock alınınca 1.5f olur.")]
+    [Tooltip("Resonance — multiplied onto damage dealt to frozen enemies. Set to 1.5 when LongbowFreezeUnlock is obtained.")]
     [SerializeField] private float frozenEnemyVulnerabilityMultiplier = 1f;
 
     [Header("Longbow — Fire Arrow")]
@@ -87,31 +87,31 @@ public class PlayerAugmentController : MonoBehaviour
 
     [Header("Crossbow — Pierce")]
     [SerializeField] private bool  hasCrossbowBoltPierce;
-    [Tooltip("Her düşman başına hasarın yüzde kaçı düşer (0.20 = %20).")]
+    [Tooltip("Damage reduction per enemy pierced (0.20 = 20%).")]
     [SerializeField] private float crossbowPierceDamageFalloff = 0.20f;
-    [Tooltip("Pierce hasarının minimum çarpanı (0.30 = %30).")]
+    [Tooltip("Minimum damage multiplier for pierce (0.30 = 30%).")]
     [SerializeField] private float crossbowPierceDamageFloor   = 0.30f;
-    [Tooltip("Kaç düşman sonrası floor'a düşülür (varsayılan 3 → 4. düşmandan itibaren %30).")]
+    [Tooltip("Number of enemies before damage drops to floor (default 3 → 30% from the 4th enemy onward).")]
     [SerializeField] private int   crossbowPierceFalloffCount  = 3;
 
     [Header("Crossbow — Bleed")]
     [SerializeField] private bool  hasCrossbowBoltBleed;
-    [Tooltip("Her stack'in bolt hasarına oranı (0.01 = %1). Max stack'te toplam hasar = maxStacks * oran.")]
+    [Tooltip("Damage per stack as a ratio of bolt damage (0.01 = 1%). Total at max stacks = maxStacks * ratio.")]
     [SerializeField] private float crossbowBleedDamageRatioPerStack = 0.01f;
-    [Tooltip("Maksimum stack sayısı (varsayılan 5 → toplam %5).")]
+    [Tooltip("Maximum stack count (default 5 → total 5%).")]
     [SerializeField] private int   crossbowBleedMaxStacks           = 5;
-    [Tooltip("Son vuruştan bu süre geçerse (saniye) kanama sona erer.")]
+    [Tooltip("Bleed expires if this many seconds pass since the last hit (seconds).")]
     [SerializeField] private float crossbowBleedExpireSeconds       = 5f;
 
     private float _initialChargedLongbowAoeRadius;
     private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
 
     [Header("Unlock Augment Database")]
-    [Tooltip("Silaha göre unlock augmentleri takip etmek için. Mutation kontrolünde kullanılır.")]
+    [Tooltip("Tracks unlock augments per weapon. Used for mutation checks.")]
     [SerializeField] private UnlockAugmentDatabase unlockDatabase;
 
     [Header("Test")]
-    [Tooltip("İşaretlenince 6 longbow augment varmış gibi Obsidyen mutasyonu tetiklenir.")]
+    [Tooltip("When checked, triggers the Obsidian mutation as if 6 longbow augments were obtained.")]
     [SerializeField] private bool mutationAugmentsLongbow;
 
     // Weapon mutation flags — set automatically when all unlock augments for a weapon are obtained
@@ -119,9 +119,9 @@ public class PlayerAugmentController : MonoBehaviour
     private bool _crossbowMutated;
     private bool _hammerMutated;
 
-    [Header("Motor (Play Mode'da güncellenir)")]
-    [SerializeField] private int      longbowCevherCountMotor;
-    [SerializeField] private string   longbowCevherTierMotor;
+    [Header("Debug (Updated in Play Mode)")]
+    [SerializeField] private int      longbowGemCountDebug;
+    [SerializeField] private string   longbowGemTierDebug;
 
     private Player _player;
 
@@ -168,7 +168,7 @@ public class PlayerAugmentController : MonoBehaviour
     public bool  HasHammerChargeUnlock                => hasHammerChargeUnlock;
     public bool  HasHammerChargeDamageReductionUnlock => hasHammerChargeDamageReductionUnlock;
     public float HammerFreezeDuration                => Mathf.Max(0f, hammerFreezeDuration);
-    /// <summary>Resonance çarpanı — donmuş düşmanlara vurulacak hasar bu değerle çarpılır.</summary>
+    /// <summary>Resonance multiplier — damage dealt to frozen enemies is multiplied by this value.</summary>
     public float FrozenEnemyVulnerabilityMultiplier  => Mathf.Max(1f, frozenEnemyVulnerabilityMultiplier);
     public float HammerMagnetRadius                  => Mathf.Max(0f, hammerMagnetRadius);
     public float HammerMagnetPullSpeed               => Mathf.Max(0f, hammerMagnetPullSpeed);
@@ -180,29 +180,29 @@ public class PlayerAugmentController : MonoBehaviour
     public float ChargedLongbowAoeRadius            => Mathf.Max(0f, chargedLongbowAoeRadius * (1f + Mathf.Max(0f, longbowAoeRadiusBonus)));
     public float FlatMaxHealthBonus             => Mathf.Max(0f, flatMaxHealthBonus);
 
-    // ── Cevher Sistemi hesaplama ──────────────────────────────────────────────
+    // ── Gem Tier calculation ──────────────────────────────────────────────────
 
-    public int LongbowCevherAugmentCount
+    public int LongbowGemAugmentCount
     {
         get
         {
-            if (mutationAugmentsLongbow) return CevherObsidyenThreshold;
+            if (mutationAugmentsLongbow) return GemObsidianThreshold;
             int total = 0;
-            for (int i = 0; i < LongbowCevherAugmentIds.Length; i++)
-                total += GetAppliedCount(LongbowCevherAugmentIds[i]);
+            for (int i = 0; i < LongbowGemAugmentIds.Length; i++)
+                total += GetAppliedCount(LongbowGemAugmentIds[i]);
             return total;
         }
     }
 
-    public CevherTier LongbowCevherTier
+    public GemTier LongbowGemTier
     {
         get
         {
-            int n = LongbowCevherAugmentCount;
-            if (n >= CevherObsidyenThreshold) return CevherTier.Obsidyen;
-            if (n >= CevherElmasThreshold)    return CevherTier.Elmas;
-            if (n >= CevherAltinThreshold)    return CevherTier.Altin;
-            return CevherTier.Komur;
+            int n = LongbowGemAugmentCount;
+            if (n >= GemObsidianThreshold) return GemTier.Obsidian;
+            if (n >= GemDiamondThreshold)  return GemTier.Diamond;
+            if (n >= GemGoldThreshold)     return GemTier.Gold;
+            return GemTier.Coal;
         }
     }
 
@@ -211,7 +211,7 @@ public class PlayerAugmentController : MonoBehaviour
     public bool HasHammerMutation   => _hammerMutated;
 
     public bool HasRadialLongbowMutationUnlock =>
-        mutationAugmentsLongbow || LongbowCevherTier == CevherTier.Obsidyen || _longbowMutated;
+        mutationAugmentsLongbow || LongbowGemTier == GemTier.Obsidian || _longbowMutated;
 
     public bool MutatedArrowShots => HasRadialLongbowMutationUnlock;
 
@@ -227,8 +227,8 @@ public class PlayerAugmentController : MonoBehaviour
 
     private void LateUpdate()
     {
-        longbowCevherCountMotor = LongbowCevherAugmentCount;
-        longbowCevherTierMotor  = LongbowCevherTier.ToString();
+        longbowGemCountDebug = LongbowGemAugmentCount;
+        longbowGemTierDebug  = LongbowGemTier.ToString();
     }
 
     // ── Reset ─────────────────────────────────────────────────────────────────
@@ -324,7 +324,7 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.LongbowFreezeUnlock:
                 hasLongbowFreezeUnlock = true;
                 longbowFreezeDuration  = augment.value > 0f ? augment.value : 1.5f;
-                // Resonance: freeze unlock alınınca donmuş düşmanlar %50 daha kırılgan olur
+                // Resonance: frozen enemies take 50% more damage once freeze unlock is obtained
                 frozenEnemyVulnerabilityMultiplier = Mathf.Max(frozenEnemyVulnerabilityMultiplier, 1.5f);
                 break;
             case AugmentId.FireArrowUnlock:
@@ -513,7 +513,7 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.CrossbowBoltPierce:
             case AugmentId.CrossbowBoltBleed:
                 // Crossbow augments are only relevant once the crossbow is active
-                // (Obsidyen cevher tier / radial longbow mutation unlocked)
+                // (Obsidian gem tier / radial longbow mutation unlocked)
                 return HasRadialLongbowMutationUnlock;
             default:
                 return true;

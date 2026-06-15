@@ -8,15 +8,15 @@ public partial class Player
     public float hammerAOE = 2.5f;
     public float hammerCooldown = 3f;
     [SerializeField] private float heavyImpactFallbackDelay = 0.2f;
-    [Tooltip("Sol tuş bu kadar süre basılı tutulursa charge modu başlar (saniye). Altında kalırsa hafif saldırı.")]
+    [Tooltip("Hold duration (seconds) before charge mode activates. Releasing before this threshold triggers a light attack.")]
     [SerializeField] private float hammerChargeStartDelay = 0.5f;
 
     [Header("Hammer Settings (Light)")]
-    [Tooltip("İki hafif hammer saldırısı arasındaki minimum süre (saniye).")]
+    [Tooltip("Minimum time between light hammer attacks (seconds).")]
     [SerializeField] private float hammerLightAttackRate = 0.4f;
-    [Tooltip("Hafif hammer salvo yarıçapı. Genellikle ağır hammerın yarısı kadar.")]
+    [Tooltip("Light hammer salvo radius. Usually half the heavy hammer radius.")]
     [SerializeField] private float hammerLightAoe;
-    [Tooltip("Animasyon event'i gelmezse fallback tetiklenme gecikmesi (saniye).")]
+    [Tooltip("Fallback trigger delay if no animation event is received (seconds).")]
     [SerializeField] private float hammerLightFallbackDelay = 0.15f;
 
     [Header("Light Attack Settings (Spammable)")]
@@ -280,13 +280,13 @@ public partial class Player
         Vector2 boxSize   = new Vector2(hammerLightAoe * 2f, hammerLightAoe);
         Vector2 boxCenter = (Vector2)attackPoint.position + facing * hammerLightAoe;
 
-        // Light attack — yönlü kutu (turuncu)
+        // Light attack — directional box (orange)
         Gizmos.color = new Color(1f, 0.6f, 0f, 0.25f);
         Gizmos.DrawCube(boxCenter, boxSize);
         Gizmos.color = new Color(1f, 0.6f, 0f, 1f);
         Gizmos.DrawWireCube(boxCenter, boxSize);
 
-        // Heavy slam — radyal daire (kırmızı)
+        // Heavy slam — radial circle (red)
         float effectiveHeavyAoe = hammerAOE * (playerAugmentController != null ? playerAugmentController.HammerAoeRadiusMultiplier : 1f);
         Gizmos.color = new Color(1f, 0.1f, 0.1f, 0.15f);
         Gizmos.DrawSphere(attackPoint.position, effectiveHeavyAoe);

@@ -10,28 +10,28 @@ public class DungeonGenerator : MonoBehaviour
 {
     public static DungeonGenerator Instance { get; private set; }
 
-    [Header("Tile Ayarlari")]
+    [Header("Tile Settings")]
     public Tilemap floorTilemap;
     public Tilemap wallTilemap;
     public TileBase floorTile;
     public TileBase wallTile;
 
-    [Header("Ana Dunya Ayarlari")]
+    [Header("World Settings")]
     public GameObject dungeonEntrance;
 
-    [Header("UI Ayarlari")]
+    [Header("UI Settings")]
     public GameObject exitUI;
 
-    [Header("Zindan Ayarlari")]
-    [Tooltip("Wave sistemi aktifse bu değerler enemy sayısına göre otomatik ölçeklenir.")]
+    [Header("Dungeon Settings")]
+    [Tooltip("When the wave system is active, these values scale automatically based on enemy count.")]
     public int minSteps = 100;
     public int maxSteps = 250;
-    [Tooltip("Her enemy için minimum tile sayısı (wave sistemi aktifken geçerli).")]
+    [Tooltip("Minimum tile count per enemy (applies when wave system is active).")]
     public int minStepsPerEnemy = 8;
-    [Tooltip("Her enemy için maksimum tile sayısı (wave sistemi aktifken geçerli).")]
+    [Tooltip("Maximum tile count per enemy (applies when wave system is active).")]
     public int maxStepsPerEnemy = 12;
 
-    [Header("Spawn Ayarlari")]
+    [Header("Spawn Settings")]
     public GameObject player;
     [FormerlySerializedAs("enemyPrefab")]
     public List<GameObject> enemyPrefabs = new List<GameObject>();
@@ -40,32 +40,32 @@ public class DungeonGenerator : MonoBehaviour
     public EnemyObjectPooler enemyPooler;
 
     [Header("Wave System")]
-    [Tooltip("Atanırsa wave sistemi devreye girer; boş bırakılırsa eski sabit spawn davranışı korunur.")]
+    [Tooltip("If assigned, the wave system activates; if empty, the legacy fixed-spawn behaviour is used.")]
     public RoomWaveController roomWaveController;
 
-    [Header("Kirilabilir Objeler")]
+    [Header("Breakable Objects")]
     public BreakableSpawner breakableSpawner;
-    [Tooltip("Her odada spawn edilecek kirilabilir obje sayisi.")]
+    [Tooltip("Number of breakable objects to spawn per room.")]
     public int breakablesPerRoom = 5;
-    [Tooltip("Oyuncunun baslangic noktasina minimum mesafe (tile).")]
+    [Tooltip("Minimum distance from the player's start position (tiles).")]
     public float minBreakableDistanceFromPlayer = 5f;
 
-    [Header("Chest Sistemi")]
+    [Header("Chest System")]
     public GameObject woodenChestPrefab;
     public GameObject silverChestPrefab;
     public GameObject goldenChestPrefab;
-    [Tooltip("Bu kata kadar (dahil) wooden chest cikar.")]
+    [Tooltip("Wooden chests appear up to and including this floor.")]
     public int woodenChestMaxFloor = 5;
-    [Tooltip("Bu kata kadar (dahil) silver chest cikar.")]
+    [Tooltip("Silver chests appear up to and including this floor.")]
     public int silverChestMaxFloor = 15;
 
-    [Header("Transition Ayarlari")]
+    [Header("Transition Settings")]
     public TransitionFader transitionFader;
-    public CinemachineCamera vcam; // Sahnedeki sanal kamera
+    public CinemachineCamera vcam; // virtual camera in the scene
 
-    [Header("Yeni Mekanik: Kirilabilir Duvar")]
-    public TileBase destructableWallTile; // Kırılabilir duvar görseli
-    [Range(0, 1)] public float destructableChance = 0.15f; // Çıkma şansı
+    [Header("Breakable Wall")]
+    public TileBase destructableWallTile; // breakable wall tile graphic
+    [Range(0, 1)] public float destructableChance = 0.15f; // spawn chance
 
     private HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
     private readonly List<GameObject> currentExitInstances = new List<GameObject>();
@@ -564,13 +564,13 @@ public class DungeonGenerator : MonoBehaviour
         DungeonExit.ExitAction secondAction;
         if (isExitFloor)
         {
-            // Exit katında 1 NextFloor + 1 Exit (toplam yine 2 kapı)
+            // Exit floor: 1 NextFloor + 1 Exit door (still 2 doors total)
             firstAction = DungeonExit.ExitAction.NextFloor;
             secondAction = DungeonExit.ExitAction.ExitDungeon;
         }
         else
         {
-            // Normal katlarda 2 adet NextFloor kapısı
+            // Normal floors: 2 NextFloor doors
             firstAction = DungeonExit.ExitAction.NextFloor;
             secondAction = DungeonExit.ExitAction.NextFloor;
         }
@@ -683,7 +683,7 @@ public class DungeonGenerator : MonoBehaviour
             return;
         }
 
-        // Güvenli fallback (teorik olarak floorPositions.Count >= 2 iken buraya düşmemeli)
+        // Safe fallback (should never be reached when floorPositions.Count >= 2)
         using (var enumerator = floorPositions.GetEnumerator())
         {
             if (!enumerator.MoveNext())
@@ -708,7 +708,7 @@ public class DungeonGenerator : MonoBehaviour
     {
         if (player == null) return Vector2.right;
 
-        // Rotasyonu baz al; sprite X flip kullanıyorsa yönü ters çevir.
+        // Base on rotation; invert direction if sprite uses X flip.
         Vector2 forward = player.transform.right;
         if (player.transform.localScale.x < 0f)
             forward = -forward;

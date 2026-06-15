@@ -9,20 +9,20 @@ public struct WaveEntry
 }
 
 /// <summary>
-/// Tek bir wave'in içeriğini tanımlar: hangi tipte kaç düşman, ne kadar aralıkla spawn edilir.
+/// Defines the contents of a single wave: enemy types, counts, and spawn interval.
 /// </summary>
 [CreateAssetMenu(fileName = "WaveDefinition", menuName = "Scriptable Objects/Wave Definition")]
 public class WaveDefinition : ScriptableObject
 {
-    [Tooltip("Bu wave'de spawn edilecek düşman tipleri ve sayıları.")]
+    [Tooltip("Enemy types and counts to spawn in this wave.")]
     public List<WaveEntry> entries = new();
 
-    [Tooltip("İki enemy spawn arasındaki bekleme süresi (saniye).")]
+    [Tooltip("Wait time between enemy spawns (seconds).")]
     public float spawnDelayBetweenEnemies = 0.3f;
 
-    [Tooltip("Wave temizlenince verilen EXP çarpanı (1 = normal).")]
+    [Tooltip("EXP multiplier awarded when the wave is cleared (1 = normal).")]
     public float expMultiplier = 1f;
 
-    [Tooltip("Wave temizlenince verilen Gold çarpanı (1 = normal).")]
+    [Tooltip("Gold multiplier awarded when the wave is cleared (1 = normal).")]
     public float goldMultiplier = 1f;
 }

@@ -4,19 +4,19 @@ using System.Collections;
 public partial class Player
 {
     [Header("─── CROSSBOW ───────────────────────────")]
-    [Tooltip("Crossbow bolt prefab (PlayerBolt component'i olmali).")]
+    [Tooltip("Crossbow bolt prefab (must have PlayerBolt component).")]
     public GameObject crossbowBoltPrefab;
 
-    [Header("Crossbow — Atış")]
-    [Tooltip("Iki atis arasindaki sure (saniye). Animasyon suresiyle esit tutulmasi onerilir.")]
+    [Header("Crossbow — Fire")]
+    [Tooltip("Time between shots (seconds). Recommended to match animation duration.")]
     public float crossbowAttackRate = 0.5f;
-    [Tooltip("Trigger'dan bolt spawn'a kadar gecen sure (saniye). Genellikle: animasyonSuresi - 0.2")]
+    [Tooltip("Delay from trigger to bolt spawn (seconds). Typically: animationDuration - 0.2")]
     public float crossbowBoltReleaseDelay = 0.3f;
 
-    [Header("Crossbow — Bolt İstatistikleri")]
-    [Tooltip("Bolt hizi = arrowSpeed x bu carpan.")]
+    [Header("Crossbow — Bolt Stats")]
+    [Tooltip("Bolt speed = arrowSpeed x this multiplier.")]
     public float crossbowBoltSpeedMultiplier = 2f;
-    [Tooltip("Bolt sahnede kaldigi maksimum sure (saniye).")]
+    [Tooltip("Maximum lifetime of a bolt in the scene (seconds).")]
     public float crossbowBoltMaxLifetime = 5f;
 
     // ─── Crossbow / bolt ─────────────────────────────────────────────────────

@@ -5,30 +5,30 @@ using System.Collections;
 public partial class Player
 {
     [Header("Longbow / Arrow")]
-    [Tooltip("Üzerinde PlayerArrow bileşeni olan ok prefabı.")]
+    [Tooltip("Arrow prefab with a PlayerArrow component.")]
     public GameObject arrowPrefab;
     public float arrowSpeed = 14f;
     public float arrowMaxLifetime = 8f;
-    [Tooltip("Boş bırakılırsa Camera.main kullanılır; imleç dünya koordinatı için.")]
+    [Tooltip("If empty, Camera.main is used for cursor world position.")]
     public Camera aimCamera;
-    [Tooltip("Yay animasyonu bittikten sonra ok instantiate edilir.")]
+    [Tooltip("Arrow is instantiated after the bow animation finishes.")]
     public float longbowArrowReleaseDelay = 0.4f;
-    [Tooltip("Tam şarjlı sağ-tık yayda ok HIZI bu çarpanla çarpılır. Hasar EntityStats.bowHeavyAp'tan gelir.")]
+    [Tooltip("Arrow SPEED on a fully charged right-click shot is multiplied by this. Damage comes from EntityStats.bowHeavyAp.")]
     public float longbowChargedSpeedDamageMultiplier = 3f;
-    [Tooltip("Sağ tık basılı tutma süresi (saniye); dolunca yay tam şarj sayılır.")]
+    [Tooltip("Hold duration (seconds) before the bow is considered fully charged.")]
     public float maxLongbowChargeTime = 0.5f;
-    [Tooltip("Boşsa yay şarj çubuğu gösterilmez; Inspector'dan atayabilirsin.")]
+    [Tooltip("If empty, the bow charge bar is not shown.")]
     public Slider longbowChargeMeter;
-    [Tooltip("Boşsa yay şarj UI kanvası açılmaz.")]
+    [Tooltip("If empty, the bow charge UI canvas does not open.")]
     public GameObject longbowMeterCanvas;
 
     [Header("Longbow radial mutation (auto)")]
-    [Tooltip("6 longbow cevher augmenti ile Obsidyen'e ulaşınca, ek input olmadan kaç saniyede bir salvı.")]
+    [Tooltip("Seconds between automatic volleys once the Obsidian gem tier is reached with 6 longbow augments.")]
     [SerializeField] private float radialLongbowAutoVolleyIntervalSeconds = 1f;
     [SerializeField] private int autoArrowVolleyCount = 8;
     [SerializeField] private float autoArrowVolleyAngleStepDegrees = 45f;
     [SerializeField] private float radialLongbowSpawnInset = 0.2f;
-    [Tooltip("Otomatik salvıda hedef mesafe (imleç yok).")]
+    [Tooltip("Travel distance for arrows in automatic volley mode (no cursor).")]
     [SerializeField] private float radialLongbowAutoVolleyTravelDistance = 8f;
 
     private bool _hadRadialLongbowMutationLastFrame;

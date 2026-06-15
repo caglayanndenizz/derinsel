@@ -83,7 +83,7 @@ public class PlayerImpactFeedback : MonoBehaviour
         hitAudioSource.pitch = previousPitch;
     }
 
-    [Tooltip("hitVfxPrefab'ın sahnede kalacağı süre (saniye). Sonra otomatik yok edilir.")]
+    [Tooltip("How long the hitVfxPrefab stays in the scene (seconds) before being destroyed.")]
     [SerializeField] private float hitVfxLifetime = 2f;
 
     private void SpawnHitVfx(Vector3 worldPos)

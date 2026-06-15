@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Her kat için wave sırasını yönetir.
-/// DungeonGenerator.PlaceEntities() tarafından çağrılır; tüm dalgalar temizlenince
-/// DungeonGenerator.OnAllWavesCleared() ile çıkış kapılarının açılmasını tetikler.
+/// Manages the wave sequence for each floor.
+/// Called by DungeonGenerator.PlaceEntities(); triggers DungeonGenerator.OnAllWavesCleared()
+/// to open exit doors once all waves are cleared.
 /// </summary>
 public class RoomWaveController : MonoBehaviour
 {
@@ -16,15 +16,15 @@ public class RoomWaveController : MonoBehaviour
     [SerializeField] private EnemyObjectPooler enemyPooler;
 
     [Header("Floor Wave Configs")]
-    [Tooltip("Her config bir kat aralığını kapsar. En yüksek fromFloor eşleşmesi kullanılır.")]
+    [Tooltip("Each config covers a floor range. The highest matching fromFloor is used.")]
     [SerializeField] private List<FloorWaveConfig> floorConfigs = new();
 
     [Header("Timing")]
-    [Tooltip("Dalgalar arası bekleme süresi (saniye).")]
+    [Tooltip("Wait time between waves (seconds).")]
     [SerializeField] private float delayBetweenWaves = 1.5f;
 
     [Header("Fallback")]
-    [Tooltip("Eşleşen config yoksa spawn edilecek enemy sayısı (eski davranış).")]
+    [Tooltip("Enemy count to spawn when no matching config is found (legacy behaviour).")]
     [SerializeField] private int fallbackEnemyCount = 8;
 
     // ── Read-only runtime state ──────────────────────────────────────────────
@@ -180,8 +180,8 @@ public class RoomWaveController : MonoBehaviour
             }
         }
 
-        // Fallback'te wave tracking yok; DungeonGenerator'ın Update() tag-check'ini
-        // devralabilmesi için wave sistemini devre dışı bırak.
+        // No wave tracking in fallback mode; disable wave system so DungeonGenerator's
+        // Update() tag-check can take over.
         dungeonGenerator?.OnAllWavesCleared();
     }
 
@@ -224,8 +224,8 @@ public class RoomWaveController : MonoBehaviour
     // ── Public query ─────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Verilen kattaki tüm wave'lerdeki toplam enemy sayısını döndürür.
-    /// Wave config yoksa fallbackEnemyCount kullanılır.
+    /// Returns the total enemy count across all waves for the given floor.
+    /// Falls back to fallbackEnemyCount if no wave config is found.
     /// </summary>
     public int GetTotalEnemyCountForFloor(int floor)
     {

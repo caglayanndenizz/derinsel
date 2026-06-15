@@ -23,7 +23,7 @@ public class PlayerArrow : MonoBehaviour
     bool _fullyChargedLongbowExplosion;
     float _explosionRadius;
     float _freezeDuration;
-    float _frozenVulnerabilityMult; // Resonance: donmuş düşmana uygulanan hasar çarpanı
+    float _frozenVulnerabilityMult; // Resonance: damage multiplier applied to frozen enemies
     bool  _hasIceArrow;   // true when the ice/freeze unlock is active — drives ice particles
     bool  _hasFireArrow;
     float _fireDotDuration;
@@ -47,7 +47,7 @@ public class PlayerArrow : MonoBehaviour
     void OnEnable()
     {
         _wasVisibleSinceSpawn = false;
-        transform.localScale  = Vector3.one; // ArrowSizeUnlock sonrası pool'a döndüğünde scale sıfırlanır
+        transform.localScale  = Vector3.one; // reset scale when returned to pool after ArrowSizeUnlock
         StopAllElementParticles();
     }
     void OnBecameVisible()   { _wasVisibleSinceSpawn = true; }
@@ -183,7 +183,7 @@ public class PlayerArrow : MonoBehaviour
 
     // Pre-allocated buffer — eliminates per-frame RaycastHit2D[] heap allocation
     private static readonly RaycastHit2D[]  _hitBuffer      = new RaycastHit2D[32];
-    // ContactFilter2D.noFilter: tüm layer ve trigger'ları kapsar — LinecastNonAlloc ile birebir aynı davranış
+    // ContactFilter2D.noFilter: covers all layers and triggers — identical behaviour to LinecastNonAlloc
     private static readonly ContactFilter2D _linecastFilter = ContactFilter2D.noFilter;
 
     bool TryResolveMovementHit(Vector2 from, Vector2 to, out RaycastHit2D hit)
@@ -210,7 +210,7 @@ public class PlayerArrow : MonoBehaviour
         return false;
     }
 
-    // Statik comparer — lambda yerine kullanılır, her frame allocation yaratmaz
+    // Static comparer — avoids per-frame allocation that a lambda would cause
     private static readonly RaycastDistanceComparer _raycastComparer = new RaycastDistanceComparer();
     private class RaycastDistanceComparer : System.Collections.Generic.IComparer<RaycastHit2D>
     {
@@ -229,8 +229,8 @@ public class PlayerArrow : MonoBehaviour
 
         Enemy enemy = other.GetComponent<Enemy>() ?? other.GetComponentInParent<Enemy>();
 
-        // Vampiric Arrow: düşmanın max HP'sinin %5'i kadar player'ı iyileştirir.
-        // Düşmanın hayatta olup olmadığına bakılmaz — darbe isabet etti mi, o yeterli.
+        // Vampiric Arrow: heals the player for 5% of the enemy's max HP on hit.
+        // Does not check if the enemy is alive — landing the hit is sufficient.
         if (_hasVampiricArrow && enemy != null && _player != null)
             _player.Heal(enemy.MaxHealth * 0.05f);
 
