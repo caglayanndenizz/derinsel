@@ -1187,7 +1187,7 @@ GameObject:
   - component: {fileID: 1172257317}
   - component: {fileID: 1172257316}
   m_Layer: 0
-  m_Name: Tilemap_Walls
+  m_Name: Tilemap_OuterWalls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -94113,7 +94113,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.01
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000f7a4fdcfffdadb84
@@ -102646,7 +102646,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 2
-      m_TileSpriteIndex: 2
+      m_TileSpriteIndex: 12
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -103639,8 +103639,8 @@ Tilemap:
     m_Data: {fileID: -1932507957, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
   - m_RefCount: 3
     m_Data: {fileID: 1262746854, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
-  - m_RefCount: 1
-    m_Data: {fileID: 584843739, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 26
     m_Data: {fileID: -169844095, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
   - m_RefCount: 4
@@ -103659,8 +103659,8 @@ Tilemap:
     m_Data: {fileID: -1453350334737186109, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
   - m_RefCount: 24
     m_Data: {fileID: -797452395, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: 584843739, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
   - m_RefCount: 3
     m_Data: {fileID: -1819257743, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
   - m_RefCount: 3
@@ -103910,7 +103910,7 @@ GameObject:
   - component: {fileID: 1996572836}
   - component: {fileID: 1996572835}
   m_Layer: 0
-  m_Name: Tilemap_InsideWalls
+  m_Name: Tilemap_InnerWalls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
