@@ -334,94 +334,6 @@ MonoBehaviour:
   - {x: 0.1715374, y: 0.009637803, z: 0}
   - {x: 0.028398037, y: 0.1501889, z: 0}
   - {x: -0.111773014, y: 0.005623549, z: 0}
---- !u!1 &1420371497893043459
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5735996213559623626}
-  - component: {fileID: 4954764064748617524}
-  m_Layer: 0
-  m_Name: Sprite Light 2D
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5735996213559623626
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1420371497893043459}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 22.68506, y: 14.2779, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1980292253116098423}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4954764064748617524
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1420371497893043459}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.Light2D
-  m_ComponentVersion: 2
-  m_LightType: 1
-  m_BlendStyleIndex: 0
-  m_FalloffIntensity: 1
-  m_Color: {r: 0.764151, g: 0.764151, b: 0.764151, a: 1}
-  m_Intensity: 0.5
-  m_LightVolumeIntensity: 1
-  m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 00000000f7a4fdcfffdadb84
-  m_LightCookieSprite: {fileID: 21300000, guid: 119f93d0bcbf1e743bf5fcf237507d39, type: 3}
-  m_DeprecatedPointLightCookieSprite: {fileID: 0}
-  m_LightOrder: 0
-  m_AlphaBlendOnOverlap: 0
-  m_OverlapOperation: 0
-  m_NormalMapDistance: 3
-  m_NormalMapQuality: 2
-  m_UseNormalMap: 0
-  m_ShadowsEnabled: 1
-  m_ShadowIntensity: 0.75
-  m_ShadowSoftness: 0.3
-  m_ShadowSoftnessFalloffIntensity: 0.5
-  m_ShadowVolumeIntensityEnabled: 0
-  m_ShadowVolumeIntensity: 0.75
-  m_LocalBounds:
-    m_Center: {x: 0.030550003, y: -0.030799985, z: 0}
-    m_Extent: {x: 0.75045, y: 0.9059, z: 0}
-  m_PointLightInnerAngle: 360
-  m_PointLightOuterAngle: 360
-  m_PointLightInnerRadius: 0
-  m_PointLightOuterRadius: 1
-  m_ShapeLightParametricSides: 5
-  m_ShapeLightParametricAngleOffset: 0
-  m_ShapeLightParametricRadius: 1
-  m_ShapeLightFalloffSize: 0.5
-  m_ShapeLightFalloffOffset: {x: 0, y: 0}
-  m_ShapePath:
-  - {x: -0.22012806, y: -0.435503, z: 0}
-  - {x: 0.28084183, y: -0.43754005, z: 0}
-  - {x: 0.27996063, y: -0.12470913, z: 0}
-  - {x: 0.092336655, y: -0.12319279, z: 0}
-  - {x: 0.09227371, y: 0.37459564, z: 0}
-  - {x: -0.032859802, y: 0.37235928, z: 0}
-  - {x: -0.037410736, y: -0.12009621, z: 0}
-  - {x: -0.22014523, y: -0.1251049, z: 0}
 --- !u!1 &1817783425956238092
 GameObject:
   m_ObjectHideFlags: 0
@@ -554,10 +466,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 1.5
   intensityVariance: 0.3
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 1
 --- !u!1 &2290480218055326072
 GameObject:
@@ -5109,10 +5020,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 1.5
   intensityVariance: 0.3
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 1
 --- !u!1 &2869329790515873994
 GameObject:
@@ -5493,10 +5403,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 1.5
   intensityVariance: 0.3
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 1
 --- !u!1 &3078253189998103495
 GameObject:
@@ -75982,8 +75891,6 @@ Transform:
   - {fileID: 3901535650910734700}
   - {fileID: 1118047515422849604}
   - {fileID: 3670426276782471741}
-  - {fileID: 5735996213559623626}
-  - {fileID: 3321225895849888208}
   - {fileID: 6315907428122740232}
   m_Father: {fileID: 3453180495944154785}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -76084,10 +75991,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 1.5
   intensityVariance: 1
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 1
 --- !u!1 &3713272648576131600
 GameObject:
@@ -76445,10 +76351,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 1.5
   intensityVariance: 0.3
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 1
 --- !u!1 &4963095647070390475
 GameObject:
@@ -76564,10 +76469,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 2
   intensityVariance: 0.3
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 4
 --- !u!1 &5105089086706209836
 GameObject:
@@ -76799,10 +76703,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 1.5
   intensityVariance: 0.3
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 1
 --- !u!1 &5627394117701250546
 GameObject:
@@ -76901,10 +76804,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 1.5
   intensityVariance: 0.3
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 1
 --- !u!1 &5814735572351243268
 GameObject:
@@ -78073,7 +77975,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 21
-      m_TileSpriteIndex: 22
+      m_TileSpriteIndex: 23
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -79502,10 +79404,10 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 1
-    m_Data: {fileID: 25367656, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
   - m_RefCount: 0
     m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: 25367656, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: -495934561, guid: 37f5dd147de8be9468ff8642d3e735e8, type: 3}
   - m_RefCount: 1
@@ -79804,10 +79706,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 1.5
   intensityVariance: 0.3
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 1
 --- !u!1 &6765938697158903694
 GameObject:
@@ -80249,10 +80150,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 1.5
   intensityVariance: 0.3
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 1
 --- !u!1 &8426631730785246370
 GameObject:
@@ -80351,10 +80251,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 1.5
   intensityVariance: 0.3
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 1
 --- !u!1 &8697644800442258062
 GameObject:
@@ -80581,99 +80480,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed1be91420f446018eaaf1857a80689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightFlicker
-  baseIntensity: 1.5
   intensityVariance: 0.3
-  baseOuterRadius: 3
   radiusVariance: 0.2
+  positionJitter: 0.05
   flickerSpeed: 1
---- !u!1 &8856522174332110069
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3321225895849888208}
-  - component: {fileID: 3701608077230383709}
-  m_Layer: 0
-  m_Name: Sprite Light 2D (3)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3321225895849888208
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8856522174332110069}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 20.689, y: 14.279, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1980292253116098423}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3701608077230383709
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8856522174332110069}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.Light2D
-  m_ComponentVersion: 2
-  m_LightType: 1
-  m_BlendStyleIndex: 0
-  m_FalloffIntensity: 1
-  m_Color: {r: 0.764151, g: 0.764151, b: 0.764151, a: 1}
-  m_Intensity: 0.5
-  m_LightVolumeIntensity: 1
-  m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 00000000f7a4fdcfffdadb84
-  m_LightCookieSprite: {fileID: 21300000, guid: 119f93d0bcbf1e743bf5fcf237507d39, type: 3}
-  m_DeprecatedPointLightCookieSprite: {fileID: 0}
-  m_LightOrder: 0
-  m_AlphaBlendOnOverlap: 0
-  m_OverlapOperation: 0
-  m_NormalMapDistance: 3
-  m_NormalMapQuality: 2
-  m_UseNormalMap: 0
-  m_ShadowsEnabled: 1
-  m_ShadowIntensity: 0.75
-  m_ShadowSoftness: 0.3
-  m_ShadowSoftnessFalloffIntensity: 0.5
-  m_ShadowVolumeIntensityEnabled: 0
-  m_ShadowVolumeIntensity: 0.75
-  m_LocalBounds:
-    m_Center: {x: 0.030550003, y: -0.030799985, z: 0}
-    m_Extent: {x: 0.75045, y: 0.9059, z: 0}
-  m_PointLightInnerAngle: 360
-  m_PointLightOuterAngle: 360
-  m_PointLightInnerRadius: 0
-  m_PointLightOuterRadius: 1
-  m_ShapeLightParametricSides: 5
-  m_ShapeLightParametricAngleOffset: 0
-  m_ShapeLightParametricRadius: 1
-  m_ShapeLightFalloffSize: 0.5
-  m_ShapeLightFalloffOffset: {x: 0, y: 0}
-  m_ShapePath:
-  - {x: -0.22012806, y: -0.435503, z: 0}
-  - {x: 0.28084183, y: -0.43754005, z: 0}
-  - {x: 0.27996063, y: -0.12470913, z: 0}
-  - {x: 0.092336655, y: -0.12319279, z: 0}
-  - {x: 0.09227371, y: 0.37459564, z: 0}
-  - {x: -0.032859802, y: 0.37235928, z: 0}
-  - {x: -0.037410736, y: -0.12009621, z: 0}
-  - {x: -0.22014523, y: -0.1251049, z: 0}
 --- !u!1001 &2737196627658838867
 PrefabInstance:
   m_ObjectHideFlags: 0

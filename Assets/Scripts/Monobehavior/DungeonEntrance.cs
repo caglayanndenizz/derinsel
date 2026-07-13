@@ -3,8 +3,7 @@ using UnityEngine;
 public class DungeonEntrance : MonoBehaviour
 {
     [Header("Referanslar")]
-    public DungeonGenerator generator; 
-    public GameObject interactionUI;  
+    public GameObject interactionUI;
 
     private bool isPlayerNearby = false;
 
@@ -34,16 +33,15 @@ public class DungeonEntrance : MonoBehaviour
 
     public void OnAcceptEnter()
     {
-        if (isPlayerNearby)
-        {
-            interactionUI.SetActive(false);
-            generator.GenerateDungeon();
-            gameObject.SetActive(false);
-        }
+        if (!isPlayerNearby) return;
+
+        if (interactionUI != null) interactionUI.SetActive(false);
+        gameObject.SetActive(false);
+        LevelManager.Instance?.LoadFirstLevel();
     }
 
     public void OnDeclineEnter()
     {
-        interactionUI.SetActive(false);
+        if (interactionUI != null) interactionUI.SetActive(false);
     }
 }

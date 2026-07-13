@@ -12,7 +12,6 @@ public class RoomWaveController : MonoBehaviour
     public static RoomWaveController Instance { get; private set; }
 
     [Header("References")]
-    [SerializeField] private DungeonGenerator dungeonGenerator;
     [SerializeField] private EnemyObjectPooler enemyPooler;
 
     [Header("Floor Wave Configs")]
@@ -45,8 +44,6 @@ public class RoomWaveController : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        if (dungeonGenerator == null)
-            dungeonGenerator = Object.FindAnyObjectByType<DungeonGenerator>();
         if (enemyPooler == null)
             enemyPooler = EnemyObjectPooler.Instance ?? Object.FindAnyObjectByType<EnemyObjectPooler>();
     }
@@ -151,7 +148,7 @@ public class RoomWaveController : MonoBehaviour
         }
 
         _wavesRunning = false;
-        dungeonGenerator?.OnAllWavesCleared();
+        LevelManager.Instance?.OnMiniBossKilled();
     }
 
     private IEnumerator NextWaveAfterDelay(WaveDefinition wave)
@@ -182,7 +179,7 @@ public class RoomWaveController : MonoBehaviour
 
         // No wave tracking in fallback mode; disable wave system so DungeonGenerator's
         // Update() tag-check can take over.
-        dungeonGenerator?.OnAllWavesCleared();
+        LevelManager.Instance?.OnMiniBossKilled();
     }
 
     private List<(Enemy.EnemyType type, Vector3 pos)> BuildSpawnList(WaveDefinition wave)

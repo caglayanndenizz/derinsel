@@ -50,22 +50,24 @@ public partial class Player
 
     private void ScheduleLongbowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
     {
+        // Lock attackPoint position at fire time so direction stays correct after delay.
+        Vector2 fireOrigin = attackPoint != null ? (Vector2)attackPoint.position : Vector2.zero;
         float delay = Mathf.Max(0f, longbowArrowReleaseDelay);
         if (delay <= 0f)
         {
-            SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
+            SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin);
             return;
         }
-        StartCoroutine(LongbowArrowSpawnAfterDelay(delay, damage, useBowChargedMultiplier, aimWorldAtFireInput));
+        StartCoroutine(LongbowArrowSpawnAfterDelay(delay, damage, useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin));
     }
 
-    private IEnumerator LongbowArrowSpawnAfterDelay(float delaySeconds, float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+    private IEnumerator LongbowArrowSpawnAfterDelay(float delaySeconds, float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput, Vector2 fireOrigin)
     {
         yield return new WaitForSeconds(delaySeconds);
-        SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput);
+        SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin);
     }
 
-    private void SpawnArrowTowardWorld(float damage, bool useBowChargedMultiplier, Vector2 targetWorld)
+    private void SpawnArrowTowardWorld(float damage, bool useBowChargedMultiplier, Vector2 targetWorld, Vector2 directionOrigin)
     {
         if (arrowPrefab == null || attackPoint == null) return;
 
@@ -79,7 +81,8 @@ public partial class Player
         float useDamage    = damage * dmgMult;
 
         Vector2 origin = attackPoint.position;
-        Vector2 offset = targetWorld - origin;
+        // Direction is calculated from fire-time origin to avoid flip/movement errors during delay.
+        Vector2 offset = targetWorld - directionOrigin;
         if (offset.sqrMagnitude < 0.0001f) offset = Vector2.right * 0.01f;
         Vector2 dir = offset.normalized;
         float targetDistance = Mathf.Max(0.5f, offset.magnitude);

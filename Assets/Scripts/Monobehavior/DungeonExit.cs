@@ -82,10 +82,7 @@ public class DungeonExit : MonoBehaviour
             return;
         }
 
-        if (exitAction == ExitAction.NextFloor)
-            dungeonGenerator.StartNextFloorTransition();
-        else
-            dungeonGenerator.StartExitTransition();
+        dungeonGenerator.StartNextFloorTransition();
     }
 
 }

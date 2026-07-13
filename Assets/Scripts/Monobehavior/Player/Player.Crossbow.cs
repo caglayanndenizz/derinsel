@@ -23,18 +23,20 @@ public partial class Player
 
     private void ScheduleCrossbowBolt(float damage, Vector2 aimWorld)
     {
+        // Lock attackPoint position at fire time so direction stays correct after delay.
+        Vector2 fireOrigin = attackPoint != null ? (Vector2)attackPoint.position : Vector2.zero;
         float delay = Mathf.Max(0f, crossbowBoltReleaseDelay);
-        if (delay <= 0f) { SpawnCrossbowBolt(damage, aimWorld); return; }
-        StartCoroutine(CrossbowBoltSpawnAfterDelay(delay, damage, aimWorld));
+        if (delay <= 0f) { SpawnCrossbowBolt(damage, aimWorld, fireOrigin); return; }
+        StartCoroutine(CrossbowBoltSpawnAfterDelay(delay, damage, aimWorld, fireOrigin));
     }
 
-    private IEnumerator CrossbowBoltSpawnAfterDelay(float delay, float damage, Vector2 aimWorld)
+    private IEnumerator CrossbowBoltSpawnAfterDelay(float delay, float damage, Vector2 aimWorld, Vector2 fireOrigin)
     {
         yield return new WaitForSeconds(delay);
-        SpawnCrossbowBolt(damage, aimWorld);
+        SpawnCrossbowBolt(damage, aimWorld, fireOrigin);
     }
 
-    private void SpawnCrossbowBolt(float damage, Vector2 aimWorld)
+    private void SpawnCrossbowBolt(float damage, Vector2 aimWorld, Vector2 directionOrigin)
     {
         if (attackPoint == null) return;
 
@@ -44,7 +46,8 @@ public partial class Player
         float useDamage = damage * dmgMult;
 
         Vector2 origin = attackPoint.position;
-        Vector2 offset = aimWorld - origin;
+        // Direction calculated from fire-time origin to avoid flip/movement errors during delay.
+        Vector2 offset = aimWorld - directionOrigin;
         if (offset.sqrMagnitude < 0.0001f) offset = Vector2.right * 0.01f;
         Vector2 dir = offset.normalized;
         float targetDistance = Mathf.Max(0.5f, offset.magnitude);
