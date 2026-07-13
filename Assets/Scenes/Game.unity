@@ -2275,7 +2275,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!224 &816801428
 RectTransform:
@@ -2310,7 +2310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TransitionFader
   canvasGroup: {fileID: 816801430}
-  fadeDuration: 1
+  fadeDuration: 0.5
   blockRaycastsDuringFade: 1
 --- !u!225 &816801430
 CanvasGroup:
@@ -4524,7 +4524,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1764338251}
-  - component: {fileID: 1764338250}
   m_Layer: 0
   m_Name: WaveManager
   m_TagString: Untagged
@@ -4532,26 +4531,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1764338250
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1764338249}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d119757b1cb64bc2b587d4d679c0f79, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RoomWaveController
-  enemyPooler: {fileID: 1679956769}
-  floorConfigs:
-  - {fileID: 11400000, guid: ece3f20be4b1e4f5ead122146edb58d5, type: 2}
-  - {fileID: 11400000, guid: 8b3e27cbbcb8141bfa4d75cb4b584861, type: 2}
-  - {fileID: 11400000, guid: 688dba18e2b2c4d7e8673cd3f7ba0fbd, type: 2}
-  - {fileID: 11400000, guid: 9a404593f55644830b985cdc5572c5ec, type: 2}
-  delayBetweenWaves: 1.5
-  fallbackEnemyCount: 8
 --- !u!4 &1764338251
 Transform:
   m_ObjectHideFlags: 0
@@ -6037,6 +6016,10 @@ PrefabInstance:
       propertyPath: interactionUI
       value: 
       objectReference: {fileID: 119007987}
+    - target: {fileID: 4652952364623199263, guid: e9133290db3fe8244b03e6064a99e160, type: 3}
+      propertyPath: uiFadeDuration
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 4979736000352713042, guid: e9133290db3fe8244b03e6064a99e160, type: 3}
       propertyPath: m_Name
       value: Dungeon Entrance

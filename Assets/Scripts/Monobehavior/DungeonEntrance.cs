@@ -5,6 +5,7 @@ public class DungeonEntrance : MonoBehaviour
     [Header("Referanslar")]
     public GameObject interactionUI;
 
+    private bool _accepted = false;
     private bool isPlayerNearby = false;
 
     void Start()
@@ -15,6 +16,7 @@ public class DungeonEntrance : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (_accepted) return;
         if (other.CompareTag("Player"))
         {
             isPlayerNearby = true;
@@ -33,10 +35,10 @@ public class DungeonEntrance : MonoBehaviour
 
     public void OnAcceptEnter()
     {
-        if (!isPlayerNearby) return;
+        if (!isPlayerNearby || _accepted) return;
 
+        _accepted = true;
         if (interactionUI != null) interactionUI.SetActive(false);
-        gameObject.SetActive(false);
         LevelManager.Instance?.LoadFirstLevel();
     }
 
