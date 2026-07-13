@@ -140,7 +140,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -2062459578, guid: ae0a268378c197a40836013dcaa951b9, type: 3}
+  m_Sprite: {fileID: -1408436710, guid: ae0a268378c197a40836013dcaa951b9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -288,6 +288,90 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1 &1405766682168010127
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4402650221786493611}
+  - component: {fileID: 1796379227469820888}
+  m_Layer: 0
+  m_Name: PlayerLight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4402650221786493611
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1405766682168010127}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1445455240794291464}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &1796379227469820888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1405766682168010127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.Light2D
+  m_ComponentVersion: 2
+  m_LightType: 3
+  m_BlendStyleIndex: 0
+  m_FalloffIntensity: 0.5
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 1
+  m_LightVolumeIntensity: 1
+  m_LightVolumeEnabled: 0
+  m_ApplyToSortingLayers: 00000000f7a4fdcfffdadb84
+  m_LightCookieSprite: {fileID: 0}
+  m_DeprecatedPointLightCookieSprite: {fileID: 0}
+  m_LightOrder: 0
+  m_AlphaBlendOnOverlap: 0
+  m_OverlapOperation: 0
+  m_NormalMapDistance: 3
+  m_NormalMapQuality: 2
+  m_UseNormalMap: 0
+  m_ShadowsEnabled: 1
+  m_ShadowIntensity: 0.75
+  m_ShadowSoftness: 0.3
+  m_ShadowSoftnessFalloffIntensity: 0.5
+  m_ShadowVolumeIntensityEnabled: 0
+  m_ShadowVolumeIntensity: 0.75
+  m_LocalBounds:
+    m_Center: {x: 0, y: -0.00000011920929, z: 0}
+    m_Extent: {x: 0.9985302, y: 0.99853027, z: 0}
+  m_PointLightInnerAngle: 360
+  m_PointLightOuterAngle: 360
+  m_PointLightInnerRadius: 0
+  m_PointLightOuterRadius: 1
+  m_ShapeLightParametricSides: 5
+  m_ShapeLightParametricAngleOffset: 0
+  m_ShapeLightParametricRadius: 1
+  m_ShapeLightFalloffSize: 0.5
+  m_ShapeLightFalloffOffset: {x: 0, y: 0}
+  m_ShapePath:
+  - {x: -0.5, y: -0.5, z: 0}
+  - {x: 0.5, y: -0.5, z: 0}
+  - {x: 0.5, y: 0.5, z: 0}
+  - {x: -0.5, y: 0.5, z: 0}
 --- !u!1 &2397508272434322654
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,7 +695,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 7
   m_Sprite: {fileID: -219742340364353706, guid: cf2a0874d53717747889c57a26521c37, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -730,6 +814,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1445455240794291464}
   - component: {fileID: 8065734436094031504}
+  - component: {fileID: 6503687583984296382}
+  - component: {fileID: 3820127437461864083}
+  - component: {fileID: 5610950964264296312}
+  - component: {fileID: 3368341711262196754}
+  - component: {fileID: 1213795939226200453}
   - component: {fileID: 2498132936826151563}
   - component: {fileID: 843639116177421086}
   - component: {fileID: 1514579499696216982}
@@ -759,6 +848,7 @@ Transform:
   - {fileID: 7198533950980055540}
   - {fileID: 7816862297080185812}
   - {fileID: 3998264616438826122}
+  - {fileID: 4402650221786493611}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8065734436094031504
@@ -807,7 +897,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -2065966337
   m_SortingLayer: 2
-  m_SortingOrder: 1
+  m_SortingOrder: 7
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -819,6 +909,141 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &6503687583984296382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7512604712775791757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da5c657ed4df80d43a6108b6141684a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerImpactFeedback
+  hitStopManager: {fileID: 0}
+  lightHitStopTimeScale: 0.14
+  lightHitStopDuration: 0.02
+  heavyHitStopTimeScale: 0.08
+  heavyHitStopDuration: 0.045
+  lightHitImpulse: {fileID: 0}
+  hitVfxPrefab: {fileID: 0}
+  hitAudioSource: {fileID: 0}
+  lightHitSfx: {fileID: 0}
+  heavyHitSfx: {fileID: 0}
+  lightHitPitch: 0.92
+  heavyHitPitch: 0.82
+  hitVfxLifetime: 2
+--- !u!114 &3820127437461864083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7512604712775791757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eeb881971e066084ba1e703b735fd7a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLevel
+  baseExpForLevel2: 60
+  xpGrowthRatePerLevel: 1.3
+  experienceCount: 0
+  currentLevel: 1
+  requiredExperienceForNextLevel: 100
+--- !u!114 &5610950964264296312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7512604712775791757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6c877c69abf4d643ad418bcce8c2516, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAugmentController
+  movementSpeedBonus: 0
+  luckMultiplier: 1
+  incomingDamageReduction: 0
+  outgoingDamageMultiplier: 1
+  maxHealthMultiplier: 1
+  flatMaxHealthBonus: 0
+  hasExtraAugmentSlotUnlock: 0
+  hasHammerChargeUnlock: 0
+  hasHammerChargeDamageReductionUnlock: 0
+  hammerChargeMultiplier: 1
+  hammerAoeRadiusBonus: 0
+  hammerFreezeDuration: 0
+  hammerSlamCooldownMultiplier: 1
+  hammerLightDamageMultiplier: 1
+  hammerLightRateMultiplier: 1
+  hammerMagnetRadius: 6
+  hammerMagnetPullSpeed: 7
+  hammerChargeFullStopDuration: 1.2
+  hasChargedLongbowAoe: 0
+  chargedLongbowAoeRadius: 3
+  hasTripleArrowUnlock: 0
+  longbowAoeRadiusBonus: 0
+  hasArrowSizeUnlock: 0
+  hasVampiricArrowUnlock: 0
+  projectileShotBonusCount: 0
+  arrowProjectileSpeedMultiplier: 1
+  hasLongbowFreezeUnlock: 0
+  longbowFreezeDuration: 0
+  frozenEnemyVulnerabilityMultiplier: 1
+  hasFireArrowUnlock: 0
+  fireDotDuration: 3
+  fireDotDamagePerSecond: 2
+  hasPoisonArrowUnlock: 0
+  poisonDotDuration: 5
+  poisonDotDamagePerSecond: 1.5
+  hasCrossbowBoltPierce: 0
+  crossbowPierceDamageFalloff: 0.2
+  crossbowPierceDamageFloor: 0.3
+  crossbowPierceFalloffCount: 3
+  hasCrossbowBoltBleed: 0
+  crossbowBleedDamageRatioPerStack: 0.01
+  crossbowBleedMaxStacks: 5
+  crossbowBleedExpireSeconds: 5
+  unlockDatabase: {fileID: 11400000, guid: 8a4b742d450e24d66b2b1249d1692152, type: 2}
+  mutationAugmentsLongbow: 0
+  longbowGemCountDebug: 0
+  longbowGemTierDebug: 
+--- !u!114 &3368341711262196754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7512604712775791757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df90236793f38bf40bf97cf806e9f7a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCurrency
+  goldCount: 0
+--- !u!114 &1213795939226200453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7512604712775791757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 969a95253d56643dd91f69a9a6baea31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallLootHandler
+  wallLootDropGateChance: 0.05
+  wallLootGoldChance: 0.3
+  wallLootExpChance: 0.5
+  wallLootHealingPotionChance: 0.2
+  wallLootExpValue: 5
+  maxGoldPerRoom: 10
+  maxExpOrbsPerRoom: 10
+  maxHealingPotionsPerRoom: 2
+  healingPotionPrefab: {fileID: 5071090204471560867, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
 --- !u!114 &2498132936826151563
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -831,58 +1056,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ebcce7fd447a5846811d503b88550c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
+  crossbowBoltPrefab: {fileID: 2482262364273775424, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
+  crossbowAttackRate: 0.5
+  crossbowBoltReleaseDelay: 0.3
+  crossbowBoltSpeedMultiplier: 2
+  crossbowBoltMaxLifetime: 5
   stats: {fileID: 11400000, guid: 51a62771fc2e9484a9150bcbc472472f, type: 2}
   generator: {fileID: 0}
-  maxChargeTime: 0.5
-  hammerAOE: 2.5
-  hammerCooldown: 3
-  heavyChargeFullDamageReduction: 0.5
-  heavyImpactFallbackDelay: 0.17
-  arrowPrefab: {fileID: 7915370314391698887, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
-  arrowSpeed: 14
-  arrowMaxLifetime: 8
-  aimCamera: {fileID: 0}
-  bowArrowReleaseDelay: 0.3
-  bowChargedSpeedDamageMultiplier: 3
-  maxBowChargeTime: 0.5
-  bowChargeMeter: {fileID: 911403621568502592}
-  bowMeterCanvas: {fileID: 2397508272434322654}
-  radialBowAutoVolleyIntervalSeconds: 1
-  autoArrowVolleyCount: 8
-  autoArrowVolleyAngleStepDegrees: 45
-  radialBowSpawnInset: 0.2
-  radialBowAutoVolleyTravelDistance: 8
-  lightAttackRate: 0.2
-  lightAttackDuration: 0.1
-  lightImpactFallbackDelay: 0.7
-  dungeonEntryBaseSpeedMultiplier: 1.25
   damageInvulnerabilityDuration: 0.2
   attackPoint: {fileID: 8790453129827999283}
   animator: {fileID: 3626925181394866402}
   enemyLayers:
     serializedVersion: 2
-    m_Bits: 64
-  goldCount: 0
-  experienceCount: 0
-  requiredExperienceForNextLevel: 100
-  currentLevel: 1
+    m_Bits: 320
+  dashDistance: 3
+  dashCooldown: 10
+  dashAlphaFlashDuration: 0.1
+  dashFlashTarget: {fileID: 0}
+  dashCooldownBar: {fileID: 0}
+  dashCooldownCanvas: {fileID: 0}
+  showDashCooldownBarWhenReady: 1
+  maxChargeTime: 0.5
+  hammerAOE: 2.5
+  hammerCooldown: 3
+  heavyImpactFallbackDelay: 0.17
+  hammerChargeStartDelay: 0.5
+  hammerLightAttackRate: 0.4
+  hammerLightAoe: 1.1
+  hammerLightFallbackDelay: 0.15
+  lightAttackRate: 0.2
+  lightAttackDuration: 0.1
+  lightImpactFallbackDelay: 0.7
   hammerCooldownBar: {fileID: 0}
   hammerCooldownCanvas: {fileID: 0}
   showCooldownBarWhenReady: 1
   chargeMeter: {fileID: 8427204553392215787}
   meterCanvas: {fileID: 1332627934314262385}
-  hitStopManager: {fileID: 0}
-  lightHitStopTimeScale: 0.06
-  lightHitStopDuration: 0.035
-  heavyHitStopTimeScale: 0.02
-  heavyHitStopDuration: 0.08
-  lightHitImpulse: {fileID: 0}
-  hitVfxPrefab: {fileID: 0}
-  hitAudioSource: {fileID: 0}
-  lightHitSfx: {fileID: 0}
-  heavyHitSfx: {fileID: 0}
-  lightHitPitch: 0.92
-  heavyHitPitch: 0.82
+  arrowPrefab: {fileID: 7915370314391698887, guid: 14e74848eb9e0b84788966f4f048922c, type: 3}
+  arrowSpeed: 14
+  arrowMaxLifetime: 8
+  aimCamera: {fileID: 0}
+  longbowArrowReleaseDelay: 0.4
+  longbowChargedSpeedDamageMultiplier: 3
+  maxLongbowChargeTime: 0.5
+  longbowChargeMeter: {fileID: 0}
+  longbowMeterCanvas: {fileID: 0}
+  radialLongbowAutoVolleyIntervalSeconds: 1
+  autoArrowVolleyCount: 8
+  autoArrowVolleyAngleStepDegrees: 45
+  radialLongbowSpawnInset: 0.2
+  radialLongbowAutoVolleyTravelDistance: 8
 --- !u!50 &843639116177421086
 Rigidbody2D:
   serializedVersion: 5

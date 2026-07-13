@@ -1466,7 +1466,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.3
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000ffdadb84f7a4fdcf
@@ -4362,11 +4362,10 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1445455240794291464, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
   m_PrefabInstance: {fileID: 214915947830347461}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1700128196
+--- !u!114 &1700128196 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 3820127437461864083, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+  m_PrefabInstance: {fileID: 214915947830347461}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1700128186}
   m_Enabled: 1
@@ -4374,54 +4373,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eeb881971e066084ba1e703b735fd7a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLevel
-  baseExpForLevel2: 60
-  xpGrowthRatePerLevel: 1.3
-  experienceCount: 0
-  currentLevel: 1
-  requiredExperienceForNextLevel: 100
---- !u!114 &1700128197
+--- !u!114 &1700128199 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1700128186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da5c657ed4df80d43a6108b6141684a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerImpactFeedback
-  hitStopManager: {fileID: 0}
-  lightHitStopTimeScale: 0.14
-  lightHitStopDuration: 0.02
-  heavyHitStopTimeScale: 0.08
-  heavyHitStopDuration: 0.045
-  lightHitImpulse: {fileID: 0}
-  hitVfxPrefab: {fileID: 0}
-  hitAudioSource: {fileID: 0}
-  lightHitSfx: {fileID: 0}
-  heavyHitSfx: {fileID: 0}
-  lightHitPitch: 0.92
-  heavyHitPitch: 0.82
-  hitVfxLifetime: 2
---- !u!114 &1700128198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1700128186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df90236793f38bf40bf97cf806e9f7a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerCurrency
-  goldCount: 0
---- !u!114 &1700128199
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 5610950964264296312, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+  m_PrefabInstance: {fileID: 214915947830347461}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1700128186}
   m_Enabled: 1
@@ -4429,74 +4384,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6c877c69abf4d643ad418bcce8c2516, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAugmentController
-  movementSpeedBonus: 0
-  luckMultiplier: 1
-  incomingDamageReduction: 0
-  outgoingDamageMultiplier: 1
-  maxHealthMultiplier: 1
-  flatMaxHealthBonus: 0
-  hasExtraAugmentSlotUnlock: 0
-  hasHammerChargeUnlock: 0
-  hasHammerChargeDamageReductionUnlock: 0
-  hammerChargeMultiplier: 1
-  hammerAoeRadiusBonus: 0
-  hammerFreezeDuration: 0
-  hammerSlamCooldownMultiplier: 1
-  hammerLightDamageMultiplier: 1
-  hammerLightRateMultiplier: 1
-  hammerMagnetRadius: 6
-  hammerMagnetPullSpeed: 7
-  hammerChargeFullStopDuration: 1.2
-  hasChargedLongbowAoe: 0
-  chargedLongbowAoeRadius: 3
-  hasTripleArrowUnlock: 0
-  longbowAoeRadiusBonus: 0
-  hasArrowSizeUnlock: 0
-  hasVampiricArrowUnlock: 0
-  projectileShotBonusCount: 0
-  arrowProjectileSpeedMultiplier: 1
-  hasLongbowFreezeUnlock: 0
-  longbowFreezeDuration: 0
-  frozenEnemyVulnerabilityMultiplier: 1
-  hasFireArrowUnlock: 0
-  fireDotDuration: 3
-  fireDotDamagePerSecond: 2
-  hasPoisonArrowUnlock: 0
-  poisonDotDuration: 5
-  poisonDotDamagePerSecond: 1.5
-  hasCrossbowBoltPierce: 0
-  crossbowPierceDamageFalloff: 0.2
-  crossbowPierceDamageFloor: 0.3
-  crossbowPierceFalloffCount: 3
-  hasCrossbowBoltBleed: 0
-  crossbowBleedDamageRatioPerStack: 0.01
-  crossbowBleedMaxStacks: 5
-  crossbowBleedExpireSeconds: 5
-  unlockDatabase: {fileID: 11400000, guid: 8a4b742d450e24d66b2b1249d1692152, type: 2}
-  mutationAugmentsLongbow: 0
-  longbowGemCountDebug: 0
-  longbowGemTierDebug: 
---- !u!114 &1700128204
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1700128186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 969a95253d56643dd91f69a9a6baea31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WallLootHandler
-  wallLootDropGateChance: 0.05
-  wallLootGoldChance: 0.3
-  wallLootExpChance: 0.5
-  wallLootHealingPotionChance: 0.2
-  wallLootExpValue: 5
-  maxGoldPerRoom: 10
-  maxExpOrbsPerRoom: 10
-  maxHealingPotionsPerRoom: 2
-  healingPotionPrefab: {fileID: 5071090204471560867, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
 --- !u!1 &1730437410
 GameObject:
   m_ObjectHideFlags: 0
@@ -5851,30 +5738,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 213991786953616355, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 254655886362368020, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 320444626900081384, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_SortingOrder
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 800428578735404159, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: -1408436710, guid: ae0a268378c197a40836013dcaa951b9, type: 3}
-    - target: {fileID: 826531781291267238, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1332627934314262385, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1445455240794291464, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -5915,9 +5778,13 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2397508272434322654, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
+    - target: {fileID: 1796379227469820888, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_Intensity
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1796379227469820888, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_PointLightOuterRadius
+      value: 2.0153794
       objectReference: {fileID: 0}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: aimCamera
@@ -5928,108 +5795,37 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 465123767}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: hammerLightAoe
-      value: 1.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: maxBowChargeTime
-      value: 0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: grappleBoltPrefab
-      value: 
-      objectReference: {fileID: 2411174373936254785, guid: 03501f1792e2a4d3493b51a3cd1c991e, type: 3}
-    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: hammerCooldownBar
       value: 
       objectReference: {fileID: 456458915}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: crossbowBoltPrefab
-      value: 
-      objectReference: {fileID: 2482262364273775424, guid: 63722acf32f1b40349e0e6a5da8878d0, type: 3}
-    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: enemyLayers.m_Bits
-      value: 320
-      objectReference: {fileID: 0}
-    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: hammerCooldownCanvas
       value: 
       objectReference: {fileID: 1767116303}
-    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: hammerLightAnimClipDuration
-      value: 0.4
+    - target: {fileID: 4402650221786493611, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 3539615716991133667, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
+    - target: {fileID: 4402650221786493611, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 3566996990873359050, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
+    - target: {fileID: 4402650221786493611, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 4438358461583920752, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5991273114160866731, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6577081127843540114, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
+    - target: {fileID: 4402650221786493611, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7841788350698203598, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8065734436094031504, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_SortingLayer
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8065734436094031504, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_SortingOrder
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 8065734436094031504, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_SortingLayerID
-      value: -2065966337
-      objectReference: {fileID: 0}
-    - target: {fileID: 8260866262171227600, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9145245037588279182, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      insertIndex: 2
-      addedObject: {fileID: 1700128197}
-    - targetCorrespondingSourceObject: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      insertIndex: 3
-      addedObject: {fileID: 1700128196}
-    - targetCorrespondingSourceObject: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      insertIndex: 4
-      addedObject: {fileID: 1700128199}
-    - targetCorrespondingSourceObject: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      insertIndex: 5
-      addedObject: {fileID: 1700128198}
-    - targetCorrespondingSourceObject: {fileID: 7512604712775791757, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
-      insertIndex: 6
-      addedObject: {fileID: 1700128204}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
 --- !u!1001 &425736149327663609
 PrefabInstance:
