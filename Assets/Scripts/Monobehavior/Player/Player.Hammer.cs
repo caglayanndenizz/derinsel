@@ -101,12 +101,6 @@ public partial class Player
         float effectiveHammerAoe = hammerAOE * (playerAugmentController != null ? playerAugmentController.HammerAoeRadiusMultiplier : 1f);
         float hammerFreezeDuration = playerAugmentController != null ? playerAugmentController.HammerFreezeDuration : 0f;
 
-        if (generator != null)
-        {
-            var brokenWalls = generator.BreakWallsInArea(attackPoint.position, effectiveHammerAoe);
-            wallLootHandler?.TrySpawnWallLootForBrokenWalls(brokenWalls);
-        }
-
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, effectiveHammerAoe, enemyLayers);
         int successfulHits = 0;
         Vector3 firstHitPosition = attackPoint.position;

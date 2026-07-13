@@ -1261,53 +1261,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!1 &465123766
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 465123768}
-  - component: {fileID: 465123767}
-  m_Layer: 0
-  m_Name: Generator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &465123767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 465123766}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 105033a3f631dcf4081ecec6b106114e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DungeonGenerator
-  wallTilemap: {fileID: 0}
-  floorTilemap: {fileID: 0}
-  floorTile: {fileID: 11400000, guid: d29b31cfc14636447a4df92ff118f762, type: 2}
---- !u!4 &465123768
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 465123766}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 33.52323, y: -13.38161, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1295312150}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &542447882
 GameObject:
   m_ObjectHideFlags: 0
@@ -1825,9 +1778,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 465123767}
-        m_TargetAssemblyTypeName: DungeonGenerator, Assembly-CSharp
-        m_MethodName: StartDungeonTransition
+      - m_Target: {fileID: 1575127066}
+        m_TargetAssemblyTypeName: DungeonEntrance, Assembly-CSharp
+        m_MethodName: OnAcceptEnter
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3096,11 +3049,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 619394802}
   - {fileID: 171513029}
-  - {fileID: 465123768}
   - {fileID: 273267496}
   - {fileID: 711965915}
-  - {fileID: 619394802}
   - {fileID: 1451887778}
   - {fileID: 1764338251}
   - {fileID: 2061067775}
@@ -5793,7 +5745,7 @@ PrefabInstance:
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: generator
       value: 
-      objectReference: {fileID: 465123767}
+      objectReference: {fileID: 0}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: hammerCooldownBar
       value: 
@@ -5838,7 +5790,7 @@ PrefabInstance:
     - target: {fileID: 4652952364623199263, guid: e9133290db3fe8244b03e6064a99e160, type: 3}
       propertyPath: generator
       value: 
-      objectReference: {fileID: 465123767}
+      objectReference: {fileID: 0}
     - target: {fileID: 4652952364623199263, guid: e9133290db3fe8244b03e6064a99e160, type: 3}
       propertyPath: interactionUI
       value: 

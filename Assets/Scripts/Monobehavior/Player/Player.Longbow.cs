@@ -188,7 +188,6 @@ public partial class Player
             transform,
             chargedExplosionEnabled,
             explosionRadius,
-            generator,
             chargedExplosionEnabled ? _defaultImpulseSource : null,
             playerAugmentController != null ? playerAugmentController.LongbowFreezeDuration : 0f,
             playerAugmentController != null && playerAugmentController.HasLongbowFreezeUnlock,

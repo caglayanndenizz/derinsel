@@ -83,9 +83,6 @@ public class ExplosiveObject : MonoBehaviour, IDamageable
 
     private void ApplyExplosionDamage()
     {
-        if (DungeonGenerator.Instance != null)
-            DungeonGenerator.Instance.BreakWallsInArea(transform.position, explosionRadius);
-
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
         HashSet<int> processed = new HashSet<int>();
 

@@ -31,10 +31,8 @@ public class PlayerArrow : MonoBehaviour
     bool  _hasPoisonArrow;
     float _poisonDotDuration;
     float _poisonDotDps;
-    DungeonGenerator _dungeonGenerator;
     CinemachineImpulseSource _hitCameraImpulse;
     Vector2 _previousFramePosition;
-    WallLootHandler _wallLootHandler;
     Player _player;
     bool   _hasVampiricArrow;
 
@@ -62,7 +60,6 @@ public class PlayerArrow : MonoBehaviour
         Transform ownerRoot,
         bool fullyChargedLongbowExplosion = false,
         float chargedExplosionRadius = 0f,
-        DungeonGenerator dungeonGenerator = null,
         CinemachineImpulseSource hitCameraImpulse = null,
         float freezeDuration = 0f,
         bool hasIceArrow = false,
@@ -91,7 +88,6 @@ public class PlayerArrow : MonoBehaviour
         _hasPoisonArrow    = hasPoisonArrow;
         _poisonDotDuration = poisonDotDuration;
         _poisonDotDps      = poisonDotDps;
-        _dungeonGenerator    = dungeonGenerator;
         _hitCameraImpulse    = hitCameraImpulse;
         _hasVampiricArrow    = hasVampiricArrow;
 
@@ -115,7 +111,6 @@ public class PlayerArrow : MonoBehaviour
 
         if (ownerRoot != null)
         {
-            _wallLootHandler = ownerRoot.GetComponent<WallLootHandler>();
             _player          = ownerRoot.GetComponent<Player>();
 
             var arrowCols = GetComponentsInChildren<Collider2D>(true);
@@ -151,12 +146,7 @@ public class PlayerArrow : MonoBehaviour
 
             if (_fullyChargedLongbowExplosion && _explosionRadius > 0f)
             {
-                Vector2 p = hit.point;
-                List<Vector3> brokenWalls = null;
-                if (_dungeonGenerator != null)
-                    brokenWalls = _dungeonGenerator.BreakWallsInArea(p, _explosionRadius);
-                ApplyChargedExplosionDamage(p);
-                _wallLootHandler?.TrySpawnWallLootForBrokenWalls(brokenWalls);
+                ApplyChargedExplosionDamage(hit.point);
             }
             else
                 TryApplyDirectArrowDamage(hit.collider);

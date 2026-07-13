@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using System.Collections;
 
 public class Enemy : BaseEntity
@@ -43,7 +42,6 @@ public class Enemy : BaseEntity
     public Vector2 patrolForwardWorld = Vector2.up;
     public float patrolWaypointReachDistance = 0.22f;
 
-    private DungeonGenerator _generator;
     private Vector2 _patrolAnchor;
     private int _patrolLegIndex;
 
@@ -132,7 +130,6 @@ public class Enemy : BaseEntity
         _rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        _generator = UnityEngine.Object.FindAnyObjectByType<DungeonGenerator>();
         _originalColor = _spriteRenderer.color;
 
         if (_rb != null)
@@ -304,12 +301,6 @@ public class Enemy : BaseEntity
 
     private bool IsNavigationBlockedAt(Vector2 worldPos)
     {
-        if (_generator != null && _generator.wallTilemap != null)
-        {
-            Vector3Int cellPos = _generator.wallTilemap.WorldToCell(worldPos);
-            if (_generator.wallTilemap.HasTile(cellPos)) return true;
-        }
-
         const float probeRadius = 0.12f;
         Collider2D hit = Physics2D.OverlapCircle(worldPos, probeRadius, blockingEnvironmentMask);
         if (hit == null) return false;
@@ -323,30 +314,7 @@ public class Enemy : BaseEntity
 
     private Vector2 GetValidGoldSpawnPosition(Vector2 desiredPosition)
     {
-        if (_generator == null || _generator.floorTilemap == null) return desiredPosition;
-
-        Tilemap floorTilemap = _generator.floorTilemap;
-        Vector3Int centerCell = floorTilemap.WorldToCell(desiredPosition);
-
-        if (floorTilemap.HasTile(centerCell))
-            return floorTilemap.GetCellCenterWorld(centerCell);
-
-        const int maxRadius = 2;
-        for (int radius = 1; radius <= maxRadius; radius++)
-        {
-            for (int x = -radius; x <= radius; x++)
-            {
-                for (int y = -radius; y <= radius; y++)
-                {
-                    if (Mathf.Abs(x) != radius && Mathf.Abs(y) != radius) continue;
-                    Vector3Int candidateCell = centerCell + new Vector3Int(x, y, 0);
-                    if (floorTilemap.HasTile(candidateCell))
-                        return floorTilemap.GetCellCenterWorld(candidateCell);
-                }
-            }
-        }
-
-        return _lastSafeWorldPosition;
+        return desiredPosition;
     }
 
     private Vector2 GetAvoidanceDirection(Vector2 currentDir)

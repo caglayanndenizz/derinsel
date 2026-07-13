@@ -9,9 +9,6 @@ public partial class Player : BaseEntity, IPlayerContext
     [Header("Data Reference")]
     [SerializeField] private EntityStats stats;
 
-    [Header("External References")]
-    public DungeonGenerator generator;
-
     [Header("Damage")]
     [SerializeField] private float damageInvulnerabilityDuration = 0.2f;
 
