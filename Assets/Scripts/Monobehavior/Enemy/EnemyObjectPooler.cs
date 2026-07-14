@@ -25,7 +25,7 @@ public class EnemyObjectPooler : MonoBehaviour
     [SerializeField] private List<EnemyTypePrefabEntry> typedPrefabs = new List<EnemyTypePrefabEntry>();
 
     [Header("Linked Poolers")]
-    [Tooltip("If empty, Gold / Experience / Projectile poolers are searched in the scene (including inactive).")]
+    [Tooltip("If empty, Gold / Experience / Projectile poolers are searched in the scene (including inactive). They are activated once at startup and never toggled off — loot dropped in the world lives under them.")]
     [SerializeField] private GoldLootPooler linkedGoldLootPooler;
     [SerializeField] private ExperienceLootPooler linkedExperienceLootPooler;
     [SerializeField] private EnemyProjectilePooler linkedProjectilePooler;
@@ -37,8 +37,13 @@ public class EnemyObjectPooler : MonoBehaviour
     private readonly Dictionary<Enemy.EnemyType, Queue<GameObject>>   _typedAvailable = new();
     private readonly Dictionary<Enemy.EnemyType, HashSet<GameObject>> _typedQueued    = new();
 
+    // Which typed pool each instance was created for. Instances not in this map
+    // belong to the generic pool — ReturnEnemy must not guess by enemyType,
+    // otherwise generic-pool enemies migrate into typed pools and the generic
+    // pool drains permanently.
+    private readonly Dictionary<GameObject, Enemy.EnemyType> _typedPoolMembership = new();
+
     private List<GameObject> _validPrefabCache;
-    private int _leasedActiveEnemyCount;
 
     private void Awake()
     {
@@ -62,7 +67,7 @@ public class EnemyObjectPooler : MonoBehaviour
     private void Start()
     {
         ResolveLinkedPoolersIfNeeded();
-        SetLinkedPoolersActive(_leasedActiveEnemyCount > 0);
+        SetLinkedPoolersActive(true);
     }
 
     private void ResolveLinkedPoolersIfNeeded()
@@ -75,6 +80,8 @@ public class EnemyObjectPooler : MonoBehaviour
             linkedProjectilePooler = FindFirstObjectByType<EnemyProjectilePooler>(FindObjectsInactive.Include);
     }
 
+    // Loot poolers must stay active for the whole scene: dropped gold/xp is
+    // parented under them, so deactivating a pooler hides live loot in the world.
     private void SetLinkedPoolersActive(bool active)
     {
         if (linkedGoldLootPooler != null)
@@ -87,6 +94,24 @@ public class EnemyObjectPooler : MonoBehaviour
 
     private void WarmupPool()
     {
+        // Warm the typed pools the wave system actually spawns from;
+        // the generic random pool is only warmed when no typed prefab exists.
+        List<Enemy.EnemyType> typesToWarm = GetDistinctTypedTypes();
+        if (typesToWarm.Count > 0)
+        {
+            int perType = Mathf.Max(1, initialPoolSize / typesToWarm.Count);
+            foreach (Enemy.EnemyType type in typesToWarm)
+            {
+                for (int i = 0; i < perType; i++)
+                {
+                    GameObject enemy = CreateNewTypedEnemy(type);
+                    if (enemy == null) break;
+                    ReturnEnemy(enemy);
+                }
+            }
+            return;
+        }
+
         if (!HasValidPrefabs())
         {
             Debug.LogWarning("EnemyObjectPooler: no valid prefab found in enemyPrefabs list.");
@@ -115,6 +140,27 @@ public class EnemyObjectPooler : MonoBehaviour
         return enemy;
     }
 
+    private GameObject CreateNewTypedEnemy(Enemy.EnemyType type)
+    {
+        GameObject prefab = GetTypedPrefab(type);
+        if (prefab == null) return null;
+
+        Transform parent = poolParent != null ? poolParent : transform;
+        GameObject enemy = Instantiate(prefab, parent);
+        enemy.SetActive(false);
+        _typedPoolMembership[enemy] = type;
+        return enemy;
+    }
+
+    private void EnsureTypedPool(Enemy.EnemyType type,
+        out Queue<GameObject> available, out HashSet<GameObject> queued)
+    {
+        if (!_typedAvailable.TryGetValue(type, out available))
+            _typedAvailable[type] = available = new Queue<GameObject>();
+        if (!_typedQueued.TryGetValue(type, out queued))
+            _typedQueued[type] = queued = new HashSet<GameObject>();
+    }
+
     public GameObject GetEnemy(Vector3 worldPosition, Quaternion rotation)
     {
         if (_availableEnemies.Count == 0)
@@ -133,31 +179,26 @@ public class EnemyObjectPooler : MonoBehaviour
         GameObject enemy = _availableEnemies.Dequeue();
         _queuedEnemies.Remove(enemy);
         enemy.transform.SetPositionAndRotation(worldPosition, rotation);
-
-        if (_leasedActiveEnemyCount == 0)
-            SetLinkedPoolersActive(true);
-        _leasedActiveEnemyCount++;
-
         enemy.SetActive(true);
         return enemy;
     }
 
     /// <summary>
-    /// Type-specific spawn for the wave system. Falls back to generic GetEnemy() if no match in typedPrefabs.
-    /// Uses a per-type pool — Instantiate is NOT called on every spawn.
+    /// Type-specific spawn for the wave system. Uses a per-type pool —
+    /// Instantiate is NOT called on every spawn. If the type has no prefab in
+    /// typedPrefabs, logs an error and falls back to a random generic enemy.
     /// </summary>
     public GameObject GetEnemyOfType(Enemy.EnemyType type, Vector3 worldPosition, Quaternion rotation)
     {
         GameObject prefab = GetTypedPrefab(type);
 
         if (prefab == null)
+        {
+            Debug.LogError($"EnemyObjectPooler: no prefab assigned for {type} in typedPrefabs — spawning a RANDOM enemy from the generic pool instead. Assign the prefab in the inspector.");
             return GetEnemy(worldPosition, rotation);
+        }
 
-        // Get or create the per-type queue
-        if (!_typedAvailable.TryGetValue(type, out Queue<GameObject> available))
-            _typedAvailable[type] = available = new Queue<GameObject>();
-        if (!_typedQueued.TryGetValue(type, out HashSet<GameObject> queued))
-            _typedQueued[type] = queued = new HashSet<GameObject>();
+        EnsureTypedPool(type, out Queue<GameObject> available, out HashSet<GameObject> queued);
 
         // Expand if pool is empty
         if (available.Count == 0)
@@ -167,9 +208,8 @@ public class EnemyObjectPooler : MonoBehaviour
                 Debug.LogWarning($"EnemyObjectPooler: {type} typed pool is exhausted, expansion is disabled.");
                 return null;
             }
-            Transform parent = poolParent != null ? poolParent : transform;
-            GameObject newEnemy = Instantiate(prefab, parent);
-            newEnemy.SetActive(false);
+            GameObject newEnemy = CreateNewTypedEnemy(type);
+            if (newEnemy == null) return null;
             available.Enqueue(newEnemy);
             queued.Add(newEnemy);
         }
@@ -177,11 +217,6 @@ public class EnemyObjectPooler : MonoBehaviour
         GameObject enemy = available.Dequeue();
         queued.Remove(enemy);
         enemy.transform.SetPositionAndRotation(worldPosition, rotation);
-
-        if (_leasedActiveEnemyCount == 0)
-            SetLinkedPoolersActive(true);
-        _leasedActiveEnemyCount++;
-
         enemy.SetActive(true);
         return enemy;
     }
@@ -195,41 +230,35 @@ public class EnemyObjectPooler : MonoBehaviour
         return null;
     }
 
+    private List<Enemy.EnemyType> GetDistinctTypedTypes()
+    {
+        List<Enemy.EnemyType> types = new List<Enemy.EnemyType>();
+        if (typedPrefabs == null) return types;
+        foreach (EnemyTypePrefabEntry entry in typedPrefabs)
+            if (entry.prefab != null && !types.Contains(entry.enemyType))
+                types.Add(entry.enemyType);
+        return types;
+    }
+
     public void ReturnEnemy(GameObject enemy)
     {
         if (enemy == null) return;
 
-        bool wasActiveInWorld = enemy.activeSelf;
-
         enemy.SetActive(false);
         enemy.transform.SetParent(poolParent != null ? poolParent : transform);
 
-        // Belongs to typed pool? → return to the correct queue
-        Enemy enemyComp = enemy.GetComponent<Enemy>();
-        if (enemyComp != null
-            && _typedQueued.TryGetValue(enemyComp.enemyType, out HashSet<GameObject> typedQSet)
-            && _typedAvailable.TryGetValue(enemyComp.enemyType, out Queue<GameObject> typedQ))
+        // Instances created by a typed pool go back to that pool;
+        // everything else belongs to the generic pool.
+        if (_typedPoolMembership.TryGetValue(enemy, out Enemy.EnemyType type))
         {
-            if (typedQSet.Add(enemy))
-            {
-                typedQ.Enqueue(enemy);
-                if (wasActiveInWorld)
-                    _leasedActiveEnemyCount = Mathf.Max(0, _leasedActiveEnemyCount - 1);
-            }
-            if (_leasedActiveEnemyCount == 0) SetLinkedPoolersActive(false);
+            EnsureTypedPool(type, out Queue<GameObject> available, out HashSet<GameObject> queued);
+            if (queued.Add(enemy))
+                available.Enqueue(enemy);
             return;
         }
 
-        // Generic pool
         if (_queuedEnemies.Add(enemy))
-        {
             _availableEnemies.Enqueue(enemy);
-            if (wasActiveInWorld)
-                _leasedActiveEnemyCount = Mathf.Max(0, _leasedActiveEnemyCount - 1);
-        }
-
-        if (_leasedActiveEnemyCount == 0)
-            SetLinkedPoolersActive(false);
     }
 
     private bool HasValidPrefabs()
