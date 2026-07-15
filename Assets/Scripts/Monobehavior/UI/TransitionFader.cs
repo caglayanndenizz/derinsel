@@ -7,7 +7,7 @@ public class TransitionFader : MonoBehaviour
 {
     [Header("Fade Settings")]
     [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private float fadeDuration = 0.5f;
+    [SerializeField] private float fadeDuration;
     [SerializeField] private bool blockRaycastsDuringFade = true;
 
     private Coroutine _runningFadeRoutine;
