@@ -75,6 +75,7 @@ GameObject:
   - component: {fileID: 3297539337289784264}
   - component: {fileID: 4578505465515028023}
   - component: {fileID: 3924341414968054820}
+  - component: {fileID: 5314159265358979323}
   m_Layer: 6
   m_Name: Mage
   m_TagString: Enemy
@@ -234,10 +235,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   stats: {fileID: 11400000, guid: bd848fb3a85ab4e13b43cc3518574a00, type: 2}
   currentState: 0
-  enemyType: 0
   detectionRange: 10
   expandedDetectionRange: 20
-  cd: {fileID: 3297539337289784264}
+  detectionCollider: {fileID: 3297539337289784264}
   lightKnockbackForce: 4
   heavyKnockbackForce: 10
   knockbackDuration: 0.2
@@ -250,24 +250,31 @@ MonoBehaviour:
   patrolLegRight: 4
   patrolForwardWorld: {x: 0, y: 1}
   patrolWaypointReachDistance: 0.22
-  mageProjectilePrefab: {fileID: 6304853734587583923, guid: 85829922e17f94981a185366d6919300, type: 3}
-  mageRangedFireInterval: 4
-  mageProjectileSpeed: 10
-  mageUseAttackPowerForProjectile: 0
-  mageProjectileDamageOverride: 5
-  mageProjectileMaxLifetime: 12
-  attackCloseMaxDistance: 10
-  mageProjectilePivot: {fileID: 5968996605710377698}
-  mageProjectileSpawnPoint: {fileID: 1874076496926856992}
-  mageProjectileSpawnOffset: {x: 0, y: 0, z: 0}
-  mageProjectilePooler: {fileID: 0}
-  goldPooler: {fileID: 0}
-  experiencePooler: {fileID: 0}
   chaseApproachSpeedMultiplier: 1.6
-  mageProjectileFireRateMultiplier: 1.5
-  meleeAttackInterval: 2
-  meleeHitRange: 1.2
   goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
   experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
   goldDropChance: 0.2
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &5314159265358979323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4020198177656319069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81dfdb4fc2ee4c068f0565c10e4b3043, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::RangedAttackBehavior
+  projectilePrefab: {fileID: 6304853734587583923, guid: 85829922e17f94981a185366d6919300, type: 3}
+  projectileSpeed: 10
+  useAttackPowerForProjectile: 0
+  projectileDamageOverride: 5
+  projectileMaxLifetime: 12
+  fireInterval: 4
+  fireRateMultiplier: 1.5
+  projectilePivot: {fileID: 5968996605710377698}
+  projectileSpawnPoint: {fileID: 1874076496926856992}
+  projectileSpawnOffset: {x: 0, y: 0, z: 0}
+  projectilePooler: {fileID: 0}
+  attackRange: 10

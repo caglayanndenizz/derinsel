@@ -3,13 +3,13 @@ using UnityEngine;
 /// <summary>
 /// Coordinator: holds serialized config, the Patrol/Chase/Attack state machine and death/loot.
 /// Capabilities live in sibling components (EntityStatusEffects, EntityStatusVisuals,
-/// EntitySensor, EnemyMotor, EnemyCombat); public status methods stay here as facades
+/// EntitySensor, EnemyMotor, IAttackBehavior); public status methods stay here as facades
 /// so external callers (Player.Hammer, PlayerArrow, PlayerBolt) are unaffected.
+/// Attack style (ranged/melee) comes from the IAttackBehavior component on the prefab.
 /// </summary>
 public class Enemy : BaseEntity
 {
     public enum State { Patrol, Chase, Attack, Dead }
-    public enum EnemyType { Mage, Tanky, Warrior }
 
     [Header("Data Reference")]
     [SerializeField] private EnemyEntityStats stats;
@@ -19,7 +19,6 @@ public class Enemy : BaseEntity
 
     [Header("State Settings")]
     [SerializeField] private State currentState = State.Patrol;
-    public EnemyType enemyType = EnemyType.Mage;
     public float detectionRange = 10f;
     public float expandedDetectionRange = 22f;
     [SerializeField] private CircleCollider2D detectionCollider;
@@ -47,32 +46,9 @@ public class Enemy : BaseEntity
     public Vector2 patrolForwardWorld = Vector2.up;
     public float patrolWaypointReachDistance = 0.22f;
 
-    [Header("Mage Ranged Attack")]
-    [Tooltip("Prefab must have an EnemyProjectile script.")]
-    public GameObject mageProjectilePrefab;
-    [Tooltip("Time between projectiles while in Attack state (seconds).")]
-    public float mageRangedFireInterval = 4f;
-    public float mageProjectileSpeed = 10f;
-    [Tooltip("Uses EnemyEntityStats.enemyAP as damage when enabled.")]
-    public bool mageUseAttackPowerForProjectile = true;
-    public float mageProjectileDamageOverride = 5f;
-    public float mageProjectileMaxLifetime = 12f;
-    [Tooltip("Chase → Attack when player is within this distance (units); Attack → Chase when farther.")]
-    public float attackCloseMaxDistance = 5f;
-    [Tooltip("Projectile spawns from this child transform (searches for 'projectilePivot' child if empty).")]
-    public Transform mageProjectilePivot;
-    public Transform mageProjectileSpawnPoint;
-    public Vector3 mageProjectileSpawnOffset = Vector3.zero;
-    public EnemyProjectilePooler mageProjectilePooler;
+    [Header("Movement")]
     [Tooltip("Speed multiplier when chasing the player.")]
     public float chaseApproachSpeedMultiplier = 1.6f;
-    [Tooltip("Fire rate multiplier for projectiles. 1.5 => 50% faster fire rate.")]
-    public float mageProjectileFireRateMultiplier = 1.5f;
-
-    [Header("Melee Attack")]
-    public float meleeAttackInterval = 2f;
-    [Tooltip("Actual contact/proximity range for melee damage to be applied.")]
-    public float meleeHitRange = 1.6f;
 
     [Header("Loot Prefabs")]
     public GameObject goldPrefab;
@@ -85,7 +61,9 @@ public class Enemy : BaseEntity
     private EntityStatusVisuals _visuals;
     private EntitySensor _sensor;
     private EnemyMotor _motor;
-    private EnemyCombat _combat;
+    private IAttackBehavior _attack;
+
+    public IAttackBehavior AttackBehavior => _attack;
 
     public override bool IsDead => _isDead || _currentHealth <= 0f;
     public bool IsFrozen => _status.IsFrozen;
@@ -100,16 +78,8 @@ public class Enemy : BaseEntity
     public bool HasLastKnownPlayerPosition => _hasLastKnownPlayerWorld;
     public Vector2 LastKnownPlayerPosition => _lastKnownPlayerWorld;
 
-    /// <summary>Mage uses the rigidbody position, melee types the transform position.</summary>
     public Vector2 ReferencePosition
-    {
-        get
-        {
-            if (enemyType != EnemyType.Mage)
-                return transform.position;
-            return _rb != null ? _rb.position : (Vector2)transform.position;
-        }
-    }
+        => _rb != null ? _rb.position : (Vector2)transform.position;
 
     protected override void Awake()
     {
@@ -126,8 +96,14 @@ public class Enemy : BaseEntity
         if (_sensor == null) _sensor = gameObject.AddComponent<EntitySensor>();
         _motor = GetComponent<EnemyMotor>();
         if (_motor == null) _motor = gameObject.AddComponent<EnemyMotor>();
-        _combat = GetComponent<EnemyCombat>();
-        if (_combat == null) _combat = gameObject.AddComponent<EnemyCombat>();
+
+        // Saldırı stili prefab'daki component'ten gelir; eksikse melee'ye düş
+        _attack = GetComponent<IAttackBehavior>();
+        if (_attack == null)
+        {
+            Debug.LogWarning($"{name}: no IAttackBehavior component on prefab, defaulting to MeleeAttackBehavior.", this);
+            _attack = gameObject.AddComponent<MeleeAttackBehavior>();
+        }
 
         if (_rb != null)
         {
@@ -135,13 +111,10 @@ public class Enemy : BaseEntity
             _rb.freezeRotation = true;
         }
 
-        if (enemyType == EnemyType.Mage && mageProjectilePivot == null)
-            mageProjectilePivot = transform.Find("projectilePivot");
-
         // Serialize edilen config Enemy'de kalır; component'lere buradan bağlanır
         _sensor.Configure(blockingEnvironmentMask, sensorLength);
         _motor.Configure(this, _sensor, _status);
-        _combat.Configure(this);
+        _attack.Configure(this);
 
         _sensor.SetLastSafePosition(ReferencePosition);
     }
@@ -151,7 +124,7 @@ public class Enemy : BaseEntity
         if (_isDead || _motor.IsKnockedBack || _status.IsFrozen) return;
         CheckState();
         UpdateLastKnownPlayerPosition();
-        _combat.TickAttack();
+        _attack.TickAttack();
     }
 
     void FixedUpdate()
@@ -192,14 +165,14 @@ public class Enemy : BaseEntity
     {
         if (player == null) return;
         float dist = Vector2.Distance(ReferencePosition, player.transform.position);
-        float attackDistance = attackCloseMaxDistance;
+        float attackDistance = _attack.AttackRange;
 
         if (currentState == State.Patrol)
         {
             if (dist <= detectionRange && HasLineOfSightToPlayer())
             {
                 currentState = State.Chase;
-                _combat.ResetRangedFireCooldown();
+                _attack.ResetAttackCooldown();
             }
         }
         else if (currentState == State.Chase)
@@ -208,7 +181,7 @@ public class Enemy : BaseEntity
             {
                 currentState = State.Patrol;
                 _hasLastKnownPlayerWorld = false;
-                _combat.ResetRangedFireCooldown();
+                _attack.ResetAttackCooldown();
                 _motor.ResetPatrolRoute();
             }
             else if (dist <= attackDistance)
@@ -222,7 +195,7 @@ public class Enemy : BaseEntity
             {
                 currentState = State.Patrol;
                 _hasLastKnownPlayerWorld = false;
-                _combat.ResetRangedFireCooldown();
+                _attack.ResetAttackCooldown();
                 _motor.ResetPatrolRoute();
             }
             else if (dist > attackDistance)
@@ -327,7 +300,7 @@ public class Enemy : BaseEntity
         currentState = State.Patrol;
         _hasLastKnownPlayerWorld = false;
         _motor.ResetForSpawn();
-        _combat.ResetForSpawn();
+        _attack.ResetForSpawn();
         _sensor.SetLastSafePosition(ReferencePosition);
     }
 }

@@ -72,13 +72,6 @@ public class EnemyMotor : MonoBehaviour
     public void MoveByState()
     {
         if (_owner.IsDead || _status.IsFrozen) return;
-
-        if (_owner.enemyType != Enemy.EnemyType.Mage)
-        {
-            MoveMeleeTypeWithTranslate();
-            return;
-        }
-
         if (_rb == null) return;
 
         Vector2 velocity = Vector2.zero;
@@ -97,10 +90,12 @@ public class EnemyMotor : MonoBehaviour
                 velocity = _sensor.GetAvoidanceDirection(dir) * baseSpeed;
             }
         }
-        else if (playerT != null && _owner.CurrentState == Enemy.State.Chase)
+        else if (playerT != null)
         {
+            // Chase ve Attack: behavior'ın istediği mesafeye kadar yaklaş
+            // (ranged menzilinde durur, melee vuruş mesafesine kadar girer)
             float dist = Vector2.Distance(origin, playerT.position);
-            if (dist > _owner.attackCloseMaxDistance)
+            if (dist > _owner.AttackBehavior.DesiredApproachDistance)
             {
                 Vector2 targetDir = ((Vector2)playerT.position - origin).normalized;
                 velocity = _sensor.GetAvoidanceDirection(targetDir) * baseSpeed * _owner.chaseApproachSpeedMultiplier;
@@ -116,25 +111,6 @@ public class EnemyMotor : MonoBehaviour
         }
         else if (playerT != null)
             FaceByHorizontal(playerT.position.x - transform.position.x);
-    }
-
-    private void MoveMeleeTypeWithTranslate()
-    {
-        Transform playerT = _owner.PlayerTransform;
-        if (playerT == null) return;
-        if (_owner.CurrentState == Enemy.State.Patrol) return;
-
-        if (_rb != null)
-            _rb.linearVelocity = Vector2.zero;
-
-        Vector3 toPlayer = playerT.position - transform.position;
-        toPlayer.z = 0f;
-        if (toPlayer.sqrMagnitude < 0.0001f) return;
-
-        float speed = _owner.Stats != null ? _owner.Stats.moveSpeed : 4f;
-        Vector3 dir = toPlayer.normalized;
-        transform.Translate(dir * speed * Time.fixedDeltaTime, Space.World);
-        FaceByHorizontal(dir.x);
     }
 
     public void FaceByHorizontal(float horizontal)

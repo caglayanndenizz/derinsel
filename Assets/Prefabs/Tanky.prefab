@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 98358715176295488}
   - component: {fileID: 178589339634994658}
   - component: {fileID: 1094349744243876722}
+  - component: {fileID: 6626070040071021113}
   m_Layer: 6
   m_Name: Tanky
   m_TagString: Enemy
@@ -107,10 +108,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   stats: {fileID: 11400000, guid: 04a22bf6419ad401abeb24f81f6142f3, type: 2}
   currentState: 0
-  enemyType: 1
   detectionRange: 10
   expandedDetectionRange: 22
-  cd: {fileID: 178589339634994658}
+  detectionCollider: {fileID: 178589339634994658}
   lightKnockbackForce: 5
   heavyKnockbackForce: 12
   knockbackDuration: 0.2
@@ -123,27 +123,10 @@ MonoBehaviour:
   patrolLegRight: 4
   patrolForwardWorld: {x: 0, y: 1}
   patrolWaypointReachDistance: 0.22
-  mageProjectilePrefab: {fileID: 0}
-  mageRangedFireInterval: 4
-  mageProjectileSpeed: 10
-  mageUseAttackPowerForProjectile: 1
-  mageProjectileDamageOverride: 5
-  mageProjectileMaxLifetime: 12
-  attackCloseMaxDistance: 5
-  mageProjectilePivot: {fileID: 0}
-  mageProjectileSpawnPoint: {fileID: 0}
-  mageProjectileSpawnOffset: {x: 0, y: 0, z: 0}
-  mageProjectilePooler: {fileID: 0}
-  goldPooler: {fileID: 0}
-  experiencePooler: {fileID: 0}
-  chaseApproachSpeedMultiplier: 1.6
-  mageProjectileFireRateMultiplier: 1.5
-  meleeAttackInterval: 3
-  meleeHitRange: 1.2
+  chaseApproachSpeedMultiplier: 1
   goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
   experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
   goldDropChance: 1
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!58 &178589339634994658
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -207,3 +190,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &6626070040071021113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4369630054169769414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 786855a92c254384af8636cda3855dd4, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeAttackBehavior
+  attackInterval: 3
+  hitRange: 1.2
+  attackRange: 5

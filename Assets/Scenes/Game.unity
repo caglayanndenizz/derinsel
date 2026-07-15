@@ -4478,13 +4478,6 @@ MonoBehaviour:
   initialPoolSize: 40
   canExpandPool: 1
   poolParent: {fileID: 273267496}
-  typedPrefabs:
-  - enemyType: 0
-    prefab: {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}
-  - enemyType: 1
-    prefab: {fileID: 4369630054169769414, guid: 6af5b04e133e80f448d9a8dd9c90f4c1, type: 3}
-  - enemyType: 2
-    prefab: {fileID: 9054262178047731215, guid: f63ecbfb4afa04446aa4013cbf460301, type: 3}
   linkedGoldLootPooler: {fileID: 562320326}
   linkedExperienceLootPooler: {fileID: 1592173275}
   linkedProjectilePooler: {fileID: 1730437411}

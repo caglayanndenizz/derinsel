@@ -7,7 +7,7 @@ public class LevelEnemySpawner : MonoBehaviour
     public struct SpawnEntry
     {
         public Transform spawnPoint;
-        public Enemy.EnemyType enemyType;
+        public GameObject enemyPrefab;
     }
 
     [SerializeField] private List<SpawnEntry> spawnEntries = new();
@@ -26,10 +26,10 @@ public class LevelEnemySpawner : MonoBehaviour
 
         foreach (SpawnEntry entry in spawnEntries)
         {
-            if (entry.spawnPoint == null) continue;
+            if (entry.spawnPoint == null || entry.enemyPrefab == null) continue;
 
-            GameObject go = EnemyObjectPooler.Instance?.GetEnemyOfType(
-                entry.enemyType,
+            GameObject go = EnemyObjectPooler.Instance?.GetEnemy(
+                entry.enemyPrefab,
                 entry.spawnPoint.position,
                 Quaternion.identity);
 
