@@ -69,6 +69,8 @@ public class AugmentSelectionUI : MonoBehaviour
 
 
     private int _chestRarityFilter;
+    private bool _isChestPanel;
+    public event System.Action OnChestAugmentSelected;
 
     private bool UsesPrefabAugmentCards =>
         optionButtonPrefab != null && panelRoot != null;
@@ -190,6 +192,7 @@ public class AugmentSelectionUI : MonoBehaviour
                            : PanelSource.ChestWooden;
         bool result = ShowPanel(source);
         _chestRarityFilter = 0;
+        if (result) _isChestPanel = true;
         return result;
     }
 
@@ -542,11 +545,20 @@ public class AugmentSelectionUI : MonoBehaviour
         if (weightSystem != null)
             weightSystem.NotifySelection(selectedAugment, _currentOffer);
 
+        bool wasChestPanel = _isChestPanel;
+        _isChestPanel = false;
+
         HidePanel();
         _isPanelOpen = false;
 
         if (pauseGameWhenPanelOpen)
             Time.timeScale = _previousTimeScale > 0f ? _previousTimeScale : 1f;
+
+        if (wasChestPanel)
+        {
+            OnChestAugmentSelected?.Invoke();
+            return;
+        }
 
         if (_pendingSelections > 0)
         {

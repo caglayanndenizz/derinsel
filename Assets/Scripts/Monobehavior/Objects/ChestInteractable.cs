@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class ChestInteractable : MonoBehaviour
@@ -37,6 +38,24 @@ public class ChestInteractable : MonoBehaviour
         {
             _animator.SetBool(idleBoolName, false);
             _animator.SetBool(openBoolName, true);
+            StartCoroutine(ShowUIAfterAnimation());
+        }
+        else
+        {
+            _augmentUI?.ShowChestPanel(rarity);
+        }
+    }
+
+    private IEnumerator ShowUIAfterAnimation()
+    {
+        yield return null; // Animator'un Open state'e gecmesini bekle
+
+        while (_animator != null)
+        {
+            AnimatorStateInfo info = _animator.GetCurrentAnimatorStateInfo(0);
+            if (info.IsName(openBoolName) && info.normalizedTime >= 1f)
+                break;
+            yield return null;
         }
 
         _augmentUI?.ShowChestPanel(rarity);

@@ -19,8 +19,15 @@ public class LevelManager : MonoBehaviour
     [Tooltip("Lobby sahnesinim Global Light 2D'si. Level yuklendikten sonra kapanir.")]
     [SerializeField] private Light2D lobbyGlobalLight;
 
+    [Header("Level End Chest")]
+    [SerializeField] private GameObject goldenChestPrefab;
+    [Tooltip("Oyuncu augmenti sectikten bu kadar saniye sonra sonraki levela gecer.")]
+    [SerializeField] private float chestToLevelDelay = 2f;
+
     private int _currentLevelIndex = -1;
     private GameObject _activeLevelInstance;
+    private GameObject _levelEndChest;
+    private AugmentSelectionUI _augmentUI;
 
     public int CurrentLevel => _currentLevelIndex + 1;
 
@@ -43,6 +50,38 @@ public class LevelManager : MonoBehaviour
             return; // Level 5 son level — simdilik ilerleme yok
 
         StartCoroutine(LoadLevelRoutine(_currentLevelIndex + 1));
+    }
+
+    public void SpawnLevelEndChest(Vector3 position)
+    {
+        if (goldenChestPrefab == null)
+        {
+            Debug.LogWarning("LevelManager: goldenChestPrefab atanmamis, direkt level gecisi yapiliyor.");
+            OnMiniBossKilled();
+            return;
+        }
+
+        _levelEndChest = Instantiate(goldenChestPrefab, position, Quaternion.identity);
+
+        if (_augmentUI == null)
+            _augmentUI = Object.FindAnyObjectByType<AugmentSelectionUI>();
+
+        if (_augmentUI != null)
+            _augmentUI.OnChestAugmentSelected += OnChestAugmentSelected;
+    }
+
+    private void OnChestAugmentSelected()
+    {
+        if (_augmentUI != null)
+            _augmentUI.OnChestAugmentSelected -= OnChestAugmentSelected;
+
+        StartCoroutine(DelayedLevelTransition());
+    }
+
+    private IEnumerator DelayedLevelTransition()
+    {
+        yield return new WaitForSeconds(chestToLevelDelay);
+        OnMiniBossKilled();
     }
 
     private IEnumerator LoadLevelRoutine(int levelIndex)
@@ -90,6 +129,7 @@ public class LevelManager : MonoBehaviour
     {
         CleanupEnemies();
         CleanupLoot();
+        CleanupLevelEndChest();
 
         if (player != null)
             player.GetComponent<WallLootHandler>()?.ResetWallLootDropCounterForRoom();
@@ -101,6 +141,18 @@ public class LevelManager : MonoBehaviour
         }
 
         if (lobbyGlobalLight != null) lobbyGlobalLight.enabled = true;
+    }
+
+    private void CleanupLevelEndChest()
+    {
+        if (_augmentUI != null)
+            _augmentUI.OnChestAugmentSelected -= OnChestAugmentSelected;
+
+        if (_levelEndChest != null)
+        {
+            Destroy(_levelEndChest);
+            _levelEndChest = null;
+        }
     }
 
     private void CleanupEnemies()

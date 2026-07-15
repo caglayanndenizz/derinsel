@@ -13,6 +13,7 @@ public class LevelEnemySpawner : MonoBehaviour
     [SerializeField] private List<SpawnEntry> spawnEntries = new();
 
     private int _aliveCount;
+    private Vector3 _lastDeathPosition;
 
     private void Start()
     {
@@ -48,9 +49,10 @@ public class LevelEnemySpawner : MonoBehaviour
     private void OnEnemyDied(Enemy enemy)
     {
         enemy.Died -= OnEnemyDied;
+        _lastDeathPosition = enemy.transform.position;
         _aliveCount = Mathf.Max(0, _aliveCount - 1);
 
         if (_aliveCount == 0)
-            LevelManager.Instance?.OnMiniBossKilled();
+            LevelManager.Instance?.SpawnLevelEndChest(_lastDeathPosition);
     }
 }
