@@ -16,18 +16,20 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private CinemachineCamera vcam;
     [SerializeField] private TransitionFader transitionFader;
     [SerializeField] private EnemyObjectPooler enemyPooler;
+    [SerializeField] private DungeonEntrance dungeonEntrance;
+    [SerializeField] private AugmentSelectionUI augmentUI;
     [Tooltip("Lobby sahnesinim Global Light 2D'si. Level yuklendikten sonra kapanir.")]
     [SerializeField] private Light2D lobbyGlobalLight;
 
     [Header("Level End Chest")]
     [SerializeField] private GameObject goldenChestPrefab;
+    [SerializeField] private GameObject silverChestPrefab;
     [Tooltip("Oyuncu augmenti sectikten bu kadar saniye sonra sonraki levela gecer.")]
     [SerializeField] private float chestToLevelDelay = 2f;
 
     private int _currentLevelIndex = -1;
     private GameObject _activeLevelInstance;
     private GameObject _levelEndChest;
-    private AugmentSelectionUI _augmentUI;
 
     public int CurrentLevel => _currentLevelIndex + 1;
 
@@ -54,26 +56,26 @@ public class LevelManager : MonoBehaviour
 
     public void SpawnLevelEndChest(Vector3 position)
     {
-        if (goldenChestPrefab == null)
+        bool spawnGolden = Random.value < 0.5f;
+        GameObject prefabToSpawn = spawnGolden ? goldenChestPrefab : silverChestPrefab;
+
+        if (prefabToSpawn == null)
         {
-            Debug.LogWarning("LevelManager: goldenChestPrefab atanmamis, direkt level gecisi yapiliyor.");
+            Debug.LogWarning("LevelManager: chest prefab atanmamis, direkt level gecisi yapiliyor.");
             OnMiniBossKilled();
             return;
         }
 
-        _levelEndChest = Instantiate(goldenChestPrefab, position, Quaternion.identity);
+        _levelEndChest = Instantiate(prefabToSpawn, position, Quaternion.identity);
 
-        if (_augmentUI == null)
-            _augmentUI = Object.FindAnyObjectByType<AugmentSelectionUI>();
-
-        if (_augmentUI != null)
-            _augmentUI.OnChestAugmentSelected += OnChestAugmentSelected;
+        if (augmentUI != null)
+            augmentUI.OnChestAugmentSelected += OnChestAugmentSelected;
     }
 
     private void OnChestAugmentSelected()
     {
-        if (_augmentUI != null)
-            _augmentUI.OnChestAugmentSelected -= OnChestAugmentSelected;
+        if (augmentUI != null)
+            augmentUI.OnChestAugmentSelected -= OnChestAugmentSelected;
 
         StartCoroutine(DelayedLevelTransition());
     }
@@ -106,8 +108,7 @@ public class LevelManager : MonoBehaviour
         _currentLevelIndex = levelIndex;
         if (lobbyGlobalLight != null) lobbyGlobalLight.enabled = false;
 
-        DungeonEntrance entrance = Object.FindAnyObjectByType<DungeonEntrance>();
-        if (entrance != null) entrance.gameObject.SetActive(false);
+        if (dungeonEntrance != null) dungeonEntrance.gameObject.SetActive(false);
 
         _activeLevelInstance = Instantiate(levelPrefabs[levelIndex]);
 
@@ -130,6 +131,7 @@ public class LevelManager : MonoBehaviour
         CleanupEnemies();
         CleanupLoot();
         CleanupLevelEndChest();
+        KillCounter.Instance?.CleanupChests();
 
         if (player != null)
             player.GetComponent<WallLootHandler>()?.ResetWallLootDropCounterForRoom();
@@ -145,8 +147,8 @@ public class LevelManager : MonoBehaviour
 
     private void CleanupLevelEndChest()
     {
-        if (_augmentUI != null)
-            _augmentUI.OnChestAugmentSelected -= OnChestAugmentSelected;
+        if (augmentUI != null)
+            augmentUI.OnChestAugmentSelected -= OnChestAugmentSelected;
 
         if (_levelEndChest != null)
         {

@@ -50,6 +50,7 @@ public class LevelEnemySpawner : MonoBehaviour
     {
         enemy.Died -= OnEnemyDied;
         _lastDeathPosition = enemy.transform.position;
+        KillCounter.Instance?.RegisterKill(_lastDeathPosition);
         _aliveCount = Mathf.Max(0, _aliveCount - 1);
 
         if (_aliveCount == 0)

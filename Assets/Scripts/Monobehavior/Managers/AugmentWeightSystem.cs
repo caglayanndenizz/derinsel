@@ -4,15 +4,9 @@ using UnityEngine;
 /// <summary>
 /// Offer cycle (each level-up is one offer):
 ///   Every unlockOfferInterval-th offer → unlock-only offer (UnlockAugmentDatabase pool).
-///   All other offers                   → regular stat offer (AugmentDatabase.regularAugments).
+///   All other offers                   → T1-only regular offer (AugmentDatabase.regularAugments).
 ///
-/// Regular offer tier progression — gated by regular offer count, NOT floor or player level:
-///   0 .. t2UnlockAfterOffers-1               → all T1
-///   t2UnlockAfterOffers .. t3UnlockAfterOffers-1 → T1 + T2
-///   t3UnlockAfterOffers+                     → T1 + T2 + T3
-///
-/// Pity: after pityThresholdOffers total level-up offers without any T3 AND T3 pool is open,
-///       the next regular offer forces ALL slots to T3.
+/// T2/T3 augments are only available via chests (BuildChestOffer).
 /// Rejection: per-ID weight multiplier that drops on skip and recovers over subsequent offers.
 /// </summary>
 public class AugmentWeightSystem : MonoBehaviour
@@ -33,16 +27,6 @@ public class AugmentWeightSystem : MonoBehaviour
     [Tooltip("Every Nth level-up is an unlock-only offer. 3 = offers 3, 6, 9... show only unlocks.")]
     [SerializeField] private int unlockOfferInterval = 3;
 
-    [Header("Tier Unlock (by regular offer count — floor/level independent)")]
-    [Tooltip("T2 augments enter the pool after this many regular (non-unlock) offers.")]
-    [SerializeField] private int t2UnlockAfterOffers = 3;
-    [Tooltip("T3 augments enter the pool after this many regular offers.")]
-    [SerializeField] private int t3UnlockAfterOffers = 8;
-
-    [Header("Pity")]
-    [Tooltip("After this many level-up offers (regular + unlock) without a T3, the next regular offer forces all slots to T3.")]
-    [SerializeField] private int pityThresholdOffers = 4;
-
     [Header("Rejection (per augment ID)")]
     [Tooltip("Weight multiplier immediately after the augment is skipped.")]
     [SerializeField] private float rejectionStartMultiplier = 0.30f;
@@ -52,7 +36,6 @@ public class AugmentWeightSystem : MonoBehaviour
     [Header("Runtime State (Read-Only)")]
     [SerializeField] private int _totalOfferCount;
     [SerializeField] private int _regularOfferCount;
-    [SerializeField] private int _offersSinceLastT3;
 
     private readonly Dictionary<AugmentId, float> _rejectionMult   = new Dictionary<AugmentId, float>();
     private readonly Dictionary<AugmentId, int>   _rejectedAtOffer = new Dictionary<AugmentId, int>();
@@ -63,12 +46,8 @@ public class AugmentWeightSystem : MonoBehaviour
         (IReadOnlyList<AugmentDefinition>)(augmentDatabase?.regularAugments) ??
         System.Array.Empty<AugmentDefinition>();
 
-    public int  TotalOfferCount   => _totalOfferCount;
-    public int  RegularOfferCount => _regularOfferCount;
-    public int  OffersSinceLastT3 => _offersSinceLastT3;
-    public int  PityThreshold     => pityThresholdOffers;
-    public bool IsPityActive      => _offersSinceLastT3 >= pityThresholdOffers
-                                     && _regularOfferCount >= t3UnlockAfterOffers;
+    public int TotalOfferCount   => _totalOfferCount;
+    public int RegularOfferCount => _regularOfferCount;
 
     /// <summary>True if the NEXT call to BuildOffer will produce an unlock offer.</summary>
     public bool IsNextOfferUnlock =>
@@ -121,24 +100,14 @@ public class AugmentWeightSystem : MonoBehaviour
             result = BuildUnlockOffer(controller, slotCount);
             if (result.Count == 0)
             {
-                // No eligible unlocks — fall back to regular offer
                 _regularOfferCount++;
-                result = BuildRegularOffer(controller, slotCount, pityActive: false);
+                result = BuildRegularOffer(controller, slotCount);
             }
         }
         else
         {
             _regularOfferCount++;
-            result = BuildRegularOffer(controller, slotCount, pityActive: IsPityActive);
-        }
-
-        // Pity counter only advances on regular offers — unlock offers can never contain T3
-        if (!isUnlockOffer)
-        {
-            bool hadT3 = false;
-            foreach (AugmentDefinition a in result)
-                if (a != null && a.rarity == 3) { hadT3 = true; break; }
-            _offersSinceLastT3 = hadT3 ? 0 : _offersSinceLastT3 + 1;
+            result = BuildRegularOffer(controller, slotCount);
         }
 
         return result;
@@ -172,7 +141,6 @@ public class AugmentWeightSystem : MonoBehaviour
     {
         _totalOfferCount   = 0;
         _regularOfferCount = 0;
-        _offersSinceLastT3 = 0;
         _rejectionMult.Clear();
         _rejectedAtOffer.Clear();
 
@@ -182,7 +150,7 @@ public class AugmentWeightSystem : MonoBehaviour
 
     // ── Offer Builders ─────────────────────────────────────────────────────────
 
-    private List<AugmentDefinition> BuildUnlockOffer(PlayerAugmentController controller, int slotCount)
+    public List<AugmentDefinition> BuildUnlockOffer(PlayerAugmentController controller, int slotCount)
     {
         var result     = new List<AugmentDefinition>();
         var candidates = new List<AugmentDefinition>();
@@ -207,59 +175,19 @@ public class AugmentWeightSystem : MonoBehaviour
         return result;
     }
 
-    private List<AugmentDefinition> BuildRegularOffer(
-        PlayerAugmentController controller,
-        int slotCount,
-        bool pityActive)
+    private List<AugmentDefinition> BuildRegularOffer(PlayerAugmentController controller, int slotCount)
     {
         var result  = new List<AugmentDefinition>(slotCount);
         var usedIds = new HashSet<AugmentId>();
 
-        List<int> tierSlots = pityActive
-            ? BuildAllT3Slots(slotCount)
-            : GetRegularTierSlots(slotCount);
-
-        foreach (int tier in tierSlots)
+        for (int i = 0; i < slotCount; i++)
         {
-            AugmentDefinition pick = PickFromTier(tier, controller, usedIds);
+            AugmentDefinition pick = PickFromTier(1, controller, usedIds);
             if (pick == null) break;
             result.Add(pick);
             usedIds.Add(pick.id);
         }
         return result;
-    }
-
-    /// <summary>
-    /// Slot tier composition by regular offer count.
-    /// Slot 0 → T1 always.
-    /// Slot 1 → T2 once t2UnlockAfterOffers passed, else T1.
-    /// Slot 2 → T3 once t3UnlockAfterOffers passed, else T2 (or T1).
-    /// Extra  → T1.
-    /// </summary>
-    private List<int> GetRegularTierSlots(int slotCount)
-    {
-        bool t2 = _regularOfferCount >= t2UnlockAfterOffers;
-        bool t3 = _regularOfferCount >= t3UnlockAfterOffers;
-
-        var slots = new List<int>(slotCount);
-        for (int i = 0; i < slotCount; i++)
-        {
-            switch (i)
-            {
-                case 0:  slots.Add(1); break;
-                case 1:  slots.Add(t2 ? 2 : 1); break;
-                case 2:  slots.Add(t3 ? 3 : (t2 ? 2 : 1)); break;
-                default: slots.Add(1); break;
-            }
-        }
-        return slots;
-    }
-
-    private static List<int> BuildAllT3Slots(int slotCount)
-    {
-        var slots = new List<int>(slotCount);
-        for (int i = 0; i < slotCount; i++) slots.Add(3);
-        return slots;
     }
 
     // ── Tier Picking ───────────────────────────────────────────────────────────

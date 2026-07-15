@@ -54,7 +54,7 @@ public class AugmentSelectionUI : MonoBehaviour
 
     [Header("Level-Up Augment Selection")]
     [Tooltip("Utility augmentler hazir olana kadar kapali tut.")]
-    [SerializeField] private bool levelUpAugmentSelectionEnabled = false;
+    [SerializeField] private bool levelUpAugmentSelectionEnabled = true;
 
     private const string AutoCardsRowName = "AugmentCards";
     private readonly List<AugmentOptionButton> _runtimeButtons = new();
@@ -70,6 +70,7 @@ public class AugmentSelectionUI : MonoBehaviour
 
     private int _chestRarityFilter;
     private bool _isChestPanel;
+    private bool _isUnlockChestPanel;
     public event System.Action OnChestAugmentSelected;
 
     private bool UsesPrefabAugmentCards =>
@@ -182,6 +183,13 @@ public class AugmentSelectionUI : MonoBehaviour
     public bool TryShowWallLootGiftPanel()
     {
         return ShowPanel(PanelSource.WallLootGift);
+    }
+
+    public bool TryShowUnlockChestPanel()
+    {
+        bool result = ShowPanel(PanelSource.UnlockOffer);
+        if (result) _isUnlockChestPanel = true;
+        return result;
     }
 
     public bool ShowChestPanel(int rarity)
@@ -450,6 +458,8 @@ public class AugmentSelectionUI : MonoBehaviour
     private List<AugmentDefinition> BuildOfferOptions(int slotCount)
     {
         TryResolveWeightSystem();
+        if (_isUnlockChestPanel && weightSystem != null)
+            return weightSystem.BuildUnlockOffer(playerAugmentController, slotCount);
         if (_chestRarityFilter > 0 && weightSystem != null)
             return weightSystem.BuildChestOffer(_chestRarityFilter, playerAugmentController, slotCount);
         if (weightSystem != null)
@@ -546,7 +556,9 @@ public class AugmentSelectionUI : MonoBehaviour
             weightSystem.NotifySelection(selectedAugment, _currentOffer);
 
         bool wasChestPanel = _isChestPanel;
+        bool wasUnlockChestPanel = _isUnlockChestPanel;
         _isChestPanel = false;
+        _isUnlockChestPanel = false;
 
         HidePanel();
         _isPanelOpen = false;
@@ -559,6 +571,9 @@ public class AugmentSelectionUI : MonoBehaviour
             OnChestAugmentSelected?.Invoke();
             return;
         }
+
+        if (wasUnlockChestPanel)
+            return;
 
         if (_pendingSelections > 0)
         {

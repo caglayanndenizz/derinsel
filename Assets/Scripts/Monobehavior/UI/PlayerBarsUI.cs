@@ -12,6 +12,7 @@ public class PlayerBarsUI : MonoBehaviour
     [SerializeField] private Slider experienceBar;
     [SerializeField] private TMP_Text levelText;
     [SerializeField] private TMP_Text goldText;
+    [SerializeField] private TMP_Text killText;
 
     private void Awake()
     {
@@ -30,12 +31,14 @@ public class PlayerBarsUI : MonoBehaviour
     private void OnEnable()
     {
         BindPlayer();
+        BindKillCounter();
         PushInitialValues();
     }
 
     private void OnDisable()
     {
         UnbindPlayer();
+        UnbindKillCounter();
     }
 
     private void BindPlayer()
@@ -101,5 +104,23 @@ public class PlayerBarsUI : MonoBehaviour
     {
         if (goldText == null) return;
         goldText.text = $"Gold: {Mathf.FloorToInt(Mathf.Max(0f, gold))}";
+    }
+
+    private void BindKillCounter()
+    {
+        if (KillCounter.Instance != null)
+            KillCounter.Instance.KillCountChanged += HandleKillCountChanged;
+    }
+
+    private void UnbindKillCounter()
+    {
+        if (KillCounter.Instance != null)
+            KillCounter.Instance.KillCountChanged -= HandleKillCountChanged;
+    }
+
+    private void HandleKillCountChanged(int kills)
+    {
+        if (killText == null) return;
+        killText.text = $"Kills: {kills}";
     }
 }

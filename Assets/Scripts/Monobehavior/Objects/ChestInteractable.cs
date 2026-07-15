@@ -5,6 +5,7 @@ public class ChestInteractable : MonoBehaviour
 {
     [Tooltip("1 = Wooden (Common), 2 = Silver (Rare), 3 = Gold (Extraordinary)")]
     [SerializeField] private int rarity = 1;
+    [SerializeField] private bool isUnlockChest;
 
     [Header("Animation")]
     [SerializeField] private string idleBoolName = "Idle";
@@ -58,6 +59,9 @@ public class ChestInteractable : MonoBehaviour
             yield return null;
         }
 
-        _augmentUI?.ShowChestPanel(rarity);
+        if (isUnlockChest)
+            _augmentUI?.TryShowUnlockChestPanel();
+        else
+            _augmentUI?.ShowChestPanel(rarity);
     }
 }
