@@ -21,7 +21,7 @@ public class Enemy : BaseEntity
     [SerializeField] private State currentState = State.Patrol;
     public float detectionRange = 10f;
     public float expandedDetectionRange = 22f;
-    [SerializeField] private CircleCollider2D detectionCollider;
+    [SerializeField] private Collider2D detectionCollider;
 
     public State CurrentState => currentState;
 

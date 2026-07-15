@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// Hit flash and status effect coloring for the SpriteRenderer on this GameObject.
+/// Hit flash and status effect coloring for the SpriteRenderer on this GameObject
+/// or its children (art-pack enemies keep the sprite on a "Body" child).
 /// Listens to EntityStatusEffects.StatusChanged; the owning entity only calls PlayHitFlash().
 /// </summary>
 public class EntityStatusVisuals : MonoBehaviour
@@ -22,7 +23,7 @@ public class EntityStatusVisuals : MonoBehaviour
 
     private void Awake()
     {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         if (_spriteRenderer != null)
             _originalColor = _spriteRenderer.color;
         _status = GetComponent<EntityStatusEffects>();
