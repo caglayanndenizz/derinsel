@@ -4472,7 +4472,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyObjectPooler
   enemyPrefabs:
-  - {fileID: 4020198177656319069, guid: e81c641c1871f854386a0b917781cd24, type: 3}
+  - {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
   - {fileID: 4369630054169769414, guid: 6af5b04e133e80f448d9a8dd9c90f4c1, type: 3}
   - {fileID: 9054262178047731215, guid: f63ecbfb4afa04446aa4013cbf460301, type: 3}
   initialPoolSize: 40
