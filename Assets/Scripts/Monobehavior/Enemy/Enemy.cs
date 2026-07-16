@@ -51,6 +51,8 @@ public class Enemy : BaseEntity
     [Range(0f, 1f)] public float goldDropChance = 0.15f;
 
     public event System.Action<Enemy> Died;
+    /// <summary>Fired every time damage is applied — including the killing blow.</summary>
+    public event System.Action Damaged;
 
     private EntityStatusEffects _status;
     private EntityStatusVisuals _visuals;
@@ -221,6 +223,7 @@ public class Enemy : BaseEntity
 
         _currentHealth -= amount;
         _visuals.PlayHitFlash();
+        Damaged?.Invoke();
         float force = isHeavy ? heavyKnockbackForce : lightKnockbackForce;
         _motor.ApplyKnockback(force);
         if (_currentHealth <= 0 && !_isDead) PrepareToDie();

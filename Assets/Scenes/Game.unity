@@ -1249,8 +1249,16 @@ PrefabInstance:
       value: 1.68
       objectReference: {fileID: 0}
     - target: {fileID: 708111569614397260, guid: 9c46aba7942722249a5bc3079d188580, type: 3}
+      propertyPath: knockbackDuration
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 708111569614397260, guid: 9c46aba7942722249a5bc3079d188580, type: 3}
+      propertyPath: corpseLingerSeconds
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 708111569614397260, guid: 9c46aba7942722249a5bc3079d188580, type: 3}
       propertyPath: lightKnockbackForce
-      value: 10
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 708111569614397260, guid: 9c46aba7942722249a5bc3079d188580, type: 3}
       propertyPath: expandedDetectionRange
@@ -3749,8 +3757,16 @@ PrefabInstance:
       value: BrownRat
       objectReference: {fileID: 0}
     - target: {fileID: 4869283945954061395, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+      propertyPath: knockbackDuration
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4869283945954061395, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+      propertyPath: corpseLingerSeconds
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4869283945954061395, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
       propertyPath: lightKnockbackForce
-      value: 10
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

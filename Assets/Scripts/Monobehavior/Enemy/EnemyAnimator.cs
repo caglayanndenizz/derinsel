@@ -20,6 +20,9 @@ public class EnemyAnimator : MonoBehaviour
     [Tooltip("One is picked at random per attack (equal chance). Names must be trigger parameters on the controller.")]
     [SerializeField] private string[] attackTriggers = { "Attack" };
 
+    [Tooltip("Trigger fired whenever the enemy takes damage, including the killing blow. Empty = disabled.")]
+    [SerializeField] private string hitTrigger = "Hit";
+
     [Tooltip("Patrol speeds below this count as standing still (Idle).")]
     [SerializeField] private float idleSpeedThreshold = 0.05f;
 
@@ -38,6 +41,7 @@ public class EnemyAnimator : MonoBehaviour
     private Enemy _enemy;
     private Rigidbody2D _rb;
     private EnemyMotor _motor;
+    private int _hitTriggerHash;
     private int[] _attackTriggerHashes;
     private HashSet<int> _availableParams;
     private Enemy.State _lastState = Enemy.State.Patrol;
@@ -56,6 +60,7 @@ public class EnemyAnimator : MonoBehaviour
         _attackTriggerHashes = new int[attackTriggers.Length];
         for (int i = 0; i < attackTriggers.Length; i++)
             _attackTriggerHashes[i] = Animator.StringToHash(attackTriggers[i]);
+        _hitTriggerHash = string.IsNullOrEmpty(hitTrigger) ? 0 : Animator.StringToHash(hitTrigger);
 
         _availableParams = new HashSet<int>();
         if (animator != null && animator.runtimeAnimatorController != null)
@@ -80,12 +85,22 @@ public class EnemyAnimator : MonoBehaviour
         // so the subscription has to wait until Start.
         if (_enemy.AttackBehavior != null)
             _enemy.AttackBehavior.AttackPerformed += OnAttackPerformed;
+        _enemy.Damaged += OnDamaged;
     }
 
     private void OnDestroy()
     {
-        if (_enemy != null && _enemy.AttackBehavior != null)
+        if (_enemy == null) return;
+        if (_enemy.AttackBehavior != null)
             _enemy.AttackBehavior.AttackPerformed -= OnAttackPerformed;
+        _enemy.Damaged -= OnDamaged;
+    }
+
+    private void OnDamaged()
+    {
+        if (animator == null || _hitTriggerHash == 0) return;
+        if (_availableParams.Contains(_hitTriggerHash))
+            animator.SetTrigger(_hitTriggerHash);
     }
 
     /// <summary>Pooled respawn reset; clears Die/trigger residue from the previous life.</summary>
