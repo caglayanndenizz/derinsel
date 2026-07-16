@@ -37,15 +37,20 @@ public class EnemyAnimator : MonoBehaviour
 
     private Enemy _enemy;
     private Rigidbody2D _rb;
+    private EnemyMotor _motor;
     private int[] _attackTriggerHashes;
     private HashSet<int> _availableParams;
     private Enemy.State _lastState = Enemy.State.Patrol;
     private bool _readyPending;
 
+    /// <summary>Length of the controller's "Die" clip in seconds; 0 when the controller has none.</summary>
+    public float DieAnimationLength { get; private set; }
+
     private void Awake()
     {
         _enemy = GetComponent<Enemy>();
         _rb = GetComponent<Rigidbody2D>();
+        _motor = GetComponent<EnemyMotor>();
         if (animator == null) animator = GetComponentInChildren<Animator>(true);
 
         _attackTriggerHashes = new int[attackTriggers.Length];
@@ -57,6 +62,15 @@ public class EnemyAnimator : MonoBehaviour
         {
             foreach (AnimatorControllerParameter p in animator.parameters)
                 _availableParams.Add(p.nameHash);
+
+            foreach (AnimationClip clip in animator.runtimeAnimatorController.animationClips)
+            {
+                if (clip != null && clip.name == "Die")
+                {
+                    DieAnimationLength = clip.length;
+                    break;
+                }
+            }
         }
     }
 
@@ -90,7 +104,14 @@ public class EnemyAnimator : MonoBehaviour
     {
         if (animator == null) return;
 
-        if (_enemy.IsDead)   { animator.speed = 1f; ApplyExclusiveBool(DieHash);  return; }
+        if (_enemy.IsDead)
+        {
+            animator.speed = 1f;
+            // Önce knockback tamamlanır; ölüm animasyonu ceset durduktan sonra başlar
+            if (_motor == null || !_motor.IsKnockedBack)
+                ApplyExclusiveBool(DieHash);
+            return;
+        }
         if (_enemy.IsFrozen) { animator.speed = 1f; ApplyExclusiveBool(IdleHash); return; }
 
         Enemy.State state = _enemy.CurrentState;

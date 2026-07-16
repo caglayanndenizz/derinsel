@@ -228,6 +228,8 @@ public class EnemyMotor : MonoBehaviour
             }
         }
 
-        if (!_owner.IsDead) { _rb.linearVelocity = Vector2.zero; _isKnockedBack = false; }
+        // Ölü de olsa hız sıfırlanır; yoksa ceset kalan impulse'la kaymaya devam eder
+        _rb.linearVelocity = Vector2.zero;
+        _isKnockedBack = false;
     }
 }

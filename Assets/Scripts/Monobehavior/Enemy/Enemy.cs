@@ -29,8 +29,8 @@ public class Enemy : BaseEntity
     public float lightKnockbackForce = 5f;
     public float heavyKnockbackForce = 12f;
     public float knockbackDuration = 0.2f;
-    [Tooltip("Minimum time the corpse stays active so the Die animation can play out before pool return.")]
-    public float deathAnimationSeconds = 0.45f;
+    [Tooltip("Corpse time after the Die animation finishes, before pool return.")]
+    public float corpseLingerSeconds = 0.75f;
     private Rigidbody2D _rb;
 
     [Header("Navigation (Tilemap + Colliders)")]
@@ -57,6 +57,7 @@ public class Enemy : BaseEntity
     private EntitySensor _sensor;
     private EnemyMotor _motor;
     private IAttackBehavior _attack;
+    private EnemyAnimator _animatorBridge; // optional; death timing falls back gracefully without it
 
     public IAttackBehavior AttackBehavior => _attack;
 
@@ -91,6 +92,7 @@ public class Enemy : BaseEntity
         if (_sensor == null) _sensor = gameObject.AddComponent<EntitySensor>();
         _motor = GetComponent<EnemyMotor>();
         if (_motor == null) _motor = gameObject.AddComponent<EnemyMotor>();
+        _animatorBridge = GetComponent<EnemyAnimator>();
 
         // Saldırı stili prefab'daki component'ten gelir; eksikse melee'ye düş
         _attack = GetComponent<IAttackBehavior>();
@@ -219,14 +221,25 @@ public class Enemy : BaseEntity
 
         _currentHealth -= amount;
         _visuals.PlayHitFlash();
-        float force = (isHeavy ? heavyKnockbackForce : lightKnockbackForce) * 0.5f;
+        float force = isHeavy ? heavyKnockbackForce : lightKnockbackForce;
         _motor.ApplyKnockback(force);
         if (_currentHealth <= 0 && !_isDead) PrepareToDie();
     }
 
-    private void PrepareToDie() { _isDead = true; if (detectionCollider != null) detectionCollider.enabled = false; Invoke("Die", Mathf.Max(knockbackDuration + 0.05f, deathAnimationSeconds)); }
+    private void PrepareToDie()
+    {
+        _isDead = true;
+        if (detectionCollider != null) detectionCollider.enabled = false;
+        DropLoot(); // loot ölüm anında düşer, ceset süresini ve pool dönüşünü beklemez
 
-    protected override void Die() {
+        // Sıra: knockback biter → Die animasyonu oynar (gerçek uzunluğu controller'dan okunur,
+        // enemy başına hardcode yok) → ceset corpseLingerSeconds bekler → Die çalışır.
+        float dieAnimSeconds = _animatorBridge != null ? _animatorBridge.DieAnimationLength : 0f;
+        Invoke("Die", knockbackDuration + 0.05f + dieAnimSeconds + corpseLingerSeconds);
+    }
+
+    private void DropLoot()
+    {
         Vector2 deathPosition = ReferencePosition;
 
         Player playerComponent = player != null ? player.GetComponent<Player>() : null;
@@ -244,7 +257,9 @@ public class Enemy : BaseEntity
             ExperienceLootPooler.Instance.GetExperience((Vector3)deathPosition + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
         else if (experiencePrefab != null)
             Instantiate(experiencePrefab, (Vector3)deathPosition + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
+    }
 
+    protected override void Die() {
         Died?.Invoke(this);
         base.Die();
         if (EnemyObjectPooler.Instance != null)
