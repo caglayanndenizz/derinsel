@@ -136,12 +136,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   stats: {fileID: 11400000, guid: e1b87c5ee8e0b914897785fa04ba9507, type: 2}
   currentState: 0
-  detectionRange: 10
-  expandedDetectionRange: 22
+  detectionRange: 1.68
+  expandedDetectionRange: 5
   detectionCollider: {fileID: 5723824824528666556}
-  lightKnockbackForce: 5
+  lightKnockbackForce: 7
   heavyKnockbackForce: 12
-  knockbackDuration: 0.2
+  knockbackDuration: 0.15
+  corpseLingerSeconds: 0.6
   sensorLength: 1.5
   blockingEnvironmentMask:
     serializedVersion: 2
@@ -204,12 +205,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e1ab60bc9d8c468ca2f5447113137d81, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
   animator: {fileID: 3118878543372189048}
   attackTriggers:
   - Attack
+  hitTrigger: Hit
   idleSpeedThreshold: 0.05
+  runResumeDistance: 1.5
+  animReferenceSpeed: 5
 --- !u!1 &7379994096229225103
 GameObject:
   m_ObjectHideFlags: 0
