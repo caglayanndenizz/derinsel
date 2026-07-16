@@ -7,6 +7,9 @@ using UnityEngine;
 /// </summary>
 public interface IAttackBehavior
 {
+    /// <summary>Fired the moment the attack actually happens (melee hit applied, projectile spawned).</summary>
+    event System.Action AttackPerformed;
+
     /// <summary>Chase → Attack state transition threshold (world units).</summary>
     float AttackRange { get; }
 

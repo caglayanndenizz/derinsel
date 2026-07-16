@@ -14,6 +14,10 @@ public class EnemyMotor : MonoBehaviour
 
     private Vector2 _patrolAnchor;
     private int _patrolLegIndex;
+    private float _patrolLegDeadline;
+    private bool _patrolLegStarted;
+    private bool _patrolWaiting;
+    private float _patrolWaitUntil;
     private bool _isKnockedBack;
 
     public bool IsKnockedBack => _isKnockedBack;
@@ -35,39 +39,52 @@ public class EnemyMotor : MonoBehaviour
     public void ResetForSpawn()
     {
         if (_owner == null) return;
-        _patrolAnchor   = _owner.ReferencePosition;
-        _patrolLegIndex = 0;
-        _isKnockedBack  = false;
+        _patrolAnchor     = _owner.ReferencePosition;
+        _patrolLegIndex   = 0;
+        _patrolLegStarted = false;
+        _patrolWaiting    = false;
+        _isKnockedBack    = false;
     }
 
     public void ResetPatrolRoute()
     {
-        _patrolLegIndex = 0;
+        _patrolLegIndex   = 0;
+        _patrolLegStarted = false;
+        _patrolWaiting    = false;
     }
 
+    /// <summary>
+    /// Ping-pong route around the spawn anchor: anchor → left → anchor → right → anchor,
+    /// each side patrolLegUnits wide. Directions swap every round by construction.
+    /// </summary>
     private Vector2 GetPatrolWaypointWorld(int leg)
     {
-        Vector2 left = Vector2.left * _owner.patrolLegLeft;
-        Vector2 fwd = _owner.patrolForwardWorld.sqrMagnitude > 0.0001f
-            ? _owner.patrolForwardWorld.normalized * _owner.patrolLegForward
-            : Vector2.up * _owner.patrolLegForward;
-        Vector2 right = Vector2.right * _owner.patrolLegRight;
         switch (leg)
         {
-            case 0: return _patrolAnchor + left;
-            case 1: return _patrolAnchor + left + fwd;
-            case 2: return _patrolAnchor + left + fwd + right;
-            case 3: return _patrolAnchor;
+            case 0: return _patrolAnchor + Vector2.left * _owner.patrolLegUnits;
+            case 1: return _patrolAnchor;
+            case 2: return _patrolAnchor + Vector2.right * _owner.patrolLegUnits;
             default: return _patrolAnchor;
         }
     }
 
-    private void AdvancePatrolLegIfReached(Vector2 pos)
+    private void StartPatrolLeg(Vector2 from, float secondsPerUnit)
     {
         Vector2 wp = GetPatrolWaypointWorld(_patrolLegIndex);
-        if (Vector2.Distance(pos, wp) < _owner.patrolWaypointReachDistance)
-            _patrolLegIndex = (_patrolLegIndex + 1) % 4;
+        // 50% tolerance + fixed buffer: a blocked waypoint gets skipped instead of
+        // being pushed at forever.
+        _patrolLegDeadline = Time.time + Vector2.Distance(from, wp) * secondsPerUnit * 1.5f + 0.5f;
+        _patrolLegStarted  = true;
     }
+
+    private void AdvancePatrolLeg(Vector2 from, float secondsPerUnit)
+    {
+        _patrolLegIndex = (_patrolLegIndex + 1) % 4;
+        StartPatrolLeg(from, secondsPerUnit);
+    }
+
+    /// <summary>Legs 0 and 2 end at the left/right extremes; anchor legs are pass-through.</summary>
+    private static bool IsEndpointLeg(int leg) => leg == 0 || leg == 2;
 
     public void MoveByState()
     {
@@ -75,20 +92,49 @@ public class EnemyMotor : MonoBehaviour
         if (_rb == null) return;
 
         Vector2 velocity = Vector2.zero;
-        float baseSpeed = _owner.Stats != null ? _owner.Stats.moveSpeed : 4f;
         Vector2 origin = _owner.ReferencePosition;
         Transform playerT = _owner.PlayerTransform;
 
         if (_owner.CurrentState == Enemy.State.Patrol)
         {
-            AdvancePatrolLegIfReached(origin);
+            // stats.walkSpeed = seconds to traverse one unit; patrol speed is its inverse
+            float secondsPerUnit = _owner.Stats != null ? Mathf.Max(0.01f, _owner.Stats.walkSpeed) : 1f;
+
+            if (!_patrolLegStarted) StartPatrolLeg(origin, secondsPerUnit);
+
+            // Endpoint wait: stand still at zero velocity (animator shows Idle), then resume
+            if (_patrolWaiting)
+            {
+                if (Time.time < _patrolWaitUntil)
+                {
+                    _rb.linearVelocity = Vector2.zero;
+                    return;
+                }
+                _patrolWaiting = false;
+                AdvancePatrolLeg(origin, secondsPerUnit);
+            }
+
             Vector2 targetWp = GetPatrolWaypointWorld(_patrolLegIndex);
+            bool reached  = Vector2.Distance(origin, targetWp) < _owner.patrolWaypointReachDistance;
+            bool timedOut = Time.time >= _patrolLegDeadline;
+
+            if (reached && IsEndpointLeg(_patrolLegIndex) && _owner.patrolWaitSeconds > 0f)
+            {
+                _patrolWaiting  = true;
+                _patrolWaitUntil = Time.time + _owner.patrolWaitSeconds;
+                _rb.linearVelocity = Vector2.zero;
+                return;
+            }
+
+            if (reached || timedOut)
+            {
+                AdvancePatrolLeg(origin, secondsPerUnit);
+                targetWp = GetPatrolWaypointWorld(_patrolLegIndex);
+            }
+
             Vector2 toWp = targetWp - origin;
             if (toWp.sqrMagnitude > 0.0001f)
-            {
-                Vector2 dir = toWp.normalized;
-                velocity = _sensor.GetAvoidanceDirection(dir) * baseSpeed;
-            }
+                velocity = _sensor.GetAvoidanceDirection(toWp.normalized) * (1f / secondsPerUnit);
         }
         else if (playerT != null)
         {
@@ -97,8 +143,9 @@ public class EnemyMotor : MonoBehaviour
             float dist = Vector2.Distance(origin, playerT.position);
             if (dist > _owner.AttackBehavior.DesiredApproachDistance)
             {
+                float runSpeed = _owner.Stats != null ? _owner.Stats.runSpeed : 5f;
                 Vector2 targetDir = ((Vector2)playerT.position - origin).normalized;
-                velocity = _sensor.GetAvoidanceDirection(targetDir) * baseSpeed * _owner.chaseApproachSpeedMultiplier;
+                velocity = _sensor.GetAvoidanceDirection(targetDir) * runSpeed;
             }
         }
 

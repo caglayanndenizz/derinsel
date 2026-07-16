@@ -12,9 +12,13 @@ GameObject:
   - component: {fileID: 6500344557797086040}
   - component: {fileID: 3118878543372189048}
   - component: {fileID: 5723824824528666556}
-  m_Layer: 0
+  - component: {fileID: 708111569614397260}
+  - component: {fileID: 8132395466572430976}
+  - component: {fileID: 8823108636488799539}
+  - component: {fileID: 6853102947516482309}
+  m_Layer: 6
   m_Name: GreyRat
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118,6 +122,94 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &708111569614397260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3589069294228239780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2eb609b86791b74ab921e076ca59a6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  stats: {fileID: 11400000, guid: e1b87c5ee8e0b914897785fa04ba9507, type: 2}
+  currentState: 0
+  detectionRange: 10
+  expandedDetectionRange: 22
+  detectionCollider: {fileID: 5723824824528666556}
+  lightKnockbackForce: 5
+  heavyKnockbackForce: 12
+  knockbackDuration: 0.2
+  sensorLength: 1.5
+  blockingEnvironmentMask:
+    serializedVersion: 2
+    m_Bits: 499
+  patrolLegUnits: 2
+  patrolWaitSeconds: 1
+  patrolWaypointReachDistance: 0.22
+  goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
+  experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
+  goldDropChance: 0.15
+--- !u!114 &8132395466572430976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3589069294228239780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 786855a92c254384af8636cda3855dd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeAttackBehavior
+  attackInterval: 2
+  hitRange: 1.6
+  attackRange: 5
+--- !u!50 &8823108636488799539
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3589069294228239780}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &6853102947516482309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3589069294228239780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1ab60bc9d8c468ca2f5447113137d81, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+  animator: {fileID: 3118878543372189048}
+  attackTriggers:
+  - Attack
+  idleSpeedThreshold: 0.05
 --- !u!1 &7379994096229225103
 GameObject:
   m_ObjectHideFlags: 0
@@ -130,7 +222,7 @@ GameObject:
   - component: {fileID: 3315068207210086109}
   - component: {fileID: 5459643319083567057}
   - component: {fileID: 4579279961267735462}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}

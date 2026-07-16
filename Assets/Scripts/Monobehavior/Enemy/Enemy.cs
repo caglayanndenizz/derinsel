@@ -29,6 +29,8 @@ public class Enemy : BaseEntity
     public float lightKnockbackForce = 5f;
     public float heavyKnockbackForce = 12f;
     public float knockbackDuration = 0.2f;
+    [Tooltip("Minimum time the corpse stays active so the Die animation can play out before pool return.")]
+    public float deathAnimationSeconds = 0.45f;
     private Rigidbody2D _rb;
 
     [Header("Navigation (Tilemap + Colliders)")]
@@ -37,18 +39,11 @@ public class Enemy : BaseEntity
     public LayerMask blockingEnvironmentMask = Physics2D.DefaultRaycastLayers;
 
     [Header("Patrol Route (spawn-based)")]
-    [Tooltip("Left leg from spawn point (world -X).")]
-    public float patrolLegLeft = 2f;
-    [Tooltip("Second leg: forward direction (default world +Y).")]
-    public float patrolLegForward = 2f;
-    [Tooltip("Third leg: right (world +X).")]
-    public float patrolLegRight = 4f;
-    public Vector2 patrolForwardWorld = Vector2.up;
+    [Tooltip("Ping-pong distance to each side of the spawn point (world X units).")]
+    public float patrolLegUnits = 2f;
+    [Tooltip("Idle wait (zero velocity) at each patrol endpoint before heading back, in seconds.")]
+    public float patrolWaitSeconds = 1f;
     public float patrolWaypointReachDistance = 0.22f;
-
-    [Header("Movement")]
-    [Tooltip("Speed multiplier when chasing the player.")]
-    public float chaseApproachSpeedMultiplier = 1.6f;
 
     [Header("Loot Prefabs")]
     public GameObject goldPrefab;
@@ -229,7 +224,7 @@ public class Enemy : BaseEntity
         if (_currentHealth <= 0 && !_isDead) PrepareToDie();
     }
 
-    private void PrepareToDie() { _isDead = true; if (detectionCollider != null) detectionCollider.enabled = false; Invoke("Die", knockbackDuration + 0.05f); }
+    private void PrepareToDie() { _isDead = true; if (detectionCollider != null) detectionCollider.enabled = false; Invoke("Die", Mathf.Max(knockbackDuration + 0.05f, deathAnimationSeconds)); }
 
     protected override void Die() {
         Vector2 deathPosition = ReferencePosition;

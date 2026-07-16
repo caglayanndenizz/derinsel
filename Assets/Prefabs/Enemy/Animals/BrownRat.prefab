@@ -12,9 +12,13 @@ GameObject:
   - component: {fileID: 8608047093787517559}
   - component: {fileID: 7376582028313723653}
   - component: {fileID: 5111490866506752300}
-  m_Layer: 0
+  - component: {fileID: 5192769747498601167}
+  - component: {fileID: 4869283945954061395}
+  - component: {fileID: 1055298745915381111}
+  - component: {fileID: 7461538291046537201}
+  m_Layer: 6
   m_Name: BrownRat
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118,6 +122,94 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &5192769747498601167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2984326890098438617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 786855a92c254384af8636cda3855dd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeAttackBehavior
+  attackInterval: 2
+  hitRange: 1.6
+  attackRange: 5
+--- !u!114 &4869283945954061395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2984326890098438617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2eb609b86791b74ab921e076ca59a6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  stats: {fileID: 11400000, guid: e1b87c5ee8e0b914897785fa04ba9507, type: 2}
+  currentState: 0
+  detectionRange: 10
+  expandedDetectionRange: 22
+  detectionCollider: {fileID: 5111490866506752300}
+  lightKnockbackForce: 5
+  heavyKnockbackForce: 12
+  knockbackDuration: 0.2
+  sensorLength: 1.5
+  blockingEnvironmentMask:
+    serializedVersion: 2
+    m_Bits: 499
+  patrolLegUnits: 2
+  patrolWaitSeconds: 1
+  patrolWaypointReachDistance: 0.22
+  goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
+  experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
+  goldDropChance: 0.15
+--- !u!50 &1055298745915381111
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2984326890098438617}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &7461538291046537201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2984326890098438617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1ab60bc9d8c468ca2f5447113137d81, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+  animator: {fileID: 7376582028313723653}
+  attackTriggers:
+  - Attack
+  idleSpeedThreshold: 0.05
 --- !u!1 &7715907485246549302
 GameObject:
   m_ObjectHideFlags: 0
@@ -130,7 +222,7 @@ GameObject:
   - component: {fileID: 8039396812359692375}
   - component: {fileID: 255295690592146612}
   - component: {fileID: 1476021155362026107}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}

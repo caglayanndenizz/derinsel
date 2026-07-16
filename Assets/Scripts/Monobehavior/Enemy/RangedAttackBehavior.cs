@@ -36,6 +36,8 @@ public class RangedAttackBehavior : MonoBehaviour, IAttackBehavior
     private Enemy _owner;
     private float _nextFireTime;
 
+    public event System.Action AttackPerformed;
+
     public float AttackRange => attackRange;
     public float DesiredApproachDistance => attackRange;
 
@@ -94,6 +96,7 @@ public class RangedAttackBehavior : MonoBehaviour, IAttackBehavior
                 mover.Initialize(aim, projectileSpeed, dmg, projectileMaxLifetime);
         }
 
+        AttackPerformed?.Invoke();
         _nextFireTime = Time.time + AdjustedFireInterval;
     }
 

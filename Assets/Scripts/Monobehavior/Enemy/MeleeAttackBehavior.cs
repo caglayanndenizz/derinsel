@@ -16,6 +16,8 @@ public class MeleeAttackBehavior : MonoBehaviour, IAttackBehavior
     private Enemy _owner;
     private float _nextAttackTime;
 
+    public event System.Action AttackPerformed;
+
     public float AttackRange => attackRange;
 
     // Slightly inside hit range so the motor doesn't oscillate on the exact boundary.
@@ -46,6 +48,7 @@ public class MeleeAttackBehavior : MonoBehaviour, IAttackBehavior
         if (target != null)
             target.TakeDamage(_owner.Stats != null ? _owner.Stats.enemyAP : 0f, false);
 
+        AttackPerformed?.Invoke();
         _nextAttackTime = Time.time + attackInterval;
     }
 
