@@ -3,13 +3,10 @@ using UnityEngine;
 
 /// <summary>
 /// Bridges Enemy state to the art-pack Animator (PixelMonsters shared controller).
-/// Mapping: Patrol → Walk, Chase → Run, death → Die, everything else → Idle.
-/// Entering the Attack state plays Ready once as a wind-up; the first swing
-/// (melee hit / projectile spawn) fires an attack trigger and drops back to Idle
-/// between swings. While the player is farther than runResumeDistance the
-/// animator falls back to Run (still closing in) and the Ready wind-up re-arms.
-/// Controller-agnostic: parameters missing from the Animator are skipped, so any
-/// enemy prefab can carry this component with its own controller variant.
+/// Mapping: Patrol → Walk/Idle, Chase → Run, Attack → Ready (or Run while still
+/// closing in), death → Die. Idle is only ever reached from Patrol; Attack never
+/// shows Idle. Controller-agnostic: parameters missing from the Animator are
+/// skipped, so any enemy prefab can carry this component with its own controller variant.
 /// </summary>
 [RequireComponent(typeof(Enemy))]
 public class EnemyAnimator : MonoBehaviour
@@ -26,7 +23,7 @@ public class EnemyAnimator : MonoBehaviour
     [Tooltip("Patrol speeds below this count as standing still (Idle).")]
     [SerializeField] private float idleSpeedThreshold = 0.05f;
 
-    [Tooltip("In the Attack state, farther than this from the player shows Run (still closing in); the Ready wind-up re-arms.")]
+    [Tooltip("In the Attack state, farther than this from the player shows Run (still closing in); closer shows Ready.")]
     [SerializeField] private float runResumeDistance = 1.5f;
 
     [Tooltip("Movement speed (units/sec) at which locomotion clips play at 1x; slower movement plays them proportionally slower.")]
@@ -44,8 +41,6 @@ public class EnemyAnimator : MonoBehaviour
     private int _hitTriggerHash;
     private int[] _attackTriggerHashes;
     private HashSet<int> _availableParams;
-    private Enemy.State _lastState = Enemy.State.Patrol;
-    private bool _readyPending;
 
     /// <summary>Length of the controller's "Die" clip in seconds; 0 when the controller has none.</summary>
     public float DieAnimationLength { get; private set; }
@@ -106,8 +101,6 @@ public class EnemyAnimator : MonoBehaviour
     /// <summary>Pooled respawn reset; clears Die/trigger residue from the previous life.</summary>
     private void OnEnable()
     {
-        _readyPending = false;
-        _lastState = Enemy.State.Patrol;
         if (animator == null) return;
         animator.Rebind();
         animator.Update(0f);
@@ -130,15 +123,6 @@ public class EnemyAnimator : MonoBehaviour
         if (_enemy.IsFrozen) { animator.speed = 1f; ApplyExclusiveBool(IdleHash); return; }
 
         Enemy.State state = _enemy.CurrentState;
-        if (state == Enemy.State.Attack && _lastState != Enemy.State.Attack)
-            _readyPending = true; // one Ready wind-up per approach; cleared by the first swing
-        _lastState = state;
-
-        // Idle/Ready are zero-exit-time "Any State" transitions in the controller, so
-        // flipping either bool while the Attack clip is still playing cuts it short
-        // (looks like Ready -> Idle -> Attack). Leave bools untouched until it's done.
-        if (IsPlayingAttackClip())
-            return;
 
         int target;
         switch (state)
@@ -149,12 +133,11 @@ public class EnemyAnimator : MonoBehaviour
                     && Vector2.Distance(_enemy.ReferencePosition, playerT.position) > runResumeDistance;
                 if (closingIn)
                 {
-                    _readyPending = true; // wind-up replays once the enemy gets back in swing range
                     target = RunHash;
                 }
                 else
                 {
-                    target = _readyPending ? ReadyHash : IdleHash;
+                    target = ReadyHash; // Attack state never shows Idle; only Patrol can
                 }
                 break;
             case Enemy.State.Chase:
@@ -184,15 +167,6 @@ public class EnemyAnimator : MonoBehaviour
         ApplyExclusiveBool(target);
     }
 
-    private bool IsPlayingAttackClip()
-    {
-        AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
-        if (info.normalizedTime >= 1f) return false;
-        for (int i = 0; i < _attackTriggerHashes.Length; i++)
-            if (info.shortNameHash == _attackTriggerHashes[i]) return true;
-        return false;
-    }
-
     private void ApplyExclusiveBool(int activeHash)
     {
         SetBoolIfPresent(IdleHash,  activeHash == IdleHash);
@@ -210,7 +184,6 @@ public class EnemyAnimator : MonoBehaviour
 
     private void OnAttackPerformed()
     {
-        _readyPending = false;
         if (animator == null || _attackTriggerHashes.Length == 0) return;
         int hash = _attackTriggerHashes[Random.Range(0, _attackTriggerHashes.Length)];
         if (_availableParams.Contains(hash))

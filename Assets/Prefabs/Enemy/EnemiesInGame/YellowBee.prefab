@@ -165,8 +165,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   stats: {fileID: 11400000, guid: 5b1e107637dacb24b86ba8fa3aeab306, type: 2}
   currentState: 0
-  detectionRange: 10
-  expandedDetectionRange: 22
+  detectionRange: 5.92
+  expandedDetectionRange: 12.3
   detectionCollider: {fileID: 6064246435412071292}
   lightKnockbackForce: 5
   heavyKnockbackForce: 12
