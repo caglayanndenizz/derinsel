@@ -2420,6 +2420,63 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!1001 &828025477
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2665357852276176133, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -6.482952
+      objectReference: {fileID: 0}
+    - target: {fileID: 2665357852276176133, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 4.7550445
+      objectReference: {fileID: 0}
+    - target: {fileID: 2665357852276176133, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2665357852276176133, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2665357852276176133, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2665357852276176133, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2665357852276176133, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2665357852276176133, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2665357852276176133, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2665357852276176133, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3956432861087736936, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
+      propertyPath: m_Name
+      value: YellowBee
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b3f405c6ffa2bfd4098ce262eb9c845f, type: 3}
 --- !u!1 &883284788
 GameObject:
   m_ObjectHideFlags: 0
@@ -4614,7 +4671,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f371097396a045f598db010dc4e721f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyProjectilePooler
-  projectilePrefab: {fileID: 6304853734587583923, guid: 85829922e17f94981a185366d6919300, type: 3}
+  projectilePrefabs:
+  - {fileID: 9051098391796714330, guid: 3f256470331e96849a38cd8bfba03729, type: 3}
+  - {fileID: 6275147764241687680, guid: 9b82ed35f45f7f3499924cc871814c42, type: 3}
   initialPoolSize: 40
   canExpandPool: 1
   poolParent: {fileID: 273267496}
@@ -5959,6 +6018,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 456458915}
     - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
+      propertyPath: damageFlashDuration
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2498132936826151563, guid: d6e0fa6f890373947be16d13774230d0, type: 3}
       propertyPath: hammerCooldownCanvas
       value: 
       objectReference: {fileID: 1767116303}
@@ -6048,3 +6111,4 @@ SceneRoots:
   - {fileID: 1134197084}
   - {fileID: 2137899507}
   - {fileID: 214915947830347461}
+  - {fileID: 828025477}

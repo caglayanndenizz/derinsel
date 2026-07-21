@@ -186,6 +186,7 @@ public class Enemy : BaseEntity
             else if (dist <= attackDistance)
             {
                 currentState = State.Attack;
+                _attack.ResetAttackCooldown();
             }
         }
         else if (currentState == State.Attack)

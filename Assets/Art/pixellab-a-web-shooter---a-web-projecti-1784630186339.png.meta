@@ -1,0 +1,1781 @@
+fileFormatVersion: 2
+guid: 9a3f58e558e2b564c98dc425990ff8b6
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1539893521300423143
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_0
+  - first:
+      213: -5000708920574044564
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_1
+  - first:
+      213: -4831218216431931240
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_2
+  - first:
+      213: 403530836069116948
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_3
+  - first:
+      213: 3267890251701526709
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_4
+  - first:
+      213: -1460847042027973709
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_5
+  - first:
+      213: -6359947949240426008
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_6
+  - first:
+      213: -5843206117720329099
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_7
+  - first:
+      213: -5791822685311517144
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_8
+  - first:
+      213: 5149217824344911494
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_9
+  - first:
+      213: 3290358814523559897
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_10
+  - first:
+      213: 7643939016482762602
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_11
+  - first:
+      213: -6075108423103949722
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_12
+  - first:
+      213: 2059367071497774211
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_13
+  - first:
+      213: -6032894367260946688
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_14
+  - first:
+      213: -1779277698138616872
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_15
+  - first:
+      213: -5356855431404601251
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_16
+  - first:
+      213: -5092588815245733978
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_17
+  - first:
+      213: -4532178170418410292
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_18
+  - first:
+      213: 2928721034548172312
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_19
+  - first:
+      213: 759550842696682745
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_20
+  - first:
+      213: -1967417167945701478
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_21
+  - first:
+      213: -1316520783000354862
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_22
+  - first:
+      213: -3647402684553704824
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_23
+  - first:
+      213: -5098210667963564222
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_24
+  - first:
+      213: 8969174308100337159
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_25
+  - first:
+      213: 6051602829642341715
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_26
+  - first:
+      213: 2312057243085435801
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_27
+  - first:
+      213: -1540513408428610315
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_28
+  - first:
+      213: -2291823678133585388
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_29
+  - first:
+      213: -7103827573583050860
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_30
+  - first:
+      213: -6554956801853467843
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_31
+  - first:
+      213: -8601216185956149394
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_32
+  - first:
+      213: -4923483300395337525
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_33
+  - first:
+      213: -1983209321000148626
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_34
+  - first:
+      213: 3888163780133294065
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_35
+  - first:
+      213: -1232319771769597560
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_36
+  - first:
+      213: -4842775601778370763
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_37
+  - first:
+      213: -2002487179735685664
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_38
+  - first:
+      213: 8537084041249086798
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_39
+  - first:
+      213: 756459028427179568
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_40
+  - first:
+      213: -1439767777059906511
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_41
+  - first:
+      213: -464393703909156753
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_42
+  - first:
+      213: -7065482015747525744
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_43
+  - first:
+      213: -7208581209218699117
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_44
+  - first:
+      213: -2751241741840517681
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_45
+  - first:
+      213: 3822919578632663664
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_46
+  - first:
+      213: 1910162207809538460
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_47
+  - first:
+      213: 2680861081811123025
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_48
+  - first:
+      213: -5013855317195178357
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_49
+  - first:
+      213: -248462198418984791
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_50
+  - first:
+      213: -1409169584079316121
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_51
+  - first:
+      213: -2412656048524397550
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_52
+  - first:
+      213: 5081077716548085116
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_53
+  - first:
+      213: 3028236181443351521
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_54
+  - first:
+      213: -3441249779623664759
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_55
+  - first:
+      213: -7060754736926048922
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_56
+  - first:
+      213: -1197149399373369545
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_57
+  - first:
+      213: -4729757075406099633
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_58
+  - first:
+      213: 1439439123610117630
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_59
+  - first:
+      213: -3887266299803696665
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_60
+  - first:
+      213: 9011048967570148840
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_61
+  - first:
+      213: 1557046147577952829
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_62
+  - first:
+      213: -4026273820715167942
+    second: pixellab-a-web-shooter---a-web-projecti-1784630186339_63
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_0
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 225
+        width: 18
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91e76f6400331aae0800000000000000
+      internalID: -1539893521300423143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_1
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 226
+        width: 30
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c669e0c4bb9e99ab0800000000000000
+      internalID: -5000708920574044564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_2
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 225
+        width: 18
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 890bd2901a014fcb0800000000000000
+      internalID: -4831218216431931240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_3
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 225
+        width: 21
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41ce0db4821a99500800000000000000
+      internalID: 403530836069116948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_4
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 226
+        width: 30
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b0a1a1bed0e95d20800000000000000
+      internalID: 3267890251701526709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_5
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 226
+        width: 30
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b31ebcea570abbe0800000000000000
+      internalID: -1460847042027973709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_6
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 225
+        width: 27
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e1ec8f590decb7a0800000000000000
+      internalID: -6359947949240426008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_7
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 225
+        width: 22
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 574f3eb9ef2c8eea0800000000000000
+      internalID: -5843206117720329099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_8
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 195
+        width: 30
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82e35ff34ff4f9fa0800000000000000
+      internalID: -5791822685311517144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_9
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 193
+        width: 18
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68e203b5452b57740800000000000000
+      internalID: 5149217824344911494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_10
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 194
+        width: 30
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9df8043a8e3b9ad20800000000000000
+      internalID: 3290358814523559897
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_11
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 193
+        width: 22
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6f2432490ab41a60800000000000000
+      internalID: 7643939016482762602
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_12
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 193
+        width: 30
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 664d7e49311e0bba0800000000000000
+      internalID: -6075108423103949722
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_13
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 193
+        width: 30
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 384e2c6c077549c10800000000000000
+      internalID: 2059367071497774211
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_14
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 194
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00fc4ff598ad64ca0800000000000000
+      internalID: -6032894367260946688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_15
+      rect:
+        serializedVersion: 2
+        x: 234
+        y: 193
+        width: 14
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8db4cad4c5cbe47e0800000000000000
+      internalID: -1779277698138616872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_16
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 162
+        width: 30
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d50c102fd50a8a5b0800000000000000
+      internalID: -5356855431404601251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_17
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 161
+        width: 23
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6af8628447d7359b0800000000000000
+      internalID: -5092588815245733978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_18
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 161
+        width: 26
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccc4e6d67f77a11c0800000000000000
+      internalID: -4532178170418410292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_19
+      rect:
+        serializedVersion: 2
+        x: 97
+        y: 161
+        width: 30
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 816557e8348e4a820800000000000000
+      internalID: 2928721034548172312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_20
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 162
+        width: 30
+        height: 27
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9fcc8c797777a8a00800000000000000
+      internalID: 759550842696682745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_21
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 161
+        width: 18
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a976793728452b4e0800000000000000
+      internalID: -1967417167945701478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_22
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 161
+        width: 15
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2df38d5b257cabde0800000000000000
+      internalID: -1316520783000354862
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_23
+      rect:
+        serializedVersion: 2
+        x: 233
+        y: 161
+        width: 16
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88ace5a4592d16dc0800000000000000
+      internalID: -3647402684553704824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_24
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 131
+        width: 27
+        height: 27
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 24fbce1b8648f39b0800000000000000
+      internalID: -5098210667963564222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_25
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 130
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70e61e23388e87c70800000000000000
+      internalID: 8969174308100337159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_26
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 129
+        width: 28
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35d9496f5bc9bf350800000000000000
+      internalID: 6051602829642341715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_27
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 131
+        width: 25
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 993f97210d3161020800000000000000
+      internalID: 2312057243085435801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_28
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 131
+        width: 26
+        height: 25
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5fce2ee873ffe9ae0800000000000000
+      internalID: -1540513408428610315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_29
+      rect:
+        serializedVersion: 2
+        x: 163
+        y: 131
+        width: 26
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41ab401e18ec130e0800000000000000
+      internalID: -2291823678133585388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_30
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 133
+        width: 24
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49705f2a5722a6d90800000000000000
+      internalID: -7103827573583050860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_31
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 127
+        width: 33
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d335e73b48d1805a0800000000000000
+      internalID: -6554956801853467843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_32
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 107
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e675eb7337752a880800000000000000
+      internalID: -8601216185956149394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_33
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 99
+        width: 26
+        height: 27
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc83e5626064cabb0800000000000000
+      internalID: -4923483300395337525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_34
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 98
+        width: 26
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e61ea8a41a93a74e0800000000000000
+      internalID: -1983209321000148626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_35
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 99
+        width: 25
+        height: 25
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ff826f8b5885f530800000000000000
+      internalID: 3888163780133294065
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_36
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 102
+        width: 28
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8819bf952bbe5eee0800000000000000
+      internalID: -1232319771769597560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_37
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 100
+        width: 28
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53752119f310bccb0800000000000000
+      internalID: -4842775601778370763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_38
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 98
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e5a498058cb534e0800000000000000
+      internalID: -2002487179735685664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_39
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 101
+        width: 22
+        height: 22
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4dde4044b0d97670800000000000000
+      internalID: 8537084041249086798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_40
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 63
+        width: 33
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0360a8c7a7b7f7a00800000000000000
+      internalID: 756459028427179568
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_41
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 69
+        width: 26
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 13c5a41c5dae40ce0800000000000000
+      internalID: -1439767777059906511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_42
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 67
+        width: 28
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f68119203642e89f0800000000000000
+      internalID: -464393703909156753
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_43
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 70
+        width: 28
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 093357c8a8d52fd90800000000000000
+      internalID: -7065482015747525744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_44
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 66
+        width: 28
+        height: 27
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 390b6f93599f5fb90800000000000000
+      internalID: -7208581209218699117
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_45
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 66
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc57e566630a1d9d0800000000000000
+      internalID: -2751241741840517681
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_46
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 66
+        width: 24
+        height: 27
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07239412a1dbd0530800000000000000
+      internalID: 3822919578632663664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_47
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 68
+        width: 26
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c990dd35862428a10800000000000000
+      internalID: 1910162207809538460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ex1
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 33
+        width: 20
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15b758933f4543520800000000000000
+      internalID: 2680861081811123025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ex3
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 33
+        width: 24
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8eb06f47253b6ab0800000000000000
+      internalID: -5013855317195178357
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_50
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 33
+        width: 26
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a0bf1b62f84d8cf0800000000000000
+      internalID: -248462198418984791
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_51
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 32
+        width: 26
+        height: 31
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76bdaa8babf917ce0800000000000000
+      internalID: -1409169584079316121
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_52
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 35
+        width: 26
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 214718e4b16848ed0800000000000000
+      internalID: -2412656048524397550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_53
+      rect:
+        serializedVersion: 2
+        x: 163
+        y: 35
+        width: 26
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c756003334d938640800000000000000
+      internalID: 5081077716548085116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_54
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 33
+        width: 28
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e39ae243c4760a20800000000000000
+      internalID: 3028236181443351521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_55
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 33
+        width: 30
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 983e326de893e30d0800000000000000
+      internalID: -3441249779623664759
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ex2
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 1
+        width: 22
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66dbd5be9f8230e90800000000000000
+      internalID: -7060754736926048922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ex4
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 1
+        width: 24
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73f274bc6fed26fe0800000000000000
+      internalID: -1197149399373369545
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_58
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 1
+        width: 26
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4b678ecff68c5eb0800000000000000
+      internalID: -4729757075406099633
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_59
+      rect:
+        serializedVersion: 2
+        x: 103
+        y: 3
+        width: 18
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef5a496a14ae9f310800000000000000
+      internalID: 1439439123610117630
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_60
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 3
+        width: 26
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e18adc55e7ad0ac0800000000000000
+      internalID: -3887266299803696665
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_61
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 1
+        width: 30
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ed4bad1b4dad0d70800000000000000
+      internalID: 9011048967570148840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_62
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 2
+        width: 27
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3a364db83dbb9510800000000000000
+      internalID: 1557046147577952829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pixellab-a-web-shooter---a-web-projecti-1784630186339_63
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 1
+        width: 29
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3f41dbca4dcf18c0800000000000000
+      internalID: -4026273820715167942
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 48b2853e0927c6949827d2ec6a17c795
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      ex1: 2680861081811123025
+      ex2: -7060754736926048922
+      ex3: -5013855317195178357
+      ex4: -1197149399373369545
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_0: -1539893521300423143
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_1: -5000708920574044564
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_10: 3290358814523559897
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_11: 7643939016482762602
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_12: -6075108423103949722
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_13: 2059367071497774211
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_14: -6032894367260946688
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_15: -1779277698138616872
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_16: -5356855431404601251
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_17: -5092588815245733978
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_18: -4532178170418410292
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_19: 2928721034548172312
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_2: -4831218216431931240
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_20: 759550842696682745
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_21: -1967417167945701478
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_22: -1316520783000354862
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_23: -3647402684553704824
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_24: -5098210667963564222
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_25: 8969174308100337159
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_26: 6051602829642341715
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_27: 2312057243085435801
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_28: -1540513408428610315
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_29: -2291823678133585388
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_3: 403530836069116948
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_30: -7103827573583050860
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_31: -6554956801853467843
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_32: -8601216185956149394
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_33: -4923483300395337525
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_34: -1983209321000148626
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_35: 3888163780133294065
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_36: -1232319771769597560
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_37: -4842775601778370763
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_38: -2002487179735685664
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_39: 8537084041249086798
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_4: 3267890251701526709
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_40: 756459028427179568
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_41: -1439767777059906511
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_42: -464393703909156753
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_43: -7065482015747525744
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_44: -7208581209218699117
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_45: -2751241741840517681
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_46: 3822919578632663664
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_47: 1910162207809538460
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_5: -1460847042027973709
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_50: -248462198418984791
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_51: -1409169584079316121
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_52: -2412656048524397550
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_53: 5081077716548085116
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_54: 3028236181443351521
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_55: -3441249779623664759
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_58: -4729757075406099633
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_59: 1439439123610117630
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_6: -6359947949240426008
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_60: -3887266299803696665
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_61: 9011048967570148840
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_62: 1557046147577952829
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_63: -4026273820715167942
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_7: -5843206117720329099
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_8: -5791822685311517144
+      pixellab-a-web-shooter---a-web-projecti-1784630186339_9: 5149217824344911494
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

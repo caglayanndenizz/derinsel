@@ -134,6 +134,12 @@ public class EnemyAnimator : MonoBehaviour
             _readyPending = true; // one Ready wind-up per approach; cleared by the first swing
         _lastState = state;
 
+        // Idle/Ready are zero-exit-time "Any State" transitions in the controller, so
+        // flipping either bool while the Attack clip is still playing cuts it short
+        // (looks like Ready -> Idle -> Attack). Leave bools untouched until it's done.
+        if (IsPlayingAttackClip())
+            return;
+
         int target;
         switch (state)
         {
@@ -176,6 +182,15 @@ public class EnemyAnimator : MonoBehaviour
         }
 
         ApplyExclusiveBool(target);
+    }
+
+    private bool IsPlayingAttackClip()
+    {
+        AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
+        if (info.normalizedTime >= 1f) return false;
+        for (int i = 0; i < _attackTriggerHashes.Length; i++)
+            if (info.shortNameHash == _attackTriggerHashes[i]) return true;
+        return false;
     }
 
     private void ApplyExclusiveBool(int activeHash)

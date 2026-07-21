@@ -1071,7 +1071,7 @@ MonoBehaviour:
   dashDistance: 3
   dashCooldown: 10
   dashAlphaFlashDuration: 0.1
-  dashFlashTarget: {fileID: 0}
+  dashFlashTarget: {fileID: 320444626900081384}
   dashCooldownBar: {fileID: 0}
   dashCooldownCanvas: {fileID: 0}
   showDashCooldownBarWhenReady: 1

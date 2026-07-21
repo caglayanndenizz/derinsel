@@ -11,6 +11,8 @@ public partial class Player : BaseEntity, IPlayerContext
 
     [Header("Damage")]
     [SerializeField] private float damageInvulnerabilityDuration = 0.2f;
+    [SerializeField] private Color damageFlashColor = Color.red;
+    [SerializeField] private float damageFlashDuration = 0.5f;
 
     [Header("References")]
     public Transform attackPoint;
@@ -215,6 +217,16 @@ public partial class Player : BaseEntity, IPlayerContext
         base.TakeDamage(amount, isHeavy);
         NotifyHealthChanged();
         _invulnerableUntil = Time.time + Mathf.Max(0f, damageInvulnerabilityDuration);
+        StartCoroutine(DamageFlashRoutine());
+    }
+
+    private IEnumerator DamageFlashRoutine()
+    {
+        if (dashFlashTarget == null) yield break;
+        Color original = dashFlashTarget.color;
+        dashFlashTarget.color = damageFlashColor;
+        yield return new WaitForSeconds(damageFlashDuration);
+        dashFlashTarget.color = original;
     }
 
     protected override void Die()

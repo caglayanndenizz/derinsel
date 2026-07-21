@@ -85,7 +85,8 @@ public class EnemyProjectile : MonoBehaviour
     void OnEnable()
     {
         if (_pooler == null) _pooler = EnemyProjectilePooler.Instance;
-        transform.rotation = Quaternion.identity;
+        // Rotation is intentionally left alone here: Initialize() already set it
+        // to the correct travel-direction angle before SetActive(true) triggers this.
         ConfigureNoPushThroughPlayer();
     }
 

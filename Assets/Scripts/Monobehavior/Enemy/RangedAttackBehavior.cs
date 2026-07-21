@@ -21,6 +21,8 @@ public class RangedAttackBehavior : MonoBehaviour, IAttackBehavior
     public float fireInterval = 4f;
     [Tooltip("Fire rate multiplier. 1.5 => 50% faster fire rate.")]
     public float fireRateMultiplier = 1.5f;
+    [Tooltip("Delay between the Attack animation trigger and the projectile actually spawning (seconds). Sync this to the throw frame of the Attack clip so the projectile doesn't launch before the wind-up plays.")]
+    public float attackWindUpDelay = 0.25f;
 
     [Header("Spawn Point")]
     [Tooltip("Projectile spawns from this child transform (searches for 'projectilePivot' child if empty).")]
@@ -35,6 +37,7 @@ public class RangedAttackBehavior : MonoBehaviour, IAttackBehavior
 
     private Enemy _owner;
     private float _nextFireTime;
+    private bool _windingUp;
 
     public event System.Action AttackPerformed;
 
@@ -54,6 +57,7 @@ public class RangedAttackBehavior : MonoBehaviour, IAttackBehavior
     public void ResetForSpawn()
     {
         _nextFireTime = Time.time + AdjustedFireInterval;
+        _windingUp = false;
     }
 
     public void ResetAttackCooldown()
@@ -63,9 +67,37 @@ public class RangedAttackBehavior : MonoBehaviour, IAttackBehavior
 
     public void TickAttack()
     {
+        if (_windingUp) return;
         if (_owner.CurrentState == Enemy.State.Patrol || _owner.PlayerObject == null || projectilePrefab == null) return;
         if (!_owner.HasLineOfSightToPlayer()) return;
         if (Time.time < _nextFireTime) return;
+
+        // Reserve the next slot immediately so TickAttack can't re-enter while winding up.
+        _nextFireTime = Time.time + AdjustedFireInterval;
+        AttackPerformed?.Invoke(); // triggers the Attack animation now; projectile spawns after the wind-up
+
+        if (attackWindUpDelay > 0f)
+        {
+            _windingUp = true;
+            StartCoroutine(FireAfterWindUp(attackWindUpDelay));
+        }
+        else
+        {
+            SpawnProjectile();
+        }
+    }
+
+    private System.Collections.IEnumerator FireAfterWindUp(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        _windingUp = false;
+        if (_owner == null || _owner.IsDead || _owner.CurrentState == Enemy.State.Patrol) yield break;
+        SpawnProjectile();
+    }
+
+    private void SpawnProjectile()
+    {
+        if (_owner.PlayerObject == null || projectilePrefab == null) return;
 
         Vector2 aim = _owner.HasLastKnownPlayerPosition
             ? _owner.LastKnownPlayerPosition
@@ -82,7 +114,7 @@ public class RangedAttackBehavior : MonoBehaviour, IAttackBehavior
             dmg = Mathf.Max(0.0001f, projectileDamageOverride);
 
         GameObject proj = projectilePooler != null
-            ? projectilePooler.GetProjectile(spawnPos, Quaternion.identity, mover =>
+            ? projectilePooler.GetProjectile(projectilePrefab, spawnPos, Quaternion.identity, mover =>
             {
                 if (mover != null)
                     mover.Initialize(aim, projectileSpeed, dmg, projectileMaxLifetime);
@@ -95,9 +127,6 @@ public class RangedAttackBehavior : MonoBehaviour, IAttackBehavior
             if (mover != null)
                 mover.Initialize(aim, projectileSpeed, dmg, projectileMaxLifetime);
         }
-
-        AttackPerformed?.Invoke();
-        _nextFireTime = Time.time + AdjustedFireInterval;
     }
 
     private Vector3 GetProjectileSpawnPosition()
