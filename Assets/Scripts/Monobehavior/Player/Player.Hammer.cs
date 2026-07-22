@@ -11,7 +11,7 @@ public partial class Player
     [Tooltip("Hold duration (seconds) before charge mode activates. Releasing before this threshold triggers a light attack.")]
     [SerializeField] private float hammerChargeStartDelay = 0.5f;
 
-    [Header("Hammer Settings (Light)")]
+    [Header("Light Hammer Settings")]
     [Tooltip("Minimum time between light hammer attacks (seconds).")]
     [SerializeField] private float hammerLightAttackRate = 0.4f;
     [Tooltip("Light hammer attack range (overlap circle radius). Should usually be larger than the heavy hammer radius.")]
@@ -19,7 +19,7 @@ public partial class Player
     [Tooltip("Fallback trigger delay if no animation event is received (seconds).")]
     [SerializeField] private float hammerLightFallbackDelay = 0.15f;
 
-    [Header("Light Attack Settings (Spammable)")]
+    [Header("Spammable Light Attack Settings")]
     public float lightAttackRate = 0.2f;
     public float lightAttackDuration = 0.1f;
     [SerializeField] private float lightImpactFallbackDelay = 0.08f;
