@@ -14,8 +14,8 @@ public partial class Player
     [Header("Hammer Settings (Light)")]
     [Tooltip("Minimum time between light hammer attacks (seconds).")]
     [SerializeField] private float hammerLightAttackRate = 0.4f;
-    [Tooltip("Light hammer salvo radius. Usually half the heavy hammer radius.")]
-    [SerializeField] private float hammerLightAoe;
+    [Tooltip("Light hammer attack range (overlap circle radius). Should usually be larger than the heavy hammer radius.")]
+    [SerializeField] private float hammerLightRange = 3f;
     [Tooltip("Fallback trigger delay if no animation event is received (seconds).")]
     [SerializeField] private float hammerLightFallbackDelay = 0.15f;
 
@@ -159,10 +159,7 @@ public partial class Player
 
         if (attackPoint == null) return;
 
-        Vector2 facing    = transform.localScale.x >= 0f ? Vector2.right : Vector2.left;
-        Vector2 boxSize   = new Vector2(hammerLightAoe * 2f, hammerLightAoe);
-        Vector2 boxCenter = (Vector2)attackPoint.position + facing * hammerLightAoe;
-        RaycastHit2D[] hits = Physics2D.BoxCastAll(boxCenter, boxSize, 0f, facing, 0f, enemyLayers);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, hammerLightRange, enemyLayers);
         if (hits.Length == 0) return;
 
         float lightDmg     = stats != null ? stats.hammerLightDamage : 0f;
@@ -173,14 +170,14 @@ public partial class Player
         Vector2 firstHitPoint = attackPoint.position;
         bool anyHit = false;
 
-        foreach (RaycastHit2D hit in hits)
+        foreach (Collider2D hit in hits)
         {
-            IDamageable target = hit.collider.GetComponent<IDamageable>() ?? hit.collider.GetComponentInParent<IDamageable>();
+            IDamageable target = hit.GetComponent<IDamageable>() ?? hit.GetComponentInParent<IDamageable>();
             if (target == null) continue;
             target.TakeDamage(useDamage, false);
             if (!anyHit)
             {
-                firstHitPoint = hit.collider.ClosestPoint(attackPoint.position);
+                firstHitPoint = hit.ClosestPoint(attackPoint.position);
                 anyHit = true;
             }
         }
@@ -270,15 +267,11 @@ public partial class Player
     {
         if (attackPoint == null) return;
 
-        Vector2 facing    = transform.localScale.x >= 0f ? Vector2.right : Vector2.left;
-        Vector2 boxSize   = new Vector2(hammerLightAoe * 2f, hammerLightAoe);
-        Vector2 boxCenter = (Vector2)attackPoint.position + facing * hammerLightAoe;
-
-        // Light attack — directional box (orange)
-        Gizmos.color = new Color(1f, 0.6f, 0f, 0.25f);
-        Gizmos.DrawCube(boxCenter, boxSize);
+        // Light attack — radial circle (orange)
+        Gizmos.color = new Color(1f, 0.6f, 0f, 0.15f);
+        Gizmos.DrawSphere(attackPoint.position, hammerLightRange);
         Gizmos.color = new Color(1f, 0.6f, 0f, 1f);
-        Gizmos.DrawWireCube(boxCenter, boxSize);
+        Gizmos.DrawWireSphere(attackPoint.position, hammerLightRange);
 
         // Heavy slam — radial circle (red)
         float effectiveHeavyAoe = hammerAOE * (playerAugmentController != null ? playerAugmentController.HammerAoeRadiusMultiplier : 1f);

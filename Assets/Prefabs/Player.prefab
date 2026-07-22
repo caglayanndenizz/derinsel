@@ -1081,7 +1081,7 @@ MonoBehaviour:
   heavyImpactFallbackDelay: 0.17
   hammerChargeStartDelay: 0.5
   hammerLightAttackRate: 0.4
-  hammerLightAoe: 1.1
+  hammerLightRange: 3
   hammerLightFallbackDelay: 0.15
   lightAttackRate: 0.2
   lightAttackDuration: 0.1
