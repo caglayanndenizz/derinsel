@@ -14,6 +14,8 @@ public class PlayerBarsUI : MonoBehaviour
     [SerializeField] private TMP_Text goldText;
     [SerializeField] private TMP_Text killText;
 
+    private KillCounter _killCounter;
+
     private void Awake()
     {
         if (player == null)
@@ -108,14 +110,21 @@ public class PlayerBarsUI : MonoBehaviour
 
     private void BindKillCounter()
     {
-        if (KillCounter.Instance != null)
-            KillCounter.Instance.KillCountChanged += HandleKillCountChanged;
+        // KillCounter.Instance may not be set yet if KillCounter's own Awake hasn't run
+        // before this OnEnable (Awake order between separate GameObjects isn't guaranteed).
+        // FindAnyObjectByType finds the component regardless of that ordering.
+        if (_killCounter == null)
+            _killCounter = KillCounter.Instance != null ? KillCounter.Instance : Object.FindAnyObjectByType<KillCounter>();
+        if (_killCounter == null) return;
+
+        _killCounter.KillCountChanged += HandleKillCountChanged;
+        HandleKillCountChanged(_killCounter.TotalKills);
     }
 
     private void UnbindKillCounter()
     {
-        if (KillCounter.Instance != null)
-            KillCounter.Instance.KillCountChanged -= HandleKillCountChanged;
+        if (_killCounter == null) return;
+        _killCounter.KillCountChanged -= HandleKillCountChanged;
     }
 
     private void HandleKillCountChanged(int kills)
