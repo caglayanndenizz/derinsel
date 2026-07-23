@@ -28,12 +28,8 @@ public class CrossbowState : PlayerState
     {
         if (Time.time < context.NextAttackTime) return;
 
-        float dmg = context.Stats != null
-            ? context.Stats.crossbowAp
-            : 0f;
-
         Vector2 aim = context.GetLongbowAimWorldPointAtCurrentMouse();
-        context.ScheduleCrossbowBolt(dmg, aim);
+        context.ScheduleCrossbowBolt(aim);
 
         if (context.Animator != null)
             context.Animator.SetTrigger(CrossbowShootHash);

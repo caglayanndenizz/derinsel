@@ -86,11 +86,11 @@ public partial class Player : BaseEntity, IPlayerContext
         set => _lightFallbackExecuteAt = value;
     }
 
-    void IPlayerContext.ScheduleLongbowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
-        => ScheduleLongbowArrow(damage, useBowChargedMultiplier, aimWorldAtFireInput);
+    void IPlayerContext.ScheduleLongbowArrow(bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+        => ScheduleLongbowArrow(useBowChargedMultiplier, aimWorldAtFireInput);
 
-    void IPlayerContext.ScheduleCrossbowBolt(float damage, Vector2 aimWorldAtFireInput)
-        => ScheduleCrossbowBolt(damage, aimWorldAtFireInput);
+    void IPlayerContext.ScheduleCrossbowBolt(Vector2 aimWorldAtFireInput)
+        => ScheduleCrossbowBolt(aimWorldAtFireInput);
 
     Vector2 IPlayerContext.GetLongbowAimWorldPointAtCurrentMouse()
         => GetLongbowAimWorldPointAtCurrentMouse();

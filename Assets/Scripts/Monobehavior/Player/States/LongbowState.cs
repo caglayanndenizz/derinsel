@@ -24,10 +24,7 @@ public class LongbowState : PlayerState
             {
                 context.Animator?.SetTrigger(LightAttackHash);
                 Vector2 aim = context.GetLongbowAimWorldPointAtCurrentMouse();
-                float dmg = context.Stats != null
-                    ? (wasFull ? context.Stats.bowHeavyAp : context.Stats.bowLightAp)
-                    : 0f;
-                context.ScheduleLongbowArrow(dmg, wasFull, aim);
+                context.ScheduleLongbowArrow(wasFull, aim);
                 context.LightAttackInProgress = true;
                 context.LightFallbackExecuteAt = Time.time + Mathf.Max(0.03f, context.LightImpactFallbackDelay);
                 context.NextAttackTime = Time.time + context.LightAttackRate;

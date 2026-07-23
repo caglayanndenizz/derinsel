@@ -21,29 +21,28 @@ public partial class Player
 
     // ─── Crossbow / bolt ─────────────────────────────────────────────────────
 
-    private void ScheduleCrossbowBolt(float damage, Vector2 aimWorld)
+    private void ScheduleCrossbowBolt(Vector2 aimWorld)
     {
         // Lock attackPoint position at fire time so direction stays correct after delay.
         Vector2 fireOrigin = attackPoint != null ? (Vector2)attackPoint.position : Vector2.zero;
         float delay = Mathf.Max(0f, crossbowBoltReleaseDelay);
-        if (delay <= 0f) { SpawnCrossbowBolt(damage, aimWorld, fireOrigin); return; }
-        StartCoroutine(CrossbowBoltSpawnAfterDelay(delay, damage, aimWorld, fireOrigin));
+        if (delay <= 0f) { SpawnCrossbowBolt(aimWorld, fireOrigin); return; }
+        StartCoroutine(CrossbowBoltSpawnAfterDelay(delay, aimWorld, fireOrigin));
     }
 
-    private IEnumerator CrossbowBoltSpawnAfterDelay(float delay, float damage, Vector2 aimWorld, Vector2 fireOrigin)
+    private IEnumerator CrossbowBoltSpawnAfterDelay(float delay, Vector2 aimWorld, Vector2 fireOrigin)
     {
         yield return new WaitForSeconds(delay);
-        SpawnCrossbowBolt(damage, aimWorld, fireOrigin);
+        SpawnCrossbowBolt(aimWorld, fireOrigin);
     }
 
-    private void SpawnCrossbowBolt(float damage, Vector2 aimWorld, Vector2 directionOrigin)
+    private void SpawnCrossbowBolt(Vector2 aimWorld, Vector2 directionOrigin)
     {
         if (attackPoint == null) return;
 
         PlayerAugmentController aug = playerAugmentController;
-        float dmgMult   = aug != null ? aug.OutgoingDamageMultiplier : 1f;
-        float useSpeed  = arrowSpeed * crossbowBoltSpeedMultiplier;
-        float useDamage = damage * dmgMult;
+        float dmgMult  = aug != null ? aug.OutgoingDamageMultiplier : 1f;
+        float useSpeed = arrowSpeed * crossbowBoltSpeedMultiplier;
 
         Vector2 origin = attackPoint.position;
         // Direction calculated from fire-time origin to avoid flip/movement errors during delay.
@@ -59,13 +58,15 @@ public partial class Player
         {
             float angleOffset = (i - centerOffset) * spreadStepDegrees;
             Vector2 shotDir = Quaternion.Euler(0f, 0f, angleOffset) * dir;
-            TrySpawnSingleCrossbowBolt(origin, origin + shotDir * targetDistance, useSpeed, useDamage);
+            // Her civata kendi hasarını ayrı ayrı roll eder (min-max aralık).
+            TrySpawnSingleCrossbowBolt(origin, origin + shotDir * targetDistance, useSpeed, dmgMult);
         }
     }
 
-    private void TrySpawnSingleCrossbowBolt(Vector2 origin, Vector2 aimWorld, float useSpeed, float useDamage)
+    private void TrySpawnSingleCrossbowBolt(Vector2 origin, Vector2 aimWorld, float useSpeed, float dmgMult)
     {
         PlayerAugmentController aug = playerAugmentController;
+        float useDamage = (stats != null ? stats.RollCrossbowAp() : 0f) * dmgMult;
         PlayerBolt bolt = null;
         if (PlayerArrowPooler.Instance != null)
             PlayerArrowPooler.Instance.GetBolt(origin, Quaternion.identity, b => bolt = b);

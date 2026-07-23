@@ -13,7 +13,7 @@ public partial class Player
     public Camera aimCamera;
     [Tooltip("Arrow is instantiated after the bow animation finishes.")]
     public float longbowArrowReleaseDelay = 0.4f;
-    [Tooltip("Arrow SPEED on a fully charged right-click shot is multiplied by this. Damage comes from EntityStats.bowHeavyAp.")]
+    [Tooltip("Arrow SPEED on a fully charged right-click shot is multiplied by this. Damage comes from EntityStats.bowHeavyApMin/Max.")]
     public float longbowChargedSpeedDamageMultiplier = 3f;
     [Tooltip("Hold duration (seconds) before the bow is considered fully charged.")]
     public float maxLongbowChargeTime = 0.5f;
@@ -48,26 +48,26 @@ public partial class Player
         return cam.ScreenToWorldPoint(mouse);
     }
 
-    private void ScheduleLongbowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+    private void ScheduleLongbowArrow(bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
     {
         // Lock attackPoint position at fire time so direction stays correct after delay.
         Vector2 fireOrigin = attackPoint != null ? (Vector2)attackPoint.position : Vector2.zero;
         float delay = Mathf.Max(0f, longbowArrowReleaseDelay);
         if (delay <= 0f)
         {
-            SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin);
+            SpawnArrowTowardWorld(useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin);
             return;
         }
-        StartCoroutine(LongbowArrowSpawnAfterDelay(delay, damage, useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin));
+        StartCoroutine(LongbowArrowSpawnAfterDelay(delay, useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin));
     }
 
-    private IEnumerator LongbowArrowSpawnAfterDelay(float delaySeconds, float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput, Vector2 fireOrigin)
+    private IEnumerator LongbowArrowSpawnAfterDelay(float delaySeconds, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput, Vector2 fireOrigin)
     {
         yield return new WaitForSeconds(delaySeconds);
-        SpawnArrowTowardWorld(damage, useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin);
+        SpawnArrowTowardWorld(useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin);
     }
 
-    private void SpawnArrowTowardWorld(float damage, bool useBowChargedMultiplier, Vector2 targetWorld, Vector2 directionOrigin)
+    private void SpawnArrowTowardWorld(bool useBowChargedMultiplier, Vector2 targetWorld, Vector2 directionOrigin)
     {
         if (arrowPrefab == null || attackPoint == null) return;
 
@@ -78,7 +78,6 @@ public partial class Player
         float dmgMult      = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
         float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;
         float useSpeed     = arrowSpeed * spdMult * arrowSpdMult;
-        float useDamage    = damage * dmgMult;
 
         Vector2 origin = attackPoint.position;
         // Direction is calculated from fire-time origin to avoid flip/movement errors during delay.
@@ -95,7 +94,8 @@ public partial class Player
             float angleOffset = (i - centerOffset) * spreadStepDegrees;
             Vector2 shotDir = Quaternion.Euler(0f, 0f, angleOffset) * dir;
             Vector2 spawnPos = origin + shotDir * radialLongbowSpawnInset;
-            TrySpawnSinglePlayerArrow(spawnPos, origin + shotDir * targetDistance, useSpeed, useDamage, chargedExplosionEnabled);
+            // Her ok kendi hasarını ayrı ayrı roll eder (min-max aralık), tek atış icin ortak degil.
+            TrySpawnSinglePlayerArrow(spawnPos, origin + shotDir * targetDistance, useSpeed, useBowChargedMultiplier, dmgMult, chargedExplosionEnabled);
         }
     }
 
@@ -118,17 +118,15 @@ public partial class Player
 
         if (Time.time < _nextRadialLongbowAutoVolleyTime) return;
 
-        float baseDamage = stats != null ? stats.bowLightAp : 0f;
-        FireRadialLongbowMutationAutoVolley(baseDamage);
+        FireRadialLongbowMutationAutoVolley();
         _nextRadialLongbowAutoVolleyTime = Time.time + Mathf.Max(0.05f, radialLongbowAutoVolleyIntervalSeconds);
     }
 
-    private void FireRadialLongbowMutationAutoVolley(float lightDamage)
+    private void FireRadialLongbowMutationAutoVolley()
     {
         float dmgMult      = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
         float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;
         float useSpeed     = arrowSpeed * arrowSpdMult;
-        float useDamage    = lightDamage * dmgMult;
         bool chargedExplosion = playerAugmentController != null && playerAugmentController.HasChargedLongbowAoe;
 
         Vector2 radialOrigin = transform.position;
@@ -142,7 +140,8 @@ public partial class Player
             float forward = Mathf.Max(0f, radialLongbowSpawnInset);
             Vector2 spawnPos = radialOrigin + radialDir * forward;
             Vector2 shotTarget = radialOrigin + radialDir * Mathf.Max(forward + 0.3f, targetDistance);
-            TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, useDamage, chargedExplosion);
+            // Radial yayılım her zaman "light" hasar tipini kullanır; her ok kendi rolünü alır.
+            TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, false, dmgMult, chargedExplosion);
         }
     }
 
@@ -156,9 +155,15 @@ public partial class Player
         Vector2 spawnWorldPosition,
         Vector2 targetWorldPoint,
         float useSpeed,
-        float useDamage,
+        bool useHeavyDamage,
+        float dmgMult,
         bool chargedExplosionEnabled)
     {
+        float rolledDamage = stats != null
+            ? (useHeavyDamage ? stats.RollBowHeavyAp() : stats.RollBowLightAp())
+            : 0f;
+        float useDamage = rolledDamage * dmgMult;
+
         float explosionRadius = chargedExplosionEnabled && playerAugmentController != null
             ? playerAugmentController.ChargedLongbowAoeRadius
             : 0f;

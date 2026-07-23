@@ -227,6 +227,7 @@ public class Enemy : BaseEntity
 
         _currentHealth -= amount;
         _visuals.PlayHitFlash();
+        DamageNumberPooler.SpawnDamageNumber(ReferencePosition, amount, isHeavy);
         Damaged?.Invoke();
         float force = isHeavy ? heavyKnockbackForce : lightKnockbackForce;
         _motor.ApplyKnockback(force);

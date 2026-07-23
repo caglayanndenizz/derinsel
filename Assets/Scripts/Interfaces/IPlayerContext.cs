@@ -41,8 +41,8 @@ public interface IPlayerContext
     float LightFallbackExecuteAt { get; set; }
 
     // Methods
-    void ScheduleLongbowArrow(float damage, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput);
-    void ScheduleCrossbowBolt(float damage, Vector2 aimWorldAtFireInput);
+    void ScheduleLongbowArrow(bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput);
+    void ScheduleCrossbowBolt(Vector2 aimWorldAtFireInput);
     Vector2 GetLongbowAimWorldPointAtCurrentMouse();
     void TriggerHeavyAttack();
     void TriggerHammerLightAttack();
