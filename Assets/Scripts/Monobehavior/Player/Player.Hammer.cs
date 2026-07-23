@@ -192,7 +192,7 @@ public partial class Player
     private void UpdateHammerMagnet()
     {
         if (playerAugmentController == null || !playerAugmentController.HasHammerChargeUnlock) return;
-        if (!(_currentState is HammerState)) return;
+        if (!(_currentState is HammerState) && !(_currentState is GreatHammerState)) return;
 
         bool isCharging   = _currentState.IsChargingForMovement;
         bool isChargeFull = _currentState.IsChargeMeterFull(this);

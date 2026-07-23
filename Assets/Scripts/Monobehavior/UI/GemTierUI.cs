@@ -1,17 +1,24 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 using TMPro;
 
 /// <summary>
-/// Updates the tier color on a single badge image.
-/// Thresholds: Coal≥1 · Gold≥2 · Diamond≥4 · Obsidian≥6
+/// Updates the tier badge (color/count/visibility) for one weapon's gem-augment progress.
+/// One instance tracks the Longbow, another instance of this same script (different Inspector
+/// config, <see cref="weaponToTrack"/> set to Hammer) tracks the Hammer.
+/// Thresholds come from PlayerAugmentController's shared Gem*Threshold constants.
 /// </summary>
 public class GemTierUI : MonoBehaviour
 {
+    [Header("Weapon")]
+    [Tooltip("Which weapon's gem tier this badge tracks.")]
+    [SerializeField] private WeaponType weaponToTrack = WeaponType.Longbow;
+
     [Header("UI Elements")]
-    [SerializeField] private GameObject      longbowTrait;
+    [FormerlySerializedAs("longbowTrait")] [SerializeField] private GameObject traitRoot;
     [SerializeField] private Image           badgeImage;
-    [SerializeField] private Image           longbowIcon;
+    [FormerlySerializedAs("longbowIcon")] [SerializeField] private Image weaponIcon;
     [SerializeField] private TextMeshProUGUI countText;
 
     [Header("Colors")]
@@ -75,22 +82,22 @@ public class GemTierUI : MonoBehaviour
     {
         if (augmentController == null) return;
 
-        GemTier tier  = augmentController.LongbowGemTier;
-        int     count = augmentController.LongbowGemAugmentCount;
+        GemTier tier  = weaponToTrack == WeaponType.Hammer ? augmentController.HammerGemTier        : augmentController.LongbowGemTier;
+        int     count = weaponToTrack == WeaponType.Hammer ? augmentController.HammerGemAugmentCount : augmentController.LongbowGemAugmentCount;
 
         if (tier == _cachedTier && count == _cachedCount) return;
         _cachedTier  = tier;
         _cachedCount = count;
 
-        if (longbowTrait != null)
-            longbowTrait.SetActive(count > 0);
+        if (traitRoot != null)
+            traitRoot.SetActive(count > 0);
         else
-            Debug.LogWarning("[GemTierUI] longbowTrait is not assigned in the Inspector!", this);
+            Debug.LogWarning("[GemTierUI] traitRoot is not assigned in the Inspector!", this);
 
         Color c = TierColor(tier);
-        if (badgeImage  != null) badgeImage.color  = c;
-        if (longbowIcon != null) longbowIcon.color  = c;
-        if (countText   != null) countText.text     = $"{count}/{PlayerAugmentController.GemObsidianThreshold}";
+        if (badgeImage != null) badgeImage.color = c;
+        if (weaponIcon != null) weaponIcon.color = c;
+        if (countText  != null) countText.text   = $"{count}/{PlayerAugmentController.GemObsidianThreshold}";
     }
 
     private Color TierColor(GemTier tier)

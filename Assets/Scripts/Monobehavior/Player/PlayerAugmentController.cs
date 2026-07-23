@@ -8,8 +8,8 @@ public class PlayerAugmentController : MonoBehaviour
 
     public const int GemCoalThreshold     = 1;
     public const int GemGoldThreshold     = 2;
-    public const int GemDiamondThreshold  = 4;
-    public const int GemObsidianThreshold = 6;
+    public const int GemDiamondThreshold  = 3;
+    public const int GemObsidianThreshold = 4;
 
     private static readonly AugmentId[] LongbowGemAugmentIds =
     {
@@ -26,6 +26,23 @@ public class PlayerAugmentController : MonoBehaviour
         AugmentId.ProjectileCount_PlusOneAndSpeed10Percent,
         AugmentId.ProjectileCount_PlusOneAndSpeed15Percent,
         AugmentId.ProjectileCount_ExtraArrowPlus,
+    };
+
+    private static readonly AugmentId[] HammerGemAugmentIds =
+    {
+        AugmentId.HammerChargeUnlock,
+        AugmentId.HammerChargeReduceUnlock,
+        AugmentId.HammerChargeDamageReductionUnlock,
+        AugmentId.HammerFreezeUnlock,
+        AugmentId.HammerAoeRadiusUnlock,
+        AugmentId.HammerSlamCooldownReduceUnlock,
+        AugmentId.HammerChargeReduce_Common_I,
+        AugmentId.HammerChargeReduce_Common_II,
+        AugmentId.HammerChargeReduce_Rare,
+        AugmentId.HammerFreeze_Common,
+        AugmentId.HammerFreeze_Rare,
+        AugmentId.HammerAoeRadius_Common,
+        AugmentId.HammerAoeRadius_Rare,
     };
 
     // ── Runtime stats ─────────────────────────────────────────────────────────
@@ -111,8 +128,10 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private UnlockAugmentDatabase unlockDatabase;
 
     [Header("Test")]
-    [Tooltip("When checked, triggers the Obsidian mutation as if 6 longbow augments were obtained.")]
+    [Tooltip("When checked, triggers the Obsidian mutation as if 4 longbow augments were obtained.")]
     [SerializeField] private bool mutationAugmentsLongbow;
+    [Tooltip("When checked, triggers the Obsidian mutation as if all hammer gem augments were obtained.")]
+    [SerializeField] private bool mutationAugmentsHammer;
 
     // Weapon mutation flags — set automatically when all unlock augments for a weapon are obtained
     private bool _longbowMutated;
@@ -122,6 +141,8 @@ public class PlayerAugmentController : MonoBehaviour
     [Header("Debug (Updated in Play Mode)")]
     [SerializeField] private int      longbowGemCountDebug;
     [SerializeField] private string   longbowGemTierDebug;
+    [SerializeField] private int      hammerGemCountDebug;
+    [SerializeField] private string   hammerGemTierDebug;
 
     private Player _player;
 
@@ -206,12 +227,39 @@ public class PlayerAugmentController : MonoBehaviour
         }
     }
 
+    public int HammerGemAugmentCount
+    {
+        get
+        {
+            if (mutationAugmentsHammer) return GemObsidianThreshold;
+            int total = 0;
+            for (int i = 0; i < HammerGemAugmentIds.Length; i++)
+                total += GetAppliedCount(HammerGemAugmentIds[i]);
+            return total;
+        }
+    }
+
+    public GemTier HammerGemTier
+    {
+        get
+        {
+            int n = HammerGemAugmentCount;
+            if (n >= GemObsidianThreshold) return GemTier.Obsidian;
+            if (n >= GemDiamondThreshold)  return GemTier.Diamond;
+            if (n >= GemGoldThreshold)     return GemTier.Gold;
+            return GemTier.Coal;
+        }
+    }
+
     public bool HasLongbowMutation  => _longbowMutated;
     public bool HasCrossbowMutation => _crossbowMutated;
     public bool HasHammerMutation   => _hammerMutated;
 
     public bool HasRadialLongbowMutationUnlock =>
         mutationAugmentsLongbow || LongbowGemTier == GemTier.Obsidian || _longbowMutated;
+
+    public bool HasHammerMutationUnlock =>
+        mutationAugmentsHammer || HammerGemTier == GemTier.Obsidian || _hammerMutated;
 
     public bool MutatedArrowShots => HasRadialLongbowMutationUnlock;
 
@@ -229,6 +277,8 @@ public class PlayerAugmentController : MonoBehaviour
     {
         longbowGemCountDebug = LongbowGemAugmentCount;
         longbowGemTierDebug  = LongbowGemTier.ToString();
+        hammerGemCountDebug  = HammerGemAugmentCount;
+        hammerGemTierDebug   = HammerGemTier.ToString();
     }
 
     // ── Reset ─────────────────────────────────────────────────────────────────

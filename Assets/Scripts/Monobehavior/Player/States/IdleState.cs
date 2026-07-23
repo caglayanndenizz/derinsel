@@ -13,7 +13,8 @@ public class IdleState : PlayerState
     {
         if (Input.GetButton("Fire1"))
         {
-            context.SetState(new HammerState());
+            bool hammerMutationActive = context.AugmentController != null && context.AugmentController.HasHammerMutationUnlock;
+            context.SetState(hammerMutationActive ? (PlayerState)new GreatHammerState() : new HammerState());
             return;
         }
 

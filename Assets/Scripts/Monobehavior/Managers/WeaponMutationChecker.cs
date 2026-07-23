@@ -8,7 +8,7 @@ using UnityEngine;
 ///
 /// Usage:
 ///   – Attach to a single object in the scene (singleton).
-///   – Set <see cref="longbowMutationThreshold"/> in the Inspector (default: 6).
+///   – Set <see cref="longbowMutationThreshold"/> in the Inspector (default: 4).
 ///   – <see cref="AugmentWeightSystem"/> queries <see cref="ShouldExcludeWeaponUnlocks"/> in IsEligible;
 ///     all unlock augments for that weapon are removed from the pool once the threshold is exceeded.
 /// </summary>
@@ -20,13 +20,13 @@ public class WeaponMutationChecker : MonoBehaviour
 
     [Header("Mutation Thresholds")]
     [Tooltip("Number of longbow unlock augments required before bow unlocks stop being offered. 0 = disabled.")]
-    [SerializeField] private int longbowMutationThreshold  = 6;
+    [SerializeField] private int longbowMutationThreshold  = 4;
 
     [Tooltip("Number of crossbow unlock augments required before crossbow unlocks stop being offered. 0 = disabled.")]
     [SerializeField] private int crossbowMutationThreshold = 0;
 
     [Tooltip("Number of hammer unlock augments required before hammer unlocks stop being offered. 0 = disabled.")]
-    [SerializeField] private int hammerMutationThreshold   = 0;
+    [SerializeField] private int hammerMutationThreshold   = PlayerAugmentController.GemObsidianThreshold;
 
     [Header("Runtime State (Read-Only)")]
     [SerializeField] private int _longbowUnlocksApplied;
