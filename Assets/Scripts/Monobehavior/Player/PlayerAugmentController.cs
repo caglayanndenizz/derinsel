@@ -346,6 +346,9 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.LuckIncrease_Extraordinary:
                 luckMultiplier *= 1f + Mathf.Max(0f, augment.value);
                 break;
+            case AugmentId.HammerChargeReduce_Common_I:
+            case AugmentId.HammerChargeReduce_Common_II:
+            case AugmentId.HammerChargeReduce_Rare:
             case AugmentId.HammerChargeReduceUnlock:
                 hammerChargeMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
                 break;
@@ -360,9 +363,13 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.HammerChargeDamageReductionUnlock:
                 hasHammerChargeDamageReductionUnlock = true;
                 break;
+            case AugmentId.HammerFreeze_Common:
+            case AugmentId.HammerFreeze_Rare:
             case AugmentId.HammerFreezeUnlock:
                 hammerFreezeDuration += Mathf.Max(0f, augment.value);
                 break;
+            case AugmentId.HammerAoeRadius_Common:
+            case AugmentId.HammerAoeRadius_Rare:
             case AugmentId.HammerAoeRadiusUnlock:
                 hammerAoeRadiusBonus += Mathf.Max(0f, augment.value);
                 break;
@@ -500,9 +507,16 @@ public class PlayerAugmentController : MonoBehaviour
     {
         switch (id)
         {
+            case AugmentId.HammerChargeReduce_Common_I:
+            case AugmentId.HammerChargeReduce_Common_II:
+            case AugmentId.HammerChargeReduce_Rare:
             case AugmentId.HammerChargeReduceUnlock:
             case AugmentId.HammerChargeDamageReductionUnlock:
+            case AugmentId.HammerFreeze_Common:
+            case AugmentId.HammerFreeze_Rare:
             case AugmentId.HammerFreezeUnlock:
+            case AugmentId.HammerAoeRadius_Common:
+            case AugmentId.HammerAoeRadius_Rare:
             case AugmentId.HammerAoeRadiusUnlock:
             case AugmentId.HammerSlamCooldownReduceUnlock:
                 return hasHammerChargeUnlock;

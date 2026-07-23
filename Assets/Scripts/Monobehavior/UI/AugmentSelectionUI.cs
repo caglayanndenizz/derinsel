@@ -553,7 +553,7 @@ public class AugmentSelectionUI : MonoBehaviour
 
         TryResolveWeightSystem();
         if (weightSystem != null)
-            weightSystem.NotifySelection(selectedAugment, _currentOffer);
+            weightSystem.RecordOfferOutcome(selectedAugment, _currentOffer);
 
         bool wasChestPanel = _isChestPanel;
         bool wasUnlockChestPanel = _isUnlockChestPanel;
