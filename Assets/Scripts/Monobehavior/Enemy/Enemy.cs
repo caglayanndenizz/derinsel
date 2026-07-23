@@ -21,7 +21,6 @@ public class Enemy : BaseEntity
     [SerializeField] private State currentState = State.Patrol;
     public float detectionRange = 10f;
     public float expandedDetectionRange = 22f;
-    [SerializeField] private Collider2D detectionCollider;
 
     public State CurrentState => currentState;
 
@@ -72,6 +71,7 @@ public class Enemy : BaseEntity
     private bool _isDead = false;
     private Vector2 _lastKnownPlayerWorld;
     private bool _hasLastKnownPlayerWorld;
+    private Collider2D[] _allColliders;
 
     public GameObject PlayerObject => player;
     public Transform PlayerTransform => player != null ? player.transform : null;
@@ -85,6 +85,7 @@ public class Enemy : BaseEntity
     {
         base.Awake();
         _rb = GetComponent<Rigidbody2D>();
+        _allColliders = GetComponentsInChildren<Collider2D>(true);
         player = GameObject.FindGameObjectWithTag("Player");
 
         // Fallback: prefab'da yoksa runtime'da ekle (status önce — visuals ona abone oluyor)
@@ -235,13 +236,21 @@ public class Enemy : BaseEntity
     private void PrepareToDie()
     {
         _isDead = true;
-        if (detectionCollider != null) detectionCollider.enabled = false;
+        SetCollidersEnabled(false); // ceset artik vurulamaz/carpisamaz, animasyon beklenmez
         DropLoot(); // loot ölüm anında düşer, ceset süresini ve pool dönüşünü beklemez
+        Died?.Invoke(this); // kill counter vb. olum anında tetiklenir, animasyon bitmesini beklemez
 
         // Sıra: knockback biter → Die animasyonu oynar (gerçek uzunluğu controller'dan okunur,
-        // enemy başına hardcode yok) → ceset corpseLingerSeconds bekler → Die çalışır.
+        // enemy başına hardcode yok) → ceset corpseLingerSeconds bekler → Die çalışır (pool'a dönüş).
         float dieAnimSeconds = _animatorBridge != null ? _animatorBridge.DieAnimationLength : 0f;
         Invoke("Die", knockbackDuration + 0.05f + dieAnimSeconds + corpseLingerSeconds);
+    }
+
+    private void SetCollidersEnabled(bool value)
+    {
+        if (_allColliders == null) return;
+        for (int i = 0; i < _allColliders.Length; i++)
+            if (_allColliders[i] != null) _allColliders[i].enabled = value;
     }
 
     private void DropLoot()
@@ -269,7 +278,6 @@ public class Enemy : BaseEntity
     }
 
     protected override void Die() {
-        Died?.Invoke(this);
         base.Die();
         if (EnemyObjectPooler.Instance != null)
         {
@@ -313,7 +321,7 @@ public class Enemy : BaseEntity
     {
         _isDead = false;
         // Status/renk resetleri EntityStatusEffects ve EntityStatusVisuals OnEnable'larında yapılır
-        if (detectionCollider != null) detectionCollider.enabled = true;
+        SetCollidersEnabled(true);
         if (_rb != null) _rb.linearVelocity = Vector2.zero;
         if (stats != null) _currentHealth = stats.maxHealth;
         currentState = State.Patrol;
