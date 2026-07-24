@@ -6,7 +6,6 @@ public enum AugmentId
     MovementSpeedIncreaseExtraordinary = 3,
     ChargedLongbowAoeUnlock = 4,
     TripleArrowUnlock = 5,
-    WallLootsUnlock = 6,
     ExtraAugmentSlotUnlock = 7,
     GlassCannonDoubleDamageHalveMaxHealth = 8,
     MaxHealthIncreasePercent = 9,

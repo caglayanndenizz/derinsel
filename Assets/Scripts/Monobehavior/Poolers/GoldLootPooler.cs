@@ -64,8 +64,6 @@ public class GoldLootPooler : MonoBehaviour
     {
         Transform parent = poolParent != null ? poolParent : transform;
         GameObject gold = Instantiate(goldPrefab, parent);
-        Lootable lootable = gold.GetComponent<Lootable>();
-        if (lootable != null) lootable.isGold = true;
         gold.SetActive(false);
         return gold;
     }

@@ -39,15 +39,6 @@ public class AugmentWeightSystem : MonoBehaviour
 
     private readonly Dictionary<AugmentId, int> _skipCounts = new Dictionary<AugmentId, int>();
 
-    // ── Public Read ────────────────────────────────────────────────────────────
-
-    public int TotalOfferCount   => _totalOfferCount;
-    public int RegularOfferCount => _regularOfferCount;
-
-    /// <summary>True if the NEXT call to BuildOffer will produce an unlock offer.</summary>
-    public bool IsNextOfferUnlock =>
-        unlockOfferInterval > 0 && (_totalOfferCount + 1) % unlockOfferInterval == 0;
-
     // ── Unity ──────────────────────────────────────────────────────────────────
 
     private void Awake()

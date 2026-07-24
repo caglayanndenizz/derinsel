@@ -176,12 +176,6 @@ public class PlayerAugmentController : MonoBehaviour
     public float ArrowProjectileSpeedMultiplier => Mathf.Max(0.01f, arrowProjectileSpeedMultiplier);
     public float OutgoingDamageMultiplier       => Mathf.Max(0.01f, outgoingDamageMultiplier);
     public float MaxHealthMultiplier            => Mathf.Max(0.01f, maxHealthMultiplier);
-    /// <summary>
-    /// Passive — automatically active when the player has Charged Longbow AoE OR any Hammer Slam AoE upgrade.
-    /// No augment slot is consumed; wall-loot behaviour triggers whenever this returns true.
-    /// </summary>
-    [Tooltip("Read-only at runtime. True when the player has Charged Longbow AoE or any Hammer AoE radius bonus.")]
-    public bool  HasWallLootsUnlock             => hasChargedLongbowAoe || hammerAoeRadiusBonus > 0f;
     public bool  HasExtraAugmentSlotUnlock      => hasExtraAugmentSlotUnlock;
     public float LuckMultiplier                 => Mathf.Max(0.01f, luckMultiplier);
     public float HammerChargeMultiplier         => Mathf.Max(0.01f, hammerChargeMultiplier);

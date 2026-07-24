@@ -46,7 +46,6 @@ public class Enemy : BaseEntity
 
     [Header("Loot Prefabs")]
     public GameObject goldPrefab;
-    public GameObject experiencePrefab;
     [Range(0f, 1f)] public float goldDropChance = 0.15f;
     [Tooltip("Optional reward chest for miniboss/boss enemies. Dropped on death when assigned; left empty, normal enemies drop nothing extra.")]
     public GameObject chestPrefab;
@@ -268,11 +267,6 @@ public class Enemy : BaseEntity
             else if (goldPrefab != null)
                 Instantiate(goldPrefab, goldSpawnPosition, Quaternion.identity);
         }
-
-        if (ExperienceLootPooler.Instance != null)
-            ExperienceLootPooler.Instance.GetExperience((Vector3)deathPosition + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
-        else if (experiencePrefab != null)
-            Instantiate(experiencePrefab, (Vector3)deathPosition + new Vector3(0.3f, 0f, 0f), Quaternion.identity);
 
         if (chestPrefab != null)
             Instantiate(chestPrefab, deathPosition, Quaternion.identity);

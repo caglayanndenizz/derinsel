@@ -6,8 +6,7 @@ public class AugmentSelectionUI : MonoBehaviour
 {
     private enum PanelSource
     {
-        LevelUp,
-        WallLootGift,
+        Default,
         UnlockOffer,
         ChestWooden,
         ChestSilver,
@@ -16,7 +15,6 @@ public class AugmentSelectionUI : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private Player player;
-    [SerializeField] private PlayerLevel playerLevel;
     [SerializeField] private PlayerAugmentController playerAugmentController;
     [SerializeField] private AugmentDatabase augmentDatabase;
     [SerializeField] private AugmentWeightSystem weightSystem;
@@ -45,26 +43,19 @@ public class AugmentSelectionUI : MonoBehaviour
 
     [Header("Visual theme")]
     [SerializeField] private Image panelThemeTargetImage;
-    [SerializeField] private Color levelUpPanelThemeColor      = Color.white;
-    [SerializeField] private Color wallLootGiftPanelThemeColor = new Color(0.35f, 0.35f, 0.35f, 1f);
+    [SerializeField] private Color defaultPanelThemeColor      = Color.white;
     [SerializeField] private Color unlockOfferPanelThemeColor  = new Color(1f, 0.84f, 0.0f, 1f);
     [SerializeField] private Color chestWoodenPanelThemeColor  = new Color(0.55f, 0.35f, 0.15f, 1f);
     [SerializeField] private Color chestSilverPanelThemeColor  = new Color(0.75f, 0.75f, 0.80f, 1f);
     [SerializeField] private Color chestGoldPanelThemeColor    = new Color(1f, 0.84f, 0.0f, 1f);
-
-    [Header("Level-Up Augment Selection")]
-    [Tooltip("Utility augmentler hazir olana kadar kapali tut.")]
-    [SerializeField] private bool levelUpAugmentSelectionEnabled = true;
 
     private const string AutoCardsRowName = "AugmentCards";
     private readonly List<AugmentOptionButton> _runtimeButtons = new();
     private RectTransform _runtimeCardsParent;
     private float _previousTimeScale = 1f;
     private float _panelOpenedAt = -999f;
-    private bool _isSubscribed;
     private CanvasGroup _panelCanvasGroup;
     private bool _isPanelOpen;
-    private int _pendingSelections;
     private List<AugmentDefinition> _currentOffer;
 
 
@@ -82,27 +73,13 @@ public class AugmentSelectionUI : MonoBehaviour
 
         TryResolveAugmentDynamicsOnAwake();
         TryResolvePlayer();
-        TryResolvePlayerLevel();
         TryResolveAugmentController();
         EnsurePanelCanvasGroup();
         HidePanel();
     }
 
-    private void OnEnable()
-    {
-        TrySubscribeToPlayer();
-    }
-
-    private void Start()
-    {
-        // In some scene setups Player is created/enabled after this UI.
-        TrySubscribeToPlayer();
-    }
-
     private void OnDisable()
     {
-        UnsubscribeFromPlayer();
-
         if (pauseGameWhenPanelOpen && Mathf.Approximately(Time.timeScale, 0f))
             Time.timeScale = _previousTimeScale;
     }
@@ -170,21 +147,6 @@ public class AugmentSelectionUI : MonoBehaviour
         return true;
     }
 
-    private void ShowPanel()
-    {
-        if (_isPanelOpen) { _pendingSelections++; return; }
-        TryResolveWeightSystem();
-        PanelSource source = (weightSystem != null && weightSystem.IsNextOfferUnlock)
-            ? PanelSource.UnlockOffer
-            : PanelSource.LevelUp;
-        ShowPanel(source);
-    }
-
-    public bool TryShowWallLootGiftPanel()
-    {
-        return ShowPanel(PanelSource.WallLootGift);
-    }
-
     public bool TryShowUnlockChestPanel()
     {
         bool result = ShowPanel(PanelSource.UnlockOffer);
@@ -208,7 +170,7 @@ public class AugmentSelectionUI : MonoBehaviour
     {
         if (panelRoot == null) return;
         EnsurePanelCanvasGroup();
-        ApplyPanelTheme(PanelSource.LevelUp);
+        ApplyPanelTheme(PanelSource.Default);
         _panelCanvasGroup.alpha = 0f;
         _panelCanvasGroup.interactable = false;
         _panelCanvasGroup.blocksRaycasts = false;
@@ -535,12 +497,11 @@ public class AugmentSelectionUI : MonoBehaviour
         if (panelThemeTargetImage == null) return;
         switch (source)
         {
-            case PanelSource.WallLootGift: panelThemeTargetImage.color = wallLootGiftPanelThemeColor; break;
             case PanelSource.UnlockOffer:  panelThemeTargetImage.color = unlockOfferPanelThemeColor;  break;
             case PanelSource.ChestWooden:  panelThemeTargetImage.color = chestWoodenPanelThemeColor;  break;
             case PanelSource.ChestSilver:  panelThemeTargetImage.color = chestSilverPanelThemeColor;  break;
             case PanelSource.ChestGold:    panelThemeTargetImage.color = chestGoldPanelThemeColor;    break;
-            default:                       panelThemeTargetImage.color = levelUpPanelThemeColor;       break;
+            default:                       panelThemeTargetImage.color = defaultPanelThemeColor;       break;
         }
     }
 
@@ -556,7 +517,6 @@ public class AugmentSelectionUI : MonoBehaviour
             weightSystem.RecordOfferOutcome(selectedAugment, _currentOffer);
 
         bool wasChestPanel = _isChestPanel;
-        bool wasUnlockChestPanel = _isUnlockChestPanel;
         _isChestPanel = false;
         _isUnlockChestPanel = false;
 
@@ -572,29 +532,12 @@ public class AugmentSelectionUI : MonoBehaviour
             return;
         }
 
-        if (wasUnlockChestPanel)
-            return;
-
-        if (_pendingSelections > 0)
-        {
-            _pendingSelections--;
-            ShowPanel(PanelSource.LevelUp);
-        }
     }
 
     private void TryResolvePlayer()
     {
         if (player != null) return;
         player = Object.FindAnyObjectByType<Player>();
-    }
-
-    private void TryResolvePlayerLevel()
-    {
-        if (playerLevel != null) return;
-        if (player != null)
-            playerLevel = player.PlayerLevel;
-        if (playerLevel == null)
-            playerLevel = Object.FindAnyObjectByType<PlayerLevel>();
     }
 
     private void TryResolveAugmentController()
@@ -604,31 +547,6 @@ public class AugmentSelectionUI : MonoBehaviour
             playerAugmentController = player.PlayerAugmentController;
         if (playerAugmentController == null)
             playerAugmentController = Object.FindAnyObjectByType<PlayerAugmentController>();
-    }
-
-    private void TrySubscribeToPlayer()
-    {
-        if (_isSubscribed) return;
-        if (!levelUpAugmentSelectionEnabled) return;
-
-        TryResolvePlayer();
-        TryResolvePlayerLevel();
-        TryResolveAugmentController();
-        if (playerLevel == null)
-        {
-            Debug.LogWarning("AugmentSelectionUI: PlayerLevel could not be found, level-up event not subscribed.");
-            return;
-        }
-
-        playerLevel.LevelUpAugmentSelectionRequested += ShowPanel;
-        _isSubscribed = true;
-    }
-
-    private void UnsubscribeFromPlayer()
-    {
-        if (!_isSubscribed || playerLevel == null) return;
-        playerLevel.LevelUpAugmentSelectionRequested -= ShowPanel;
-        _isSubscribed = false;
     }
 
     private void ShowPanelRoot()
@@ -681,7 +599,7 @@ public class AugmentSelectionUI : MonoBehaviour
         if (thisObjectWillBeDisabled)
         {
             Debug.LogWarning(
-                "AugmentSelectionUI: panelRoot deactivated this object would also be disabled, so level-up events would stop. " +
+                "AugmentSelectionUI: panelRoot deactivated this object would also be disabled, so panel calls would stop working. " +
                 "Keep this script on an always-active object (e.g. AugmentCanvas) and assign panelRoot to the visual panel.");
             return false;
         }
@@ -692,6 +610,6 @@ public class AugmentSelectionUI : MonoBehaviour
     [ContextMenu("Debug/Show Augment Panel")]
     private void DebugShowAugmentPanel()
     {
-        ShowPanel();
+        ShowPanel(PanelSource.Default);
     }
 }

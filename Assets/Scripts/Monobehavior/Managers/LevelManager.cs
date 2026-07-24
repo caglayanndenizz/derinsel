@@ -133,9 +133,6 @@ public class LevelManager : MonoBehaviour
         CleanupLevelEndChest();
         KillCounter.Instance?.CleanupChests();
 
-        if (player != null)
-            player.GetComponent<WallLootHandler>()?.ResetWallLootDropCounterForRoom();
-
         if (_activeLevelInstance != null)
         {
             Destroy(_activeLevelInstance);

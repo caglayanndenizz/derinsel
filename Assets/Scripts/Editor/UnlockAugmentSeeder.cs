@@ -128,7 +128,6 @@ public static class UnlockAugmentSeeder
             AugmentId.LongbowFreezeUnlock,
             AugmentId.FireArrowUnlock,
             AugmentId.PoisonArrowUnlock,
-            AugmentId.WallLootsUnlock,
             AugmentId.CrossbowBoltPierce,
             AugmentId.CrossbowBoltBleed,
             AugmentId.HammerChargeUnlock,

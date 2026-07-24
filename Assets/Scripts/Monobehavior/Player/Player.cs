@@ -18,10 +18,8 @@ public partial class Player : BaseEntity, IPlayerContext
     public Transform attackPoint;
     [SerializeField] private Animator animator;
     public LayerMask enemyLayers;
-    private PlayerLevel playerLevel;
     private PlayerCurrency playerCurrency;
     private PlayerAugmentController playerAugmentController;
-    private WallLootHandler wallLootHandler;
     private PlayerImpactFeedback impactFeedback;
 
     private Rigidbody2D _rb;
@@ -34,7 +32,6 @@ public partial class Player : BaseEntity, IPlayerContext
     public event Action<float, float> HealthChanged;
     public event Action Died;
 
-    public PlayerLevel PlayerLevel => playerLevel;
     public PlayerCurrency PlayerCurrency => playerCurrency;
     public PlayerAugmentController PlayerAugmentController => playerAugmentController;
 
@@ -147,15 +144,11 @@ public partial class Player : BaseEntity, IPlayerContext
 
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
-        if (playerLevel == null)
-            playerLevel = GetComponent<PlayerLevel>();
         if (playerCurrency == null)
             playerCurrency = GetComponent<PlayerCurrency>();
         if (playerAugmentController == null)
             playerAugmentController = GetComponent<PlayerAugmentController>()
                 ?? GetComponentInChildren<PlayerAugmentController>(true);
-        if (wallLootHandler == null)
-            wallLootHandler = GetComponent<WallLootHandler>();
         if (impactFeedback == null)
             impactFeedback = GetComponent<PlayerImpactFeedback>();
         if (dashFlashTarget == null)
@@ -171,16 +164,8 @@ public partial class Player : BaseEntity, IPlayerContext
             playerCurrency.NotifyGoldChanged();
     }
 
-    private void OnEnable()
-    {
-        if (playerLevel != null)
-            playerLevel.LevelUp += HandleLevelUp;
-    }
-
     void OnDisable()
     {
-        if (playerLevel != null)
-            playerLevel.LevelUp -= HandleLevelUp;
         CancelPendingLongbowArrow();
     }
 
@@ -255,12 +240,6 @@ public partial class Player : BaseEntity, IPlayerContext
         HealthChanged?.Invoke(CurrentHealth, Mathf.Max(1f, MaxHealth));
     }
 
-    public void AddExperience(float amount)
-    {
-        if (amount <= 0f || playerLevel == null) return;
-        playerLevel.AddExperience(amount);
-    }
-
     // ─── Movement ─────────────────────────────────────────────────────────────
 
     protected override void Move()
@@ -282,22 +261,14 @@ public partial class Player : BaseEntity, IPlayerContext
         else if (moveX < 0) transform.localScale = new Vector3(-1f, 1f, 1f);
     }
 
-    // ─── Level / misc ─────────────────────────────────────────────────────────
+    // ─── Misc ─────────────────────────────────────────────────────────────────
 
     public void ResetForDungeonExit()
     {
         playerAugmentController?.ResetAll();
-        playerLevel?.Reset();
         _currentHealth = MaxHealth;
         NotifyHealthChanged();
         if (playerCurrency != null)
             playerCurrency.NotifyGoldChanged();
-    }
-
-    private void HandleLevelUp()
-    {
-        _currentHealth = MaxHealth;
-        NotifyHealthChanged();
-        SetState(new IdleState());
     }
 }

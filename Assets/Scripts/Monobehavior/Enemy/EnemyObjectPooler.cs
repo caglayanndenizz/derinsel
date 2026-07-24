@@ -19,9 +19,8 @@ public class EnemyObjectPooler : MonoBehaviour
     public Transform poolParent;
 
     [Header("Linked Poolers")]
-    [Tooltip("If empty, Gold / Experience / Projectile poolers are searched in the scene (including inactive). They are activated once at startup and never toggled off — loot dropped in the world lives under them.")]
+    [Tooltip("If empty, Gold / Projectile poolers are searched in the scene (including inactive). They are activated once at startup and never toggled off — loot dropped in the world lives under them.")]
     [SerializeField] private GoldLootPooler linkedGoldLootPooler;
-    [SerializeField] private ExperienceLootPooler linkedExperienceLootPooler;
     [SerializeField] private EnemyProjectilePooler linkedProjectilePooler;
 
     // Key: source prefab. Every instance remembers its prefab so ReturnEnemy
@@ -52,20 +51,16 @@ public class EnemyObjectPooler : MonoBehaviour
     {
         if (linkedGoldLootPooler == null)
             linkedGoldLootPooler = FindFirstObjectByType<GoldLootPooler>(FindObjectsInactive.Include);
-        if (linkedExperienceLootPooler == null)
-            linkedExperienceLootPooler = FindFirstObjectByType<ExperienceLootPooler>(FindObjectsInactive.Include);
         if (linkedProjectilePooler == null)
             linkedProjectilePooler = FindFirstObjectByType<EnemyProjectilePooler>(FindObjectsInactive.Include);
     }
 
-    // Loot poolers must stay active for the whole scene: dropped gold/xp is
+    // Loot poolers must stay active for the whole scene: dropped gold is
     // parented under them, so deactivating a pooler hides live loot in the world.
     private void SetLinkedPoolersActive(bool active)
     {
         if (linkedGoldLootPooler != null)
             linkedGoldLootPooler.gameObject.SetActive(active);
-        if (linkedExperienceLootPooler != null)
-            linkedExperienceLootPooler.gameObject.SetActive(active);
         if (linkedProjectilePooler != null)
             linkedProjectilePooler.gameObject.SetActive(active);
     }

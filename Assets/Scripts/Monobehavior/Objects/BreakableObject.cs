@@ -3,14 +3,12 @@ using UnityEngine;
 
 public class BreakableObject : MonoBehaviour, IDamageable, IBreakable
 {
-    public enum DropType { None, Gold, Experience, Both }
+    public enum DropType { None, Gold }
 
     [Header("Loot")]
-    [SerializeField] private DropType dropType = DropType.Both;
+    [SerializeField] private DropType dropType = DropType.Gold;
     [Tooltip("Dusecek altin sikke adedi.")]
     [SerializeField] private int goldCoins = 3;
-    [Tooltip("Dusecek deneyim kure adedi.")]
-    [SerializeField] private int expOrbs = 2;
 
     [Header("Animation")]
     [Tooltip("Animator'daki idle bool parametresinin adi.")]
@@ -68,12 +66,8 @@ public class BreakableObject : MonoBehaviour, IDamageable, IBreakable
 
     private void SpawnLoot()
     {
-        if (dropType == DropType.Gold || dropType == DropType.Both)
+        if (dropType == DropType.Gold)
             for (int i = 0; i < goldCoins; i++)
                 GoldLootPooler.Instance?.GetGold(transform.position, Quaternion.identity);
-
-        if (dropType == DropType.Experience || dropType == DropType.Both)
-            for (int i = 0; i < expOrbs; i++)
-                ExperienceLootPooler.Instance?.GetExperience(transform.position, Quaternion.identity);
     }
 }
