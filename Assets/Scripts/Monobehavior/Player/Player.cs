@@ -126,7 +126,7 @@ public partial class Player : BaseEntity, IPlayerContext
 
     public void OnFlatMaxHealthBonusChanged(float addedAmount)
     {
-        if (addedAmount <= 0f) return;
+        if (Mathf.Approximately(addedAmount, 0f)) return;
         _currentHealth = Mathf.Clamp(_currentHealth + addedAmount, 1f, MaxHealth);
         NotifyHealthChanged();
     }

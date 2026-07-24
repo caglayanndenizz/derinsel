@@ -807,6 +807,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelManager
   levelPrefabs:
+  - {fileID: 5722852612872668948, guid: 1a70a9d01c9feab439c4c19d281042ff, type: 3}
   - {fileID: 3428780871300842465, guid: d41314094974148aa88eb1fa09fe6908, type: 3}
   - {fileID: 4441966019484019267, guid: 2b879ecadd1e3244ba1bc585a3236236, type: 3}
   - {fileID: 6912590155674469954, guid: 3fb28df2a986aca4393afed89aa27f90, type: 3}

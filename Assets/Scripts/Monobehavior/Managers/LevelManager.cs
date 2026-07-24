@@ -112,10 +112,15 @@ public class LevelManager : MonoBehaviour
 
         _activeLevelInstance = Instantiate(levelPrefabs[levelIndex]);
 
-        Transform birth = FindChildByName(_activeLevelInstance.transform, "Birth");
+        var births = new List<Transform>();
+        FindChildrenByNamePrefix(_activeLevelInstance.transform, "Birth", births);
+
         Vector3 spawnPos;
-        if (birth != null)
+        if (births.Count > 0)
+        {
+            Transform birth = births[Random.Range(0, births.Count)];
             spawnPos = new Vector3(birth.position.x + 0.5f, birth.position.y + 0.5f, 0f);
+        }
         else
         {
             Debug.LogWarning($"LevelManager: Level {levelIndex + 1} icinde 'Birth' objesi bulunamadi, (0.5, 0.5) kullaniliyor.");
@@ -177,14 +182,12 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    private static Transform FindChildByName(Transform root, string targetName)
+    /// <summary>Collects every descendant whose name is exactly namePrefix or starts with it (covers Unity's "Birth (1)", "Birth (2)" auto-dedup naming).</summary>
+    private static void FindChildrenByNamePrefix(Transform root, string namePrefix, List<Transform> results)
     {
-        if (root.name == targetName) return root;
+        if (root.name == namePrefix || root.name.StartsWith(namePrefix))
+            results.Add(root);
         foreach (Transform child in root)
-        {
-            Transform found = FindChildByName(child, targetName);
-            if (found != null) return found;
-        }
-        return null;
+            FindChildrenByNamePrefix(child, namePrefix, results);
     }
 }

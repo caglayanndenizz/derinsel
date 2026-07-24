@@ -121,7 +121,7 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float crossbowBleedExpireSeconds       = 5f;
 
     private float _initialChargedLongbowAoeRadius;
-    private readonly Dictionary<AugmentId, int> _appliedAugmentCounts = new();
+    private readonly List<AugmentDefinition> _appliedAugments = new();
 
     [Header("Unlock Augment Database")]
     [Tooltip("Tracks unlock augments per weapon. Used for mutation checks.")]
@@ -147,6 +147,10 @@ public class PlayerAugmentController : MonoBehaviour
     private Player _player;
 
     public event Action<AugmentDefinition> AugmentApplied;
+    public event Action<AugmentDefinition> AugmentRemoved;
+
+    /// <summary>Every currently active augment instance, in the order they were applied. Duplicates appear once per stack.</summary>
+    public IReadOnlyList<AugmentDefinition> AppliedAugments => _appliedAugments;
 
     // ── Properties ────────────────────────────────────────────────────────────
 
@@ -277,7 +281,8 @@ public class PlayerAugmentController : MonoBehaviour
 
     // ── Reset ─────────────────────────────────────────────────────────────────
 
-    public void ResetAll()
+    /// <summary>Resets every mutated field to its default — the baseline that <see cref="RecomputeFromAppliedAugments"/> replays augments onto.</summary>
+    private void ResetMutableFieldsToDefaults()
     {
         movementSpeedBonus                  = 0f;
         hasChargedLongbowAoe                    = false;
@@ -309,10 +314,16 @@ public class PlayerAugmentController : MonoBehaviour
         maxHealthMultiplier                 = 1f;
         hasCrossbowBoltPierce               = false;
         hasCrossbowBoltBleed                = false;
-        _longbowMutated                     = false;
-        _crossbowMutated                    = false;
-        _hammerMutated                      = false;
-        _appliedAugmentCounts.Clear();
+    }
+
+    /// <summary>Full reset for a new run — clears the active augment list and permanent weapon-mutation flags too.</summary>
+    public void ResetAll()
+    {
+        ResetMutableFieldsToDefaults();
+        _longbowMutated  = false;
+        _crossbowMutated = false;
+        _hammerMutated   = false;
+        _appliedAugments.Clear();
     }
 
     // ── Augment query ─────────────────────────────────────────────────────────
@@ -326,7 +337,11 @@ public class PlayerAugmentController : MonoBehaviour
     public int GetAppliedCount(AugmentId id)
     {
         if (id == AugmentId.None) return 0;
-        return _appliedAugmentCounts.TryGetValue(id, out int count) ? Mathf.Max(0, count) : 0;
+        int count = 0;
+        for (int i = 0; i < _appliedAugments.Count; i++)
+            if (_appliedAugments[i] != null && _appliedAugments[i].id == id)
+                count++;
+        return count;
     }
 
     public bool CanApplyAugment(AugmentDefinition augment)
@@ -338,15 +353,61 @@ public class PlayerAugmentController : MonoBehaviour
         return currentCount < maxCount;
     }
 
-    // ── Apply ─────────────────────────────────────────────────────────────────
+    // ── Apply / Remove ────────────────────────────────────────────────────────
 
     public void ApplyAugment(AugmentDefinition augment)
     {
         if (augment == null) return;
         if (!CanApplyAugment(augment)) return;
 
-        float prevMaxHpMult = maxHealthMultiplier;
+        _appliedAugments.Add(augment);
+        RecomputeFromAppliedAugments();
+        AugmentApplied?.Invoke(augment);
 
+        if (augment is UnlockAugmentDefinition unlockDef)
+            CheckWeaponMutation(unlockDef.weaponType);
+    }
+
+    /// <summary>
+    /// Sells one stack of the given augment — removes it from the active list and fully
+    /// undoes its effect (via <see cref="RecomputeFromAppliedAugments"/>). Weapon-mutation
+    /// flags are NOT reverted; once a weapon mutates it stays mutated even if a prerequisite
+    /// unlock is later sold, and any other augment that already required it stays applied.
+    /// </summary>
+    public bool RemoveAugment(AugmentDefinition augment)
+    {
+        if (augment == null) return false;
+
+        int index = _appliedAugments.FindIndex(a => a != null && a.id == augment.id);
+        if (index < 0) return false;
+
+        _appliedAugments.RemoveAt(index);
+        RecomputeFromAppliedAugments();
+        AugmentRemoved?.Invoke(augment);
+        return true;
+    }
+
+    /// <summary>Resets to defaults then replays every active augment's effect in application order — keeps ApplyAugment/RemoveAugment symmetric.</summary>
+    private void RecomputeFromAppliedAugments()
+    {
+        float prevMaxHealthMultiplier = maxHealthMultiplier;
+        float prevFlatMaxHealthBonus  = flatMaxHealthBonus;
+
+        ResetMutableFieldsToDefaults();
+
+        for (int i = 0; i < _appliedAugments.Count; i++)
+            ApplyEffectOnly(_appliedAugments[i]);
+
+        if (!Mathf.Approximately(prevFlatMaxHealthBonus, flatMaxHealthBonus))
+            _player?.OnFlatMaxHealthBonusChanged(flatMaxHealthBonus - prevFlatMaxHealthBonus);
+
+        if (!Mathf.Approximately(prevMaxHealthMultiplier, maxHealthMultiplier))
+            _player?.OnMaxHealthMultiplierChanged(prevMaxHealthMultiplier, maxHealthMultiplier);
+    }
+
+    /// <summary>Pure stat mutation for one augment instance — no bookkeeping, no events. Only ever called by RecomputeFromAppliedAugments.</summary>
+    private void ApplyEffectOnly(AugmentDefinition augment)
+    {
         switch (augment.id)
         {
             case AugmentId.MovementSpeedIncreaseCommon:
@@ -427,7 +488,6 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.MaxHealthFlatIncrease_Common_III:
             case AugmentId.MaxHealthFlatIncrease_Common_IV:
                 flatMaxHealthBonus += Mathf.Max(0f, augment.value);
-                _player?.OnFlatMaxHealthBonusChanged(augment.value);
                 break;
             case AugmentId.HalfHealthBonusDamage:
                 outgoingDamageMultiplier *= 1.5f;
@@ -473,15 +533,6 @@ public class PlayerAugmentController : MonoBehaviour
                 hammerSlamCooldownMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
                 break;
         }
-
-        _appliedAugmentCounts[augment.id] = GetAppliedCount(augment.id) + 1;
-        AugmentApplied?.Invoke(augment);
-
-        if (!Mathf.Approximately(prevMaxHpMult, maxHealthMultiplier))
-            _player?.OnMaxHealthMultiplierChanged(prevMaxHpMult, maxHealthMultiplier);
-
-        if (augment is UnlockAugmentDefinition unlockDef)
-            CheckWeaponMutation(unlockDef.weaponType);
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────

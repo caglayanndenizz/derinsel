@@ -60,6 +60,7 @@ public class AugmentSelectionUI : MonoBehaviour
     private float _panelOpenedAt = -999f;
     private CanvasGroup _panelCanvasGroup;
     private bool _isPanelOpen;
+    public bool IsPanelOpen => _isPanelOpen;
     private List<AugmentDefinition> _currentOffer;
     private bool _rerollUsedForCurrentOffer;
     private bool _rerollLockedAsUnlockOffer;

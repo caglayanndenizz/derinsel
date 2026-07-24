@@ -16,6 +16,17 @@ public class PlayerCurrency : MonoBehaviour
         NotifyGoldChanged();
     }
 
+    /// <summary>Deducts gold only if the player can afford it. Returns false (no-op) if not.</summary>
+    public bool TrySpendGold(float amount)
+    {
+        if (amount <= 0f) return true;
+        if (goldCount < amount) return false;
+
+        goldCount -= amount;
+        NotifyGoldChanged();
+        return true;
+    }
+
     public void NotifyGoldChanged()
     {
         GoldChanged?.Invoke(Mathf.Max(0f, goldCount));
