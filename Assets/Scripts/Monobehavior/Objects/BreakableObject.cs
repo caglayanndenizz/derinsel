@@ -3,12 +3,14 @@ using UnityEngine;
 
 public class BreakableObject : MonoBehaviour, IDamageable, IBreakable
 {
-    public enum DropType { None, Gold }
+    public enum DropType { None, Gold, Healing }
 
     [Header("Loot")]
     [SerializeField] private DropType dropType = DropType.Gold;
     [Tooltip("Dusecek altin sikke adedi.")]
     [SerializeField] private int goldCoins = 3;
+    [Tooltip("DropType Healing secildiginde spawn edilecek prefab.")]
+    [SerializeField] private GameObject healingPrefab;
 
     [Header("Animation")]
     [Tooltip("Animator'daki idle bool parametresinin adi.")]
@@ -69,5 +71,7 @@ public class BreakableObject : MonoBehaviour, IDamageable, IBreakable
         if (dropType == DropType.Gold)
             for (int i = 0; i < goldCoins; i++)
                 GoldLootPooler.Instance?.GetGold(transform.position, Quaternion.identity);
+        else if (dropType == DropType.Healing && healingPrefab != null)
+            Instantiate(healingPrefab, transform.position, Quaternion.identity);
     }
 }
