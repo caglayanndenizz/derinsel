@@ -41,6 +41,10 @@ public class AugmentSelectionUI : MonoBehaviour
     [Tooltip("Seconds of real time after the panel opens before buttons become clickable. Prevents accidental selection.")]
     [SerializeField][Range(0.5f, 2f)] private float buttonActivationDelay = 1f;
 
+    [Header("Reroll")]
+    [Tooltip("Optional. Shown when a new offer opens, hidden once the single reroll for that offer is used.")]
+    [SerializeField] private GameObject rerollButtonRoot;
+
     [Header("Visual theme")]
     [SerializeField] private Image panelThemeTargetImage;
     [SerializeField] private Color defaultPanelThemeColor      = Color.white;
@@ -57,6 +61,11 @@ public class AugmentSelectionUI : MonoBehaviour
     private CanvasGroup _panelCanvasGroup;
     private bool _isPanelOpen;
     private List<AugmentDefinition> _currentOffer;
+    private bool _rerollUsedForCurrentOffer;
+    private bool _rerollLockedAsUnlockOffer;
+    private int _rerollLockedChestRarity;
+
+    public bool CanRerollCurrentOffer => _isPanelOpen && !_rerollUsedForCurrentOffer;
 
 
     private int _chestRarityFilter;
@@ -124,6 +133,10 @@ public class AugmentSelectionUI : MonoBehaviour
             return false;
         }
         _currentOffer = options;
+        _rerollUsedForCurrentOffer = false;
+        _rerollLockedAsUnlockOffer = _isUnlockChestPanel || (options.Count > 0 && options[0] is UnlockAugmentDefinition);
+        _rerollLockedChestRarity   = _chestRarityFilter;
+        if (rerollButtonRoot != null) rerollButtonRoot.SetActive(true);
 
         ApplyPanelTheme(source);
 
@@ -161,9 +174,55 @@ public class AugmentSelectionUI : MonoBehaviour
                            : rarity == 2 ? PanelSource.ChestSilver
                            : PanelSource.ChestWooden;
         bool result = ShowPanel(source);
-        _chestRarityFilter = 0;
+        if (!result) _chestRarityFilter = 0;
         if (result) _isChestPanel = true;
         return result;
+    }
+
+    // ── Reroll ──
+
+    public bool TryRerollOffer()
+    {
+        if (!_isPanelOpen || _rerollUsedForCurrentOffer) return false;
+
+        int slotCount = GetDesiredOptionSlotCount();
+        List<AugmentDefinition> options = BuildRerollOfferOptions(slotCount);
+        if (options.Count == 0) return false;
+
+        _rerollUsedForCurrentOffer = true;
+        _currentOffer = options;
+        if (rerollButtonRoot != null) rerollButtonRoot.SetActive(false);
+
+        HideUnusedRuntimeButtons(slotCount);
+        for (int i = 0; i < slotCount; i++)
+        {
+            AugmentDefinition option = i < options.Count ? options[i] : null;
+            _runtimeButtons[i].SetOption(option, HandleAugmentSelected);
+        }
+
+        if (GetRuntimeCardsParent() != null)
+            RefreshRuntimeCardsLayout();
+
+        return true;
+    }
+
+    /// <summary>Rerolls within the exact same pool/tier the current offer was locked to at open time — never widens to a different chest rarity or unlock/regular pool.</summary>
+    private List<AugmentDefinition> BuildRerollOfferOptions(int slotCount)
+    {
+        TryResolveWeightSystem();
+        if (_rerollLockedAsUnlockOffer && weightSystem != null)
+            return weightSystem.BuildUnlockOffer(playerAugmentController, slotCount);
+        if (_rerollLockedChestRarity > 0 && weightSystem != null)
+            return weightSystem.BuildChestOffer(_rerollLockedChestRarity, playerAugmentController, slotCount);
+        if (weightSystem != null)
+            return weightSystem.BuildRegularOffer(playerAugmentController, slotCount);
+        return BuildRandomAugmentOptions(slotCount);
+    }
+
+    /// <summary>UnityEvent-friendly wrapper for UI Button OnClick — Unity's OnClick() dropdown only lists void methods.</summary>
+    public void RerollButtonClicked()
+    {
+        TryRerollOffer();
     }
 
     private void HidePanel()
@@ -519,6 +578,7 @@ public class AugmentSelectionUI : MonoBehaviour
         bool wasChestPanel = _isChestPanel;
         _isChestPanel = false;
         _isUnlockChestPanel = false;
+        _chestRarityFilter = 0;
 
         HidePanel();
         _isPanelOpen = false;

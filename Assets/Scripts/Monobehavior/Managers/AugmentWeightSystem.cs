@@ -156,7 +156,7 @@ public class AugmentWeightSystem : MonoBehaviour
         return result;
     }
 
-    private List<AugmentDefinition> BuildRegularOffer(PlayerAugmentController controller, int slotCount)
+    public List<AugmentDefinition> BuildRegularOffer(PlayerAugmentController controller, int slotCount)
     {
         var result  = new List<AugmentDefinition>(slotCount);
         var usedIds = new HashSet<AugmentId>();

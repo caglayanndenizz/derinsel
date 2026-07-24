@@ -17,6 +17,9 @@ public partial class Player
     public float longbowChargedSpeedDamageMultiplier = 3f;
     [Tooltip("Hold duration (seconds) before the bow is considered fully charged.")]
     public float maxLongbowChargeTime = 0.5f;
+    [Tooltip("Per-arrow chance (0-1) to trigger the charged AoE explosion on hit, when the ChargedLongbowAoeUnlock augment is active.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float chargedLongbowExplosionChance = 0.35f;
     [Tooltip("If empty, the bow charge bar is not shown.")]
     public Slider longbowChargeMeter;
     [Tooltip("If empty, the bow charge UI canvas does not open.")]
@@ -71,9 +74,9 @@ public partial class Player
     {
         if (arrowPrefab == null || attackPoint == null) return;
 
-        bool chargedExplosionEnabled = useBowChargedMultiplier &&
-                                       playerAugmentController != null &&
-                                       playerAugmentController.HasChargedLongbowAoe;
+        bool hasChargedLongbowAoeAugment = useBowChargedMultiplier &&
+                                            playerAugmentController != null &&
+                                            playerAugmentController.HasChargedLongbowAoe;
         float spdMult      = useBowChargedMultiplier ? Mathf.Max(1f, longbowChargedSpeedDamageMultiplier) : 1f;
         float dmgMult      = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
         float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;
@@ -95,7 +98,7 @@ public partial class Player
             Vector2 shotDir = Quaternion.Euler(0f, 0f, angleOffset) * dir;
             Vector2 spawnPos = origin + shotDir * radialLongbowSpawnInset;
             // Her ok kendi hasarını ayrı ayrı roll eder (min-max aralık), tek atış icin ortak degil.
-            TrySpawnSinglePlayerArrow(spawnPos, origin + shotDir * targetDistance, useSpeed, useBowChargedMultiplier, dmgMult, chargedExplosionEnabled);
+            TrySpawnSinglePlayerArrow(spawnPos, origin + shotDir * targetDistance, useSpeed, useBowChargedMultiplier, dmgMult, hasChargedLongbowAoeAugment);
         }
     }
 
@@ -127,7 +130,7 @@ public partial class Player
         float dmgMult      = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
         float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;
         float useSpeed     = arrowSpeed * arrowSpdMult;
-        bool chargedExplosion = playerAugmentController != null && playerAugmentController.HasChargedLongbowAoe;
+        bool hasChargedLongbowAoeAugment = playerAugmentController != null && playerAugmentController.HasChargedLongbowAoe;
 
         Vector2 radialOrigin = transform.position;
         float targetDistance = Mathf.Max(0.5f, radialLongbowAutoVolleyTravelDistance);
@@ -141,7 +144,7 @@ public partial class Player
             Vector2 spawnPos = radialOrigin + radialDir * forward;
             Vector2 shotTarget = radialOrigin + radialDir * Mathf.Max(forward + 0.3f, targetDistance);
             // Radial yayılım her zaman "light" hasar tipini kullanır; her ok kendi rolünü alır.
-            TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, false, dmgMult, chargedExplosion);
+            TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, false, dmgMult, hasChargedLongbowAoeAugment);
         }
     }
 
@@ -157,12 +160,14 @@ public partial class Player
         float useSpeed,
         bool useHeavyDamage,
         float dmgMult,
-        bool chargedExplosionEnabled)
+        bool hasChargedLongbowAoeAugment)
     {
         float rolledDamage = stats != null
             ? (useHeavyDamage ? stats.RollBowHeavyAp() : stats.RollBowLightAp())
             : 0f;
         float useDamage = rolledDamage * dmgMult;
+
+        bool chargedExplosionEnabled = hasChargedLongbowAoeAugment && UnityEngine.Random.value <= chargedLongbowExplosionChance;
 
         float explosionRadius = chargedExplosionEnabled && playerAugmentController != null
             ? playerAugmentController.ChargedLongbowAoeRadius
