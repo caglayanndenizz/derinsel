@@ -815,10 +815,8 @@ GameObject:
   - component: {fileID: 1445455240794291464}
   - component: {fileID: 8065734436094031504}
   - component: {fileID: 6503687583984296382}
-  - component: {fileID: 3820127437461864083}
   - component: {fileID: 5610950964264296312}
   - component: {fileID: 3368341711262196754}
-  - component: {fileID: 1213795939226200453}
   - component: {fileID: 2498132936826151563}
   - component: {fileID: 843639116177421086}
   - component: {fileID: 1514579499696216982}
@@ -934,23 +932,6 @@ MonoBehaviour:
   lightHitPitch: 0.92
   heavyHitPitch: 0.82
   hitVfxLifetime: 2
---- !u!114 &3820127437461864083
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7512604712775791757}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb881971e066084ba1e703b735fd7a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerLevel
-  baseExpForLevel2: 60
-  xpGrowthRatePerLevel: 1.3
-  experienceCount: 0
-  currentLevel: 1
-  requiredExperienceForNextLevel: 100
 --- !u!114 &5610950964264296312
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1023,27 +1004,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCurrency
   goldCount: 0
---- !u!114 &1213795939226200453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7512604712775791757}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 969a95253d56643dd91f69a9a6baea31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WallLootHandler
-  wallLootDropGateChance: 0.05
-  wallLootGoldChance: 0.3
-  wallLootExpChance: 0.5
-  wallLootHealingPotionChance: 0.2
-  wallLootExpValue: 5
-  maxGoldPerRoom: 10
-  maxExpOrbsPerRoom: 10
-  maxHealingPotionsPerRoom: 2
-  healingPotionPrefab: {fileID: 5071090204471560867, guid: dd5d7420ee1c24614a84083182a1645b, type: 3}
 --- !u!114 &2498132936826151563
 MonoBehaviour:
   m_ObjectHideFlags: 0
