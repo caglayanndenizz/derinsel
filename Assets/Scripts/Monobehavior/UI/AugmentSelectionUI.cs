@@ -65,8 +65,9 @@ public class AugmentSelectionUI : MonoBehaviour
     private bool _rerollUsedForCurrentOffer;
     private bool _rerollLockedAsUnlockOffer;
     private int _rerollLockedChestRarity;
+    private bool _rerollAllowedForCurrentOffer = true;
 
-    public bool CanRerollCurrentOffer => _isPanelOpen && !_rerollUsedForCurrentOffer;
+    public bool CanRerollCurrentOffer => _isPanelOpen && !_rerollUsedForCurrentOffer && _rerollAllowedForCurrentOffer;
 
 
     private int _chestRarityFilter;
@@ -94,7 +95,7 @@ public class AugmentSelectionUI : MonoBehaviour
             Time.timeScale = _previousTimeScale;
     }
 
-    private bool ShowPanel(PanelSource source)
+    private bool ShowPanel(PanelSource source, bool allowReroll = true)
     {
         if (_isPanelOpen) return false;
 
@@ -137,7 +138,8 @@ public class AugmentSelectionUI : MonoBehaviour
         _rerollUsedForCurrentOffer = false;
         _rerollLockedAsUnlockOffer = _isUnlockChestPanel || (options.Count > 0 && options[0] is UnlockAugmentDefinition);
         _rerollLockedChestRarity   = _chestRarityFilter;
-        if (rerollButtonRoot != null) rerollButtonRoot.SetActive(true);
+        _rerollAllowedForCurrentOffer = allowReroll;
+        if (rerollButtonRoot != null) rerollButtonRoot.SetActive(allowReroll);
 
         ApplyPanelTheme(source);
 
@@ -161,20 +163,20 @@ public class AugmentSelectionUI : MonoBehaviour
         return true;
     }
 
-    public bool TryShowUnlockChestPanel()
+    public bool TryShowUnlockChestPanel(bool allowReroll = true)
     {
-        bool result = ShowPanel(PanelSource.UnlockOffer);
+        bool result = ShowPanel(PanelSource.UnlockOffer, allowReroll);
         if (result) _isUnlockChestPanel = true;
         return result;
     }
 
-    public bool ShowChestPanel(int rarity)
+    public bool ShowChestPanel(int rarity, bool allowReroll = true)
     {
         _chestRarityFilter = rarity;
         PanelSource source = rarity == 3 ? PanelSource.ChestGold
                            : rarity == 2 ? PanelSource.ChestSilver
                            : PanelSource.ChestWooden;
-        bool result = ShowPanel(source);
+        bool result = ShowPanel(source, allowReroll);
         if (!result) _chestRarityFilter = 0;
         if (result) _isChestPanel = true;
         return result;
@@ -184,7 +186,7 @@ public class AugmentSelectionUI : MonoBehaviour
 
     public bool TryRerollOffer()
     {
-        if (!_isPanelOpen || _rerollUsedForCurrentOffer) return false;
+        if (!_isPanelOpen || _rerollUsedForCurrentOffer || !_rerollAllowedForCurrentOffer) return false;
 
         int slotCount = GetDesiredOptionSlotCount();
         List<AugmentDefinition> options = BuildRerollOfferOptions(slotCount);

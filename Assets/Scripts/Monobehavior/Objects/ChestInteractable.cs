@@ -14,9 +14,12 @@ public class ChestInteractable : MonoBehaviour
     private Animator _animator;
     private AugmentSelectionUI _augmentUI;
     private bool _opened;
+    private bool _suppressRerollOnOpen;
 
     void Start()
     {
+        if (_opened) return;
+
         _animator = GetComponent<Animator>();
         if (_animator != null)
             _animator.SetBool(idleBoolName, true);
@@ -28,6 +31,17 @@ public class ChestInteractable : MonoBehaviour
     {
         if (_opened) return;
         if (other.GetComponent<Player>() == null && other.GetComponentInParent<Player>() == null) return;
+        Open();
+    }
+
+    /// <summary>Opens immediately without waiting for the player to walk into the trigger — used when the chest is bought from a shop.</summary>
+    /// <summary>Opens immediately without waiting for the player to walk into the trigger — used when the chest is bought from a shop. Shop-bought chests never offer a reroll.</summary>
+    public void OpenNow()
+    {
+        if (_opened) return;
+        _suppressRerollOnOpen = true;
+        if (_animator == null) _animator = GetComponent<Animator>();
+        if (_augmentUI == null) _augmentUI = Object.FindAnyObjectByType<AugmentSelectionUI>();
         Open();
     }
 
@@ -43,7 +57,7 @@ public class ChestInteractable : MonoBehaviour
         }
         else
         {
-            _augmentUI?.ShowChestPanel(rarity);
+            _augmentUI?.ShowChestPanel(rarity, !_suppressRerollOnOpen);
         }
     }
 
@@ -60,8 +74,8 @@ public class ChestInteractable : MonoBehaviour
         }
 
         if (isUnlockChest)
-            _augmentUI?.TryShowUnlockChestPanel();
+            _augmentUI?.TryShowUnlockChestPanel(!_suppressRerollOnOpen);
         else
-            _augmentUI?.ShowChestPanel(rarity);
+            _augmentUI?.ShowChestPanel(rarity, !_suppressRerollOnOpen);
     }
 }
