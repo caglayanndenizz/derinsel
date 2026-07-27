@@ -989,8 +989,11 @@ MonoBehaviour:
   crossbowBleedExpireSeconds: 5
   unlockDatabase: {fileID: 11400000, guid: 8a4b742d450e24d66b2b1249d1692152, type: 2}
   mutationAugmentsLongbow: 0
+  mutationAugmentsHammer: 0
   longbowGemCountDebug: 0
   longbowGemTierDebug: 
+  hammerGemCountDebug: 0
+  hammerGemTierDebug: 
 --- !u!114 &3368341711262196754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1023,6 +1026,8 @@ MonoBehaviour:
   crossbowBoltMaxLifetime: 5
   stats: {fileID: 11400000, guid: 51a62771fc2e9484a9150bcbc472472f, type: 2}
   damageInvulnerabilityDuration: 0.2
+  damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  damageFlashDuration: 0.2
   attackPoint: {fileID: 8790453129827999283}
   animator: {fileID: 3626925181394866402}
   enemyLayers:
@@ -1036,12 +1041,12 @@ MonoBehaviour:
   dashCooldownCanvas: {fileID: 0}
   showDashCooldownBarWhenReady: 1
   maxChargeTime: 0.5
-  hammerAOE: 2.5
+  hammerAOE: 2.28
   hammerCooldown: 3
   heavyImpactFallbackDelay: 0.17
   hammerChargeStartDelay: 0.5
   hammerLightAttackRate: 0.4
-  hammerLightRange: 3
+  hammerLightRange: 1.5
   hammerLightFallbackDelay: 0.15
   lightAttackRate: 0.2
   lightAttackDuration: 0.1
@@ -1058,6 +1063,7 @@ MonoBehaviour:
   longbowArrowReleaseDelay: 0.4
   longbowChargedSpeedDamageMultiplier: 3
   maxLongbowChargeTime: 0.5
+  chargedLongbowExplosionChance: 0.35
   longbowChargeMeter: {fileID: 0}
   longbowMeterCanvas: {fileID: 0}
   radialLongbowAutoVolleyIntervalSeconds: 1

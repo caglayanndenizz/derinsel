@@ -20,6 +20,8 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private AugmentSelectionUI augmentUI;
     [Tooltip("Lobby sahnesinim Global Light 2D'si. Level yuklendikten sonra kapanir.")]
     [SerializeField] private Light2D lobbyGlobalLight;
+    [Tooltip("Hiyerarsideki World/Lobby objesi. Level yuklendikten sonra kapanir, level unload edilince tekrar acilir.")]
+    [SerializeField] private GameObject lobbyRoot;
 
     [Header("Level End Chest")]
     [SerializeField] private GameObject goldenChestPrefab;
@@ -107,6 +109,7 @@ public class LevelManager : MonoBehaviour
 
         _currentLevelIndex = levelIndex;
         if (lobbyGlobalLight != null) lobbyGlobalLight.enabled = false;
+        if (lobbyRoot != null) lobbyRoot.SetActive(false);
 
         if (dungeonEntrance != null) dungeonEntrance.gameObject.SetActive(false);
 
@@ -145,6 +148,7 @@ public class LevelManager : MonoBehaviour
         }
 
         if (lobbyGlobalLight != null) lobbyGlobalLight.enabled = true;
+        if (lobbyRoot != null) lobbyRoot.SetActive(true);
     }
 
     private void CleanupLevelEndChest()

@@ -242,6 +242,12 @@ public partial class Player
             hammerCooldownCanvas.SetActive(showCooldownBarWhenReady);
     }
 
+    /// <summary>Called once by PlayerAugmentController when HammerChargeUnlock is newly acquired (never on removal).</summary>
+    public void OnHammerChargeUnlockAcquired()
+    {
+        if (meterCanvas != null) meterCanvas.SetActive(true);
+    }
+
     private void UpdateHammerCooldownUI()
     {
         if (hammerCooldownBar == null) return;

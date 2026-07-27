@@ -392,6 +392,7 @@ public class PlayerAugmentController : MonoBehaviour
     {
         float prevMaxHealthMultiplier = maxHealthMultiplier;
         float prevFlatMaxHealthBonus  = flatMaxHealthBonus;
+        bool  prevHasHammerChargeUnlock = hasHammerChargeUnlock;
 
         ResetMutableFieldsToDefaults();
 
@@ -403,6 +404,9 @@ public class PlayerAugmentController : MonoBehaviour
 
         if (!Mathf.Approximately(prevMaxHealthMultiplier, maxHealthMultiplier))
             _player?.OnMaxHealthMultiplierChanged(prevMaxHealthMultiplier, maxHealthMultiplier);
+
+        if (hasHammerChargeUnlock && !prevHasHammerChargeUnlock)
+            _player?.OnHammerChargeUnlockAcquired();
     }
 
     /// <summary>Pure stat mutation for one augment instance — no bookkeeping, no events. Only ever called by RecomputeFromAppliedAugments.</summary>

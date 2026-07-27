@@ -1,12 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class AugmentSelectionUI : MonoBehaviour
 {
     private enum PanelSource
     {
-        Default,
         UnlockOffer,
         ChestWooden,
         ChestSilver,
@@ -18,22 +16,17 @@ public class AugmentSelectionUI : MonoBehaviour
     [SerializeField] private PlayerAugmentController playerAugmentController;
     [SerializeField] private AugmentDatabase augmentDatabase;
     [SerializeField] private AugmentWeightSystem weightSystem;
-    [SerializeField] private GameObject panelRoot;
+
+    [Header("Chest tier panel roots")]
+    [Tooltip("Each root already contains its own hand-placed AugmentOptionButton cards (and its own reroll Button child). Only the matching tier's root is shown; the others stay inactive.")]
+    [SerializeField] private GameObject woodenPanelRoot;
+    [SerializeField] private GameObject silverPanelRoot;
+    [SerializeField] private GameObject goldPanelRoot;
+    [SerializeField] private GameObject unlockPanelRoot;
 
     [Header("Augment cards")]
-    [Tooltip("Required. Cards are instantiated from this prefab under the resolved row parent.")]
-    [SerializeField] private AugmentOptionButton optionButtonPrefab;
-    [Tooltip("Optional RectTransform holding the row — e.g. child named CardsContainer. If unset, CardsContainer under panelRoot is searched, else an AugmentCards row is created automatically.")]
-    [SerializeField] private Transform optionsContainer;
     [SerializeField] private int baseOptionCount = 3;
     [SerializeField] private int unlockedOptionCount = 4;
-    [Tooltip("Runtime augment card size (LayoutElement + prefab root).")]
-    [SerializeField] private float runtimeCardPreferredWidth = 400f;
-    [SerializeField] private float runtimeCardPreferredHeight = 400f;
-    [SerializeField] private float augmentRowSpacing = 24f;
-    [SerializeField] private int augmentRowPaddingPx = 8;
-    [Tooltip("Row is anchored to the center of PanelRoot and sized via ContentSizeFitter to fit the cards.")]
-    [SerializeField] private bool forceAugmentRowToCenterViewport = true;
 
     [Header("Behavior")]
     [SerializeField] private bool pauseGameWhenPanelOpen = true;
@@ -42,23 +35,11 @@ public class AugmentSelectionUI : MonoBehaviour
     [SerializeField][Range(0.5f, 2f)] private float buttonActivationDelay = 1f;
 
     [Header("Reroll")]
-    [Tooltip("Optional. Shown when a new offer opens, hidden once the single reroll for that offer is used.")]
-    [SerializeField] private GameObject rerollButtonRoot;
+    [Tooltip("Name of the reroll Button child inside each panel root. Looked up per active tier so each panel's own reroll button is used.")]
+    [SerializeField] private string rerollButtonChildName = "Button";
 
-    [Header("Visual theme")]
-    [SerializeField] private Image panelThemeTargetImage;
-    [SerializeField] private Color defaultPanelThemeColor      = Color.white;
-    [SerializeField] private Color unlockOfferPanelThemeColor  = new Color(1f, 0.84f, 0.0f, 1f);
-    [SerializeField] private Color chestWoodenPanelThemeColor  = new Color(0.55f, 0.35f, 0.15f, 1f);
-    [SerializeField] private Color chestSilverPanelThemeColor  = new Color(0.75f, 0.75f, 0.80f, 1f);
-    [SerializeField] private Color chestGoldPanelThemeColor    = new Color(1f, 0.84f, 0.0f, 1f);
-
-    private const string AutoCardsRowName = "AugmentCards";
-    private readonly List<AugmentOptionButton> _runtimeButtons = new();
-    private RectTransform _runtimeCardsParent;
     private float _previousTimeScale = 1f;
     private float _panelOpenedAt = -999f;
-    private CanvasGroup _panelCanvasGroup;
     private bool _isPanelOpen;
     public bool IsPanelOpen => _isPanelOpen;
     private List<AugmentDefinition> _currentOffer;
@@ -69,24 +50,21 @@ public class AugmentSelectionUI : MonoBehaviour
 
     public bool CanRerollCurrentOffer => _isPanelOpen && !_rerollUsedForCurrentOffer && _rerollAllowedForCurrentOffer;
 
+    private GameObject _activeRoot;
+    private CanvasGroup _activeCanvasGroup;
+    private AugmentOptionButton[] _activeButtons;
+    private GameObject _activeRerollButton;
 
     private int _chestRarityFilter;
     private bool _isChestPanel;
     private bool _isUnlockChestPanel;
     public event System.Action OnChestAugmentSelected;
 
-    private bool UsesPrefabAugmentCards =>
-        optionButtonPrefab != null && panelRoot != null;
-
     private void Awake()
     {
-        ResolvePanelRootIfNeeded();
-
-        TryResolveAugmentDynamicsOnAwake();
         TryResolvePlayer();
         TryResolveAugmentController();
-        EnsurePanelCanvasGroup();
-        HidePanel();
+        HideAllPanelsImmediately();
     }
 
     private void OnDisable()
@@ -95,39 +73,52 @@ public class AugmentSelectionUI : MonoBehaviour
             Time.timeScale = _previousTimeScale;
     }
 
+    private GameObject GetTierRoot(PanelSource source)
+    {
+        switch (source)
+        {
+            case PanelSource.ChestWooden: return woodenPanelRoot;
+            case PanelSource.ChestSilver: return silverPanelRoot;
+            case PanelSource.ChestGold:   return goldPanelRoot;
+            case PanelSource.UnlockOffer: return unlockPanelRoot;
+            default: return null;
+        }
+    }
+
+    private void HideAllPanelsImmediately()
+    {
+        if (woodenPanelRoot != null) woodenPanelRoot.SetActive(false);
+        if (silverPanelRoot != null) silverPanelRoot.SetActive(false);
+        if (goldPanelRoot   != null) goldPanelRoot.SetActive(false);
+        if (unlockPanelRoot != null) unlockPanelRoot.SetActive(false);
+    }
+
     private bool ShowPanel(PanelSource source, bool allowReroll = true)
     {
         if (_isPanelOpen) return false;
 
-        if (panelRoot == null)
+        GameObject root = GetTierRoot(source);
+        if (root == null)
         {
-            Debug.LogWarning("AugmentSelectionUI: panelRoot is not assigned.");
+            Debug.LogWarning($"AugmentSelectionUI: panel root for {source} is not assigned.");
             return false;
         }
 
         TryResolveAugmentController();
 
-        if (!UsesPrefabAugmentCards)
+        AugmentOptionButton[] buttons = root.GetComponentsInChildren<AugmentOptionButton>(true);
+        if (buttons.Length == 0)
         {
-            Debug.LogWarning(
-                "AugmentSelectionUI: Assign panelRoot and optionButtonPrefab — augment cards are always spawned from the prefab.");
+            Debug.LogWarning($"AugmentSelectionUI: {root.name} has no AugmentOptionButton children.");
             return false;
         }
 
         int slotCount = GetDesiredOptionSlotCount();
+        if (buttons.Length < slotCount)
+            Debug.LogWarning($"AugmentSelectionUI: {root.name} only has {buttons.Length} AugmentOptionButton slots but {slotCount} were requested.");
+        int usableSlots = Mathf.Min(slotCount, buttons.Length);
 
-        RefreshAugmentRowPositionAndLayout();
-        EnsureButtonPool(slotCount);
-        if (_runtimeButtons.Count < slotCount)
-        {
-            Debug.LogWarning(
-                "AugmentSelectionUI: could not instantiate enough augment buttons; check PanelRoot and augment row RectTransform.");
-            return false;
-        }
-
-        HideUnusedRuntimeButtons(slotCount);
-
-        List<AugmentDefinition> options = BuildOfferOptions(slotCount);
+        List<AugmentDefinition> options = BuildOfferOptions(usableSlots);
         if (options.Count == 0)
         {
             Debug.LogWarning(
@@ -139,19 +130,20 @@ public class AugmentSelectionUI : MonoBehaviour
         _rerollLockedAsUnlockOffer = _isUnlockChestPanel || (options.Count > 0 && options[0] is UnlockAugmentDefinition);
         _rerollLockedChestRarity   = _chestRarityFilter;
         _rerollAllowedForCurrentOffer = allowReroll;
-        if (rerollButtonRoot != null) rerollButtonRoot.SetActive(allowReroll);
 
-        ApplyPanelTheme(source);
+        GameObject rerollButton = FindDescendantNamed(root.transform, rerollButtonChildName)?.gameObject;
+        if (rerollButton != null) rerollButton.SetActive(allowReroll);
 
-        for (int i = 0; i < slotCount; i++)
+        for (int i = 0; i < buttons.Length; i++)
         {
-            AugmentDefinition option = i < options.Count ? options[i] : null;
-            _runtimeButtons[i].SetOption(option, HandleAugmentSelected);
+            AugmentDefinition option = i < usableSlots && i < options.Count ? options[i] : null;
+            buttons[i].SetOption(option, HandleAugmentSelected);
         }
 
-        ShowPanelRoot();
-        if (GetRuntimeCardsParent() != null)
-            RefreshRuntimeCardsLayout();
+        ShowPanelRoot(root);
+        _activeRoot = root;
+        _activeButtons = buttons;
+        _activeRerollButton = rerollButton;
         _isPanelOpen = true;
 
         if (pauseGameWhenPanelOpen)
@@ -186,25 +178,21 @@ public class AugmentSelectionUI : MonoBehaviour
 
     public bool TryRerollOffer()
     {
-        if (!_isPanelOpen || _rerollUsedForCurrentOffer || !_rerollAllowedForCurrentOffer) return false;
+        if (!_isPanelOpen || _rerollUsedForCurrentOffer || !_rerollAllowedForCurrentOffer || _activeButtons == null) return false;
 
-        int slotCount = GetDesiredOptionSlotCount();
+        int slotCount = Mathf.Min(GetDesiredOptionSlotCount(), _activeButtons.Length);
         List<AugmentDefinition> options = BuildRerollOfferOptions(slotCount);
         if (options.Count == 0) return false;
 
         _rerollUsedForCurrentOffer = true;
         _currentOffer = options;
-        if (rerollButtonRoot != null) rerollButtonRoot.SetActive(false);
+        if (_activeRerollButton != null) _activeRerollButton.SetActive(false);
 
-        HideUnusedRuntimeButtons(slotCount);
-        for (int i = 0; i < slotCount; i++)
+        for (int i = 0; i < _activeButtons.Length; i++)
         {
-            AugmentDefinition option = i < options.Count ? options[i] : null;
-            _runtimeButtons[i].SetOption(option, HandleAugmentSelected);
+            AugmentDefinition option = i < slotCount && i < options.Count ? options[i] : null;
+            _activeButtons[i].SetOption(option, HandleAugmentSelected);
         }
-
-        if (GetRuntimeCardsParent() != null)
-            RefreshRuntimeCardsLayout();
 
         return true;
     }
@@ -230,14 +218,22 @@ public class AugmentSelectionUI : MonoBehaviour
 
     private void HidePanel()
     {
-        if (panelRoot == null) return;
-        EnsurePanelCanvasGroup();
-        ApplyPanelTheme(PanelSource.Default);
-        _panelCanvasGroup.alpha = 0f;
-        _panelCanvasGroup.interactable = false;
-        _panelCanvasGroup.blocksRaycasts = false;
-        if (deactivatePanelRootWhenHidden && CanDeactivatePanelRootWithoutDisablingListener() && panelRoot.activeSelf)
-            panelRoot.SetActive(false);
+        if (_activeRoot == null) return;
+
+        if (_activeCanvasGroup != null)
+        {
+            _activeCanvasGroup.alpha = 0f;
+            _activeCanvasGroup.interactable = false;
+            _activeCanvasGroup.blocksRaycasts = false;
+        }
+
+        if (deactivatePanelRootWhenHidden && _activeRoot.activeSelf)
+            _activeRoot.SetActive(false);
+
+        _activeRoot = null;
+        _activeCanvasGroup = null;
+        _activeButtons = null;
+        _activeRerollButton = null;
     }
 
     private int GetDesiredOptionSlotCount()
@@ -245,101 +241,6 @@ public class AugmentSelectionUI : MonoBehaviour
         if (playerAugmentController != null && playerAugmentController.HasExtraAugmentSlotUnlock)
             return Mathf.Max(1, unlockedOptionCount);
         return Mathf.Max(1, baseOptionCount);
-    }
-
-    private void TryResolveAugmentDynamicsOnAwake()
-    {
-        if (!UsesPrefabAugmentCards)
-            return;
-
-        RectTransform row = GetRuntimeCardsParent();
-        if (row != null)
-        {
-            if (forceAugmentRowToCenterViewport)
-                ApplyPreferredAugmentRowFrame(row);
-
-            EnsureAugmentRowHorizontalLayout(row);
-            HideLegacyAugmentButtonsOutsideRow(row);
-        }
-    }
-
-    /// <summary>Re-run before each picker open so scene-assigned Containers pick up anchors + HorizontalLayout reliably.</summary>
-    private void RefreshAugmentRowPositionAndLayout()
-    {
-        RectTransform row = GetRuntimeCardsParent();
-        if (row == null)
-            return;
-
-        if (forceAugmentRowToCenterViewport)
-            ApplyPreferredAugmentRowFrame(row);
-
-        EnsureAugmentRowHorizontalLayout(row);
-    }
-
-    private RectTransform GetRuntimeCardsParent()
-    {
-        if (!UsesPrefabAugmentCards)
-            return null;
-
-        if (_runtimeCardsParent != null && _runtimeCardsParent.gameObject == null)
-            _runtimeCardsParent = null;
-
-        if (_runtimeCardsParent != null)
-            return _runtimeCardsParent;
-
-        if (optionsContainer != null &&
-            (ReferenceEquals(gameObject, optionsContainer.gameObject) ||
-             ReferenceEquals(panelRoot != null ? panelRoot.gameObject : null, optionsContainer.gameObject)))
-        {
-            Debug.LogWarning(
-                "AugmentSelectionUI: optionsContainer should reference a PanelRoot child row (CardsContainer/AugmentCards), not PanelRoot nor this UI object.");
-        }
-
-        if (optionsContainer != null)
-        {
-            var explicitRect = optionsContainer as RectTransform;
-            if (explicitRect != null)
-            {
-                _runtimeCardsParent = explicitRect;
-                return _runtimeCardsParent;
-            }
-        }
-
-        Transform named = FindDescendantNamed(panelRoot.transform, "CardsContainer")
-                          ?? FindDescendantNamed(panelRoot.transform, "OptionsContainer");
-
-        if (named != null)
-        {
-            RectTransform rect = named as RectTransform;
-            if (rect != null)
-            {
-                _runtimeCardsParent = rect;
-                if (optionsContainer == null)
-                    optionsContainer = named;
-                return _runtimeCardsParent;
-            }
-
-            Debug.LogWarning(
-                $"AugmentSelectionUI: found '{named.name}' for augment row parent but it has no RectTransform; add one or use CardsContainer RectTransform.");
-        }
-
-        Transform auto = FindDescendantNamed(panelRoot.transform, AutoCardsRowName);
-        if (auto != null && auto.TryGetComponent(out RectTransform autoRect))
-        {
-            _runtimeCardsParent = autoRect;
-            return _runtimeCardsParent;
-        }
-
-        var rowGo = new GameObject(AutoCardsRowName, typeof(RectTransform));
-        RectTransform row = rowGo.GetComponent<RectTransform>();
-        row.SetParent(panelRoot.transform, false);
-        row.SetSiblingIndex(panelRoot.transform.childCount - 1);
-        ApplyPreferredAugmentRowFrame(row);
-        row.localScale = Vector3.one;
-        row.localRotation = Quaternion.identity;
-
-        _runtimeCardsParent = row;
-        return _runtimeCardsParent;
     }
 
     private static Transform FindDescendantNamed(Transform root, string name)
@@ -359,124 +260,6 @@ public class AugmentSelectionUI : MonoBehaviour
         }
 
         return null;
-    }
-
-    /// <summary>Places the card row at the center of PanelRoot; width/height come from layout children + ContentSizeFitter.</summary>
-    private void ApplyPreferredAugmentRowFrame(RectTransform row)
-    {
-        if (row == null)
-            return;
-
-        row.anchorMin = row.anchorMax = new Vector2(0.5f, 0.5f);
-        row.pivot = new Vector2(0.5f, 0.5f);
-        row.anchoredPosition = Vector2.zero;
-        row.sizeDelta = Vector2.zero;
-        row.offsetMin = Vector2.zero;
-        row.offsetMax = Vector2.zero;
-        row.localScale = Vector3.one;
-    }
-
-    /// <summary>Horizontal stack + PreferredSize shrink-wrap for the centred AugmentCards row.</summary>
-    private void EnsureAugmentRowHorizontalLayout(RectTransform row)
-    {
-        if (row == null)
-            return;
-
-        ContentSizeFitter csf = row.GetComponent<ContentSizeFitter>();
-        if (csf == null)
-            csf = row.gameObject.AddComponent<ContentSizeFitter>();
-        csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-        csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-        HorizontalLayoutGroup hlg = row.GetComponent<HorizontalLayoutGroup>();
-        if (hlg == null)
-            hlg = row.gameObject.AddComponent<HorizontalLayoutGroup>();
-
-        hlg.childAlignment = TextAnchor.MiddleCenter;
-        hlg.reverseArrangement = false;
-        hlg.spacing = augmentRowSpacing;
-        hlg.childForceExpandHeight = false;
-        hlg.childForceExpandWidth = false;
-        hlg.childControlWidth = true;
-        hlg.childControlHeight = true;
-        int p = Mathf.Max(0, augmentRowPaddingPx);
-        hlg.padding = new RectOffset(p, p, p, p);
-    }
-
-    /// <summary>Hides old scene augment buttons left under PanelRoot outside the spawned row.</summary>
-    private void HideLegacyAugmentButtonsOutsideRow(RectTransform rowParent)
-    {
-        if (panelRoot == null || rowParent == null)
-            return;
-
-        AugmentOptionButton[] all = panelRoot.GetComponentsInChildren<AugmentOptionButton>(true);
-        for (int i = 0; i < all.Length; i++)
-        {
-            AugmentOptionButton b = all[i];
-            if (b == null || b.transform.IsChildOf(rowParent))
-                continue;
-            b.gameObject.SetActive(false);
-        }
-    }
-
-    private static void ConfigureRuntimeAugmentCardTransform(AugmentOptionButton btn, float prefW, float prefH)
-    {
-        Transform t = btn.transform;
-        t.localScale = Vector3.one;
-        t.localRotation = Quaternion.identity;
-
-        LayoutElement le = btn.GetComponent<LayoutElement>();
-        if (le == null)
-            le = btn.gameObject.AddComponent<LayoutElement>();
-        float w = Mathf.Max(1f, prefW);
-        float h = Mathf.Max(1f, prefH);
-        le.minWidth = w;
-        le.preferredWidth = w;
-        le.flexibleWidth = 0f;
-        le.minHeight = h;
-        le.preferredHeight = h;
-        le.flexibleHeight = 0f;
-    }
-
-    private void RefreshRuntimeCardsLayout()
-    {
-        if (_runtimeCardsParent == null)
-            return;
-
-        Canvas.ForceUpdateCanvases();
-        LayoutRebuilder.ForceRebuildLayoutImmediate(_runtimeCardsParent);
-    }
-
-    private void EnsureButtonPool(int needed)
-    {
-        RectTransform row = GetRuntimeCardsParent();
-        if (row == null)
-        {
-            Debug.LogError(
-                "AugmentSelectionUI: augment row RectTransform could not be resolved (PanelRoot?) — cannot instantiate option cards.");
-            return;
-        }
-
-        EnsureAugmentRowHorizontalLayout(row);
-
-        while (_runtimeButtons.Count < needed)
-        {
-            AugmentOptionButton btn = Instantiate(optionButtonPrefab, row);
-            ConfigureRuntimeAugmentCardTransform(btn, runtimeCardPreferredWidth, runtimeCardPreferredHeight);
-            _runtimeButtons.Add(btn);
-        }
-
-        for (int i = 0; i < _runtimeButtons.Count; i++)
-        {
-            if (_runtimeButtons[i] != null)
-                ConfigureRuntimeAugmentCardTransform(_runtimeButtons[i], runtimeCardPreferredWidth, runtimeCardPreferredHeight);
-        }
-    }
-
-    private void HideUnusedRuntimeButtons(int usedCount)
-    {
-        for (int i = usedCount; i < _runtimeButtons.Count; i++)
-            _runtimeButtons[i].SetOption(null, HandleAugmentSelected);
     }
 
     private List<AugmentDefinition> BuildOfferOptions(int slotCount)
@@ -554,19 +337,6 @@ public class AugmentSelectionUI : MonoBehaviour
         }
     }
 
-    private void ApplyPanelTheme(PanelSource source)
-    {
-        if (panelThemeTargetImage == null) return;
-        switch (source)
-        {
-            case PanelSource.UnlockOffer:  panelThemeTargetImage.color = unlockOfferPanelThemeColor;  break;
-            case PanelSource.ChestWooden:  panelThemeTargetImage.color = chestWoodenPanelThemeColor;  break;
-            case PanelSource.ChestSilver:  panelThemeTargetImage.color = chestSilverPanelThemeColor;  break;
-            case PanelSource.ChestGold:    panelThemeTargetImage.color = chestGoldPanelThemeColor;    break;
-            default:                       panelThemeTargetImage.color = defaultPanelThemeColor;       break;
-        }
-    }
-
     private void HandleAugmentSelected(AugmentDefinition selectedAugment)
     {
         if (Time.unscaledTime - _panelOpenedAt < buttonActivationDelay) return;
@@ -612,67 +382,24 @@ public class AugmentSelectionUI : MonoBehaviour
             playerAugmentController = Object.FindAnyObjectByType<PlayerAugmentController>();
     }
 
-    private void ShowPanelRoot()
+    private void ShowPanelRoot(GameObject root)
     {
-        EnsurePanelCanvasGroup();
-        if (!panelRoot.activeSelf)
-            panelRoot.SetActive(true);
-        _panelCanvasGroup.alpha = 1f;
-        _panelCanvasGroup.interactable = true;
-        _panelCanvasGroup.blocksRaycasts = true;
+        if (!root.activeSelf)
+            root.SetActive(true);
+
+        _activeCanvasGroup = root.GetComponent<CanvasGroup>();
+        if (_activeCanvasGroup == null)
+            _activeCanvasGroup = root.AddComponent<CanvasGroup>();
+
+        _activeCanvasGroup.alpha = 1f;
+        _activeCanvasGroup.interactable = true;
+        _activeCanvasGroup.blocksRaycasts = true;
         _panelOpenedAt = Time.unscaledTime;
     }
 
-    private void EnsurePanelCanvasGroup()
-    {
-        if (panelRoot == null) return;
-        if (_panelCanvasGroup != null) return;
-        _panelCanvasGroup = panelRoot.GetComponent<CanvasGroup>();
-        if (_panelCanvasGroup == null)
-            _panelCanvasGroup = panelRoot.AddComponent<CanvasGroup>();
-    }
-
-    private void ResolvePanelRootIfNeeded()
-    {
-        if (panelRoot != null) return;
-
-        panelRoot = gameObject;
-        AugmentOptionButton[] ownButtons = panelRoot.GetComponentsInChildren<AugmentOptionButton>(true);
-        if (ownButtons.Length > 0) return;
-
-        Transform ancestor = transform.parent;
-        while (ancestor != null)
-        {
-            if (ancestor.GetComponentsInChildren<AugmentOptionButton>(true).Length > 0)
-            {
-                panelRoot = ancestor.gameObject;
-                return;
-            }
-
-            ancestor = ancestor.parent;
-        }
-    }
-
-    private bool CanDeactivatePanelRootWithoutDisablingListener()
-    {
-        if (panelRoot == null || panelRoot == gameObject)
-            return false;
-
-        bool thisObjectWillBeDisabled = transform.IsChildOf(panelRoot.transform);
-        if (thisObjectWillBeDisabled)
-        {
-            Debug.LogWarning(
-                "AugmentSelectionUI: panelRoot deactivated this object would also be disabled, so panel calls would stop working. " +
-                "Keep this script on an always-active object (e.g. AugmentCanvas) and assign panelRoot to the visual panel.");
-            return false;
-        }
-
-        return true;
-    }
-
-    [ContextMenu("Debug/Show Augment Panel")]
+    [ContextMenu("Debug/Show Wooden Chest Panel")]
     private void DebugShowAugmentPanel()
     {
-        ShowPanel(PanelSource.Default);
+        ShowChestPanel(1);
     }
 }
