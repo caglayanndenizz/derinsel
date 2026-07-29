@@ -3,11 +3,11 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
-/// <summary>Persists and applies fullscreen + brightness settings across every scene without needing a scene object.</summary>
+/// <summary>Persists and applies brightness + sound settings across every scene without needing a scene object.</summary>
 public static class SettingsManager
 {
-    private const string FullscreenKey = "Settings_Fullscreen";
     private const string BrightnessKey = "Settings_Brightness";
+    private const string MutedKey = "Settings_Muted";
 
     public const float MinBrightness = 0.3f;
     public const float MaxBrightness = 2f;
@@ -19,21 +19,8 @@ public static class SettingsManager
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Init()
     {
-        ApplyFullscreen(GetFullscreen());
+        ApplyMuted(GetMuted());
         SceneManager.sceneLoaded += (scene, mode) => ApplyGlobalLightBrightness();
-    }
-
-    public static bool GetFullscreen() => PlayerPrefs.GetInt(FullscreenKey, Screen.fullScreen ? 1 : 0) == 1;
-
-    public static void SetFullscreen(bool fullscreen)
-    {
-        PlayerPrefs.SetInt(FullscreenKey, fullscreen ? 1 : 0);
-        ApplyFullscreen(fullscreen);
-    }
-
-    private static void ApplyFullscreen(bool fullscreen)
-    {
-        Screen.fullScreen = fullscreen;
     }
 
     public static float GetBrightness() => PlayerPrefs.GetFloat(BrightnessKey, DefaultBrightness);
@@ -61,5 +48,18 @@ public static class SettingsManager
 
             light.intensity = baseIntensity * multiplier;
         }
+    }
+
+    public static bool GetMuted() => PlayerPrefs.GetInt(MutedKey, 0) == 1;
+
+    public static void SetMuted(bool muted)
+    {
+        PlayerPrefs.SetInt(MutedKey, muted ? 1 : 0);
+        ApplyMuted(muted);
+    }
+
+    private static void ApplyMuted(bool muted)
+    {
+        AudioListener.volume = muted ? 0f : 1f;
     }
 }

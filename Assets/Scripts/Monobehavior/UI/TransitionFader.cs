@@ -35,6 +35,9 @@ public class TransitionFader : MonoBehaviour
         if (canvasGroup == null)
             yield break;
 
+        if (!gameObject.activeInHierarchy)
+            gameObject.SetActive(true);
+
         if (_runningFadeRoutine != null)
             StopCoroutine(_runningFadeRoutine);
 

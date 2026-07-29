@@ -1,19 +1,18 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class OptionsPanelController : MonoBehaviour
 {
-    [SerializeField] private MainMenuController menuController;
-    [SerializeField] private Toggle fullscreenToggle;
-    [SerializeField] private Toggle windowedToggle;
     [SerializeField] private Slider brightnessSlider;
+    [SerializeField] private Toggle soundToggle;
     [SerializeField] private Button backButton;
+    [SerializeField] private UnityEvent onBack;
 
     private void Awake()
     {
-        fullscreenToggle.onValueChanged.AddListener(OnFullscreenToggleChanged);
-        windowedToggle.onValueChanged.AddListener(OnWindowedToggleChanged);
         brightnessSlider.onValueChanged.AddListener(OnBrightnessChanged);
+        soundToggle.onValueChanged.AddListener(OnSoundToggleChanged);
         backButton.onClick.AddListener(OnBackClicked);
     }
 
@@ -23,21 +22,7 @@ public class OptionsPanelController : MonoBehaviour
         brightnessSlider.maxValue = SettingsManager.MaxBrightness;
         brightnessSlider.SetValueWithoutNotify(SettingsManager.GetBrightness());
 
-        bool isFullscreen = SettingsManager.GetFullscreen();
-        fullscreenToggle.SetIsOnWithoutNotify(isFullscreen);
-        windowedToggle.SetIsOnWithoutNotify(!isFullscreen);
-    }
-
-    public void OnFullscreenToggleChanged(bool isOn)
-    {
-        if (isOn)
-            SettingsManager.SetFullscreen(true);
-    }
-
-    public void OnWindowedToggleChanged(bool isOn)
-    {
-        if (isOn)
-            SettingsManager.SetFullscreen(false);
+        soundToggle.SetIsOnWithoutNotify(!SettingsManager.GetMuted());
     }
 
     public void OnBrightnessChanged(float value)
@@ -45,8 +30,13 @@ public class OptionsPanelController : MonoBehaviour
         SettingsManager.SetBrightness(value);
     }
 
+    public void OnSoundToggleChanged(bool isOn)
+    {
+        SettingsManager.SetMuted(!isOn);
+    }
+
     public void OnBackClicked()
     {
-        menuController.ShowMainPanel();
+        onBack.Invoke();
     }
 }
