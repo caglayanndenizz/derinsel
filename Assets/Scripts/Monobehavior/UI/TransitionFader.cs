@@ -1,14 +1,19 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 [DisallowMultipleComponent]
+[RequireComponent(typeof(Canvas))]
 [RequireComponent(typeof(CanvasGroup))]
+[RequireComponent(typeof(GraphicRaycaster))]
 public class TransitionFader : MonoBehaviour
 {
     [Header("Fade Settings")]
     [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private float fadeDuration;
+    [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private bool blockRaycastsDuringFade = true;
+    [SerializeField] private Color fadeColor = Color.black;
+    [SerializeField] private int sortingOrder = 100;
 
     private Coroutine _runningFadeRoutine;
 
@@ -19,8 +24,35 @@ public class TransitionFader : MonoBehaviour
         if (canvasGroup == null)
             canvasGroup = GetComponent<CanvasGroup>();
 
+        var canvas = GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = sortingOrder;
+
+        EnsureFadeImage();
+
         // Keep canvas active but invisible at game start.
         SetState(0f, false);
+    }
+
+    // Builds the full-screen black Image child if the object doesn't already have one,
+    // so dragging this script onto a plain empty GameObject is enough to get a working fader.
+    private void EnsureFadeImage()
+    {
+        if (GetComponentInChildren<Image>() != null)
+            return;
+
+        var imageGO = new GameObject("FadeImage", typeof(RectTransform), typeof(Image));
+        imageGO.transform.SetParent(transform, false);
+
+        var rect = (RectTransform)imageGO.transform;
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        var image = imageGO.GetComponent<Image>();
+        image.color = fadeColor;
+        image.raycastTarget = false;
     }
 
     public IEnumerator FadeOutIn(System.Action onBlackReached)
