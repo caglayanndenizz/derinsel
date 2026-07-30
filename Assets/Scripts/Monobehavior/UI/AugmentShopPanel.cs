@@ -10,7 +10,6 @@ public class AugmentShopPanel : MonoBehaviour
     [SerializeField] private Button buyTabButton;
     [SerializeField] private GameObject sellContent;
     [SerializeField] private GameObject buyContent;
-    [SerializeField] private Button closeButton;
 
     [Header("Sell")]
     [SerializeField] private Transform sellListParent;
@@ -40,7 +39,6 @@ public class AugmentShopPanel : MonoBehaviour
     {
         sellTabButton.onClick.AddListener(ShowSellTab);
         buyTabButton.onClick.AddListener(ShowBuyTab);
-        closeButton.onClick.AddListener(Hide);
 
         woodenRow.Setup("Wooden", woodenPrice, () => TryBuyChest(woodenChestPrefab, woodenPrice));
         silverRow.Setup("Silver", silverPrice, () => TryBuyChest(silverChestPrefab, silverPrice));
