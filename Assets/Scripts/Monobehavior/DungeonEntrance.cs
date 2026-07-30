@@ -21,6 +21,7 @@ public class DungeonEntrance : MonoBehaviour
         {
             isPlayerNearby = true;
             if (interactionUI != null) interactionUI.SetActive(true);
+            Time.timeScale = 0f;
         }
     }
 
@@ -30,6 +31,7 @@ public class DungeonEntrance : MonoBehaviour
         {
             isPlayerNearby = false;
             if (interactionUI != null) interactionUI.SetActive(false);
+            Time.timeScale = 1f;
         }
     }
 
@@ -39,11 +41,16 @@ public class DungeonEntrance : MonoBehaviour
 
         _accepted = true;
         if (interactionUI != null) interactionUI.SetActive(false);
+
+        // Fader coroutine runs on scaled Time.deltaTime, so time must be
+        // resumed before it starts or the fade-to-black never progresses.
+        Time.timeScale = 1f;
         LevelManager.Instance?.LoadFirstLevel();
     }
 
     public void OnDeclineEnter()
     {
         if (interactionUI != null) interactionUI.SetActive(false);
+        Time.timeScale = 1f;
     }
 }

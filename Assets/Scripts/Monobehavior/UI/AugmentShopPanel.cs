@@ -45,6 +45,12 @@ public class AugmentShopPanel : MonoBehaviour
         goldenRow.Setup("Golden", goldenPrice, () => TryBuyChest(goldenChestPrefab, goldenPrice));
     }
 
+    private void Update()
+    {
+        if (IsOpen && Input.GetKeyDown(KeyCode.Escape))
+            Hide();
+    }
+
     public void Show(Player player)
     {
         _previousTimeScale = Mathf.Approximately(Time.timeScale, 0f) ? 1f : Time.timeScale;

@@ -9,6 +9,7 @@ public class PauseMenuController : MonoBehaviour
     [SerializeField] private GameObject optionsPanel;
     [SerializeField] private TransitionFader fader;
     [SerializeField] private string mainMenuSceneName = "MainMenu";
+    [SerializeField] private AugmentShopPanel augmentShopPanel;
 
     [Header("Pause Panel Buttons")]
     [SerializeField] private Button optionsButton;
@@ -23,11 +24,18 @@ public class PauseMenuController : MonoBehaviour
 
         pausePanel.SetActive(false);
         optionsPanel.SetActive(false);
+
+        if (augmentShopPanel == null)
+            augmentShopPanel = FindAnyObjectByType<AugmentShopPanel>(FindObjectsInactive.Include);
     }
 
     private void Update()
     {
         if (!Input.GetKeyDown(KeyCode.Escape))
+            return;
+
+        // Shop panel owns Escape while it's open and closes itself; don't also toggle pause.
+        if (augmentShopPanel != null && augmentShopPanel.IsOpen)
             return;
 
         if (optionsPanel.activeSelf)

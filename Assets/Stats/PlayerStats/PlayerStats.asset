@@ -18,9 +18,7 @@ MonoBehaviour:
   bowLightApMax: 2
   bowHeavyApMin: 20
   bowHeavyApMax: 30
-  crossbowApMin: 0
-  crossbowApMax: 0
-  hammerLightDamageMin: 1
-  hammerLightDamageMax: 4
+  hammerLightDamageMin: 30
+  hammerLightDamageMax: 40
   heavyAttackDamageMin: 25
   heavyAttackDamageMax: 35

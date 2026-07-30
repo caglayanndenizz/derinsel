@@ -17,16 +17,14 @@ public class GemTierUI : MonoBehaviour
 
     [Header("UI Elements")]
     [FormerlySerializedAs("longbowTrait")] [SerializeField] private GameObject traitRoot;
-    [SerializeField] private Image           badgeImage;
     [FormerlySerializedAs("longbowIcon")] [SerializeField] private Image weaponIcon;
     [SerializeField] private TextMeshProUGUI countText;
 
-    [Header("Colors")]
-    [SerializeField] private Color inactiveColor = new Color(0.22f, 0.22f, 0.22f, 1.00f);
-    [SerializeField] private Color coalColor     = new Color(0.45f, 0.40f, 0.35f, 1.00f);
-    [SerializeField] private Color goldColor     = new Color(1.00f, 0.84f, 0.00f, 1.00f);
-    [SerializeField] private Color diamondColor  = new Color(0.00f, 0.75f, 1.00f, 1.00f);
-    [SerializeField] private Color obsidianColor = new Color(0.55f, 0.00f, 1.00f, 1.00f);
+    [Header("Badge Images (one per tier — shown/hidden, not tinted)")]
+    [SerializeField] private GameObject coalBadge;
+    [SerializeField] private GameObject goldBadge;
+    [SerializeField] private GameObject diamondBadge;
+    [SerializeField] private GameObject obsidianBadge;
 
     [Header("References")]
     [SerializeField] private PlayerAugmentController augmentController;
@@ -94,21 +92,16 @@ public class GemTierUI : MonoBehaviour
         else
             Debug.LogWarning("[GemTierUI] traitRoot is not assigned in the Inspector!", this);
 
-        Color c = TierColor(tier);
-        if (badgeImage != null) badgeImage.color = c;
-        if (weaponIcon != null) weaponIcon.color = c;
-        if (countText  != null) countText.text   = $"{count}/{PlayerAugmentController.GemObsidianThreshold}";
+        if (countText != null) countText.text = $"{count}/{PlayerAugmentController.GemObsidianThreshold}";
+
+        SetActiveBadge(tier);
     }
 
-    private Color TierColor(GemTier tier)
+    private void SetActiveBadge(GemTier tier)
     {
-        switch (tier)
-        {
-            case GemTier.Coal:     return coalColor;
-            case GemTier.Gold:     return goldColor;
-            case GemTier.Diamond:  return diamondColor;
-            case GemTier.Obsidian: return obsidianColor;
-            default:               return inactiveColor;
-        }
+        if (coalBadge     != null) coalBadge.SetActive(tier == GemTier.Coal);
+        if (goldBadge     != null) goldBadge.SetActive(tier == GemTier.Gold);
+        if (diamondBadge  != null) diamondBadge.SetActive(tier == GemTier.Diamond);
+        if (obsidianBadge != null) obsidianBadge.SetActive(tier == GemTier.Obsidian);
     }
 }
