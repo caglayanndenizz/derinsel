@@ -14,6 +14,10 @@ public partial class Player : BaseEntity, IPlayerContext
     [SerializeField] private Color damageFlashColor = Color.red;
     [SerializeField] private float damageFlashDuration = 0.5f;
 
+    [Header("Death")]
+    [Tooltip("Death animasyonunun bitmesini bekleyip UI'i o sekilde tetiklemek icin sure (saniye).")]
+    [SerializeField] private float deathAnimationDuration = 0.4f;
+
     [Header("References")]
     public Transform attackPoint;
     [SerializeField] private Animator animator;
@@ -218,6 +222,12 @@ public partial class Player : BaseEntity, IPlayerContext
     {
         _currentHealth = 0f;
         SetState(new DiedState());
+        StartCoroutine(DeathSequenceRoutine());
+    }
+
+    private IEnumerator DeathSequenceRoutine()
+    {
+        yield return new WaitForSeconds(deathAnimationDuration);
         Died?.Invoke();
     }
 

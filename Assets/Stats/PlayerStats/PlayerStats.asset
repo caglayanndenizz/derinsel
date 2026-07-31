@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37576f05c4897404996640c68f8f6068, type: 3}
   m_Name: PlayerStats
   m_EditorClassIdentifier: Assembly-CSharp::EntityStats
-  maxHealth: 100
+  maxHealth: 1
   moveSpeed: 5
   bowLightApMin: 1
   bowLightApMax: 2
