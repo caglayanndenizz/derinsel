@@ -67,6 +67,7 @@ public class Enemy : BaseEntity
     public bool IsFrozen => _status.IsFrozen;
 
     protected GameObject player;
+    private BaseEntity _playerEntity;
     private bool _isDead = false;
     private Vector2 _lastKnownPlayerWorld;
     private bool _hasLastKnownPlayerWorld;
@@ -86,6 +87,7 @@ public class Enemy : BaseEntity
         _rb = GetComponent<Rigidbody2D>();
         _allColliders = GetComponentsInChildren<Collider2D>(true);
         player = GameObject.FindGameObjectWithTag("Player");
+        _playerEntity = player != null ? player.GetComponent<BaseEntity>() : null;
 
         // Fallback: prefab'da yoksa runtime'da ekle (status önce — visuals ona abone oluyor)
         _status = GetComponent<EntityStatusEffects>();
@@ -165,6 +167,19 @@ public class Enemy : BaseEntity
     private void CheckState()
     {
         if (player == null) return;
+
+        if (_playerEntity != null && _playerEntity.IsDead)
+        {
+            if (currentState != State.Patrol)
+            {
+                currentState = State.Patrol;
+                _hasLastKnownPlayerWorld = false;
+                _attack.ResetAttackCooldown();
+                _motor.ResetPatrolRoute();
+            }
+            return;
+        }
+
         float dist = Vector2.Distance(ReferencePosition, player.transform.position);
         float attackDistance = _attack.AttackRange;
 

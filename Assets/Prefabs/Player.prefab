@@ -1028,6 +1028,7 @@ MonoBehaviour:
   damageInvulnerabilityDuration: 0.2
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
   damageFlashDuration: 0.2
+  deathAnimationDuration: 0.4
   attackPoint: {fileID: 8790453129827999283}
   animator: {fileID: 3626925181394866402}
   enemyLayers:

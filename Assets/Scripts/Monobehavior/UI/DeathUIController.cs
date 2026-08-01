@@ -12,6 +12,8 @@ public class DeathUIController : MonoBehaviour
     [SerializeField] private string gameSceneName = "Game";
     [SerializeField] private string mainMenuSceneName = "MainMenu";
     [SerializeField] private Player player;
+    [Tooltip("Olum animasyonu bittikten sonra death panel'in ekrana gelmesine kadar beklenecek sure (saniye).")]
+    [SerializeField] private float showDelayAfterDeath = 2f;
 
     private void Awake()
     {
@@ -24,13 +26,18 @@ public class DeathUIController : MonoBehaviour
             player = FindAnyObjectByType<Player>();
 
         if (player != null)
-            player.Died += ShowDeathPanel;
+            player.Died += OnPlayerDied;
     }
 
-    private void ShowDeathPanel()
+    private void OnPlayerDied()
     {
+        StartCoroutine(ShowDeathPanelAfterDelay());
+    }
+
+    private IEnumerator ShowDeathPanelAfterDelay()
+    {
+        yield return new WaitForSeconds(showDelayAfterDeath);
         deathPanel.SetActive(true);
-        Time.timeScale = 0f;
     }
 
     public void OnRetryClicked()

@@ -27,6 +27,7 @@ public partial class Player : BaseEntity, IPlayerContext
     private PlayerImpactFeedback impactFeedback;
 
     private Rigidbody2D _rb;
+    private Collider2D _collider;
     private CinemachineImpulseSource _defaultImpulseSource;
     private float _invulnerableUntil = 0f;
     private PlayerState _currentState;
@@ -141,6 +142,7 @@ public partial class Player : BaseEntity, IPlayerContext
     {
         base.Awake();
         _rb = GetComponent<Rigidbody2D>();
+        _collider = GetComponent<Collider2D>();
         _rb.gravityScale = 0f;
         _rb.freezeRotation = true;
         _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -175,6 +177,8 @@ public partial class Player : BaseEntity, IPlayerContext
 
     void Update()
     {
+        if (IsDead) return;
+
         _currentState.Handle(this);
         HandleLightImpactFallback();
         HandleHeavyImpactFallback();
@@ -188,6 +192,8 @@ public partial class Player : BaseEntity, IPlayerContext
 
     void FixedUpdate()
     {
+        if (IsDead) return;
+
         Move();
     }
 
@@ -221,6 +227,8 @@ public partial class Player : BaseEntity, IPlayerContext
     protected override void Die()
     {
         _currentHealth = 0f;
+        _rb.linearVelocity = Vector2.zero;
+        if (_collider != null) _collider.enabled = false;
         SetState(new DiedState());
         StartCoroutine(DeathSequenceRoutine());
     }
