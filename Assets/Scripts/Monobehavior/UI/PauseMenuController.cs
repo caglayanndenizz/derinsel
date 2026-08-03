@@ -9,11 +9,11 @@ public class PauseMenuController : MonoBehaviour
     [SerializeField] private GameObject optionsPanel;
     [SerializeField] private TransitionFader fader;
     [SerializeField] private string mainMenuSceneName = "MainMenu";
-    [SerializeField] private AugmentShopPanel augmentShopPanel;
 
     [Header("Pause Panel Buttons")]
     [SerializeField] private Button optionsButton;
     [SerializeField] private Button quitToMenuButton;
+    [SerializeField] private Button quitGameButton;
 
     private bool _isPaused;
 
@@ -21,12 +21,10 @@ public class PauseMenuController : MonoBehaviour
     {
         optionsButton.onClick.AddListener(OpenOptions);
         quitToMenuButton.onClick.AddListener(OnQuitToMenuClicked);
+        quitGameButton.onClick.AddListener(OnQuitGameClicked);
 
         pausePanel.SetActive(false);
         optionsPanel.SetActive(false);
-
-        if (augmentShopPanel == null)
-            augmentShopPanel = FindAnyObjectByType<AugmentShopPanel>(FindObjectsInactive.Include);
     }
 
     private void Update()
@@ -35,7 +33,7 @@ public class PauseMenuController : MonoBehaviour
             return;
 
         // Shop panel owns Escape while it's open and closes itself; don't also toggle pause.
-        if (augmentShopPanel != null && augmentShopPanel.IsOpen)
+        if (AugmentShopPanel.IsAnyOpen)
             return;
 
         if (optionsPanel.activeSelf)
@@ -66,6 +64,15 @@ public class PauseMenuController : MonoBehaviour
     public void OnQuitToMenuClicked()
     {
         StartCoroutine(QuitToMainMenu());
+    }
+
+    public void OnQuitGameClicked()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     private IEnumerator QuitToMainMenu()

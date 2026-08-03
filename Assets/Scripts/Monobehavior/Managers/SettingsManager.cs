@@ -9,9 +9,9 @@ public static class SettingsManager
     private const string BrightnessKey = "Settings_Brightness";
     private const string MutedKey = "Settings_Muted";
 
-    public const float MinBrightness = 0.3f;
-    public const float MaxBrightness = 2f;
-    public const float DefaultBrightness = 1f;
+    public const float MinBrightness = -50f;
+    public const float MaxBrightness = 50f;
+    public const float DefaultBrightness = 0f;
 
     // Global Light 2D base intensity is authored per-level; brightness is applied as a multiplier on top of it.
     private static readonly Dictionary<Light2D, float> _baseIntensities = new();
@@ -33,7 +33,7 @@ public static class SettingsManager
 
     public static void ApplyGlobalLightBrightness()
     {
-        float multiplier = GetBrightness();
+        float multiplier = 1f + (GetBrightness() / 100f);
         Light2D[] lights = Object.FindObjectsByType<Light2D>(FindObjectsSortMode.None);
         foreach (Light2D light in lights)
         {

@@ -35,6 +35,8 @@ public class AugmentShopPanel : MonoBehaviour
 
     public bool IsOpen => gameObject.activeSelf;
 
+    public static bool IsAnyOpen { get; private set; }
+
     private void Awake()
     {
         sellTabButton.onClick.AddListener(ShowSellTab);
@@ -58,13 +60,21 @@ public class AugmentShopPanel : MonoBehaviour
 
         _player = player;
         gameObject.SetActive(true);
+        IsAnyOpen = true;
         ShowSellTab();
     }
 
     public void Hide()
     {
         gameObject.SetActive(false);
+        IsAnyOpen = false;
         Time.timeScale = _previousTimeScale > 0f ? _previousTimeScale : 1f;
+    }
+
+    private void OnDestroy()
+    {
+        if (IsOpen)
+            IsAnyOpen = false;
     }
 
     private void ShowSellTab()
