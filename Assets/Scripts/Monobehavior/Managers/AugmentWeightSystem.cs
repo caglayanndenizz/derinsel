@@ -307,18 +307,11 @@ public class AugmentWeightSystem : MonoBehaviour
 
     private static readonly AugmentId[][] ExclusiveOfferGroups =
     {
-        new[] { AugmentId.LuckIncrease_Common_I, AugmentId.LuckIncrease_Common_II, AugmentId.LuckIncrease_Common_III },
         new[]
         {
             AugmentId.ProjectileCount_PlusOneProjectiles,
             AugmentId.ProjectileCount_PlusOneAndSpeed10Percent,
             AugmentId.ProjectileCount_PlusOneAndSpeed15Percent,
-        },
-        new[]
-        {
-            AugmentId.MovementSpeedIncreaseCommon,
-            AugmentId.MovementSpeedIncreaseRare,
-            AugmentId.MovementSpeedIncreaseExtraordinary,
         },
     };
 

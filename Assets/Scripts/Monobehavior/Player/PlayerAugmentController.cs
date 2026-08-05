@@ -414,11 +414,6 @@ public class PlayerAugmentController : MonoBehaviour
     {
         switch (augment.id)
         {
-            case AugmentId.MovementSpeedIncreaseCommon:
-            case AugmentId.MovementSpeedIncreaseRare:
-            case AugmentId.MovementSpeedIncreaseExtraordinary:
-                movementSpeedBonus += Mathf.Max(0f, augment.value);
-                break;
             case AugmentId.ChargedLongbowAoeUnlock:
                 hasChargedLongbowAoe = true;
                 if (augment.value > 0f)
@@ -426,9 +421,6 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.TripleArrowUnlock:
                 hasTripleArrowUnlock = true;
-                break;
-            case AugmentId.ExtraAugmentSlotUnlock:
-                hasExtraAugmentSlotUnlock = true;
                 break;
             case AugmentId.LongbowFreezeUnlock:
                 hasLongbowFreezeUnlock = true;
@@ -448,23 +440,11 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.VampiricArrowUnlock:
                 hasVampiricArrowUnlock = true;
                 break;
-            case AugmentId.LuckIncrease_Common_I:
-            case AugmentId.LuckIncrease_Common_II:
-            case AugmentId.LuckIncrease_Common_III:
-            case AugmentId.LuckIncrease_Rare:
-            case AugmentId.LuckIncrease_Extraordinary:
-                luckMultiplier *= 1f + Mathf.Max(0f, augment.value);
-                break;
             case AugmentId.HammerChargeReduce_Common_I:
             case AugmentId.HammerChargeReduce_Common_II:
             case AugmentId.HammerChargeReduce_Rare:
             case AugmentId.HammerChargeReduceUnlock:
                 hammerChargeMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
-                break;
-            case AugmentId.DamageReduction_Common:
-            case AugmentId.DamageReduction_Rare:
-            case AugmentId.DamageReduction_Extraordinary:
-                incomingDamageReduction = Mathf.Clamp01(incomingDamageReduction + augment.value);
                 break;
             case AugmentId.HammerChargeUnlock:
                 hasHammerChargeUnlock = true;
@@ -486,23 +466,6 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.LongbowAoeRadius_Rare:
             case AugmentId.LongbowAoeRadius_Extraordinary:
                 longbowAoeRadiusBonus += Mathf.Max(0f, augment.value);
-                break;
-            case AugmentId.MaxHealthFlatIncrease_Common_I:
-            case AugmentId.MaxHealthFlatIncrease_Common_II:
-            case AugmentId.MaxHealthFlatIncrease_Common_III:
-            case AugmentId.MaxHealthFlatIncrease_Common_IV:
-                flatMaxHealthBonus += Mathf.Max(0f, augment.value);
-                break;
-            case AugmentId.HalfHealthBonusDamage:
-                outgoingDamageMultiplier *= 1.5f;
-                maxHealthMultiplier      *= 0.5f;
-                break;
-            case AugmentId.GlassCannonDoubleDamageHalveMaxHealth:
-                outgoingDamageMultiplier *= 2f;
-                maxHealthMultiplier      *= 0.5f;
-                break;
-            case AugmentId.MaxHealthIncreasePercent:
-                maxHealthMultiplier *= 1f + Mathf.Max(0f, augment.value);
                 break;
             case AugmentId.ProjectileCount_ExtraArrow:
             case AugmentId.ProjectileCount_ExtraArrowPlus:
@@ -546,26 +509,7 @@ public class PlayerAugmentController : MonoBehaviour
         if (augment == null) return 0;
         if (augment is UnlockAugmentDefinition) return 1; // one-time unlock
 
-        switch (augment.id)
-        {
-            case AugmentId.MovementSpeedIncreaseCommon:
-            case AugmentId.MovementSpeedIncreaseRare:
-            case AugmentId.MovementSpeedIncreaseExtraordinary:
-                return GetMovementSpeedMaxApplyCountFromRarity(augment.rarity);
-            default:
-                return 1;
-        }
-    }
-
-    private static int GetMovementSpeedMaxApplyCountFromRarity(int rarity)
-    {
-        switch (rarity)
-        {
-            case 1:  return 3;
-            case 2:  return 2;
-            case 3:  return 1;
-            default: return 1;
-        }
+        return 1;
     }
 
     // ── Weapon Mutation ───────────────────────────────────────────────────────
