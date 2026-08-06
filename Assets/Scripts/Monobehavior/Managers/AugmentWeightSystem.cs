@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Offer cycle (each level-up is one offer):
 ///   Every unlockOfferInterval-th offer → unlock-only offer (UnlockAugmentDatabase pool).
-///   All other offers                   → T1-only regular offer (AugmentDatabase.regularAugments).
+///   All other offers                   → T1-only regular offer (AugmentDatabase.tier1Augments).
 ///
 /// T2/T3 augments are only available via chests (BuildChestOffer).
 ///
@@ -197,8 +197,9 @@ public class AugmentWeightSystem : MonoBehaviour
         HashSet<AugmentId> usedIds)
     {
         var list = new List<AugmentDefinition>();
-        if (augmentDatabase?.regularAugments == null) return list;
-        foreach (AugmentDefinition aug in augmentDatabase.regularAugments)
+        List<AugmentDefinition> source = GetTierList(tier);
+        if (source == null) return list;
+        foreach (AugmentDefinition aug in source)
         {
             if (aug is UnlockAugmentDefinition) continue;
             if (aug.rarity != tier) continue;
@@ -209,13 +210,25 @@ public class AugmentWeightSystem : MonoBehaviour
         return list;
     }
 
+    private List<AugmentDefinition> GetTierList(int tier)
+    {
+        if (augmentDatabase == null) return null;
+        switch (tier)
+        {
+            case 1: return augmentDatabase.tier1Augments;
+            case 2: return augmentDatabase.tier2Augments;
+            case 3: return augmentDatabase.tier3Augments;
+            default: return null;
+        }
+    }
+
     private List<AugmentDefinition> BuildAllRegularCandidates(
         PlayerAugmentController controller,
         HashSet<AugmentId> usedIds)
     {
         var list = new List<AugmentDefinition>();
-        if (augmentDatabase?.regularAugments == null) return list;
-        foreach (AugmentDefinition aug in augmentDatabase.regularAugments)
+        if (augmentDatabase == null) return list;
+        foreach (AugmentDefinition aug in augmentDatabase.AllRegularAugments)
         {
             if (aug is UnlockAugmentDefinition) continue;
             if (!IsEligible(aug, controller, usedIds)) continue;

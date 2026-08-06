@@ -28,6 +28,9 @@ public class PlayerBolt : MonoBehaviour
     int   _bleedMaxStacks;
     float _bleedExpireSeconds;
 
+    float _critChance;
+    float _critDamage = 1f;
+
     Vector2 _previousFramePosition;
 
     void Awake()
@@ -54,7 +57,9 @@ public class PlayerBolt : MonoBehaviour
         bool      hasBleed                = false,
         float     bleedDamageRatioPerStack = 0.01f,
         int       bleedMaxStacks          = 5,
-        float     bleedExpireSeconds      = 5f)
+        float     bleedExpireSeconds      = 5f,
+        float     critChance              = 0f,
+        float     critDamage              = 1f)
     {
         _speed               = speed;
         _damage              = damage;
@@ -69,6 +74,8 @@ public class PlayerBolt : MonoBehaviour
         _bleedDamageRatioPerStack = bleedDamageRatioPerStack;
         _bleedMaxStacks      = bleedMaxStacks;
         _bleedExpireSeconds  = bleedExpireSeconds;
+        _critChance = critChance;
+        _critDamage = critDamage;
 
         _pierceCount = 0;
         _hitEnemies.Clear();
@@ -158,9 +165,12 @@ public class PlayerBolt : MonoBehaviour
 
         Enemy enemy = col.GetComponent<Enemy>() ?? col.GetComponentInParent<Enemy>();
 
+        bool isCrit = UnityEngine.Random.value < _critChance;
+        float critMult = isCrit ? _critDamage : 1f;
+
         if (enemy == null)
         {
-            dmg.TakeDamage(_damage, false);
+            dmg.TakeDamage(_damage * critMult, false);
             return;
         }
 
@@ -173,7 +183,7 @@ public class PlayerBolt : MonoBehaviour
                 : Mathf.Max(1f - _pierceCount * _pierceFalloff, _pierceFloor))
             : 1f;
 
-        dmg.TakeDamage(_damage * mult, false);
+        dmg.TakeDamage(_damage * mult * critMult, false);
         _pierceCount++;
 
         if (_hasBleed && enemy.CurrentHealth > 0f)

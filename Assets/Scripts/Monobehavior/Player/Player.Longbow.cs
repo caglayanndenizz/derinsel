@@ -13,7 +13,7 @@ public partial class Player
     public Camera aimCamera;
     [Tooltip("Arrow is instantiated after the bow animation finishes.")]
     public float longbowArrowReleaseDelay = 0.4f;
-    [Tooltip("Arrow SPEED on a fully charged right-click shot is multiplied by this. Damage comes from EntityStats.bowHeavyApMin/Max.")]
+    [Tooltip("Arrow SPEED on a fully charged right-click shot is multiplied by this. Damage comes from EntityStats.playerBaseDamageMin/Max x BowDamageMultiplier.")]
     public float longbowChargedSpeedDamageMultiplier = 3f;
     [Tooltip("Hold duration (seconds) before the bow is considered fully charged.")]
     public float maxLongbowChargeTime = 0.5f;
@@ -98,7 +98,7 @@ public partial class Player
             Vector2 shotDir = Quaternion.Euler(0f, 0f, angleOffset) * dir;
             Vector2 spawnPos = origin + shotDir * radialLongbowSpawnInset;
             // Her ok kendi hasarını ayrı ayrı roll eder (min-max aralık), tek atış icin ortak degil.
-            TrySpawnSinglePlayerArrow(spawnPos, origin + shotDir * targetDistance, useSpeed, useBowChargedMultiplier, dmgMult, hasChargedLongbowAoeAugment);
+            TrySpawnSinglePlayerArrow(spawnPos, origin + shotDir * targetDistance, useSpeed, dmgMult, hasChargedLongbowAoeAugment);
         }
     }
 
@@ -143,8 +143,8 @@ public partial class Player
             float forward = Mathf.Max(0f, radialLongbowSpawnInset);
             Vector2 spawnPos = radialOrigin + radialDir * forward;
             Vector2 shotTarget = radialOrigin + radialDir * Mathf.Max(forward + 0.3f, targetDistance);
-            // Radial yayılım her zaman "light" hasar tipini kullanır; her ok kendi rolünü alır.
-            TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, false, dmgMult, hasChargedLongbowAoeAugment);
+            // Radial yayılım her ok kendi rolünü alır.
+            TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, dmgMult, hasChargedLongbowAoeAugment);
         }
     }
 
@@ -158,14 +158,13 @@ public partial class Player
         Vector2 spawnWorldPosition,
         Vector2 targetWorldPoint,
         float useSpeed,
-        bool useHeavyDamage,
         float dmgMult,
         bool hasChargedLongbowAoeAugment)
     {
-        float rolledDamage = stats != null
-            ? (useHeavyDamage ? stats.RollBowHeavyAp() : stats.RollBowLightAp())
-            : 0f;
-        float useDamage = rolledDamage * dmgMult;
+        float rolledDamage    = stats != null ? stats.RollPlayerBaseDamage() : 0f;
+        float baseDamageBonus = playerAugmentController != null ? playerAugmentController.PlayerBaseDamageBonus : 0f;
+        float bowMult         = playerAugmentController != null ? playerAugmentController.BowDamageMultiplier : 1f;
+        float useDamage       = (rolledDamage + baseDamageBonus) * bowMult * dmgMult;
 
         bool chargedExplosionEnabled = hasChargedLongbowAoeAugment && UnityEngine.Random.value <= chargedLongbowExplosionChance;
 
@@ -208,7 +207,9 @@ public partial class Player
             playerAugmentController != null ? playerAugmentController.PoisonDotDuration : 0f,
             playerAugmentController != null ? playerAugmentController.PoisonDotDamagePerSecond : 0f,
             playerAugmentController != null ? playerAugmentController.FrozenEnemyVulnerabilityMultiplier : 1f,
-            playerAugmentController != null && playerAugmentController.HasVampiricArrowUnlock);
+            playerAugmentController != null && playerAugmentController.HasLifeStealUnlock,
+            playerAugmentController != null ? playerAugmentController.CritChance : 0f,
+            playerAugmentController != null ? playerAugmentController.CritDamage : 1f);
     }
 
     private static float GetArrowSpreadStepDegrees(int arrowCount)

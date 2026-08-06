@@ -34,7 +34,9 @@ public class PlayerArrow : MonoBehaviour
     CinemachineImpulseSource _hitCameraImpulse;
     Vector2 _previousFramePosition;
     Player _player;
-    bool   _hasVampiricArrow;
+    bool   _hasLifeSteal;
+    float _critChance;
+    float _critDamage = 1f;
 
     void Awake()
     {
@@ -70,7 +72,9 @@ public class PlayerArrow : MonoBehaviour
         float poisonDotDuration = 0f,
         float poisonDotDps = 0f,
         float frozenVulnerabilityMult = 1f,
-        bool hasVampiricArrow = false)
+        bool hasLifeSteal = false,
+        float critChance = 0f,
+        float critDamage = 1f)
     {
         _enemyMask = enemyMask;
         _speed = speed;
@@ -89,7 +93,9 @@ public class PlayerArrow : MonoBehaviour
         _poisonDotDuration = poisonDotDuration;
         _poisonDotDps      = poisonDotDps;
         _hitCameraImpulse    = hitCameraImpulse;
-        _hasVampiricArrow    = hasVampiricArrow;
+        _hasLifeSteal        = hasLifeSteal;
+        _critChance = critChance;
+        _critDamage = critDamage;
 
         RefreshElementParticles();
         _initialized = false;
@@ -215,14 +221,16 @@ public class PlayerArrow : MonoBehaviour
         IDamageable dmg = other.GetComponent<IDamageable>() ?? other.GetComponentInParent<IDamageable>();
         if (dmg == null) return;
 
-        dmg.TakeDamage(_damage, false);
+        bool isCrit = UnityEngine.Random.value < _critChance;
+        float finalDamage = isCrit ? _damage * _critDamage : _damage;
+
+        dmg.TakeDamage(finalDamage, false);
 
         Enemy enemy = other.GetComponent<Enemy>() ?? other.GetComponentInParent<Enemy>();
 
-        // Vampiric Arrow: heals the player for 5% of the enemy's max HP on hit.
-        // Does not check if the enemy is alive — landing the hit is sufficient.
-        if (_hasVampiricArrow && enemy != null && _player != null)
-            _player.Heal(enemy.MaxHealth * 0.05f);
+        // Life Steal: heals the player for 15% of the damage dealt on hit.
+        if (_hasLifeSteal && _player != null)
+            _player.Heal(finalDamage * 0.15f);
 
         if (_freezeDuration > 0f && enemy != null && enemy.CurrentHealth > 0f)
             enemy.Freeze(_freezeDuration, _frozenVulnerabilityMult);

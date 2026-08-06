@@ -157,8 +157,9 @@ public class AugmentSelectionUI : MonoBehaviour
 
     public bool TryShowUnlockChestPanel(bool allowReroll = true)
     {
+        _isUnlockChestPanel = true;
         bool result = ShowPanel(PanelSource.UnlockOffer, allowReroll);
-        if (result) _isUnlockChestPanel = true;
+        if (!result) _isUnlockChestPanel = false;
         return result;
     }
 
@@ -299,19 +300,15 @@ public class AugmentSelectionUI : MonoBehaviour
 
     private List<AugmentDefinition> BuildAvailableAugmentOptions()
     {
-        List<AugmentDefinition> opts = new List<AugmentDefinition>(
-            augmentDatabase != null && augmentDatabase.regularAugments != null
-                ? augmentDatabase.regularAugments.Count
-                : 0);
-        if (augmentDatabase == null || augmentDatabase.regularAugments == null)
+        List<AugmentDefinition> opts = new List<AugmentDefinition>();
+        if (augmentDatabase == null)
         {
             Debug.LogWarning("AugmentSelectionUI: augmentDatabase is not assigned.");
             return opts;
         }
 
-        for (int i = 0; i < augmentDatabase.regularAugments.Count; i++)
+        foreach (AugmentDefinition definition in augmentDatabase.AllRegularAugments)
         {
-            AugmentDefinition definition = augmentDatabase.regularAugments[i];
             if (definition == null || definition.id == AugmentId.None)
                 continue;
             if (playerAugmentController != null && !playerAugmentController.CanApplyAugment(definition))

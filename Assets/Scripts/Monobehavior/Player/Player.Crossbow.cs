@@ -66,7 +66,9 @@ public partial class Player
     private void TrySpawnSingleCrossbowBolt(Vector2 origin, Vector2 aimWorld, float useSpeed, float dmgMult)
     {
         PlayerAugmentController aug = playerAugmentController;
-        float useDamage = (stats != null ? stats.RollCrossbowAp() : 0f) * dmgMult;
+        float bowMult         = aug != null ? aug.BowDamageMultiplier : 1f;
+        float baseDamageBonus = aug != null ? aug.PlayerBaseDamageBonus : 0f;
+        float useDamage       = ((stats != null ? stats.RollPlayerBaseDamage() : 0f) + baseDamageBonus) * bowMult * dmgMult;
         PlayerBolt bolt = null;
         if (PlayerArrowPooler.Instance != null)
             PlayerArrowPooler.Instance.GetBolt(origin, Quaternion.identity, b => bolt = b);
@@ -94,7 +96,9 @@ public partial class Player
             hasBleed:                 aug != null && aug.HasCrossbowBoltBleed,
             bleedDamageRatioPerStack: aug != null ? aug.CrossbowBleedDamageRatioPerStack : 0.01f,
             bleedMaxStacks:           aug != null ? aug.CrossbowBleedMaxStacks          : 5,
-            bleedExpireSeconds:       aug != null ? aug.CrossbowBleedExpireSeconds      : 5f
+            bleedExpireSeconds:       aug != null ? aug.CrossbowBleedExpireSeconds      : 5f,
+            critChance:               aug != null ? aug.CritChance                      : 0f,
+            critDamage:               aug != null ? aug.CritDamage                      : 1f
         );
     }
 }

@@ -109,9 +109,13 @@ public partial class Player
             IDamageable target = enemy.GetComponent<IDamageable>() ?? enemy.GetComponentInParent<IDamageable>();
             if (target == null) continue;
             BaseEntity targetEntity = enemy.GetComponent<BaseEntity>() ?? enemy.GetComponentInParent<BaseEntity>();
-            float heavyDamage = targetEntity != null ? targetEntity.CurrentHealth : stats.RollHeavyAttackDamage();
+            float hammerMult      = playerAugmentController != null ? playerAugmentController.HammerDamageMultiplier : 1f;
+            float baseDamageBonus = playerAugmentController != null ? playerAugmentController.PlayerBaseDamageBonus : 0f;
+            float heavyDamage     = ((stats != null ? stats.RollPlayerBaseDamage() : 0f) + baseDamageBonus) * hammerMult;
             float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
-            target.TakeDamage(heavyDamage * dmgMult, true);
+            bool isCrit = playerAugmentController != null && UnityEngine.Random.value < playerAugmentController.CritChance;
+            float critMult = isCrit ? playerAugmentController.CritDamage : 1f;
+            target.TakeDamage(heavyDamage * dmgMult * critMult, true);
             if (hammerFreezeDuration > 0f && targetEntity != null && targetEntity.CurrentHealth > 0f)
             {
                 Enemy enemyComp = targetEntity as Enemy ?? enemy.GetComponentInParent<Enemy>();
@@ -162,8 +166,10 @@ public partial class Player
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, hammerLightRange, enemyLayers);
         if (hits.Length == 0) return;
 
-        float dmgMult      = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
-        float lightDmgMult = playerAugmentController != null ? playerAugmentController.HammerLightDamageMultiplier : 1f;
+        float dmgMult         = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
+        float lightDmgMult    = playerAugmentController != null ? playerAugmentController.HammerLightDamageMultiplier : 1f;
+        float hammerMult      = playerAugmentController != null ? playerAugmentController.HammerDamageMultiplier : 1f;
+        float baseDamageBonus = playerAugmentController != null ? playerAugmentController.PlayerBaseDamageBonus : 0f;
 
         Vector2 firstHitPoint = attackPoint.position;
         bool anyHit = false;
@@ -173,9 +179,11 @@ public partial class Player
             IDamageable target = hit.GetComponent<IDamageable>() ?? hit.GetComponentInParent<IDamageable>();
             if (target == null) continue;
             // Her hedef kendi hasarını ayrı ayrı roll eder (min-max aralık).
-            float lightDmg  = stats != null ? stats.RollHammerLightDamage() : 0f;
-            float useDamage = lightDmg * dmgMult * lightDmgMult;
-            target.TakeDamage(useDamage, false);
+            float lightDmg  = stats != null ? stats.RollPlayerBaseDamage() : 0f;
+            float useDamage = (lightDmg + baseDamageBonus) * dmgMult * lightDmgMult * hammerMult;
+            bool isCrit = playerAugmentController != null && UnityEngine.Random.value < playerAugmentController.CritChance;
+            float critMult = isCrit ? playerAugmentController.CritDamage : 1f;
+            target.TakeDamage(useDamage * critMult, false);
             if (!anyHit)
             {
                 firstHitPoint = hit.ClosestPoint(attackPoint.position);

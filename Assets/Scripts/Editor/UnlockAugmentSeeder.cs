@@ -53,8 +53,8 @@ public static class UnlockAugmentSeeder
 
         EditorUtility.SetDirty(db);
 
-        // Remove unlock augments from AugmentDatabase.regularAugments so they
-        // don't appear in regular tier offers.
+        // Remove unlock augments from AugmentDatabase.tier1Augments/tier2Augments/tier3Augments
+        // so they don't appear in regular tier offers.
         CleanRegularAugmentDatabase();
 
         AssetDatabase.SaveAssets();
@@ -116,11 +116,11 @@ public static class UnlockAugmentSeeder
         var augDb = AssetDatabase.LoadAssetAtPath<AugmentDatabase>(augDbPath);
         if (augDb == null)
         {
-            Debug.LogWarning("[UnlockAugmentSeeder] AugmentDatabase not found — skipping regularAugments cleanup.");
+            Debug.LogWarning("[UnlockAugmentSeeder] AugmentDatabase not found — skipping tier1Augments/tier2Augments/tier3Augments cleanup.");
             return;
         }
 
-        // IDs that belong to the unlock pool and must NOT be in regularAugments
+        // IDs that belong to the unlock pool and must NOT be in tier1Augments/tier2Augments/tier3Augments
         var unlockIds = new System.Collections.Generic.HashSet<AugmentId>
         {
             AugmentId.ChargedLongbowAoeUnlock,
@@ -138,17 +138,20 @@ public static class UnlockAugmentSeeder
             AugmentId.HammerSlamCooldownReduceUnlock,
         };
 
-        int removed = augDb.regularAugments.RemoveAll(a =>
+        System.Func<AugmentDefinition, bool> shouldRemove = a =>
         {
             if (a == null) return true;
             if (unlockIds.Contains(a.id)) return true;
             return false;
-        });
+        };
+        int removed = augDb.tier1Augments.RemoveAll(a => shouldRemove(a));
+        removed += augDb.tier2Augments.RemoveAll(a => shouldRemove(a));
+        removed += augDb.tier3Augments.RemoveAll(a => shouldRemove(a));
 
         if (removed > 0)
         {
             EditorUtility.SetDirty(augDb);
-            Debug.Log($"[UnlockAugmentSeeder] Removed {removed} unlock entries from AugmentDatabase.regularAugments.");
+            Debug.Log($"[UnlockAugmentSeeder] Removed {removed} unlock entries from AugmentDatabase.tier1Augments/tier2Augments/tier3Augments.");
         }
     }
 

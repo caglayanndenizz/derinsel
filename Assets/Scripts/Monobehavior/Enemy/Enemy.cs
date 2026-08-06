@@ -243,7 +243,9 @@ public class Enemy : BaseEntity
         _visuals.PlayHitFlash();
         DamageNumberPooler.SpawnDamageNumber(ReferencePosition, amount, isHeavy);
         Damaged?.Invoke();
-        float force = isHeavy ? heavyKnockbackForce : lightKnockbackForce;
+        Player playerComponent = player != null ? player.GetComponent<Player>() : null;
+        float knockbackMult = playerComponent?.PlayerAugmentController?.KnockbackMultiplier ?? 1f;
+        float force = (isHeavy ? heavyKnockbackForce : lightKnockbackForce) * knockbackMult;
         _motor.ApplyKnockback(force);
         if (_currentHealth <= 0 && !_isDead) PrepareToDie();
     }

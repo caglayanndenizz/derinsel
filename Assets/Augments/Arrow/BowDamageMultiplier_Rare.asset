@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf6f4c16b5f34ab45880a8a4afae4941, type: 3}
-  m_Name: Arrow_IncreaseYourArrowsBy1
+  m_Name: BowDamageMultiplier_Rare
   m_EditorClassIdentifier: Assembly-CSharp::AugmentDefinition
-  id: 14
-  displayName: Extra Arrow+
-  description: Increase the number of your arrows by 1.
+  id: 81
+  displayName: Bow Power II
+  description: Increases bow damage by 50%.
   icon: {fileID: 0}
-  rarity: 1
-  tier: 1
-  value: 0
+  rarity: 2
+  tier: 2
+  value: 0.5
   scalingCurve:
     serializedVersion: 2
     m_Curve:
@@ -43,4 +43,5 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  excludeFromAugmentPickerWhenRadialBowMutationComplete: 1
+  excludeFromAugmentPickerWhenRadialBowMutationComplete: 0
+  baseWeight: 0

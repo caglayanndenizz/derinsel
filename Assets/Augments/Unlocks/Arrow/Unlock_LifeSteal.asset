@@ -9,16 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf6f4c16b5f34ab45880a8a4afae4941, type: 3}
-  m_Name: Arrow_IncreaseNumberBy1
-  m_EditorClassIdentifier: Assembly-CSharp::AugmentDefinition
-  id: 10
-  displayName: Extra Arrow
-  description: Increase the number of arrows by 1.
+  m_Script: {fileID: 11500000, guid: 5f098bd9752714d23aacd572dae8ea8a, type: 3}
+  m_Name: Unlock_LifeSteal
+  m_EditorClassIdentifier: Assembly-CSharp::UnlockAugmentDefinition
+  id: 90
+  displayName: Life Steal
+  description: Each arrow hit heals you for 15% of the damage dealt.
   icon: {fileID: 0}
   rarity: 1
   tier: 1
-  value: 0
+  value: 1
   scalingCurve:
     serializedVersion: 2
     m_Curve:
@@ -43,4 +43,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  excludeFromAugmentPickerWhenRadialBowMutationComplete: 1
+  baseWeight: 0
+  excludeFromAugmentPickerWhenRadialLongbowMutationComplete: 0
+  weaponType: 1

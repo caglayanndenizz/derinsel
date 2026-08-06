@@ -21,11 +21,12 @@ public class PlayerAugmentController : MonoBehaviour
         AugmentId.LongbowAoeRadius_Common,
         AugmentId.LongbowAoeRadius_Rare,
         AugmentId.LongbowAoeRadius_Extraordinary,
-        AugmentId.ProjectileCount_ExtraArrow,
+        AugmentId.BowDamageMultiplier_Common,
+        AugmentId.BowDamageMultiplier_Rare,
+        AugmentId.BowDamageMultiplier_Extraordinary,
         AugmentId.ProjectileCount_PlusOneProjectiles,
         AugmentId.ProjectileCount_PlusOneAndSpeed10Percent,
         AugmentId.ProjectileCount_PlusOneAndSpeed15Percent,
-        AugmentId.ProjectileCount_ExtraArrowPlus,
     };
 
     private static readonly AugmentId[] HammerGemAugmentIds =
@@ -43,6 +44,9 @@ public class PlayerAugmentController : MonoBehaviour
         AugmentId.HammerFreeze_Rare,
         AugmentId.HammerAoeRadius_Common,
         AugmentId.HammerAoeRadius_Rare,
+        AugmentId.HammerDamageMultiplier_Common,
+        AugmentId.HammerDamageMultiplier_Rare,
+        AugmentId.HammerDamageMultiplier_Extraordinary,
     };
 
     // ── Runtime stats ─────────────────────────────────────────────────────────
@@ -64,6 +68,15 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float hammerFreezeDuration    = 0f;
     [SerializeField] private float hammerSlamCooldownMultiplier = 1f;
 
+    [Header("Weapon Damage Multipliers")]
+    [SerializeField] private float bowDamageMultiplier    = 1f;
+    [SerializeField] private float hammerDamageMultiplier = 1f;
+    [SerializeField] private float playerBaseDamageBonus  = 0f;
+    [SerializeField] private float knockbackMultiplier = 1f;
+    [SerializeField] private bool  hasCriticalStrikeUnlock;
+    [SerializeField] private float critChance = 0f;
+    [SerializeField] private float critDamage = 1f;
+
     [Header("Hammer — Light Attack")]
     [SerializeField] private float hammerLightDamageMultiplier  = 1f;
     [SerializeField] private float hammerLightRateMultiplier    = 1f;
@@ -82,7 +95,7 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private bool  hasTripleArrowUnlock;
     [SerializeField] private float longbowAoeRadiusBonus   = 0f;
     [SerializeField] private bool  hasArrowSizeUnlock;
-    [SerializeField] private bool  hasVampiricArrowUnlock;
+    [SerializeField] private bool  hasLifeStealUnlock;
     [SerializeField] private int   projectileShotBonusCount;
     [SerializeField] private float arrowProjectileSpeedMultiplier = 1f;
 
@@ -122,6 +135,7 @@ public class PlayerAugmentController : MonoBehaviour
 
     private float _initialChargedLongbowAoeRadius;
     private readonly List<AugmentDefinition> _appliedAugments = new();
+    private readonly List<float> _appliedAugmentRolls = new();
 
     [Header("Unlock Augment Database")]
     [Tooltip("Tracks unlock augments per weapon. Used for mutation checks.")]
@@ -160,7 +174,7 @@ public class PlayerAugmentController : MonoBehaviour
     public bool  HasFireArrowUnlock          => hasFireArrowUnlock  || mutationAugmentsLongbow;
     public bool  HasPoisonArrowUnlock        => hasPoisonArrowUnlock || mutationAugmentsLongbow;
     public bool  HasArrowSizeUnlock          => hasArrowSizeUnlock;
-    public bool  HasVampiricArrowUnlock      => hasVampiricArrowUnlock;
+    public bool  HasLifeStealUnlock          => hasLifeStealUnlock;
     public float FireDotDuration             => Mathf.Max(0f, fireDotDuration);
     public float FireDotDamagePerSecond      => Mathf.Max(0f, fireDotDamagePerSecond);
     public float PoisonDotDuration           => Mathf.Max(0f, poisonDotDuration);
@@ -179,6 +193,13 @@ public class PlayerAugmentController : MonoBehaviour
         1 + Mathf.Max(0, projectileShotBonusCount) + ((hasTripleArrowUnlock || mutationAugmentsLongbow) ? 2 : 0));
     public float ArrowProjectileSpeedMultiplier => Mathf.Max(0.01f, arrowProjectileSpeedMultiplier);
     public float OutgoingDamageMultiplier       => Mathf.Max(0.01f, outgoingDamageMultiplier);
+    public float BowDamageMultiplier    => Mathf.Max(0.01f, bowDamageMultiplier);
+    public float HammerDamageMultiplier => Mathf.Max(0.01f, hammerDamageMultiplier);
+    public float PlayerBaseDamageBonus  => Mathf.Max(0f, playerBaseDamageBonus);
+    public float KnockbackMultiplier => Mathf.Max(0.01f, knockbackMultiplier);
+    public bool  HasCriticalStrikeUnlock => hasCriticalStrikeUnlock;
+    public float CritChance              => Mathf.Clamp01(critChance);
+    public float CritDamage              => Mathf.Max(1f, critDamage);
     public float MaxHealthMultiplier            => Mathf.Max(0.01f, maxHealthMultiplier);
     public bool  HasExtraAugmentSlotUnlock      => hasExtraAugmentSlotUnlock;
     public float LuckMultiplier                 => Mathf.Max(0.01f, luckMultiplier);
@@ -298,13 +319,17 @@ public class PlayerAugmentController : MonoBehaviour
         frozenEnemyVulnerabilityMultiplier   = 1f;
         hammerLightDamageMultiplier         = 1f;
         hammerLightRateMultiplier           = 1f;
+        bowDamageMultiplier                 = 1f;
+        hammerDamageMultiplier              = 1f;
+        playerBaseDamageBonus               = 0f;
+        knockbackMultiplier                 = 1f;
         hammerSlamCooldownMultiplier        = 1f;
         longbowFreezeDuration                   = 0f;
         hasLongbowFreezeUnlock                  = false;
         hasFireArrowUnlock                  = false;
         hasPoisonArrowUnlock                = false;
         hasArrowSizeUnlock                  = false;
-        hasVampiricArrowUnlock              = false;
+        hasLifeStealUnlock                  = false;
         hammerAoeRadiusBonus                = 0f;
         longbowAoeRadiusBonus                   = 0f;
         flatMaxHealthBonus                  = 0f;
@@ -314,6 +339,9 @@ public class PlayerAugmentController : MonoBehaviour
         maxHealthMultiplier                 = 1f;
         hasCrossbowBoltPierce               = false;
         hasCrossbowBoltBleed                = false;
+        hasCriticalStrikeUnlock             = false;
+        critChance                          = 0f;
+        critDamage                          = 1f;
     }
 
     /// <summary>Full reset for a new run — clears the active augment list and permanent weapon-mutation flags too.</summary>
@@ -324,6 +352,7 @@ public class PlayerAugmentController : MonoBehaviour
         _crossbowMutated = false;
         _hammerMutated   = false;
         _appliedAugments.Clear();
+        _appliedAugmentRolls.Clear();
     }
 
     // ── Augment query ─────────────────────────────────────────────────────────
@@ -361,6 +390,7 @@ public class PlayerAugmentController : MonoBehaviour
         if (!CanApplyAugment(augment)) return;
 
         _appliedAugments.Add(augment);
+        _appliedAugmentRolls.Add(RollAugmentBonus(augment.id));
         RecomputeFromAppliedAugments();
         AugmentApplied?.Invoke(augment);
 
@@ -382,9 +412,22 @@ public class PlayerAugmentController : MonoBehaviour
         if (index < 0) return false;
 
         _appliedAugments.RemoveAt(index);
+        _appliedAugmentRolls.RemoveAt(index);
         RecomputeFromAppliedAugments();
         AugmentRemoved?.Invoke(augment);
         return true;
+    }
+
+    /// <summary>Rolls the one-time random bonus for augments whose magnitude is randomized at pick-time (not per-hit). Returns 0 for all other augments.</summary>
+    private static float RollAugmentBonus(AugmentId id)
+    {
+        switch (id)
+        {
+            case AugmentId.BaseDamageIncrease_Tier1: return UnityEngine.Random.Range(2f, 5f);
+            case AugmentId.BaseDamageIncrease_Tier2: return UnityEngine.Random.Range(4f, 7f);
+            case AugmentId.BaseDamageIncrease_Tier3: return UnityEngine.Random.Range(5f, 10f);
+            default: return 0f;
+        }
     }
 
     /// <summary>Resets to defaults then replays every active augment's effect in application order — keeps ApplyAugment/RemoveAugment symmetric.</summary>
@@ -397,7 +440,7 @@ public class PlayerAugmentController : MonoBehaviour
         ResetMutableFieldsToDefaults();
 
         for (int i = 0; i < _appliedAugments.Count; i++)
-            ApplyEffectOnly(_appliedAugments[i]);
+            ApplyEffectOnly(_appliedAugments[i], _appliedAugmentRolls[i]);
 
         if (!Mathf.Approximately(prevFlatMaxHealthBonus, flatMaxHealthBonus))
             _player?.OnFlatMaxHealthBonusChanged(flatMaxHealthBonus - prevFlatMaxHealthBonus);
@@ -410,7 +453,7 @@ public class PlayerAugmentController : MonoBehaviour
     }
 
     /// <summary>Pure stat mutation for one augment instance — no bookkeeping, no events. Only ever called by RecomputeFromAppliedAugments.</summary>
-    private void ApplyEffectOnly(AugmentDefinition augment)
+    private void ApplyEffectOnly(AugmentDefinition augment, float rolledValue)
     {
         switch (augment.id)
         {
@@ -437,8 +480,8 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.ArrowSizeUnlock:
                 hasArrowSizeUnlock = true;
                 break;
-            case AugmentId.VampiricArrowUnlock:
-                hasVampiricArrowUnlock = true;
+            case AugmentId.LifeStealUnlock:
+                hasLifeStealUnlock = true;
                 break;
             case AugmentId.HammerChargeReduce_Common_I:
             case AugmentId.HammerChargeReduce_Common_II:
@@ -467,8 +510,6 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.LongbowAoeRadius_Extraordinary:
                 longbowAoeRadiusBonus += Mathf.Max(0f, augment.value);
                 break;
-            case AugmentId.ProjectileCount_ExtraArrow:
-            case AugmentId.ProjectileCount_ExtraArrowPlus:
             case AugmentId.ProjectileCount_PlusOneProjectiles:
                 projectileShotBonusCount++;
                 break;
@@ -490,6 +531,16 @@ public class PlayerAugmentController : MonoBehaviour
             case AugmentId.HammerLightDamageIncrease_Extraordinary:
                 hammerLightDamageMultiplier *= 1f + Mathf.Max(0f, augment.value);
                 break;
+            case AugmentId.BowDamageMultiplier_Common:
+            case AugmentId.BowDamageMultiplier_Rare:
+            case AugmentId.BowDamageMultiplier_Extraordinary:
+                bowDamageMultiplier *= 1f + Mathf.Max(0f, augment.value);
+                break;
+            case AugmentId.HammerDamageMultiplier_Common:
+            case AugmentId.HammerDamageMultiplier_Rare:
+            case AugmentId.HammerDamageMultiplier_Extraordinary:
+                hammerDamageMultiplier *= 1f + Mathf.Max(0f, augment.value);
+                break;
             case AugmentId.HammerLightAttackSpeedIncrease_Common:
             case AugmentId.HammerLightAttackSpeedIncrease_Rare:
                 hammerLightRateMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
@@ -498,6 +549,25 @@ public class PlayerAugmentController : MonoBehaviour
             // ── Hammer Slam Cooldown ──────────────────────────────────────────
             case AugmentId.HammerSlamCooldownReduceUnlock:
                 hammerSlamCooldownMultiplier *= Mathf.Max(0.01f, 1f - Mathf.Clamp01(augment.value));
+                break;
+
+            // ── Player Base Damage ─────────────────────────────────────────────
+            case AugmentId.BaseDamageIncrease_Tier1:
+            case AugmentId.BaseDamageIncrease_Tier2:
+            case AugmentId.BaseDamageIncrease_Tier3:
+                playerBaseDamageBonus += rolledValue;
+                break;
+
+            // ── Knockback ───────────────────────────────────────────────────────
+            case AugmentId.KnockbackForceIncrease:
+                knockbackMultiplier *= 1f + Mathf.Max(0f, augment.value);
+                break;
+
+            // ── Critical Strike ────────────────────────────────────────────────
+            case AugmentId.CriticalStrikeUnlock:
+                hasCriticalStrikeUnlock = true;
+                critChance = 0.10f;
+                critDamage = 1.5f;
                 break;
         }
     }

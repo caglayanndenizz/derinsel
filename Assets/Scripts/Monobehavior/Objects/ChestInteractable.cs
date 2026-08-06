@@ -3,9 +3,7 @@ using UnityEngine;
 
 public class ChestInteractable : MonoBehaviour
 {
-    [Tooltip("1 = Wooden (Common), 2 = Silver (Rare), 3 = Gold (Extraordinary)")]
-    [SerializeField] private int rarity = 1;
-    [SerializeField] private bool isUnlockChest;
+    [SerializeField] private ChestTier tier = ChestTier.Wooden;
 
     [Header("Animation")]
     [SerializeField] private string idleBoolName = "Idle";
@@ -34,7 +32,6 @@ public class ChestInteractable : MonoBehaviour
         Open();
     }
 
-    /// <summary>Opens immediately without waiting for the player to walk into the trigger — used when the chest is bought from a shop.</summary>
     /// <summary>Opens immediately without waiting for the player to walk into the trigger — used when the chest is bought from a shop. Shop-bought chests never offer a reroll.</summary>
     public void OpenNow()
     {
@@ -57,7 +54,7 @@ public class ChestInteractable : MonoBehaviour
         }
         else
         {
-            _augmentUI?.ShowChestPanel(rarity, !_suppressRerollOnOpen);
+            ShowAugmentPanel();
         }
     }
 
@@ -73,9 +70,14 @@ public class ChestInteractable : MonoBehaviour
             yield return null;
         }
 
-        if (isUnlockChest)
+        ShowAugmentPanel();
+    }
+
+    private void ShowAugmentPanel()
+    {
+        if (tier == ChestTier.Unlock)
             _augmentUI?.TryShowUnlockChestPanel(!_suppressRerollOnOpen);
         else
-            _augmentUI?.ShowChestPanel(rarity, !_suppressRerollOnOpen);
+            _augmentUI?.ShowChestPanel((int)tier, !_suppressRerollOnOpen);
     }
 }

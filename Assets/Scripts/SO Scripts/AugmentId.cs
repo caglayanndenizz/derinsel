@@ -3,11 +3,9 @@ public enum AugmentId
     None = 0,
     ChargedLongbowAoeUnlock = 4,
     TripleArrowUnlock = 5,
-    ProjectileCount_ExtraArrow = 10,
     ProjectileCount_PlusOneProjectiles = 11,
     ProjectileCount_PlusOneAndSpeed10Percent = 12,
     ProjectileCount_PlusOneAndSpeed15Percent = 13,
-    ProjectileCount_ExtraArrowPlus = 14,
     HammerChargeReduce_Common_I = 25,
     HammerChargeReduce_Common_II = 26,
     HammerChargeReduce_Rare = 27,
@@ -41,5 +39,28 @@ public enum AugmentId
 
     // ── Arrow Unlock ──────────────────────────────────────────────────────────
     ArrowSizeUnlock     = 77, // Increases arrow size by 50% (visual only, for the duration of the run)
-    VampiricArrowUnlock = 78, // Each arrow hit heals the player for 5% of the enemy's max HP
+
+    // ── Bow Damage Multiplier ─────────────────────────────────────────────────
+    BowDamageMultiplier_Common        = 80,
+    BowDamageMultiplier_Rare          = 81,
+    BowDamageMultiplier_Extraordinary = 82,
+
+    // ── Hammer Damage Multiplier ──────────────────────────────────────────────
+    HammerDamageMultiplier_Common        = 83,
+    HammerDamageMultiplier_Rare          = 84,
+    HammerDamageMultiplier_Extraordinary = 85,
+
+    // ── Player Base Damage ────────────────────────────────────────────────────
+    BaseDamageIncrease_Tier1 = 86,
+    BaseDamageIncrease_Tier2 = 87,
+    BaseDamageIncrease_Tier3 = 88,
+
+    // ── Knockback ──────────────────────────────────────────────────────────────
+    KnockbackForceIncrease = 89,
+
+    // ── Life Steal ─────────────────────────────────────────────────────────────
+    LifeStealUnlock = 90,
+
+    // ── Critical Strike ────────────────────────────────────────────────────────
+    CriticalStrikeUnlock = 91,
 }

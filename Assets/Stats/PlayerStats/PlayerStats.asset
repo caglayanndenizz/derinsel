@@ -14,11 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EntityStats
   maxHealth: 100
   moveSpeed: 5
-  bowLightApMin: 1
-  bowLightApMax: 2
-  bowHeavyApMin: 20
-  bowHeavyApMax: 30
-  hammerLightDamageMin: 30
-  hammerLightDamageMax: 40
-  heavyAttackDamageMin: 25
-  heavyAttackDamageMax: 35
+  playerBaseDamageMin: 2
+  playerBaseDamageMax: 5
