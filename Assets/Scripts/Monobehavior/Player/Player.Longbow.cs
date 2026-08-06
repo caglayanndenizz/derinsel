@@ -186,7 +186,7 @@ public partial class Player
         }
 
         mover.transform.localScale = (playerAugmentController != null && playerAugmentController.HasArrowSizeUnlock)
-            ? Vector3.one * 2f
+            ? Vector3.one * 1.5f
             : Vector3.one;
 
         mover.Initialize(

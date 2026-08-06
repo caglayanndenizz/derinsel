@@ -40,6 +40,6 @@ public enum AugmentId
     HammerSlamCooldownReduceUnlock          = 65,
 
     // ── Arrow Unlock ──────────────────────────────────────────────────────────
-    ArrowSizeUnlock     = 77, // Doubles arrow size (visual only, for the duration of the run)
+    ArrowSizeUnlock     = 77, // Increases arrow size by 50% (visual only, for the duration of the run)
     VampiricArrowUnlock = 78, // Each arrow hit heals the player for 5% of the enemy's max HP
 }
