@@ -4,7 +4,6 @@ public class HammerState : PlayerState
 {
     private float _currentCharge;
     private bool  _isCharging;
-    private float _holdTime;       // tracks how long the left mouse button has been held
 
     public override bool IsChargingForMovement => _isCharging;
 
@@ -22,45 +21,37 @@ public class HammerState : PlayerState
     {
         _currentCharge = 0f;
         _isCharging    = false;
-        _holdTime      = 0f;
     }
 
     public override void Handle(IPlayerContext context)
     {
-        bool heavyReady = Time.time >= context.NextHammerUseTime;
-
         float effective = context.MaxChargeTime *
             (context.AugmentController != null ? context.AugmentController.HammerChargeMultiplier : 1f);
+        effective = Mathf.Max(0f, effective);
 
-        bool canCharge = context.AugmentController != null && context.AugmentController.HasHammerChargeUnlock;
-
-        // Count hold time while button is pressed; switch to charge mode when cooldown is ready and augment is present.
-        if (Input.GetButton("Fire1") && heavyReady && canCharge)
+        if (Input.GetButton("Fire1"))
         {
-            _holdTime += Time.deltaTime;
-
-            // Threshold exceeded → charge mode active.
-            if (_holdTime >= context.HammerChargeStartDelay)
-            {
-                _isCharging = true;
-                if (context.MeterCanvas != null) context.MeterCanvas.SetActive(true);
-                _currentCharge += Time.deltaTime;
-                _currentCharge = Mathf.Clamp(_currentCharge, 0f, effective);
-                if (context.ChargeMeter != null)
-                    context.ChargeMeter.value = _currentCharge / Mathf.Max(0.0001f, effective);
-                if (context.Animator != null)
-                    context.Animator.speed = context.MaxChargeTime / Mathf.Max(0.0001f, effective);
-                UpdateAnimator(context);
-            }
+            _isCharging = true;
+            if (context.MeterCanvas != null) context.MeterCanvas.SetActive(true);
+            _currentCharge += Time.deltaTime;
+            _currentCharge = Mathf.Clamp(_currentCharge, 0f, effective);
+            if (context.ChargeMeter != null)
+                context.ChargeMeter.value = effective > 0.0001f ? _currentCharge / effective : 1f;
+            if (context.Animator != null)
+                context.Animator.speed = Mathf.Clamp(context.MaxChargeTime / Mathf.Max(0.05f, effective), 0.1f, 20f);
+            UpdateAnimator(context);
         }
 
         if (Input.GetButtonUp("Fire1"))
         {
-            // Fully charged + heavy ready → heavy attack; otherwise → light attack.
-            if (_isCharging && _currentCharge >= effective)
-                context.TriggerHeavyAttack();
-            else
-                context.TriggerHammerLightAttack();
+            // Minimum 5% charge required to attack at all; below that the swing is wasted.
+            // When effective charge time is ~0 (max charge-speed augments), any hold counts as 100%.
+            float chargeFraction = effective > 0.0001f
+                ? Mathf.Clamp01(_currentCharge / effective)
+                : (_isCharging ? 1f : 0f);
+
+            if (chargeFraction >= 0.05f)
+                context.TriggerHeavyAttack(chargeFraction);
 
             ResetCharge(context);
             context.SetState(new IdleState());
@@ -76,7 +67,6 @@ public class HammerState : PlayerState
     {
         _isCharging    = false;
         _currentCharge = 0f;
-        _holdTime      = 0f;
         if (context.ChargeMeter != null) context.ChargeMeter.value = 0f;
         if (context.MeterCanvas != null) context.MeterCanvas.SetActive(false);
         if (context.Animator != null) context.Animator.speed = 1f;

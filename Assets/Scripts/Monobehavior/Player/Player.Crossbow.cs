@@ -19,6 +19,8 @@ public partial class Player
     [Tooltip("Maximum lifetime of a bolt in the scene (seconds).")]
     public float crossbowBoltMaxLifetime = 5f;
 
+    private float _nextCrossbowAttackTime = 0f;
+
     // ─── Crossbow / bolt ─────────────────────────────────────────────────────
 
     private void ScheduleCrossbowBolt(Vector2 aimWorld)

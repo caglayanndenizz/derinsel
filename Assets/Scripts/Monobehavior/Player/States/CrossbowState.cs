@@ -26,7 +26,7 @@ public class CrossbowState : PlayerState
 
     void TryFireBolt(IPlayerContext context)
     {
-        if (Time.time < context.NextAttackTime) return;
+        if (Time.time < context.NextCrossbowAttackTime) return;
 
         Vector2 aim = context.GetLongbowAimWorldPointAtCurrentMouse();
         context.ScheduleCrossbowBolt(aim);
@@ -36,7 +36,7 @@ public class CrossbowState : PlayerState
 
         context.LightAttackInProgress  = true;
         context.LightFallbackExecuteAt = Time.time + Mathf.Max(0.03f, context.LightImpactFallbackDelay);
-        context.NextAttackTime         = Time.time + context.CrossbowAttackRate;
+        context.NextCrossbowAttackTime = Time.time + context.CrossbowAttackRate;
     }
 
     static void ResetAnimator(IPlayerContext context)

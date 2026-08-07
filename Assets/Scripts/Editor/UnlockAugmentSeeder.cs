@@ -44,12 +44,9 @@ public static class UnlockAugmentSeeder
         db.crossbowUnlocks.Add(Make("CrossbowBoltBleed",               "Unlock_CrossbowBoltBleed",        AugmentId.CrossbowBoltBleed,                 WeaponType.Crossbow));
 
         // ── Hammer ────────────────────────────────────────────────────────────
-        db.hammerUnlocks.Add(Make("HammerChargeUnlock",                "Unlock_HammerCharge",             AugmentId.HammerChargeUnlock,                WeaponType.Hammer));
         db.hammerUnlocks.Add(Make("HammerChargeDamageReductionUnlock", "Unlock_HammerChargeBarrier",      AugmentId.HammerChargeDamageReductionUnlock, WeaponType.Hammer));
-        db.hammerUnlocks.Add(Make("HammerChargeReduce_Extraordinary",  "Unlock_HammerChargeReduce",       AugmentId.HammerChargeReduceUnlock,          WeaponType.Hammer));
         db.hammerUnlocks.Add(Make("HammerFreeze_Extraordinary",        "Unlock_HammerFreeze",             AugmentId.HammerFreezeUnlock,                WeaponType.Hammer));
         db.hammerUnlocks.Add(Make("HammerAoeRadius_Extraordinary",     "Unlock_HammerAoeRadius",          AugmentId.HammerAoeRadiusUnlock,             WeaponType.Hammer));
-        db.hammerUnlocks.Add(Make("HammerSlamCooldownReduceUnlock",    "Unlock_HammerSlamCooldown",       AugmentId.HammerSlamCooldownReduceUnlock,    WeaponType.Hammer));
 
         EditorUtility.SetDirty(db);
 
@@ -130,12 +127,9 @@ public static class UnlockAugmentSeeder
             AugmentId.PoisonArrowUnlock,
             AugmentId.CrossbowBoltPierce,
             AugmentId.CrossbowBoltBleed,
-            AugmentId.HammerChargeUnlock,
             AugmentId.HammerChargeDamageReductionUnlock,
-            AugmentId.HammerChargeReduceUnlock,
             AugmentId.HammerFreezeUnlock,
             AugmentId.HammerAoeRadiusUnlock,
-            AugmentId.HammerSlamCooldownReduceUnlock,
         };
 
         System.Func<AugmentDefinition, bool> shouldRemove = a =>

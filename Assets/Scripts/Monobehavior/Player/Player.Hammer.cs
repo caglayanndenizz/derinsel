@@ -6,47 +6,24 @@ public partial class Player
     [Header("Hammer Settings (Heavy)")]
     public float maxChargeTime = 1.5f;
     public float hammerAOE = 2.5f;
-    public float hammerCooldown = 3f;
     [SerializeField] private float heavyImpactFallbackDelay = 0.2f;
-    [Tooltip("Hold duration (seconds) before charge mode activates. Releasing before this threshold triggers a light attack.")]
-    [SerializeField] private float hammerChargeStartDelay = 0.5f;
-
-    [Header("Light Hammer Settings")]
-    [Tooltip("Minimum time between light hammer attacks (seconds).")]
-    [SerializeField] private float hammerLightAttackRate = 0.4f;
-    [Tooltip("Light hammer attack range (overlap circle radius). Should usually be larger than the heavy hammer radius.")]
-    [SerializeField] private float hammerLightRange = 3f;
-    [Tooltip("Fallback trigger delay if no animation event is received (seconds).")]
-    [SerializeField] private float hammerLightFallbackDelay = 0.15f;
 
     [Header("Spammable Light Attack Settings")]
-    public float lightAttackRate = 0.2f;
     public float lightAttackDuration = 0.1f;
     [SerializeField] private float lightImpactFallbackDelay = 0.08f;
-    private float _nextAttackTime = 0f;
     private float _lastLightAttackResolveTime = -999f;
     private bool _lightAttackInProgress = false;
     private float _lightFallbackExecuteAt = -1f;
     private float _lastHeavyResolveTime = -999f;
     private bool _heavyAttackInProgress = false;
     private float _heavyFallbackExecuteAt = -1f;
-
-    [Header("Hammer Cooldown UI")]
-    public Slider hammerCooldownBar;
-    public GameObject hammerCooldownCanvas;
-    [SerializeField] private bool showCooldownBarWhenReady = true;
+    private float _pendingChargeFraction = 1f;
 
     [Header("Hammer Charge UI")]
     public Slider chargeMeter;
     public GameObject meterCanvas;
 
-    private float _nextHammerUseTime = 0f;
-    private bool  _hammerLightInProgress = false;
-    private bool  _prevChargeFullState = false;
-    private float _hammerLightFallbackAt = -1f;
-    private float _lastHammerLightResolveTime = -999f;
-
-    private static readonly int HammerLightAttackHash = Animator.StringToHash("HammerLightAttack");
+    private bool _prevChargeFullState = false;
 
     // ─── Attack resolution (animation events + fallbacks) ────────────────────
 
@@ -78,11 +55,9 @@ public partial class Player
         HammerSlam();
     }
 
-    private void TriggerHeavyAttack()
+    private void TriggerHeavyAttack(float chargeFraction)
     {
-        float slamCooldownMult = playerAugmentController != null ? playerAugmentController.HammerSlamCooldownMultiplier : 1f;
-        _nextHammerUseTime = Time.time + hammerCooldown * slamCooldownMult;
-        UpdateHammerCooldownUI();
+        _pendingChargeFraction = chargeFraction;
         if (animator != null)
             animator.SetTrigger(Animator.StringToHash("HeavyAttack"));
         _heavyAttackInProgress = true;
@@ -111,7 +86,7 @@ public partial class Player
             BaseEntity targetEntity = enemy.GetComponent<BaseEntity>() ?? enemy.GetComponentInParent<BaseEntity>();
             float hammerMult      = playerAugmentController != null ? playerAugmentController.HammerDamageMultiplier : 1f;
             float baseDamageBonus = playerAugmentController != null ? playerAugmentController.PlayerBaseDamageBonus : 0f;
-            float heavyDamage     = ((stats != null ? stats.RollPlayerBaseDamage() : 0f) + baseDamageBonus) * hammerMult;
+            float heavyDamage     = ((stats != null ? stats.RollPlayerBaseDamage() : 0f) + baseDamageBonus) * hammerMult * Mathf.Clamp01(_pendingChargeFraction);
             float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
             bool isCrit = playerAugmentController != null && UnityEngine.Random.value < playerAugmentController.CritChance;
             float critMult = isCrit ? playerAugmentController.CritDamage : 1f;
@@ -131,75 +106,11 @@ public partial class Player
             impactFeedback?.PlayHeavyHit(firstHitPosition, _defaultImpulseSource);
     }
 
-    // ─── Hammer Light Attack ──────────────────────────────────────────────────
-
-    private void TriggerHammerLightAttack()
-    {
-        if (Time.time < _nextAttackTime) return;
-        float lightRateMult = playerAugmentController != null ? playerAugmentController.HammerLightRateMultiplier : 1f;
-        float effectiveRate = Mathf.Max(0.05f, hammerLightAttackRate * lightRateMult);
-        _nextAttackTime = Time.time + effectiveRate;
-
-        if (animator != null)
-            animator.CrossFade(HammerLightAttackHash, 0.05f, 0, 0f);
-
-        _hammerLightInProgress = true;
-        _hammerLightFallbackAt = Time.time + Mathf.Max(0.05f, hammerLightFallbackDelay);
-    }
-
-    private void HandleHammerLightFallback()
-    {
-        if (!_hammerLightInProgress) return;
-        if (Time.time < _hammerLightFallbackAt) return;
-        HammerLightSlam();
-    }
-
-    public void HammerLightSlam()
-    {
-        if (Time.time - _lastHammerLightResolveTime < 0.05f) return;
-        _lastHammerLightResolveTime = Time.time;
-        _hammerLightInProgress = false;
-        _hammerLightFallbackAt = -1f;
-
-        if (attackPoint == null) return;
-
-        Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, hammerLightRange, enemyLayers);
-        if (hits.Length == 0) return;
-
-        float dmgMult         = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
-        float lightDmgMult    = playerAugmentController != null ? playerAugmentController.HammerLightDamageMultiplier : 1f;
-        float hammerMult      = playerAugmentController != null ? playerAugmentController.HammerDamageMultiplier : 1f;
-        float baseDamageBonus = playerAugmentController != null ? playerAugmentController.PlayerBaseDamageBonus : 0f;
-
-        Vector2 firstHitPoint = attackPoint.position;
-        bool anyHit = false;
-
-        foreach (Collider2D hit in hits)
-        {
-            IDamageable target = hit.GetComponent<IDamageable>() ?? hit.GetComponentInParent<IDamageable>();
-            if (target == null) continue;
-            // Her hedef kendi hasarını ayrı ayrı roll eder (min-max aralık).
-            float lightDmg  = stats != null ? stats.RollPlayerBaseDamage() : 0f;
-            float useDamage = (lightDmg + baseDamageBonus) * dmgMult * lightDmgMult * hammerMult;
-            bool isCrit = playerAugmentController != null && UnityEngine.Random.value < playerAugmentController.CritChance;
-            float critMult = isCrit ? playerAugmentController.CritDamage : 1f;
-            target.TakeDamage(useDamage * critMult, false);
-            if (!anyHit)
-            {
-                firstHitPoint = hit.ClosestPoint(attackPoint.position);
-                anyHit = true;
-            }
-        }
-
-        if (anyHit)
-            impactFeedback?.PlayLightHit(firstHitPoint, _defaultImpulseSource);
-    }
-
     // ─── Hammer Charge Magnet ────────────────────────────────────────────────
 
     private void UpdateHammerMagnet()
     {
-        if (playerAugmentController == null || !playerAugmentController.HasHammerChargeUnlock) return;
+        if (playerAugmentController == null) return;
         if (!(_currentState is HammerState) && !(_currentState is GreatHammerState)) return;
 
         bool isCharging   = _currentState.IsChargingForMovement;
@@ -238,57 +149,13 @@ public partial class Player
         _prevChargeFullState = isChargeFull;
     }
 
-    // ─── UI ──────────────────────────────────────────────────────────────────
-
-    private void InitializeHammerCooldownUI()
-    {
-        if (hammerCooldownBar == null) return;
-        hammerCooldownBar.minValue = 0f;
-        hammerCooldownBar.maxValue = 1f;
-        hammerCooldownBar.value = 1f;
-        if (hammerCooldownCanvas != null)
-            hammerCooldownCanvas.SetActive(showCooldownBarWhenReady);
-    }
-
-    /// <summary>Called once by PlayerAugmentController when HammerChargeUnlock is newly acquired (never on removal).</summary>
-    public void OnHammerChargeUnlockAcquired()
-    {
-        if (meterCanvas != null) meterCanvas.SetActive(true);
-    }
-
-    private void UpdateHammerCooldownUI()
-    {
-        if (hammerCooldownBar == null) return;
-        float slamCooldownMult = playerAugmentController != null ? playerAugmentController.HammerSlamCooldownMultiplier : 1f;
-        float cooldown = Mathf.Max(0f, hammerCooldown * slamCooldownMult);
-        if (cooldown <= 0f)
-        {
-            hammerCooldownBar.value = 1f;
-            if (hammerCooldownCanvas != null) hammerCooldownCanvas.SetActive(showCooldownBarWhenReady);
-            return;
-        }
-        float remaining = Mathf.Max(0f, _nextHammerUseTime - Time.time);
-        hammerCooldownBar.value = Mathf.Clamp01(1f - (remaining / cooldown));
-        if (hammerCooldownCanvas != null)
-        {
-            bool isReady = remaining <= 0f;
-            hammerCooldownCanvas.SetActive(!isReady || showCooldownBarWhenReady);
-        }
-    }
-
     // ─── Gizmos ──────────────────────────────────────────────────────────────
 
     private void OnDrawGizmosSelected()
     {
         if (attackPoint == null) return;
 
-        // Light attack — radial circle (orange)
-        Gizmos.color = new Color(1f, 0.6f, 0f, 0.15f);
-        Gizmos.DrawSphere(attackPoint.position, hammerLightRange);
-        Gizmos.color = new Color(1f, 0.6f, 0f, 1f);
-        Gizmos.DrawWireSphere(attackPoint.position, hammerLightRange);
-
-        // Heavy slam — radial circle (red)
+        // Hammer attack — radial circle (red)
         float effectiveHeavyAoe = hammerAOE * (playerAugmentController != null ? playerAugmentController.HammerAoeRadiusMultiplier : 1f);
         Gizmos.color = new Color(1f, 0.1f, 0.1f, 0.15f);
         Gizmos.DrawSphere(attackPoint.position, effectiveHeavyAoe);

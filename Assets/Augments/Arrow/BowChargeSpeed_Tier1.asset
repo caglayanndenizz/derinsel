@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf6f4c16b5f34ab45880a8a4afae4941, type: 3}
-  m_Name: HammerSlamCooldownReduceUnlock
+  m_Name: BowChargeSpeed_Tier1
   m_EditorClassIdentifier: Assembly-CSharp::AugmentDefinition
-  id: 65
-  displayName: Swift Slam
-  description: Reduces the hammer slam cooldown by 30%.
+  id: 95
+  displayName: Charge Speed I
+  description: Reduces bow charge time by 15%.
   icon: {fileID: 0}
-  rarity: 3
+  rarity: 1
   tier: 1
-  value: 0.30
+  value: 0.15
   scalingCurve:
     serializedVersion: 2
     m_Curve:
@@ -43,5 +43,5 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  excludeFromAugmentPickerWhenRadialLongbowMutationComplete: 0
   baseWeight: 0
-  excludeFromAugmentPickerWhenRadialBowMutationComplete: 0

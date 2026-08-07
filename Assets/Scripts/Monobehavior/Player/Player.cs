@@ -52,11 +52,9 @@ public partial class Player : BaseEntity, IPlayerContext
     EntityStats IPlayerContext.Stats => stats;
     PlayerAugmentController IPlayerContext.AugmentController => playerAugmentController;
     float IPlayerContext.MaxChargeTime => maxChargeTime;
-    float IPlayerContext.HammerChargeStartDelay => hammerChargeStartDelay;
     Slider IPlayerContext.ChargeMeter => chargeMeter;
     GameObject IPlayerContext.MeterCanvas => meterCanvas;
     float IPlayerContext.MaxLongbowChargeTime => maxLongbowChargeTime;
-    float IPlayerContext.LightAttackRate => lightAttackRate;
     float IPlayerContext.LightImpactFallbackDelay => lightImpactFallbackDelay;
     Slider IPlayerContext.LongbowChargeMeter => longbowChargeMeter;
     GameObject IPlayerContext.LongbowMeterCanvas => longbowMeterCanvas;
@@ -67,16 +65,12 @@ public partial class Player : BaseEntity, IPlayerContext
     float IPlayerContext.CrossbowBoltMaxLifetime => crossbowBoltMaxLifetime;
     Animator IPlayerContext.Animator => animator;
 
-    float IPlayerContext.NextHammerUseTime
+    float IPlayerContext.NextCrossbowAttackTime
     {
-        get => _nextHammerUseTime;
-        set => _nextHammerUseTime = value;
+        get => _nextCrossbowAttackTime;
+        set => _nextCrossbowAttackTime = value;
     }
-    float IPlayerContext.NextAttackTime
-    {
-        get => _nextAttackTime;
-        set => _nextAttackTime = value;
-    }
+
     bool IPlayerContext.LightAttackInProgress
     {
         get => _lightAttackInProgress;
@@ -88,8 +82,8 @@ public partial class Player : BaseEntity, IPlayerContext
         set => _lightFallbackExecuteAt = value;
     }
 
-    void IPlayerContext.ScheduleLongbowArrow(bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
-        => ScheduleLongbowArrow(useBowChargedMultiplier, aimWorldAtFireInput);
+    void IPlayerContext.ScheduleLongbowArrow(float chargeFraction, Vector2 aimWorldAtFireInput)
+        => ScheduleLongbowArrow(chargeFraction, aimWorldAtFireInput);
 
     void IPlayerContext.ScheduleCrossbowBolt(Vector2 aimWorldAtFireInput)
         => ScheduleCrossbowBolt(aimWorldAtFireInput);
@@ -97,11 +91,8 @@ public partial class Player : BaseEntity, IPlayerContext
     Vector2 IPlayerContext.GetLongbowAimWorldPointAtCurrentMouse()
         => GetLongbowAimWorldPointAtCurrentMouse();
 
-    void IPlayerContext.TriggerHeavyAttack()
-        => TriggerHeavyAttack();
-
-    void IPlayerContext.TriggerHammerLightAttack()
-        => TriggerHammerLightAttack();
+    void IPlayerContext.TriggerHeavyAttack(float chargeFraction)
+        => TriggerHeavyAttack(chargeFraction);
 
     // ─── MaxHealth ────────────────────────────────────────────────────────────
 
@@ -163,7 +154,6 @@ public partial class Player : BaseEntity, IPlayerContext
         _currentState = new IdleState();
         _currentState.Enter(this);
 
-        InitializeHammerCooldownUI();
         InitializeDashCooldownUI();
         NotifyHealthChanged();
         if (playerCurrency != null)
@@ -182,9 +172,7 @@ public partial class Player : BaseEntity, IPlayerContext
         _currentState.Handle(this);
         HandleLightImpactFallback();
         HandleHeavyImpactFallback();
-        HandleHammerLightFallback();
         HandleDash();
-        UpdateHammerCooldownUI();
         UpdateDashCooldownUI();
         UpdateRadialLongbowAutoVolley();
         UpdateHammerMagnet();

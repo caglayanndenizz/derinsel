@@ -257,12 +257,6 @@ public class AugmentWeightSystem : MonoBehaviour
             WeaponMutationChecker checker = WeaponMutationChecker.Instance;
             if (checker != null && checker.ShouldExcludeWeaponUnlocks(unlockAug.weaponType))
                 return false;
-
-            // Do not show charge-dependent hammer augments without the hammer charge unlock
-            if (unlockAug.weaponType == WeaponType.Hammer &&
-                unlockAug.id != AugmentId.HammerChargeUnlock &&
-                controller != null && !controller.HasHammerChargeUnlock)
-                return false;
         }
 
         return true;

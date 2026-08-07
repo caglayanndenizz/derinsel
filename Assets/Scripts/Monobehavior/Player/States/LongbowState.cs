@@ -3,7 +3,7 @@ using UnityEngine;
 public class LongbowState : PlayerState
 {
     private float _longbowCharge;
-    private bool _isLongbowCharging;
+    private bool  _isLongbowCharging;
 
     public override bool IsChargingForMovement => _isLongbowCharging;
 
@@ -15,32 +15,36 @@ public class LongbowState : PlayerState
 
     public override void Handle(IPlayerContext context)
     {
+        float effective = context.MaxLongbowChargeTime *
+            (context.AugmentController != null ? context.AugmentController.BowChargeMultiplier : 1f);
+        effective = Mathf.Max(0f, effective);
+
         if (Input.GetButtonUp("Fire2"))
         {
-            bool wasFull = _longbowCharge >= context.MaxLongbowChargeTime - 0.0001f;
+            // Minimum 5% charge required to fire at all; below that the draw is wasted.
+            // When effective charge time is ~0 (max charge-speed augments), any hold counts as 100%.
+            float chargeFraction = effective > 0.0001f
+                ? Mathf.Clamp01(_longbowCharge / effective)
+                : (_isLongbowCharging ? 1f : 0f);
+
             ResetBowCharge(context);
 
-            if (Time.time >= context.NextAttackTime)
+            if (chargeFraction >= 0.05f)
             {
                 context.Animator?.SetTrigger(LightAttackHash);
                 Vector2 aim = context.GetLongbowAimWorldPointAtCurrentMouse();
-                context.ScheduleLongbowArrow(wasFull, aim);
+                context.ScheduleLongbowArrow(chargeFraction, aim);
                 context.LightAttackInProgress = true;
                 context.LightFallbackExecuteAt = Time.time + Mathf.Max(0.03f, context.LightImpactFallbackDelay);
-                context.NextAttackTime = Time.time + context.LightAttackRate;
             }
 
             context.SetState(new IdleState());
             return;
         }
 
-        bool canCharge = context.AugmentController != null && context.AugmentController.HasChargedLongbowAoe;
-        _isLongbowCharging = canCharge && Input.GetButton("Fire2");
+        _isLongbowCharging = Input.GetButton("Fire2");
 
         // Return to Idle if button is released and charge is zero.
-        // NOTE: do not use "!_isLongbowCharging" here — even without HasChargedLongbowAoe,
-        //       we must stay in this state while Fire2 is held; otherwise GetButtonUp is missed
-        //       and the bow animation never fires (LongbowState↔IdleState oscillation).
         if (!Input.GetButton("Fire2") && _longbowCharge <= 0f)
         {
             context.SetState(new IdleState());
@@ -51,9 +55,9 @@ public class LongbowState : PlayerState
         {
             if (context.LongbowMeterCanvas != null) context.LongbowMeterCanvas.SetActive(true);
             _longbowCharge += Time.deltaTime;
-            _longbowCharge = Mathf.Clamp(_longbowCharge, 0f, context.MaxLongbowChargeTime);
+            _longbowCharge = Mathf.Clamp(_longbowCharge, 0f, effective);
             if (context.LongbowChargeMeter != null)
-                context.LongbowChargeMeter.value = _longbowCharge / Mathf.Max(0.0001f, context.MaxLongbowChargeTime);
+                context.LongbowChargeMeter.value = effective > 0.0001f ? _longbowCharge / effective : 1f;
         }
 
         UpdateAnimator(context);

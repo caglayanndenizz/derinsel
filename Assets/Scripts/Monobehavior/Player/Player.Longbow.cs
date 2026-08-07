@@ -17,9 +17,6 @@ public partial class Player
     public float longbowChargedSpeedDamageMultiplier = 3f;
     [Tooltip("Hold duration (seconds) before the bow is considered fully charged.")]
     public float maxLongbowChargeTime = 0.5f;
-    [Tooltip("Per-arrow chance (0-1) to trigger the charged AoE explosion on hit, when the ChargedLongbowAoeUnlock augment is active.")]
-    [Range(0f, 1f)]
-    [SerializeField] private float chargedLongbowExplosionChance = 0.35f;
     [Tooltip("If empty, the bow charge bar is not shown.")]
     public Slider longbowChargeMeter;
     [Tooltip("If empty, the bow charge UI canvas does not open.")]
@@ -51,33 +48,34 @@ public partial class Player
         return cam.ScreenToWorldPoint(mouse);
     }
 
-    private void ScheduleLongbowArrow(bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput)
+    private void ScheduleLongbowArrow(float chargeFraction, Vector2 aimWorldAtFireInput)
     {
         // Lock attackPoint position at fire time so direction stays correct after delay.
         Vector2 fireOrigin = attackPoint != null ? (Vector2)attackPoint.position : Vector2.zero;
         float delay = Mathf.Max(0f, longbowArrowReleaseDelay);
         if (delay <= 0f)
         {
-            SpawnArrowTowardWorld(useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin);
+            SpawnArrowTowardWorld(chargeFraction, aimWorldAtFireInput, fireOrigin);
             return;
         }
-        StartCoroutine(LongbowArrowSpawnAfterDelay(delay, useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin));
+        StartCoroutine(LongbowArrowSpawnAfterDelay(delay, chargeFraction, aimWorldAtFireInput, fireOrigin));
     }
 
-    private IEnumerator LongbowArrowSpawnAfterDelay(float delaySeconds, bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput, Vector2 fireOrigin)
+    private IEnumerator LongbowArrowSpawnAfterDelay(float delaySeconds, float chargeFraction, Vector2 aimWorldAtFireInput, Vector2 fireOrigin)
     {
         yield return new WaitForSeconds(delaySeconds);
-        SpawnArrowTowardWorld(useBowChargedMultiplier, aimWorldAtFireInput, fireOrigin);
+        SpawnArrowTowardWorld(chargeFraction, aimWorldAtFireInput, fireOrigin);
     }
 
-    private void SpawnArrowTowardWorld(bool useBowChargedMultiplier, Vector2 targetWorld, Vector2 directionOrigin)
+    private void SpawnArrowTowardWorld(float chargeFraction, Vector2 targetWorld, Vector2 directionOrigin)
     {
         if (arrowPrefab == null || attackPoint == null) return;
 
-        bool hasChargedLongbowAoeAugment = useBowChargedMultiplier &&
+        bool isFullyCharged = chargeFraction >= 0.999f;
+        bool hasChargedLongbowAoeAugment = isFullyCharged &&
                                             playerAugmentController != null &&
                                             playerAugmentController.HasChargedLongbowAoe;
-        float spdMult      = useBowChargedMultiplier ? Mathf.Max(1f, longbowChargedSpeedDamageMultiplier) : 1f;
+        float spdMult      = Mathf.Lerp(1f, Mathf.Max(1f, longbowChargedSpeedDamageMultiplier), Mathf.Clamp01(chargeFraction));
         float dmgMult      = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
         float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;
         float useSpeed     = arrowSpeed * spdMult * arrowSpdMult;
@@ -166,7 +164,8 @@ public partial class Player
         float bowMult         = playerAugmentController != null ? playerAugmentController.BowDamageMultiplier : 1f;
         float useDamage       = (rolledDamage + baseDamageBonus) * bowMult * dmgMult;
 
-        bool chargedExplosionEnabled = hasChargedLongbowAoeAugment && UnityEngine.Random.value <= chargedLongbowExplosionChance;
+        // Full charge + the AoE augment guarantees an explosion — no chance roll.
+        bool chargedExplosionEnabled = hasChargedLongbowAoeAugment;
 
         float explosionRadius = chargedExplosionEnabled && playerAugmentController != null
             ? playerAugmentController.ChargedLongbowAoeRadius

@@ -11,13 +11,11 @@ public interface IPlayerContext
 
     // Hammer charge settings & UI
     float MaxChargeTime { get; }
-    float HammerChargeStartDelay { get; }
     Slider ChargeMeter { get; }
     GameObject MeterCanvas { get; }
 
     // Longbow / archer settings & UI
     float MaxLongbowChargeTime { get; }
-    float LightAttackRate { get; }
     float LightImpactFallbackDelay { get; }
     Slider LongbowChargeMeter { get; }
     GameObject LongbowMeterCanvas { get; }
@@ -28,22 +26,18 @@ public interface IPlayerContext
     float CrossbowBoltReleaseDelay { get; }
     GameObject CrossbowBoltPrefab { get; }
     float CrossbowBoltMaxLifetime { get; }
+    float NextCrossbowAttackTime { get; set; }
 
     // Unity references
     Animator Animator { get; }
-
-    // Mutable timing state
-    float NextHammerUseTime { get; set; }
-    float NextAttackTime { get; set; }
 
     // Mutable attack state (written by states, read by Player fallback handlers)
     bool LightAttackInProgress { get; set; }
     float LightFallbackExecuteAt { get; set; }
 
     // Methods
-    void ScheduleLongbowArrow(bool useBowChargedMultiplier, Vector2 aimWorldAtFireInput);
+    void ScheduleLongbowArrow(float chargeFraction, Vector2 aimWorldAtFireInput);
     void ScheduleCrossbowBolt(Vector2 aimWorldAtFireInput);
     Vector2 GetLongbowAimWorldPointAtCurrentMouse();
-    void TriggerHeavyAttack();
-    void TriggerHammerLightAttack();
+    void TriggerHeavyAttack(float chargeFraction);
 }
