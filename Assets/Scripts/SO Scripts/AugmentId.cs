@@ -59,4 +59,7 @@ public enum AugmentId
 
     // ── Gold ───────────────────────────────────────────────────────────────────
     GoldDropChanceIncrease_Tier2 = 98,
+
+    // ── Gold Milestone Rewards ───────────────────────────────────────────────────
+    GoldChestBonus_Tier2 = 99,
 }

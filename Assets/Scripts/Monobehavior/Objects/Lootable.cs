@@ -18,7 +18,11 @@ public class Lootable : MonoBehaviour, ICollectable
         _isCollected = true;
 
         if (player != null)
-            player.PlayerCurrency?.AddGold(Mathf.Max(0, value));
+        {
+            int gainedGold = Mathf.Max(0, value);
+            player.PlayerCurrency?.AddGold(gainedGold);
+            KillCounter.Instance?.RegisterLootGold(gainedGold, player.transform.position);
+        }
 
         ReturnToPool();
     }

@@ -12583,6 +12583,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KillCounter
   unlockChestPrefab: {fileID: 2738283523011843055, guid: 535fd28bf3e89924683d6ad551a0b222, type: 3}
   milestones: 01000000050000000a0000000b0000000c0000000d0000000e0000000f000000f4010000ee020000e8030000
+  woodenChestPrefab: {fileID: 4929014121993435568, guid: 000de5a339504d64bae8aada1510ac3b, type: 3}
+  goldChestInterval: 15
 --- !u!4 &1726447291
 Transform:
   m_ObjectHideFlags: 0

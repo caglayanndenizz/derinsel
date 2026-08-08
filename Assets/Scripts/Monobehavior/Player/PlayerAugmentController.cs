@@ -54,6 +54,7 @@ public class PlayerAugmentController : MonoBehaviour
     [Header("General")]
     [SerializeField] private float movementSpeedBonus;
     [SerializeField] private float goldDropChanceMultiplier = 1f;
+    [SerializeField] private bool hasGoldMilestoneChest;
     [SerializeField] private float incomingDamageReduction = 0f;
     [SerializeField] private float outgoingDamageMultiplier       = 1f;
     [SerializeField] private float maxHealthMultiplier            = 1f;
@@ -200,6 +201,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float MaxHealthMultiplier            => Mathf.Max(0.01f, maxHealthMultiplier);
     public bool  HasExtraAugmentSlotUnlock      => hasExtraAugmentSlotUnlock;
     public float GoldDropChanceMultiplier       => Mathf.Max(0.01f, goldDropChanceMultiplier);
+    public bool  HasGoldMilestoneChest          => hasGoldMilestoneChest;
     public float HammerChargeMultiplier         => Mathf.Max(0f, hammerChargeMultiplier);
     public float BowChargeMultiplier            => Mathf.Max(0f, bowChargeMultiplier);
     public float IncomingDamageReduction        => Mathf.Clamp01(incomingDamageReduction);
@@ -306,6 +308,7 @@ public class PlayerAugmentController : MonoBehaviour
         bowChargeMultiplier                 = 1f;
         hasExtraAugmentSlotUnlock           = false;
         goldDropChanceMultiplier            = 1f;
+        hasGoldMilestoneChest               = false;
         hammerChargeMultiplier              = 1f;
         incomingDamageReduction             = 0f;
         hasHammerChargeDamageReductionUnlock = false;
@@ -544,6 +547,9 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.GoldDropChanceIncrease_Tier2:
                 goldDropChanceMultiplier += 0.5f;
+                break;
+            case AugmentId.GoldChestBonus_Tier2:
+                hasGoldMilestoneChest = true;
                 break;
         }
     }
