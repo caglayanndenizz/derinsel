@@ -47,7 +47,7 @@ public enum AugmentId
     LifeStealUnlock = 90,
 
     // ── Critical Strike ────────────────────────────────────────────────────────
-    CriticalStrikeUnlock = 91,
+    CriticalStrikeChance = 91,
 
     // ── Charge Speed ──────────────────────────────────────────────────────────
     HammerChargeSpeed_Tier1 = 92,

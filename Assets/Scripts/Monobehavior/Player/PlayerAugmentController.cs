@@ -71,7 +71,7 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float hammerDamageMultiplier = 1f;
     [SerializeField] private float playerBaseDamageBonus  = 0f;
     [SerializeField] private float knockbackMultiplier = 1f;
-    [SerializeField] private bool  hasCriticalStrikeUnlock;
+    [SerializeField] private bool  hasCriticalStrikeChance;
     [SerializeField] private float critChance = 0f;
     [SerializeField] private float critDamage = 1f;
 
@@ -194,7 +194,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float HammerDamageMultiplier => Mathf.Max(0.01f, hammerDamageMultiplier);
     public float PlayerBaseDamageBonus  => Mathf.Max(0f, playerBaseDamageBonus);
     public float KnockbackMultiplier => Mathf.Max(0.01f, knockbackMultiplier);
-    public bool  HasCriticalStrikeUnlock => hasCriticalStrikeUnlock;
+    public bool  HasCriticalStrikeChance => hasCriticalStrikeChance;
     public float CritChance              => Mathf.Clamp01(critChance);
     public float CritDamage              => Mathf.Max(1f, critDamage);
     public float MaxHealthMultiplier            => Mathf.Max(0.01f, maxHealthMultiplier);
@@ -330,7 +330,7 @@ public class PlayerAugmentController : MonoBehaviour
         maxHealthMultiplier                 = 1f;
         hasCrossbowBoltPierce               = false;
         hasCrossbowBoltBleed                = false;
-        hasCriticalStrikeUnlock             = false;
+        hasCriticalStrikeChance             = false;
         critChance                          = 0f;
         critDamage                          = 1f;
     }
@@ -537,8 +537,8 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
 
             // ── Critical Strike ────────────────────────────────────────────────
-            case AugmentId.CriticalStrikeUnlock:
-                hasCriticalStrikeUnlock = true;
+            case AugmentId.CriticalStrikeChance:
+                hasCriticalStrikeChance = true;
                 critChance = 0.10f;
                 critDamage = 1.5f;
                 break;
