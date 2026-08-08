@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: CriticalStrikeChance
   m_EditorClassIdentifier: Assembly-CSharp::AugmentDefinition
   id: 91
-  displayName: O-Chritic Strike-san
-  description: Critical chance has been activated. You can now occasionally deal damage above your base damage.
+  displayName: O-Critical Strike-san
+  description: Critical chance has been activated. You can now occasionally deal
+    damage above your base damage.
   icon: {fileID: 0}
   rarity: 2
   tier: 2
@@ -43,5 +44,5 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  excludeFromAugmentPickerWhenRadialBowMutationComplete: 0
   baseWeight: 0
+  excludeFromAugmentPickerWhenRadialLongbowMutationComplete: 0

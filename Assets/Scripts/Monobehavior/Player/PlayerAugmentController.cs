@@ -53,7 +53,7 @@ public class PlayerAugmentController : MonoBehaviour
 
     [Header("General")]
     [SerializeField] private float movementSpeedBonus;
-    [SerializeField] private float luckMultiplier          = 1f;
+    [SerializeField] private float goldDropChanceMultiplier = 1f;
     [SerializeField] private float incomingDamageReduction = 0f;
     [SerializeField] private float outgoingDamageMultiplier       = 1f;
     [SerializeField] private float maxHealthMultiplier            = 1f;
@@ -199,7 +199,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float CritDamage              => Mathf.Max(1f, critDamage);
     public float MaxHealthMultiplier            => Mathf.Max(0.01f, maxHealthMultiplier);
     public bool  HasExtraAugmentSlotUnlock      => hasExtraAugmentSlotUnlock;
-    public float LuckMultiplier                 => Mathf.Max(0.01f, luckMultiplier);
+    public float GoldDropChanceMultiplier       => Mathf.Max(0.01f, goldDropChanceMultiplier);
     public float HammerChargeMultiplier         => Mathf.Max(0f, hammerChargeMultiplier);
     public float BowChargeMultiplier            => Mathf.Max(0f, bowChargeMultiplier);
     public float IncomingDamageReduction        => Mathf.Clamp01(incomingDamageReduction);
@@ -305,7 +305,7 @@ public class PlayerAugmentController : MonoBehaviour
         hasTripleArrowUnlock                = false;
         bowChargeMultiplier                 = 1f;
         hasExtraAugmentSlotUnlock           = false;
-        luckMultiplier                      = 1f;
+        goldDropChanceMultiplier            = 1f;
         hammerChargeMultiplier              = 1f;
         incomingDamageReduction             = 0f;
         hasHammerChargeDamageReductionUnlock = false;
@@ -541,6 +541,9 @@ public class PlayerAugmentController : MonoBehaviour
                 hasCriticalStrikeChance = true;
                 critChance = 0.10f;
                 critDamage = 1.5f;
+                break;
+            case AugmentId.GoldDropChanceIncrease_Tier2:
+                goldDropChanceMultiplier += 0.5f;
                 break;
         }
     }

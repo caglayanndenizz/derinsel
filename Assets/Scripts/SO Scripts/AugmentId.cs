@@ -56,4 +56,7 @@ public enum AugmentId
     BowChargeSpeed_Tier1    = 95,
     BowChargeSpeed_Tier2    = 96,
     BowChargeSpeed_Tier3    = 97,
+
+    // ── Gold ───────────────────────────────────────────────────────────────────
+    GoldDropChanceIncrease_Tier2 = 98,
 }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnlockAugmentDefinition
   id: 46
   displayName: Wide Swing
-  description: Increases hammer slam radius by 30%. Also enables Wall Loot — enemies near walls drop bonus loot.
+  description: Increases hammer slam radius by 30%.
   icon: {fileID: 0}
   rarity: 3
   tier: 1
