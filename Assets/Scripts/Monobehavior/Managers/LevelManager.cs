@@ -47,8 +47,8 @@ public class LevelManager : MonoBehaviour
         StartCoroutine(LoadLevelRoutine(0));
     }
 
-    // Mini-boss olduruldugunde cagirilacak altyapi (EnemyType entegrasyonu sonraya).
-    public void OnMiniBossKilled()
+    // Level temizlendiginde (veya DungeonSpirit ile manuel) cagirilir; siradaki level'a ilerler.
+    public void AdvanceToNextLevel()
     {
         if (_currentLevelIndex >= levelPrefabs.Count - 1)
             return; // Level 5 son level — simdilik ilerleme yok
@@ -64,7 +64,7 @@ public class LevelManager : MonoBehaviour
         if (prefabToSpawn == null)
         {
             Debug.LogWarning("LevelManager: chest prefab atanmamis, direkt level gecisi yapiliyor.");
-            OnMiniBossKilled();
+            AdvanceToNextLevel();
             return;
         }
 
@@ -85,7 +85,7 @@ public class LevelManager : MonoBehaviour
     private IEnumerator DelayedLevelTransition()
     {
         yield return new WaitForSeconds(chestToLevelDelay);
-        OnMiniBossKilled();
+        AdvanceToNextLevel();
     }
 
     private IEnumerator LoadLevelRoutine(int levelIndex)

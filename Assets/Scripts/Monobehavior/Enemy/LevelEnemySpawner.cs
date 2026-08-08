@@ -43,7 +43,7 @@ public class LevelEnemySpawner : MonoBehaviour
         }
 
         if (_aliveCount == 0)
-            LevelManager.Instance?.OnMiniBossKilled();
+            LevelManager.Instance?.AdvanceToNextLevel();
     }
 
     private void OnEnemyDied(Enemy enemy)
