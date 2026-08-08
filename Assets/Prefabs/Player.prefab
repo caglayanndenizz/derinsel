@@ -1034,13 +1034,7 @@ MonoBehaviour:
   enemyLayers:
     serializedVersion: 2
     m_Bits: 320
-  dashDistance: 3
-  dashCooldown: 10
-  dashAlphaFlashDuration: 0.1
-  dashFlashTarget: {fileID: 320444626900081384}
-  dashCooldownBar: {fileID: 0}
-  dashCooldownCanvas: {fileID: 0}
-  showDashCooldownBarWhenReady: 1
+  flashTarget: {fileID: 320444626900081384}
   maxChargeTime: 0.5
   hammerAOE: 2.28
   hammerCooldown: 3

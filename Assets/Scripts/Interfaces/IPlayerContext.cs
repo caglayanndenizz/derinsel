@@ -19,6 +19,8 @@ public interface IPlayerContext
     float LightImpactFallbackDelay { get; }
     Slider LongbowChargeMeter { get; }
     GameObject LongbowMeterCanvas { get; }
+    float ArrowShotCooldown { get; }
+    float NextArrowShotTime { get; set; }
 
     // Crossbow / bolt settings
     float CrossbowBoltSpeedMultiplier { get; }

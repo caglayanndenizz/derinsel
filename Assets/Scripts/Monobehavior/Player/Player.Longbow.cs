@@ -21,6 +21,10 @@ public partial class Player
     public Slider longbowChargeMeter;
     [Tooltip("If empty, the bow charge UI canvas does not open.")]
     public GameObject longbowMeterCanvas;
+    [Tooltip("Minimum seconds between arrow shots, regardless of charge time.")]
+    [SerializeField] private float arrowShotCooldown = 0.3f;
+
+    private float _nextArrowShotTime = 0f;
 
     [Header("Longbow radial mutation (auto)")]
     [Tooltip("Seconds between automatic volleys once the Obsidian gem tier is reached with 6 longbow augments.")]

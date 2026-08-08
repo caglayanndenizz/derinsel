@@ -29,8 +29,9 @@ public class LongbowState : PlayerState
 
             ResetBowCharge(context);
 
-            if (chargeFraction >= 0.05f)
+            if (chargeFraction >= 0.05f && Time.time >= context.NextArrowShotTime)
             {
+                context.NextArrowShotTime = Time.time + Mathf.Max(0f, context.ArrowShotCooldown);
                 context.Animator?.SetTrigger(LightAttackHash);
                 Vector2 aim = context.GetLongbowAimWorldPointAtCurrentMouse();
                 context.ScheduleLongbowArrow(chargeFraction, aim);

@@ -13,6 +13,8 @@ public partial class Player : BaseEntity, IPlayerContext
     [SerializeField] private float damageInvulnerabilityDuration = 0.2f;
     [SerializeField] private Color damageFlashColor = Color.red;
     [SerializeField] private float damageFlashDuration = 0.5f;
+    [Tooltip("If empty, auto-detected from root or children.")]
+    [SerializeField] private SpriteRenderer flashTarget;
 
     [Header("Death")]
     [Tooltip("Death animasyonunun bitmesini bekleyip UI'i o sekilde tetiklemek icin sure (saniye).")]
@@ -58,6 +60,13 @@ public partial class Player : BaseEntity, IPlayerContext
     float IPlayerContext.LightImpactFallbackDelay => lightImpactFallbackDelay;
     Slider IPlayerContext.LongbowChargeMeter => longbowChargeMeter;
     GameObject IPlayerContext.LongbowMeterCanvas => longbowMeterCanvas;
+    float IPlayerContext.ArrowShotCooldown => arrowShotCooldown;
+
+    float IPlayerContext.NextArrowShotTime
+    {
+        get => _nextArrowShotTime;
+        set => _nextArrowShotTime = value;
+    }
     float IPlayerContext.CrossbowBoltSpeedMultiplier => crossbowBoltSpeedMultiplier;
     float IPlayerContext.CrossbowAttackRate => crossbowAttackRate;
     float IPlayerContext.CrossbowBoltReleaseDelay => crossbowBoltReleaseDelay;
@@ -148,13 +157,12 @@ public partial class Player : BaseEntity, IPlayerContext
                 ?? GetComponentInChildren<PlayerAugmentController>(true);
         if (impactFeedback == null)
             impactFeedback = GetComponent<PlayerImpactFeedback>();
-        if (dashFlashTarget == null)
-            dashFlashTarget = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
+        if (flashTarget == null)
+            flashTarget = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
 
         _currentState = new IdleState();
         _currentState.Enter(this);
 
-        InitializeDashCooldownUI();
         NotifyHealthChanged();
         if (playerCurrency != null)
             playerCurrency.NotifyGoldChanged();
@@ -172,8 +180,6 @@ public partial class Player : BaseEntity, IPlayerContext
         _currentState.Handle(this);
         HandleLightImpactFallback();
         HandleHeavyImpactFallback();
-        HandleDash();
-        UpdateDashCooldownUI();
         UpdateRadialLongbowAutoVolley();
         UpdateHammerMagnet();
     }
@@ -205,11 +211,11 @@ public partial class Player : BaseEntity, IPlayerContext
 
     private IEnumerator DamageFlashRoutine()
     {
-        if (dashFlashTarget == null) yield break;
-        Color original = dashFlashTarget.color;
-        dashFlashTarget.color = damageFlashColor;
+        if (flashTarget == null) yield break;
+        Color original = flashTarget.color;
+        flashTarget.color = damageFlashColor;
         yield return new WaitForSeconds(damageFlashDuration);
-        dashFlashTarget.color = original;
+        flashTarget.color = original;
     }
 
     protected override void Die()
