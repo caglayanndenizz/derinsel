@@ -30,7 +30,6 @@ public static class UnlockAugmentSeeder
         db.longbowUnlocks.Clear();
         db.crossbowUnlocks.Clear();
         db.hammerUnlocks.Clear();
-        db.universalUnlocks.Clear();
 
         // ── Longbow ───────────────────────────────────────────────────────────
         db.longbowUnlocks.Add(Make("ChargedBowAoeUnlock",              "Unlock_ChargedLongbowAoe",        AugmentId.ChargedLongbowAoeUnlock,           WeaponType.Longbow));

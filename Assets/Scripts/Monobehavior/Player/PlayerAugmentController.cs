@@ -576,7 +576,6 @@ public class PlayerAugmentController : MonoBehaviour
             case WeaponType.Longbow:   pool = unlockDatabase.longbowUnlocks;   break;
             case WeaponType.Crossbow:  pool = unlockDatabase.crossbowUnlocks;  break;
             case WeaponType.Hammer:    pool = unlockDatabase.hammerUnlocks;    break;
-            case WeaponType.Universal: pool = unlockDatabase.universalUnlocks; break;
             default: return;
         }
 

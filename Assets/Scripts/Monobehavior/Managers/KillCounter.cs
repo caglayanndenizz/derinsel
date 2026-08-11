@@ -10,7 +10,7 @@ public class KillCounter : MonoBehaviour
     [SerializeField] private int[] milestones = { 10, 25, 50, 75, 100 };
 
     [Header("Gold Milestone Chest (Spoils of War augment)")]
-    [SerializeField] private GameObject woodenChestPrefab;
+    [SerializeField] private GameObject silverChestPrefab;
     [SerializeField] private int goldChestInterval = 15;
 
     private int _totalKills;
@@ -46,7 +46,7 @@ public class KillCounter : MonoBehaviour
         _totalLootGold += amount;
 
         if (goldChestInterval > 0 && _totalLootGold % goldChestInterval == 0 && HasGoldMilestoneChestAugment())
-            SpawnWoodenChest(position);
+            SpawnSilverChest(position);
     }
 
     private bool HasGoldMilestoneChestAugment()
@@ -82,14 +82,14 @@ public class KillCounter : MonoBehaviour
         _spawnedChests.Add(chest);
     }
 
-    private void SpawnWoodenChest(Vector3 position)
+    private void SpawnSilverChest(Vector3 position)
     {
-        if (woodenChestPrefab == null)
+        if (silverChestPrefab == null)
         {
-            Debug.LogWarning("KillCounter: woodenChestPrefab atanmamis.");
+            Debug.LogWarning("KillCounter: silverChestPrefab atanmamis.");
             return;
         }
-        GameObject chest = Instantiate(woodenChestPrefab, position, Quaternion.identity);
+        GameObject chest = Instantiate(silverChestPrefab, position, Quaternion.identity);
         _spawnedChests.Add(chest);
     }
 }

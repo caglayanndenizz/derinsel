@@ -17,15 +17,11 @@ public class UnlockAugmentDatabase : ScriptableObject
     [Header("Hammer Unlocks")]
     public List<UnlockAugmentDefinition> hammerUnlocks = new();
 
-    [Header("Universal Unlocks")]
-    public List<UnlockAugmentDefinition> universalUnlocks = new();
-
     /// <summary>Iterates all unlock augments across every weapon group.</summary>
     public IEnumerable<UnlockAugmentDefinition> GetAllUnlocks()
     {
         foreach (var u in longbowUnlocks)   if (u != null) yield return u;
         foreach (var u in crossbowUnlocks)  if (u != null) yield return u;
         foreach (var u in hammerUnlocks)    if (u != null) yield return u;
-        foreach (var u in universalUnlocks) if (u != null) yield return u;
     }
 }

@@ -138,6 +138,7 @@ GameObject:
   - component: {fileID: 1122903204031472795}
   - component: {fileID: 649199937668860734}
   - component: {fileID: 9048087760841762228}
+  - component: {fileID: -2533913943096660028}
   m_Layer: 6
   m_Name: BlackSpiderMINIBOSS
   m_TagString: Enemy
@@ -260,7 +261,6 @@ MonoBehaviour:
   currentState: 0
   detectionRange: 10
   expandedDetectionRange: 22
-  detectionCollider: {fileID: 2189152980325318063}
   lightKnockbackForce: 5
   heavyKnockbackForce: 12
   knockbackDuration: 0.2
@@ -272,9 +272,8 @@ MonoBehaviour:
   patrolLegUnits: 2
   patrolWaitSeconds: 1
   patrolWaypointReachDistance: 0.22
-  goldPrefab: {fileID: 0}
-  experiencePrefab: {fileID: 0}
-  goldDropChance: 0
+  goldPrefab: {fileID: 8617352215983850939, guid: f3dc29352af3c4988913f7d91448e8b6, type: 3}
+  goldDropChance: 1
   chestPrefab: {fileID: 1736526625652122930, guid: 1bbe4049603690b4881f8088d635340f, type: 3}
 --- !u!114 &1122903204031472795
 MonoBehaviour:
@@ -337,3 +336,16 @@ MonoBehaviour:
   idleSpeedThreshold: 0.05
   runResumeDistance: 1.5
   animReferenceSpeed: 5
+--- !u!114 &-2533913943096660028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6371438451027970227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 919a84df9600a42bdadffdb790083d2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniBossChestDrop
+  woodenChestPrefab: {fileID: 0}

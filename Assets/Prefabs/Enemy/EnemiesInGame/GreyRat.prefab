@@ -138,7 +138,6 @@ MonoBehaviour:
   currentState: 0
   detectionRange: 1.68
   expandedDetectionRange: 5
-  detectionCollider: {fileID: 5723824824528666556}
   lightKnockbackForce: 7
   heavyKnockbackForce: 12
   knockbackDuration: 0.15
@@ -150,9 +149,9 @@ MonoBehaviour:
   patrolLegUnits: 2
   patrolWaitSeconds: 1
   patrolWaypointReachDistance: 0.22
-  goldPrefab: {fileID: 5330428534953399542, guid: 11f1d28a83f161e42a7ee8dee970104a, type: 3}
-  experiencePrefab: {fileID: 7706340502901435245, guid: 6819cf27b5988c34b9ffdce9f4f9eaba, type: 3}
-  goldDropChance: 0.15
+  goldPrefab: {fileID: 8617352215983850939, guid: f3dc29352af3c4988913f7d91448e8b6, type: 3}
+  goldDropChance: 0.4
+  chestPrefab: {fileID: 0}
 --- !u!114 &8132395466572430976
 MonoBehaviour:
   m_ObjectHideFlags: 0

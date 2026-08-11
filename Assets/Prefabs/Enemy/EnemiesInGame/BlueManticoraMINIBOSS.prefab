@@ -138,6 +138,7 @@ GameObject:
   - component: {fileID: 3560157936230918533}
   - component: {fileID: 6394529462425931677}
   - component: {fileID: 7634853089425925653}
+  - component: {fileID: -7196176778682056323}
   m_Layer: 6
   m_Name: BlueManticoraMINIBOSS
   m_TagString: Enemy
@@ -260,7 +261,6 @@ MonoBehaviour:
   currentState: 0
   detectionRange: 10
   expandedDetectionRange: 22
-  detectionCollider: {fileID: 1398487022154270696}
   lightKnockbackForce: 5
   heavyKnockbackForce: 12
   knockbackDuration: 0.2
@@ -272,9 +272,8 @@ MonoBehaviour:
   patrolLegUnits: 2
   patrolWaitSeconds: 1
   patrolWaypointReachDistance: 0.22
-  goldPrefab: {fileID: 0}
-  experiencePrefab: {fileID: 0}
-  goldDropChance: 0.15
+  goldPrefab: {fileID: 8617352215983850939, guid: f3dc29352af3c4988913f7d91448e8b6, type: 3}
+  goldDropChance: 1
   chestPrefab: {fileID: 0}
 --- !u!114 &3560157936230918533
 MonoBehaviour:
@@ -337,3 +336,16 @@ MonoBehaviour:
   attackInterval: 2
   hitRange: 1.6
   attackRange: 5
+--- !u!114 &-7196176778682056323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8393997838521658083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 919a84df9600a42bdadffdb790083d2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MiniBossChestDrop
+  woodenChestPrefab: {fileID: 0}
