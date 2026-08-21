@@ -136,6 +136,7 @@ public class Enemy : BaseEntity
         {
             _rb.gravityScale = 0f;
             _rb.freezeRotation = true;
+            _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         }
 
         // Serialize edilen config Enemy'de kalır; component'lere buradan bağlanır

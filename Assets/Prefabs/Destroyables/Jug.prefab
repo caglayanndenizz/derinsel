@@ -133,9 +133,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BreakableObject
   dropType: 0
   goldCoins: 3
-  expOrbs: 2
+  healingPrefab: {fileID: 0}
   idleBoolName: Idle
   destroyBoolName: Destroy
+  breakSFX: {fileID: 8300000, guid: 44953c530ec19492785a92cbb64d9b52, type: 3}
 --- !u!1 &1004404580463286005
 GameObject:
   m_ObjectHideFlags: 0
