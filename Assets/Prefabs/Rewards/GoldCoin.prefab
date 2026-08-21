@@ -164,3 +164,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Lootable
   value: 1
+  coinCollectSFX: {fileID: 8300000, guid: 8771d26fd607e3b40a99a6fe73aa7d26, type: 3}

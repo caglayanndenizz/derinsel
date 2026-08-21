@@ -38,6 +38,7 @@ public class LevelManager : MonoBehaviour
     [Header("Sound")]
     private AudioSource _audioSource;
     public AudioClip gameMusic;
+    [Range(0f, 1f)] public float gameMusicVolume = 0.5f;
 
     private int _currentLevelIndex = -1;
     private GameObject _activeLevelInstance;
@@ -54,11 +55,37 @@ public class LevelManager : MonoBehaviour
         if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
         _audioSource.playOnAwake = false;
         _audioSource.loop = true;
+        _audioSource.volume = gameMusicVolume;
         if (gameMusic != null)
         {
             _audioSource.clip = gameMusic;
             _audioSource.Play();
         }
+    }
+
+    /// <summary>Fades the dungeon music down to silence over the given duration (unscaled — works even while paused), then stops it.</summary>
+    public void FadeOutMusic(float duration)
+    {
+        StartCoroutine(FadeOutMusicRoutine(duration));
+    }
+
+    private IEnumerator FadeOutMusicRoutine(float duration)
+    {
+        if (_audioSource == null) yield break;
+
+        float startVolume = _audioSource.volume;
+        float elapsed = 0f;
+        duration = Mathf.Max(0.01f, duration);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            _audioSource.volume = Mathf.Lerp(startVolume, 0f, elapsed / duration);
+            yield return null;
+        }
+
+        _audioSource.volume = 0f;
+        _audioSource.Stop();
     }
 
     // DungeonEntrance tarafindan cagirilir.

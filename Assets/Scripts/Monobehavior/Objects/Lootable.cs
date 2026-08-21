@@ -5,6 +5,9 @@ public class Lootable : MonoBehaviour, ICollectable
     [Header("Basic Settings")]
     public int value = 1;
 
+    [Header("Sound")]
+    public AudioClip coinCollectSFX;
+
     bool _isCollected;
 
     void OnEnable()
@@ -22,6 +25,7 @@ public class Lootable : MonoBehaviour, ICollectable
             int gainedGold = Mathf.Max(0, value);
             player.PlayerCurrency?.AddGold(gainedGold);
             KillCounter.Instance?.RegisterLootGold(gainedGold, player.transform.position);
+            player.PlaySFX(coinCollectSFX);
         }
 
         ReturnToPool();

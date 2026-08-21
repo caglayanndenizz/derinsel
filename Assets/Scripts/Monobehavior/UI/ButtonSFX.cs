@@ -15,6 +15,14 @@ public class ButtonSFX : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
     public AudioClip hoverSFX;
     public AudioClip clickSFX;
 
+    [Tooltip("Minimum seconds between hover sounds, shared across every ButtonSFX — prevents a sound storm when the mouse sweeps quickly across many buttons (e.g. the augment selection grid).")]
+    public float hoverSfxCooldown = 0.08f;
+
+    // Shared across all instances (static) — the cooldown limits the total hover-sound rate,
+    // not just repeats on the same button. Unscaled time because augment selection pauses
+    // Time.timeScale, and the cooldown must still expire while the game is paused.
+    private static float _lastHoverSfxTime = -999f;
+
     private AudioSource _audioSource;
 
     private void Start()
@@ -24,6 +32,8 @@ public class ButtonSFX : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (Time.unscaledTime - _lastHoverSfxTime < hoverSfxCooldown) return;
+        _lastHoverSfxTime = Time.unscaledTime;
         PlaySFX(hoverSFX);
     }
 

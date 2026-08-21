@@ -38,6 +38,7 @@ public class DeathUIController : MonoBehaviour
     {
         yield return new WaitForSeconds(showDelayAfterDeath);
         deathPanel.SetActive(true);
+        LevelManager.Instance?.FadeOutMusic(3f);
     }
 
     public void OnRetryClicked()
