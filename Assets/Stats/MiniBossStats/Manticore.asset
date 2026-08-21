@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyEntityStats
   enemyName: Manticore
   tier: 1
-  maxHealth: 200
+  maxHealth: 125
   walkSpeed: 2
   runSpeed: 6
-  enemyAP: 20
+  enemyAP: 14

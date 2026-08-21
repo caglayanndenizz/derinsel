@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyEntityStats
   enemyName: BlackSpider
   tier: 1
-  maxHealth: 300
+  maxHealth: 150
   walkSpeed: 1
   runSpeed: 3
-  enemyAP: 15
+  enemyAP: 10

@@ -12,9 +12,17 @@ public partial class Player : BaseEntity, IPlayerContext
     [Header("Sound")]
     private AudioSource _audioSource;
     public AudioClip hurtSFX;
+    [Range(0.5f, 2f)] public float hurtSFXPitch = 1f;
+    [Range(0f, 1f)] public float hurtSFXVolume = 1f;
     public AudioClip deadSFX;
+    [Range(0.5f, 2f)] public float deadSFXPitch = 1f;
+    [Range(0f, 1f)] public float deadSFXVolume = 1f;
     public AudioClip arrowAttackSFX;
+    [Range(0.5f, 2f)] public float arrowAttackSFXPitch = 1f;
+    [Range(0f, 1f)] public float arrowAttackSFXVolume = 1f;
     public AudioClip hammerAttackSFX;
+    [Range(0.5f, 2f)] public float hammerAttackSFXPitch = 1f;
+    [Range(0f, 1f)] public float hammerAttackSFXVolume = 1f;
 
     [Header("Damage")]
     [SerializeField] private float damageInvulnerabilityDuration = 0.2f;
@@ -211,7 +219,7 @@ public partial class Player : BaseEntity, IPlayerContext
     {
         if (Time.time < _invulnerableUntil) return;
 
-        PlaySFX(hurtSFX);
+        PlaySFX(hurtSFX, hurtSFXPitch, hurtSFXVolume);
 
         if (_currentState.IsChargeMeterFull(this) && playerAugmentController != null && playerAugmentController.HasHammerChargeDamageReductionUnlock)
             amount *= 0.75f;
@@ -238,7 +246,7 @@ public partial class Player : BaseEntity, IPlayerContext
 
     protected override void Die()
     {
-        PlaySFX(deadSFX);
+        PlaySFX(deadSFX, deadSFXPitch, deadSFXVolume);
         _currentHealth = 0f;
         _rb.linearVelocity = Vector2.zero;
         if (_collider != null) _collider.enabled = false;
@@ -304,9 +312,12 @@ public partial class Player : BaseEntity, IPlayerContext
             playerCurrency.NotifyGoldChanged();
     }
 
-    public void PlaySFX(AudioClip audioclip)
+    public void PlaySFX(AudioClip audioclip, float pitch = 1f, float volume = 1f)
     {
         if (audioclip == null || _audioSource == null) return;
-        _audioSource.PlayOneShot(audioclip);
+        float previousPitch = _audioSource.pitch;
+        _audioSource.pitch = pitch;
+        _audioSource.PlayOneShot(audioclip, volume);
+        _audioSource.pitch = previousPitch;
     }
 }

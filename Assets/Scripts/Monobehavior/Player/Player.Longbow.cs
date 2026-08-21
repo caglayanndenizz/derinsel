@@ -75,7 +75,7 @@ public partial class Player
     {
         if (arrowPrefab == null || attackPoint == null) return;
 
-        PlaySFX(arrowAttackSFX);
+        PlaySFX(arrowAttackSFX, arrowAttackSFXPitch, arrowAttackSFXVolume);
 
         bool isFullyCharged = chargeFraction >= 0.999f;
         bool hasChargedLongbowAoeAugment = isFullyCharged &&
@@ -131,7 +131,7 @@ public partial class Player
 
     private void FireRadialLongbowMutationAutoVolley()
     {
-        PlaySFX(arrowAttackSFX);
+        PlaySFX(arrowAttackSFX, arrowAttackSFXPitch, arrowAttackSFXVolume);
 
         float dmgMult      = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
         float arrowSpdMult = playerAugmentController != null ? playerAugmentController.ArrowProjectileSpeedMultiplier : 1f;

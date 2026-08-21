@@ -254,3 +254,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChestInteractable
   tier: 2
+  idleBoolName: Idle
+  openBoolName: Open
+  chestOpenSFX: {fileID: 8300000, guid: 1e0f8ea023c366f41b8c9c81c91c0575, type: 3}

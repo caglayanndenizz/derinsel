@@ -760617,6 +760617,32 @@ MonoBehaviour:
     enemyPrefab: {fileID: 8500397005500710846, guid: 555eb09d87e30ef4f9b6eea9e26b3a8b, type: 3}
   - spawnPoint: {fileID: 3374512133335960647}
     enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
+  - spawnPoint: {fileID: 3374512133335960647}
+    enemyPrefab: {fileID: 2984326890098438617, guid: 9e66103ff22f62147a34f2b0d506d259, type: 3}
 --- !u!1 &7495711485633804397
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,8 +9,12 @@ public class ChestInteractable : MonoBehaviour
     [SerializeField] private string idleBoolName = "Idle";
     [SerializeField] private string openBoolName = "Open";
 
+    [Header("Sound")]
+    public AudioClip chestOpenSFX;
+
     private Animator _animator;
     private AugmentSelectionUI _augmentUI;
+    private Player _player;
     private bool _opened;
     private bool _suppressRerollOnOpen;
 
@@ -23,6 +27,7 @@ public class ChestInteractable : MonoBehaviour
             _animator.SetBool(idleBoolName, true);
 
         _augmentUI = Object.FindAnyObjectByType<AugmentSelectionUI>();
+        _player = Object.FindAnyObjectByType<Player>();
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -39,12 +44,14 @@ public class ChestInteractable : MonoBehaviour
         _suppressRerollOnOpen = true;
         if (_animator == null) _animator = GetComponent<Animator>();
         if (_augmentUI == null) _augmentUI = Object.FindAnyObjectByType<AugmentSelectionUI>();
+        if (_player == null) _player = Object.FindAnyObjectByType<Player>();
         Open();
     }
 
     private void Open()
     {
         _opened = true;
+        _player?.PlaySFX(chestOpenSFX);
 
         if (_animator != null)
         {
