@@ -166,7 +166,8 @@ public partial class Player
         float rolledDamage    = stats != null ? stats.RollPlayerBaseDamage() : 0f;
         float baseDamageBonus = playerAugmentController != null ? playerAugmentController.PlayerBaseDamageBonus : 0f;
         float bowMult         = playerAugmentController != null ? playerAugmentController.BowDamageMultiplier : 1f;
-        float useDamage       = (rolledDamage + baseDamageBonus) * bowMult * dmgMult;
+        float gemTierMult     = playerAugmentController != null ? playerAugmentController.LongbowGemTierDamageMultiplier : 1f;
+        float useDamage       = (rolledDamage + baseDamageBonus) * bowMult * gemTierMult * dmgMult;
 
         // Full charge + the AoE augment guarantees an explosion — no chance roll.
         bool chargedExplosionEnabled = hasChargedLongbowAoeAugment;

@@ -62,4 +62,11 @@ public enum AugmentId
 
     // ── Gold Milestone Rewards ───────────────────────────────────────────────────
     GoldChestBonus_Tier2 = 99,
+
+    // ── Hammer Unlock (additional) ────────────────────────────────────────────
+    HammerBleedUnlock                       = 100, // Hammer heavy hits also apply bleed stacks
+    HammerLifestealUnlock                   = 101, // Heal a % of hammer heavy damage dealt
+    HammerKnockbackUnlock                   = 102, // Bonus knockback force on hammer heavy hits
+    HammerMagnetRangeUnlock                 = 103, // +50% hammer charge-magnet pull radius
+    HammerGuaranteedCritOnFullChargeUnlock  = 104, // Fully-charged hammer slams always crit
 }

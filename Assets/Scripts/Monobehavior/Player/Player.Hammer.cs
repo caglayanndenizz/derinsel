@@ -85,17 +85,32 @@ public partial class Player
             if (target == null) continue;
             BaseEntity targetEntity = enemy.GetComponent<BaseEntity>() ?? enemy.GetComponentInParent<BaseEntity>();
             float hammerMult      = playerAugmentController != null ? playerAugmentController.HammerDamageMultiplier : 1f;
+            float gemTierMult     = playerAugmentController != null ? playerAugmentController.HammerGemTierDamageMultiplier : 1f;
             float baseDamageBonus = playerAugmentController != null ? playerAugmentController.PlayerBaseDamageBonus : 0f;
-            float heavyDamage     = ((stats != null ? stats.RollPlayerBaseDamage() : 0f) + baseDamageBonus) * hammerMult * Mathf.Clamp01(_pendingChargeFraction);
+            float heavyDamage     = ((stats != null ? stats.RollPlayerBaseDamage() : 0f) + baseDamageBonus) * hammerMult * gemTierMult * Mathf.Clamp01(_pendingChargeFraction);
             float dmgMult = playerAugmentController != null ? playerAugmentController.OutgoingDamageMultiplier : 1f;
-            bool isCrit = playerAugmentController != null && UnityEngine.Random.value < playerAugmentController.CritChance;
+            bool guaranteedCrit = playerAugmentController != null
+                && playerAugmentController.HasHammerGuaranteedCritOnFullCharge
+                && _pendingChargeFraction >= 0.999f;
+            bool isCrit = guaranteedCrit
+                || (playerAugmentController != null && UnityEngine.Random.value < playerAugmentController.CritChance);
             float critMult = isCrit ? playerAugmentController.CritDamage : 1f;
-            target.TakeDamage(heavyDamage * dmgMult * critMult, true);
-            if (hammerFreezeDuration > 0f && targetEntity != null && targetEntity.CurrentHealth > 0f)
+            float finalDamage = heavyDamage * dmgMult * critMult;
+            target.TakeDamage(finalDamage, true);
+
+            if (playerAugmentController != null && playerAugmentController.HasHammerLifestealUnlock)
+                Heal(finalDamage * playerAugmentController.HammerLifestealRatio);
+
+            Enemy enemyComp = (targetEntity as Enemy) ?? enemy.GetComponentInParent<Enemy>();
+            if (enemyComp != null && targetEntity != null && targetEntity.CurrentHealth > 0f)
             {
-                Enemy enemyComp = targetEntity as Enemy ?? enemy.GetComponentInParent<Enemy>();
-                if (enemyComp != null)
+                if (hammerFreezeDuration > 0f)
                     enemyComp.Freeze(hammerFreezeDuration);
+                if (playerAugmentController != null && playerAugmentController.HasHammerBleedUnlock)
+                    enemyComp.ApplyBleedStack(
+                        finalDamage * playerAugmentController.HammerBleedDamageRatioPerStack,
+                        playerAugmentController.HammerBleedMaxStacks,
+                        playerAugmentController.HammerBleedExpireSeconds);
             }
             if (successfulHits == 0)
                 firstHitPosition = enemy.ClosestPoint(attackPoint.position);

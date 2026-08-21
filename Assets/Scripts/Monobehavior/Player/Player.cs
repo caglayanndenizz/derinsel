@@ -15,6 +15,8 @@ public partial class Player : BaseEntity, IPlayerContext
     [SerializeField] private float damageFlashDuration = 0.5f;
     [Tooltip("If empty, auto-detected from root or children.")]
     [SerializeField] private SpriteRenderer flashTarget;
+    [Tooltip("Played whenever the player takes damage (assign playerhit.mp3 in the Inspector).")]
+    [SerializeField] private AudioClip hurtSfx;
 
     [Header("Death")]
     [Tooltip("Death animasyonunun bitmesini bekleyip UI'i o sekilde tetiklemek icin sure (saniye).")]
@@ -33,6 +35,8 @@ public partial class Player : BaseEntity, IPlayerContext
     private CinemachineImpulseSource _defaultImpulseSource;
     private float _invulnerableUntil = 0f;
     private PlayerState _currentState;
+    private Color _flashOriginalColor;
+    private Coroutine _damageFlashCoroutine;
 
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
 
@@ -159,6 +163,8 @@ public partial class Player : BaseEntity, IPlayerContext
             impactFeedback = GetComponent<PlayerImpactFeedback>();
         if (flashTarget == null)
             flashTarget = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
+        if (flashTarget != null)
+            _flashOriginalColor = flashTarget.color;
 
         _currentState = new IdleState();
         _currentState.Enter(this);
@@ -206,16 +212,18 @@ public partial class Player : BaseEntity, IPlayerContext
         base.TakeDamage(amount, isHeavy);
         NotifyHealthChanged();
         _invulnerableUntil = Time.time + Mathf.Max(0f, damageInvulnerabilityDuration);
-        StartCoroutine(DamageFlashRoutine());
+        if (_damageFlashCoroutine != null) StopCoroutine(_damageFlashCoroutine);
+        _damageFlashCoroutine = StartCoroutine(DamageFlashRoutine());
+        SoundManager.PlaySfx(hurtSfx);
     }
 
     private IEnumerator DamageFlashRoutine()
     {
         if (flashTarget == null) yield break;
-        Color original = flashTarget.color;
         flashTarget.color = damageFlashColor;
         yield return new WaitForSeconds(damageFlashDuration);
-        flashTarget.color = original;
+        flashTarget.color = _flashOriginalColor;
+        _damageFlashCoroutine = null;
     }
 
     protected override void Die()

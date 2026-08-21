@@ -70,7 +70,8 @@ public partial class Player
         PlayerAugmentController aug = playerAugmentController;
         float bowMult         = aug != null ? aug.BowDamageMultiplier : 1f;
         float baseDamageBonus = aug != null ? aug.PlayerBaseDamageBonus : 0f;
-        float useDamage       = ((stats != null ? stats.RollPlayerBaseDamage() : 0f) + baseDamageBonus) * bowMult * dmgMult;
+        float gemTierMult     = aug != null ? aug.LongbowGemTierDamageMultiplier : 1f;
+        float useDamage       = ((stats != null ? stats.RollPlayerBaseDamage() : 0f) + baseDamageBonus) * bowMult * gemTierMult * dmgMult;
         PlayerBolt bolt = null;
         if (PlayerArrowPooler.Instance != null)
             PlayerArrowPooler.Instance.GetBolt(origin, Quaternion.identity, b => bolt = b);

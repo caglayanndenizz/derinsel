@@ -16,6 +16,7 @@ public class MainMenuController : MonoBehaviour
     {
         playButton.onClick.AddListener(OnPlayClicked);
         quitButton.onClick.AddListener(OnQuitClicked);
+        SoundManager.PlayMenuMusic();
     }
 
     public void OnPlayClicked()

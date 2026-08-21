@@ -39,6 +39,7 @@ public class LevelManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+        SoundManager.PlayGameMusic();
     }
 
     // DungeonEntrance tarafindan cagirilir.

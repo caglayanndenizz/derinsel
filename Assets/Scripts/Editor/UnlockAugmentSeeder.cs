@@ -10,9 +10,10 @@ using UnityEngine;
 /// </summary>
 public static class UnlockAugmentSeeder
 {
-    private const string SourceFolder   = "Assets/Augments";
-    private const string OutputFolder   = "Assets/Augments/Unlocks";
-    private const string DatabasePath   = "Assets/Augments/UnlockAugmentDatabase.asset";
+    private const string SourceFolder       = "Assets/Augments";
+    private const string OutputFolder       = "Assets/Augments/Unlocks";
+    private const string HammerOutputFolder = "Assets/Augments/Unlocks/Hammer";
+    private const string DatabasePath       = "Assets/Augments/UnlockAugmentDatabase.asset";
 
     [MenuItem("Tools/Augments/Create Unlock Augment Assets")]
     public static void CreateUnlockAssets()
@@ -57,6 +58,120 @@ public static class UnlockAugmentSeeder
         AssetDatabase.Refresh();
 
         Debug.Log("[UnlockAugmentSeeder] Done — unlock augment assets created/updated and database populated.");
+    }
+
+    /// <summary>
+    /// Adds 5 new simple Hammer unlock augments (bleed, lifesteal, knockback, magnet range,
+    /// guaranteed crit on full charge) and rebuilds db.hammerUnlocks from the 3 existing assets
+    /// (loaded from their current location) plus these 5 — this also fixes a pre-existing data bug
+    /// where Unlock_HammerAoeRadius was listed twice in hammerUnlocks instead of a distinct 3rd entry.
+    ///
+    /// Run via: Tools ▶ Augments ▶ Add Hammer Unlock Augments
+    /// </summary>
+    [MenuItem("Tools/Augments/Add Hammer Unlock Augments")]
+    public static void AddHammerUnlockAssets()
+    {
+        EnsureFolder(HammerOutputFolder);
+
+        var db = AssetDatabase.LoadAssetAtPath<UnlockAugmentDatabase>(DatabasePath);
+        if (db == null)
+        {
+            Debug.LogError($"[UnlockAugmentSeeder] UnlockAugmentDatabase not found at '{DatabasePath}'.");
+            return;
+        }
+
+        var barrier   = AssetDatabase.LoadAssetAtPath<UnlockAugmentDefinition>($"{HammerOutputFolder}/Unlock_HammerChargeBarrier.asset");
+        var freeze    = AssetDatabase.LoadAssetAtPath<UnlockAugmentDefinition>($"{HammerOutputFolder}/Unlock_HammerFreeze.asset");
+        var aoeRadius = AssetDatabase.LoadAssetAtPath<UnlockAugmentDefinition>($"{HammerOutputFolder}/Unlock_HammerAoeRadius.asset");
+        if (barrier == null || freeze == null || aoeRadius == null)
+        {
+            Debug.LogError("[UnlockAugmentSeeder] One or more existing Hammer unlock assets not found under "
+                          + $"'{HammerOutputFolder}'. Aborting so hammerUnlocks isn't rebuilt with missing entries.");
+            return;
+        }
+
+        var bleed = MakeNew(
+            "Unlock_HammerBleed", AugmentId.HammerBleedUnlock, WeaponType.Hammer,
+            "Serrated Maul",
+            "Hammer heavy hits also cause bleeding, dealing 5% of the hit's damage per stack over time.",
+            0.05f);
+
+        var lifesteal = MakeNew(
+            "Unlock_HammerLifesteal", AugmentId.HammerLifestealUnlock, WeaponType.Hammer,
+            "Vampiric Might",
+            "Heal for 15% of hammer heavy damage dealt.",
+            0.15f);
+
+        var knockback = MakeNew(
+            "Unlock_HammerKnockback", AugmentId.HammerKnockbackUnlock, WeaponType.Hammer,
+            "Earthbreaker",
+            "Hammer heavy hits knock enemies back 75% harder.",
+            0.75f);
+
+        var magnetRange = MakeNew(
+            "Unlock_HammerMagnetRange", AugmentId.HammerMagnetRangeUnlock, WeaponType.Hammer,
+            "Gravity Well",
+            "Increases the hammer's charge magnet pull radius by 50%.",
+            0.5f);
+
+        var guaranteedCrit = MakeNew(
+            "Unlock_HammerGuaranteedCrit", AugmentId.HammerGuaranteedCritOnFullChargeUnlock, WeaponType.Hammer,
+            "Perfect Swing",
+            "Fully-charged hammer slams always land as a critical hit.",
+            1.5f);
+
+        db.hammerUnlocks.Clear();
+        db.hammerUnlocks.Add(barrier);
+        db.hammerUnlocks.Add(freeze);
+        db.hammerUnlocks.Add(aoeRadius);
+        db.hammerUnlocks.Add(bleed);
+        db.hammerUnlocks.Add(lifesteal);
+        db.hammerUnlocks.Add(knockback);
+        db.hammerUnlocks.Add(magnetRange);
+        db.hammerUnlocks.Add(guaranteedCrit);
+
+        EditorUtility.SetDirty(db);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log("[UnlockAugmentSeeder] Done — 5 new Hammer unlock augments created and hammerUnlocks rebuilt (duplicate entry fixed).");
+    }
+
+    private static UnlockAugmentDefinition MakeNew(
+        string outputAssetName,
+        AugmentId id,
+        WeaponType weaponType,
+        string displayName,
+        string description,
+        float value)
+    {
+        string outputPath = $"{HammerOutputFolder}/{outputAssetName}.asset";
+
+        var existing = AssetDatabase.LoadAssetAtPath<UnlockAugmentDefinition>(outputPath);
+        if (existing != null)
+        {
+            existing.id          = id;
+            existing.weaponType  = weaponType;
+            existing.displayName = displayName;
+            existing.description = description;
+            existing.value       = value;
+            EditorUtility.SetDirty(existing);
+            Debug.Log($"[UnlockAugmentSeeder] Updated existing: {outputAssetName}");
+            return existing;
+        }
+
+        var def = ScriptableObject.CreateInstance<UnlockAugmentDefinition>();
+        def.id          = id;
+        def.weaponType  = weaponType;
+        def.displayName = displayName;
+        def.description = description;
+        def.value        = value;
+        def.rarity       = 1;
+        def.tier         = 1;
+
+        AssetDatabase.CreateAsset(def, outputPath);
+        Debug.Log($"[UnlockAugmentSeeder] Created: {outputPath}");
+        return def;
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

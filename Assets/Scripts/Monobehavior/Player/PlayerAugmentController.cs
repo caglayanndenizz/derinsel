@@ -47,6 +47,11 @@ public class PlayerAugmentController : MonoBehaviour
         AugmentId.HammerDamageMultiplier_Common,
         AugmentId.HammerDamageMultiplier_Rare,
         AugmentId.HammerDamageMultiplier_Extraordinary,
+        AugmentId.HammerBleedUnlock,
+        AugmentId.HammerLifestealUnlock,
+        AugmentId.HammerKnockbackUnlock,
+        AugmentId.HammerMagnetRangeUnlock,
+        AugmentId.HammerGuaranteedCritOnFullChargeUnlock,
     };
 
     // ── Runtime stats ─────────────────────────────────────────────────────────
@@ -83,6 +88,24 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float hammerMagnetPullSpeed = 7f;
     [Tooltip("Freeze duration applied to enemies when charge is full (seconds).")]
     [SerializeField] private float hammerChargeFullStopDuration = 1.2f;
+    [Tooltip("Extra magnet radius fraction granted by HammerMagnetRangeUnlock (0.5 = +50%).")]
+    [SerializeField] private float hammerMagnetRadiusBonus = 0f;
+
+    [Header("Hammer — Bleed Unlock")]
+    [SerializeField] private bool  hasHammerBleedUnlock;
+    [Tooltip("Bleed damage per stack, as a ratio of the hit's damage (0.05 = 5%).")]
+    [SerializeField] private float hammerBleedDamageRatioPerStack = 0.05f;
+    [SerializeField] private int   hammerBleedMaxStacks           = 5;
+    [SerializeField] private float hammerBleedExpireSeconds       = 5f;
+
+    [Header("Hammer — Lifesteal Unlock")]
+    [SerializeField] private bool  hasHammerLifestealUnlock;
+    [Tooltip("Fraction of hammer heavy damage dealt returned as healing (0.15 = 15%).")]
+    [SerializeField] private float hammerLifestealRatio = 0.15f;
+
+    [Header("Hammer — Guaranteed Crit Unlock")]
+    [Tooltip("Fully-charged hammer slams always crit once unlocked.")]
+    [SerializeField] private bool  hasHammerGuaranteedCritOnFullCharge;
 
     [Header("Longbow — Unlock")]
     [SerializeField] private bool  hasChargedLongbowAoe;
@@ -192,7 +215,8 @@ public class PlayerAugmentController : MonoBehaviour
     public float ArrowProjectileSpeedMultiplier => Mathf.Max(0.01f, arrowProjectileSpeedMultiplier);
     public float OutgoingDamageMultiplier       => Mathf.Max(0.01f, outgoingDamageMultiplier);
     public float BowDamageMultiplier    => Mathf.Max(0.01f, bowDamageMultiplier);
-    public float HammerDamageMultiplier => Mathf.Max(0.01f, hammerDamageMultiplier);
+    /// <summary>Base hammer damage multiplier from augments, plus a flat +100% once the hammer mutation (Obsidian tier) is unlocked.</summary>
+    public float HammerDamageMultiplier => Mathf.Max(0.01f, hammerDamageMultiplier) * (HasHammerMutationUnlock ? 2f : 1f);
     public float PlayerBaseDamageBonus  => Mathf.Max(0f, playerBaseDamageBonus);
     public float KnockbackMultiplier => Mathf.Max(0.01f, knockbackMultiplier);
     public bool  HasCriticalStrikeChance => hasCriticalStrikeChance;
@@ -209,10 +233,18 @@ public class PlayerAugmentController : MonoBehaviour
     public float HammerFreezeDuration                => Mathf.Max(0f, hammerFreezeDuration);
     /// <summary>Resonance multiplier — damage dealt to frozen enemies is multiplied by this value.</summary>
     public float FrozenEnemyVulnerabilityMultiplier  => Mathf.Max(1f, frozenEnemyVulnerabilityMultiplier);
-    public float HammerMagnetRadius                  => Mathf.Max(0f, hammerMagnetRadius);
+    public float HammerMagnetRadius                  => Mathf.Max(0f, hammerMagnetRadius) * (1f + Mathf.Max(0f, hammerMagnetRadiusBonus));
     public float HammerMagnetPullSpeed               => Mathf.Max(0f, hammerMagnetPullSpeed);
     public float HammerChargeFullStopDuration        => Mathf.Max(0f, hammerChargeFullStopDuration);
-    public float HammerAoeRadiusMultiplier      => 1f + Mathf.Max(0f, hammerAoeRadiusBonus);
+    public bool  HasHammerBleedUnlock                => hasHammerBleedUnlock;
+    public float HammerBleedDamageRatioPerStack      => Mathf.Max(0f, hammerBleedDamageRatioPerStack);
+    public int   HammerBleedMaxStacks                => Mathf.Max(1, hammerBleedMaxStacks);
+    public float HammerBleedExpireSeconds            => Mathf.Max(0f, hammerBleedExpireSeconds);
+    public bool  HasHammerLifestealUnlock            => hasHammerLifestealUnlock;
+    public float HammerLifestealRatio                => Mathf.Max(0f, hammerLifestealRatio);
+    public bool  HasHammerGuaranteedCritOnFullCharge => hasHammerGuaranteedCritOnFullCharge;
+    /// <summary>Base hammer AOE radius multiplier from augments, plus a flat +50% once the hammer mutation (Obsidian tier) is unlocked.</summary>
+    public float HammerAoeRadiusMultiplier      => (1f + Mathf.Max(0f, hammerAoeRadiusBonus)) * (HasHammerMutationUnlock ? 1.5f : 1f);
     public float ChargedLongbowAoeRadius            => Mathf.Max(0f, chargedLongbowAoeRadius * (1f + Mathf.Max(0f, longbowAoeRadiusBonus)));
     public float FlatMaxHealthBonus             => Mathf.Max(0f, flatMaxHealthBonus);
 
@@ -265,6 +297,21 @@ public class PlayerAugmentController : MonoBehaviour
             return GemTier.Coal;
         }
     }
+
+    /// <summary>Gem-tier trait damage multiplier: Coal +10%, Gold +25%, Diamond +50%, Obsidian +100%. Tiers do not stack — only the current tier's bonus applies.</summary>
+    private static float GemTierDamageMultiplier(GemTier tier)
+    {
+        switch (tier)
+        {
+            case GemTier.Gold:     return 1.25f;
+            case GemTier.Diamond:  return 1.50f;
+            case GemTier.Obsidian: return 2.00f;
+            default:                return 1.10f; // Coal
+        }
+    }
+
+    public float LongbowGemTierDamageMultiplier => GemTierDamageMultiplier(LongbowGemTier);
+    public float HammerGemTierDamageMultiplier   => GemTierDamageMultiplier(HammerGemTier);
 
     public bool HasLongbowMutation  => _longbowMutated;
     public bool HasCrossbowMutation => _crossbowMutated;
@@ -336,6 +383,10 @@ public class PlayerAugmentController : MonoBehaviour
         hasCriticalStrikeChance             = false;
         critChance                          = 0f;
         critDamage                          = 1f;
+        hasHammerBleedUnlock                = false;
+        hasHammerLifestealUnlock            = false;
+        hammerMagnetRadiusBonus             = 0f;
+        hasHammerGuaranteedCritOnFullCharge = false;
     }
 
     /// <summary>Full reset for a new run — clears the active augment list and permanent weapon-mutation flags too.</summary>
@@ -550,6 +601,24 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.GoldChestBonus_Tier2:
                 hasGoldMilestoneChest = true;
+                break;
+
+            // ── Hammer Unlock (additional) ─────────────────────────────────────
+            case AugmentId.HammerBleedUnlock:
+                hasHammerBleedUnlock = true;
+                break;
+            case AugmentId.HammerLifestealUnlock:
+                hasHammerLifestealUnlock = true;
+                break;
+            case AugmentId.HammerKnockbackUnlock:
+                knockbackMultiplier *= 1.75f;
+                break;
+            case AugmentId.HammerMagnetRangeUnlock:
+                hammerMagnetRadiusBonus += 0.5f;
+                break;
+            case AugmentId.HammerGuaranteedCritOnFullChargeUnlock:
+                hasHammerGuaranteedCritOnFullCharge = true;
+                critDamage = Mathf.Max(critDamage, 1.5f);
                 break;
         }
     }
