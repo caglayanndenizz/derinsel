@@ -11507,6 +11507,7 @@ MonoBehaviour:
   silverPrice: 60
   goldenPrice: 120
   chestSpawnOffset: {x: 1.5, y: 0}
+  coinSFX: {fileID: 8300000, guid: 5c4cac9936a82ea47914b78a99d46b85, type: 3}
 --- !u!1 &1715078136556992231
 GameObject:
   m_ObjectHideFlags: 0

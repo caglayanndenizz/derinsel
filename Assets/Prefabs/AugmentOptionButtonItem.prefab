@@ -33,7 +33,7 @@ RectTransform:
   m_Father: {fileID: 1375885905656161824}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.05, y: 0.03}
-  m_AnchorMax: {x: 0.95, y: 0.80}
+  m_AnchorMax: {x: 0.95, y: 0.8}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -287,6 +287,7 @@ GameObject:
   - component: {fileID: 8252576415531076048}
   - component: {fileID: 8111499471816283670}
   - component: {fileID: 5762706493578251936}
+  - component: {fileID: 7159512156087958046}
   m_Layer: 5
   m_Name: AugmentOptionButtonItem
   m_TagString: Untagged
@@ -412,3 +413,17 @@ MonoBehaviour:
   button: {fileID: 8111499471816283670}
   titleText: {fileID: 2310515063913927463}
   descriptionText: {fileID: 3080055896603519371}
+--- !u!114 &7159512156087958046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8381654990774015057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6921254d631e900428ccba4e02aaed14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonSFX
+  hoverSFX: {fileID: 8300000, guid: a70403f7ac3d8eb45a99736205bc55d6, type: 3}
+  clickSFX: {fileID: 8300000, guid: 0f0ee35fc0951494781ea629a2e295dd, type: 3}

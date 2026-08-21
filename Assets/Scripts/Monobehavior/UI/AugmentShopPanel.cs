@@ -29,6 +29,9 @@ public class AugmentShopPanel : MonoBehaviour
     [SerializeField] private int goldenPrice = 120;
     [SerializeField] private Vector2 chestSpawnOffset = new Vector2(1.5f, 0f);
 
+    [Header("Sound")]
+    public AudioClip coinSFX;
+
     private Player _player;
     private readonly List<AugmentSellRowUI> _spawnedRows = new();
     private float _previousTimeScale = 1f;
@@ -119,6 +122,7 @@ public class AugmentShopPanel : MonoBehaviour
         if (!_player.PlayerAugmentController.RemoveAugment(augment)) return;
 
         _player.PlayerCurrency.AddGold(price);
+        _player.PlaySFX(coinSFX);
         RefreshSellList();
     }
 
@@ -127,6 +131,7 @@ public class AugmentShopPanel : MonoBehaviour
         if (_player == null || chestPrefab == null) return;
         if (!_player.PlayerCurrency.TrySpendGold(price)) return;
 
+        _player.PlaySFX(coinSFX);
         Hide();
 
         Vector3 spawnPos = _player.transform.position + (Vector3)chestSpawnOffset;

@@ -9,14 +9,19 @@ public partial class Player : BaseEntity, IPlayerContext
     [Header("Data Reference")]
     [SerializeField] private EntityStats stats;
 
+    [Header("Sound")]
+    private AudioSource _audioSource;
+    public AudioClip hurtSFX;
+    public AudioClip deadSFX;
+    public AudioClip arrowAttackSFX;
+    public AudioClip hammerAttackSFX;
+
     [Header("Damage")]
     [SerializeField] private float damageInvulnerabilityDuration = 0.2f;
     [SerializeField] private Color damageFlashColor = Color.red;
     [SerializeField] private float damageFlashDuration = 0.5f;
     [Tooltip("If empty, auto-detected from root or children.")]
     [SerializeField] private SpriteRenderer flashTarget;
-    [Tooltip("Played whenever the player takes damage (assign playerhit.mp3 in the Inspector).")]
-    [SerializeField] private AudioClip hurtSfx;
 
     [Header("Death")]
     [Tooltip("Death animasyonunun bitmesini bekleyip UI'i o sekilde tetiklemek icin sure (saniye).")]
@@ -146,6 +151,9 @@ public partial class Player : BaseEntity, IPlayerContext
     {
         base.Awake();
         _rb = GetComponent<Rigidbody2D>();
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
+        _audioSource.playOnAwake = false;
         _collider = GetComponent<Collider2D>();
         _rb.gravityScale = 0f;
         _rb.freezeRotation = true;
@@ -203,6 +211,8 @@ public partial class Player : BaseEntity, IPlayerContext
     {
         if (Time.time < _invulnerableUntil) return;
 
+        PlaySFX(hurtSFX);
+
         if (_currentState.IsChargeMeterFull(this) && playerAugmentController != null && playerAugmentController.HasHammerChargeDamageReductionUnlock)
             amount *= 0.75f;
 
@@ -214,7 +224,7 @@ public partial class Player : BaseEntity, IPlayerContext
         _invulnerableUntil = Time.time + Mathf.Max(0f, damageInvulnerabilityDuration);
         if (_damageFlashCoroutine != null) StopCoroutine(_damageFlashCoroutine);
         _damageFlashCoroutine = StartCoroutine(DamageFlashRoutine());
-        SoundManager.PlaySfx(hurtSfx);
+        
     }
 
     private IEnumerator DamageFlashRoutine()
@@ -228,11 +238,13 @@ public partial class Player : BaseEntity, IPlayerContext
 
     protected override void Die()
     {
+        PlaySFX(deadSFX);
         _currentHealth = 0f;
         _rb.linearVelocity = Vector2.zero;
         if (_collider != null) _collider.enabled = false;
         SetState(new DiedState());
         StartCoroutine(DeathSequenceRoutine());
+        
     }
 
     private IEnumerator DeathSequenceRoutine()
@@ -290,5 +302,11 @@ public partial class Player : BaseEntity, IPlayerContext
         NotifyHealthChanged();
         if (playerCurrency != null)
             playerCurrency.NotifyGoldChanged();
+    }
+
+    public void PlaySFX(AudioClip audioclip)
+    {
+        if (audioclip == null || _audioSource == null) return;
+        _audioSource.PlayOneShot(audioclip);
     }
 }

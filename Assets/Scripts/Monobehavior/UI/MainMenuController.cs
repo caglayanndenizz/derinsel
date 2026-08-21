@@ -12,11 +12,24 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Button playButton;
     [SerializeField] private Button quitButton;
 
+    [Header("Sound")]
+    private AudioSource _audioSource;
+    public AudioClip menuMusic;
+
     private void Awake()
     {
         playButton.onClick.AddListener(OnPlayClicked);
         quitButton.onClick.AddListener(OnQuitClicked);
-        SoundManager.PlayMenuMusic();
+
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
+        _audioSource.playOnAwake = false;
+        _audioSource.loop = true;
+        if (menuMusic != null)
+        {
+            _audioSource.clip = menuMusic;
+            _audioSource.Play();
+        }
     }
 
     public void OnPlayClicked()

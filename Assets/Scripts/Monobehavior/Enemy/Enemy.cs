@@ -54,6 +54,10 @@ public class Enemy : BaseEntity
     /// <summary>Fired every time damage is applied — including the killing blow.</summary>
     public event System.Action Damaged;
 
+    [Header("Sound")]
+    private AudioSource _audioSource;
+    public AudioClip hitSFX;
+
     private EntityStatusEffects _status;
     private EntityStatusVisuals _visuals;
     private EntitySensor _sensor;
@@ -85,6 +89,9 @@ public class Enemy : BaseEntity
     {
         base.Awake();
         _rb = GetComponent<Rigidbody2D>();
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
+        _audioSource.playOnAwake = false;
         _allColliders = GetComponentsInChildren<Collider2D>(true);
         player = GameObject.FindGameObjectWithTag("Player");
         _playerEntity = player != null ? player.GetComponent<BaseEntity>() : null;
@@ -236,6 +243,8 @@ public class Enemy : BaseEntity
     {
         if (IsDead) return;
 
+        PlaySFX(hitSFX);
+
         // Resonance: frozen enemies are more vulnerable
         amount *= _status.DamageTakenMultiplier;
 
@@ -315,6 +324,12 @@ public class Enemy : BaseEntity
 
     public void ApplyBleedStack(float damagePerStack, int maxStacks = 5, float expireSeconds = 5f)
         => _status.ApplyBleedStack(damagePerStack, maxStacks, expireSeconds);
+
+    private void PlaySFX(AudioClip audioclip)
+    {
+        if (audioclip == null || _audioSource == null) return;
+        _audioSource.PlayOneShot(audioclip);
+    }
 
     private void OnDrawGizmos() {
         if (player == null || _sensor == null) return;

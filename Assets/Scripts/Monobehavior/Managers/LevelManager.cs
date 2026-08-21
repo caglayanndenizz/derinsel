@@ -29,6 +29,16 @@ public class LevelManager : MonoBehaviour
     [Tooltip("Oyuncu augmenti sectikten bu kadar saniye sonra sonraki levela gecer.")]
     [SerializeField] private float chestToLevelDelay = 2f;
 
+    [Header("Healing")]
+    [Tooltip("levelPrefabs listesindeki Resting prefabi ile ayni referans olmali — bu levela girildiginde can barini full doldurur.")]
+    [SerializeField] private GameObject restingLevelPrefab;
+    [Tooltip("Bir level gecildiginde (sonraki levela ilerlerken) can barina eklenen yuzde (0.1 = %10).")]
+    [SerializeField] private float levelClearHealFraction = 0.1f;
+
+    [Header("Sound")]
+    private AudioSource _audioSource;
+    public AudioClip gameMusic;
+
     private int _currentLevelIndex = -1;
     private GameObject _activeLevelInstance;
     private GameObject _levelEndChest;
@@ -39,7 +49,16 @@ public class LevelManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        SoundManager.PlayGameMusic();
+
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
+        _audioSource.playOnAwake = false;
+        _audioSource.loop = true;
+        if (gameMusic != null)
+        {
+            _audioSource.clip = gameMusic;
+            _audioSource.Play();
+        }
     }
 
     // DungeonEntrance tarafindan cagirilir.
@@ -53,6 +72,10 @@ public class LevelManager : MonoBehaviour
     {
         if (_currentLevelIndex >= levelPrefabs.Count - 1)
             return; // Level 5 son level — simdilik ilerleme yok
+
+        Player playerComponent = player != null ? player.GetComponent<Player>() : null;
+        if (playerComponent != null)
+            playerComponent.Heal(playerComponent.MaxHealth * levelClearHealFraction);
 
         StartCoroutine(LoadLevelRoutine(_currentLevelIndex + 1));
     }
@@ -133,6 +156,12 @@ public class LevelManager : MonoBehaviour
 
         if (player != null)
             player.transform.position = spawnPos;
+
+        if (levelPrefabs[levelIndex] == restingLevelPrefab)
+        {
+            Player playerComponent = player != null ? player.GetComponent<Player>() : null;
+            playerComponent?.Heal(playerComponent.MaxHealth);
+        }
     }
 
     private void UnloadCurrentLevel()

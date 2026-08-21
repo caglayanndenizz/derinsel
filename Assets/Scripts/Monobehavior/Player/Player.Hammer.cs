@@ -72,6 +72,8 @@ public partial class Player
         _heavyAttackInProgress = false;
         _heavyFallbackExecuteAt = -1f;
 
+        PlaySFX(hammerAttackSFX);
+
         if (_defaultImpulseSource != null) _defaultImpulseSource.GenerateImpulse();
         float effectiveHammerAoe = hammerAOE * (playerAugmentController != null ? playerAugmentController.HammerAoeRadiusMultiplier : 1f);
         float hammerFreezeDuration = playerAugmentController != null ? playerAugmentController.HammerFreezeDuration : 0f;

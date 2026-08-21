@@ -621,6 +621,7 @@ GameObject:
   - component: {fileID: 1031669887}
   - component: {fileID: 1031669886}
   - component: {fileID: 1031669885}
+  - component: {fileID: 1031669888}
   m_Layer: 5
   m_Name: Play
   m_TagString: Untagged
@@ -730,6 +731,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1031669883}
   m_CullTransparentMesh: 1
+--- !u!114 &1031669888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1031669883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6921254d631e900428ccba4e02aaed14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonSFX
+  hoverSFX: {fileID: 0}
+  clickSFX: {fileID: 8300000, guid: 0f0ee35fc0951494781ea629a2e295dd, type: 3}
 --- !u!1 &1118877642
 GameObject:
   m_ObjectHideFlags: 0
@@ -879,6 +894,7 @@ GameObject:
   - component: {fileID: 1195127557}
   - component: {fileID: 1195127556}
   - component: {fileID: 1195127555}
+  - component: {fileID: 1195127558}
   m_Layer: 5
   m_Name: Quit
   m_TagString: Untagged
@@ -988,6 +1004,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1195127553}
   m_CullTransparentMesh: 1
+--- !u!114 &1195127558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1195127553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6921254d631e900428ccba4e02aaed14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonSFX
+  hoverSFX: {fileID: 0}
+  clickSFX: {fileID: 8300000, guid: 0f0ee35fc0951494781ea629a2e295dd, type: 3}
 --- !u!1 &1353817224
 GameObject:
   m_ObjectHideFlags: 0
@@ -7114,6 +7144,7 @@ MonoBehaviour:
   gameSceneName: Game
   playButton: {fileID: 1031669885}
   quitButton: {fileID: 1195127555}
+  menuMusic: {fileID: 8300000, guid: 7cc98a0bb19cb4b38a42ca1d34102d80, type: 3}
 --- !u!1 &2025821347
 GameObject:
   m_ObjectHideFlags: 0

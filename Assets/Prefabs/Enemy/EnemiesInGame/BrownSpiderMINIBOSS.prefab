@@ -275,6 +275,7 @@ MonoBehaviour:
   goldPrefab: {fileID: 8617352215983850939, guid: f3dc29352af3c4988913f7d91448e8b6, type: 3}
   goldDropChance: 1
   chestPrefab: {fileID: 0}
+  hitSFX: {fileID: 8300000, guid: 7c43ae7712a59470bacd5e641feae939, type: 3}
 --- !u!114 &7276818284739699173
 MonoBehaviour:
   m_ObjectHideFlags: 0

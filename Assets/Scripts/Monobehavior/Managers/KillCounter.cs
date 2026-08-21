@@ -11,7 +11,7 @@ public class KillCounter : MonoBehaviour
 
     [Header("Gold Milestone Chest (Spoils of War augment)")]
     [SerializeField] private GameObject silverChestPrefab;
-    [SerializeField] private int goldChestInterval = 15;
+    [SerializeField] private int goldChestInterval = 5;
 
     private int _totalKills;
     private int _nextMilestoneIndex;
