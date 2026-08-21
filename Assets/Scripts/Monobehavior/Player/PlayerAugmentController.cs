@@ -90,6 +90,8 @@ public class PlayerAugmentController : MonoBehaviour
     [SerializeField] private float hammerChargeFullStopDuration = 1.2f;
     [Tooltip("Extra magnet radius fraction granted by HammerMagnetRangeUnlock (0.5 = +50%).")]
     [SerializeField] private float hammerMagnetRadiusBonus = 0f;
+    [Tooltip("Gates the whole Hammer Charge Magnet feature (pull-while-charging + freeze-on-full-charge). Granted by HammerMagnetRangeUnlock (\"Gravity Well\") — inactive until then.")]
+    [SerializeField] private bool  hasHammerMagnetUnlock = false;
 
     [Header("Hammer — Bleed Unlock")]
     [SerializeField] private bool  hasHammerBleedUnlock;
@@ -200,7 +202,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float FireDotDamagePerSecond      => Mathf.Max(0f, fireDotDamagePerSecond);
     public float PoisonDotDuration           => Mathf.Max(0f, poisonDotDuration);
     public float PoisonDotDamagePerSecond    => Mathf.Max(0f, poisonDotDamagePerSecond);
-    public float LongbowFreezeDuration           => (mutationAugmentsLongbow && longbowFreezeDuration <= 0f) ? 1.5f : Mathf.Max(0f, longbowFreezeDuration);
+    public float LongbowFreezeDuration           => (mutationAugmentsLongbow && longbowFreezeDuration <= 0f) ? 2f : Mathf.Max(0f, longbowFreezeDuration);
     public bool  HasCrossbowBoltPierce           => hasCrossbowBoltPierce;
     public float CrossbowPierceDamageFalloff     => Mathf.Clamp01(crossbowPierceDamageFalloff);
     public float CrossbowPierceDamageFloor       => Mathf.Clamp01(crossbowPierceDamageFloor);
@@ -233,6 +235,7 @@ public class PlayerAugmentController : MonoBehaviour
     public float HammerFreezeDuration                => Mathf.Max(0f, hammerFreezeDuration);
     /// <summary>Resonance multiplier — damage dealt to frozen enemies is multiplied by this value.</summary>
     public float FrozenEnemyVulnerabilityMultiplier  => Mathf.Max(1f, frozenEnemyVulnerabilityMultiplier);
+    public bool  HasHammerMagnetUnlock                => hasHammerMagnetUnlock;
     public float HammerMagnetRadius                  => Mathf.Max(0f, hammerMagnetRadius) * (1f + Mathf.Max(0f, hammerMagnetRadiusBonus));
     public float HammerMagnetPullSpeed               => Mathf.Max(0f, hammerMagnetPullSpeed);
     public float HammerChargeFullStopDuration        => Mathf.Max(0f, hammerChargeFullStopDuration);
@@ -386,6 +389,7 @@ public class PlayerAugmentController : MonoBehaviour
         hasHammerBleedUnlock                = false;
         hasHammerLifestealUnlock            = false;
         hammerMagnetRadiusBonus             = 0f;
+        hasHammerMagnetUnlock               = false;
         hasHammerGuaranteedCritOnFullCharge = false;
     }
 
@@ -470,7 +474,7 @@ public class PlayerAugmentController : MonoBehaviour
         {
             case AugmentId.BaseDamageIncrease_Tier1: return UnityEngine.Random.Range(2f, 5f);
             case AugmentId.BaseDamageIncrease_Tier2: return UnityEngine.Random.Range(4f, 7f);
-            case AugmentId.BaseDamageIncrease_Tier3: return UnityEngine.Random.Range(5f, 10f);
+            case AugmentId.BaseDamageIncrease_Tier3: return UnityEngine.Random.Range(2f, 5f);
             default: return 0f;
         }
     }
@@ -508,7 +512,7 @@ public class PlayerAugmentController : MonoBehaviour
                 break;
             case AugmentId.LongbowFreezeUnlock:
                 hasLongbowFreezeUnlock = true;
-                longbowFreezeDuration  = augment.value > 0f ? augment.value : 1.5f;
+                longbowFreezeDuration  = augment.value > 0f ? augment.value : 2f;
                 // Resonance: frozen enemies take 50% more damage once freeze unlock is obtained
                 frozenEnemyVulnerabilityMultiplier = Mathf.Max(frozenEnemyVulnerabilityMultiplier, 1.5f);
                 break;
@@ -614,6 +618,7 @@ public class PlayerAugmentController : MonoBehaviour
                 knockbackMultiplier *= 1.75f;
                 break;
             case AugmentId.HammerMagnetRangeUnlock:
+                hasHammerMagnetUnlock = true;
                 hammerMagnetRadiusBonus += 0.5f;
                 break;
             case AugmentId.HammerGuaranteedCritOnFullChargeUnlock:

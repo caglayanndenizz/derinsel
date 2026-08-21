@@ -349,4 +349,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 919a84df9600a42bdadffdb790083d2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniBossChestDrop
-  woodenChestPrefab: {fileID: 0}
+  woodenChestPrefab: {fileID: 8874947118399667921, guid: 000de5a339504d64bae8aada1510ac3b, type: 3}

@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnlockAugmentDefinition
   id: 103
   displayName: Gravity Well
-  description: Increases the hammer's charge magnet pull radius by 50%.
+  description: Unlocks the hammer's charge magnet — pulls nearby enemies in while
+    charging and freezes them when charge is full. +50% pull radius.
   icon: {fileID: 0}
   rarity: 1
   tier: 1

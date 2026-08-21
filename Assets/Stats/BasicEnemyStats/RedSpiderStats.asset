@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyEntityStats
   enemyName: 
   tier: 0
-  maxHealth: 555
+  maxHealth: 55
   walkSpeed: 1
   runSpeed: 5
   enemyAP: 0

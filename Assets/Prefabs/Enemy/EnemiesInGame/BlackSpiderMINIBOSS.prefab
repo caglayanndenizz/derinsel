@@ -274,7 +274,7 @@ MonoBehaviour:
   patrolWaypointReachDistance: 0.22
   goldPrefab: {fileID: 8617352215983850939, guid: f3dc29352af3c4988913f7d91448e8b6, type: 3}
   goldDropChance: 1
-  chestPrefab: {fileID: 1736526625652122930, guid: 1bbe4049603690b4881f8088d635340f, type: 3}
+  chestPrefab: {fileID: 0}
   hitSFX: {fileID: 8300000, guid: 7c43ae7712a59470bacd5e641feae939, type: 3}
 --- !u!114 &1122903204031472795
 MonoBehaviour:
@@ -349,4 +349,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 919a84df9600a42bdadffdb790083d2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MiniBossChestDrop
-  woodenChestPrefab: {fileID: 0}
+  woodenChestPrefab: {fileID: 8874947118399667921, guid: 000de5a339504d64bae8aada1510ac3b, type: 3}

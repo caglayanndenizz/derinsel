@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AugmentDefinition
   id: 99
   displayName: Spoils of War
-  description: A wooden chest appears every 15 gold you collect.
+  description: A wooden chest appears every 5 gold you collect.
   icon: {fileID: 0}
   rarity: 2
   tier: 2

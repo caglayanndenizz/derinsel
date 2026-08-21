@@ -102,7 +102,7 @@ public partial class Player
             Vector2 shotDir = Quaternion.Euler(0f, 0f, angleOffset) * dir;
             Vector2 spawnPos = origin + shotDir * radialLongbowSpawnInset;
             // Her ok kendi hasarını ayrı ayrı roll eder (min-max aralık), tek atış icin ortak degil.
-            TrySpawnSinglePlayerArrow(spawnPos, origin + shotDir * targetDistance, useSpeed, dmgMult, hasChargedLongbowAoeAugment);
+            TrySpawnSinglePlayerArrow(spawnPos, origin + shotDir * targetDistance, useSpeed, dmgMult, hasChargedLongbowAoeAugment, chargeFraction);
         }
     }
 
@@ -149,8 +149,8 @@ public partial class Player
             float forward = Mathf.Max(0f, radialLongbowSpawnInset);
             Vector2 spawnPos = radialOrigin + radialDir * forward;
             Vector2 shotTarget = radialOrigin + radialDir * Mathf.Max(forward + 0.3f, targetDistance);
-            // Radial yayılım her ok kendi rolünü alır.
-            TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, dmgMult, hasChargedLongbowAoeAugment);
+            // Radial yayılım her ok kendi rolünü alır. Otomatik yaylım her zaman tam güçte sayılır.
+            TrySpawnSinglePlayerArrow(spawnPos, shotTarget, useSpeed, dmgMult, hasChargedLongbowAoeAugment, 1f);
         }
     }
 
@@ -165,13 +165,14 @@ public partial class Player
         Vector2 targetWorldPoint,
         float useSpeed,
         float dmgMult,
-        bool hasChargedLongbowAoeAugment)
+        bool hasChargedLongbowAoeAugment,
+        float chargeFraction)
     {
         float rolledDamage    = stats != null ? stats.RollPlayerBaseDamage() : 0f;
         float baseDamageBonus = playerAugmentController != null ? playerAugmentController.PlayerBaseDamageBonus : 0f;
         float bowMult         = playerAugmentController != null ? playerAugmentController.BowDamageMultiplier : 1f;
         float gemTierMult     = playerAugmentController != null ? playerAugmentController.LongbowGemTierDamageMultiplier : 1f;
-        float useDamage       = (rolledDamage + baseDamageBonus) * bowMult * gemTierMult * dmgMult;
+        float useDamage       = (rolledDamage + baseDamageBonus) * bowMult * gemTierMult * dmgMult * Mathf.Clamp01(chargeFraction);
 
         // Full charge + the AoE augment guarantees an explosion — no chance roll.
         bool chargedExplosionEnabled = hasChargedLongbowAoeAugment;

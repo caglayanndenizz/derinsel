@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AugmentDefinition
   id: 88
   displayName: Strength III
-  description: Increases your base damage by 5 to 10.
+  description: Increases your base damage by 2 to 5.
   icon: {fileID: 0}
   rarity: 3
   tier: 3

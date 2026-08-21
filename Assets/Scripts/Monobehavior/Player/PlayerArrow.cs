@@ -294,6 +294,7 @@ public class PlayerArrow : MonoBehaviour
         if (ps == null) return;
         if (active)
         {
+            if (!ps.gameObject.activeSelf) ps.gameObject.SetActive(true);
             if (!ps.isPlaying) ps.Play();
         }
         else

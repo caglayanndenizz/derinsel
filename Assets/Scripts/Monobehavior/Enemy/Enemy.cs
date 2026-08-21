@@ -2,9 +2,11 @@ using UnityEngine;
 
 /// <summary>
 /// Coordinator: holds serialized config, the Patrol/Chase/Attack state machine and death/loot.
-/// Capabilities live in sibling components (EntityStatusEffects, EntityStatusVisuals,
-/// EntitySensor, EnemyMotor, IAttackBehavior); public status methods stay here as facades
-/// so external callers (Player.Hammer, PlayerArrow, PlayerBolt) are unaffected.
+/// Capabilities live in sibling components (EntityStatusEffects, EntitySensor, EnemyMotor,
+/// IAttackBehavior); public status methods stay here as facades so external callers
+/// (Player.Hammer, PlayerArrow, PlayerBolt) are unaffected. Status-effect coloring (hit flash,
+/// freeze, fire, poison) is applied directly in LateUpdate here so it always wins over any
+/// Animator-driven color curve.
 /// Attack style (ranged/melee) comes from the IAttackBehavior component on the prefab.
 /// </summary>
 public class Enemy : BaseEntity
@@ -58,8 +60,22 @@ public class Enemy : BaseEntity
     private AudioSource _audioSource;
     public AudioClip hitSFX;
 
+    [Header("Status Colors")]
+    [Tooltip("Applied for hitFlashDuration seconds whenever this enemy takes damage.")]
+    public Color hitFlashColor = Color.red;
+    public float hitFlashDuration = 0.1f;
+    [Tooltip("Applied for as long as IsFrozen is true.")]
+    public Color freezeColor = new Color(0.3f, 0.6f, 1f);
+    [Tooltip("Applied for as long as IsOnFire is true.")]
+    public Color onFireColor = new Color(1f, 0.45f, 0.1f);
+    [Tooltip("Applied for as long as IsPoisoned is true.")]
+    public Color poisonedColor = new Color(0.2f, 0.8f, 0.2f);
+
+    private SpriteRenderer _bodySpriteRenderer;
+    private Color _bodyOriginalColor;
+    private float _hitFlashUntil = -1f;
+
     private EntityStatusEffects _status;
-    private EntityStatusVisuals _visuals;
     private EntitySensor _sensor;
     private EnemyMotor _motor;
     private IAttackBehavior _attack;
@@ -96,11 +112,12 @@ public class Enemy : BaseEntity
         player = GameObject.FindGameObjectWithTag("Player");
         _playerEntity = player != null ? player.GetComponent<BaseEntity>() : null;
 
+        _bodySpriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (_bodySpriteRenderer != null) _bodyOriginalColor = _bodySpriteRenderer.color;
+
         // Fallback: prefab'da yoksa runtime'da ekle (status önce — visuals ona abone oluyor)
         _status = GetComponent<EntityStatusEffects>();
         if (_status == null) _status = gameObject.AddComponent<EntityStatusEffects>();
-        _visuals = GetComponent<EntityStatusVisuals>();
-        if (_visuals == null) _visuals = gameObject.AddComponent<EntityStatusVisuals>();
         _sensor = GetComponent<EntitySensor>();
         if (_sensor == null) _sensor = gameObject.AddComponent<EntitySensor>();
         _motor = GetComponent<EnemyMotor>();
@@ -139,7 +156,16 @@ public class Enemy : BaseEntity
 
     void FixedUpdate()
     {
-        if (_isDead || _motor.IsKnockedBack || _status.IsFrozen) return;
+        if (_isDead) return;
+
+        if (_status.IsFrozen)
+        {
+            // Guaranteed stop: zero velocity every physics tick while frozen, regardless of
+            // what else (knockback, magnet, attack lunge) might otherwise be pushing it.
+            if (_rb != null) _rb.linearVelocity = Vector2.zero;
+            return;
+        }
+        if (_motor.IsKnockedBack) return;
 
         _sensor.TrackLastSafePosition(ReferencePosition);
 
@@ -153,6 +179,31 @@ public class Enemy : BaseEntity
     }
 
     protected override void Move() => _motor.MoveByState();
+
+    /// <summary>
+    /// Runs after Animator evaluation so it always wins, regardless of any color curve
+    /// baked into an animation clip. Priority: frozen/on fire/poisoned (elemental arrow
+    /// statuses) > hit flash > normal. Hit flash (red) only shows when the hit didn't also
+    /// apply one of those statuses — e.g. a plain hammer/melee/unenchanted-arrow hit.
+    /// </summary>
+    void LateUpdate()
+    {
+        if (_bodySpriteRenderer == null) return;
+
+        Color target;
+        if (_status.IsFrozen)
+            target = freezeColor;
+        else if (_status.IsOnFire)
+            target = onFireColor;
+        else if (_status.IsPoisoned)
+            target = poisonedColor;
+        else if (Time.time < _hitFlashUntil)
+            target = hitFlashColor;
+        else
+            target = _bodyOriginalColor;
+
+        _bodySpriteRenderer.color = target;
+    }
 
     private Vector2 GetValidGoldSpawnPosition(Vector2 desiredPosition)
     {
@@ -249,7 +300,7 @@ public class Enemy : BaseEntity
         amount *= _status.DamageTakenMultiplier;
 
         _currentHealth -= amount;
-        _visuals.PlayHitFlash();
+        _hitFlashUntil = Time.time + hitFlashDuration;
         DamageNumberPooler.SpawnDamageNumber(ReferencePosition, amount, isHeavy);
         Damaged?.Invoke();
         Player playerComponent = player != null ? player.GetComponent<Player>() : null;
@@ -347,7 +398,9 @@ public class Enemy : BaseEntity
     private void OnEnable()
     {
         _isDead = false;
-        // Status/renk resetleri EntityStatusEffects ve EntityStatusVisuals OnEnable'larında yapılır
+        // Status resetleri EntityStatusEffects'in kendi OnEnable'ında yapılır
+        _hitFlashUntil = -1f;
+        if (_bodySpriteRenderer != null) _bodySpriteRenderer.color = _bodyOriginalColor;
         SetCollidersEnabled(true);
         if (_rb != null) _rb.linearVelocity = Vector2.zero;
         if (stats != null) _currentHealth = stats.maxHealth;
