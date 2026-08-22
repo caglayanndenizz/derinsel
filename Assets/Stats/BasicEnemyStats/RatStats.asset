@@ -17,4 +17,4 @@ MonoBehaviour:
   maxHealth: 10
   walkSpeed: 1
   runSpeed: 3
-  enemyAP: 2
+  enemyAP: 1

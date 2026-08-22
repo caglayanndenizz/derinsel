@@ -11,49 +11,6 @@ public class PlayerAugmentController : MonoBehaviour
     public const int GemDiamondThreshold  = 3;
     public const int GemObsidianThreshold = 4;
 
-    private static readonly AugmentId[] LongbowGemAugmentIds =
-    {
-        AugmentId.ChargedLongbowAoeUnlock,
-        AugmentId.TripleArrowUnlock,
-        AugmentId.LongbowFreezeUnlock,
-        AugmentId.FireArrowUnlock,
-        AugmentId.PoisonArrowUnlock,
-        AugmentId.LongbowAoeRadius_Common,
-        AugmentId.LongbowAoeRadius_Rare,
-        AugmentId.LongbowAoeRadius_Extraordinary,
-        AugmentId.BowDamageMultiplier_Common,
-        AugmentId.BowDamageMultiplier_Rare,
-        AugmentId.BowDamageMultiplier_Extraordinary,
-        AugmentId.ProjectileCount_PlusOneProjectiles,
-        AugmentId.ProjectileCount_PlusOneAndSpeed10Percent,
-        AugmentId.ProjectileCount_PlusOneAndSpeed15Percent,
-        AugmentId.BowChargeSpeed_Tier1,
-        AugmentId.BowChargeSpeed_Tier2,
-        AugmentId.BowChargeSpeed_Tier3,
-    };
-
-    private static readonly AugmentId[] HammerGemAugmentIds =
-    {
-        AugmentId.HammerChargeDamageReductionUnlock,
-        AugmentId.HammerFreezeUnlock,
-        AugmentId.HammerAoeRadiusUnlock,
-        AugmentId.HammerChargeSpeed_Tier1,
-        AugmentId.HammerChargeSpeed_Tier2,
-        AugmentId.HammerChargeSpeed_Tier3,
-        AugmentId.HammerFreeze_Common,
-        AugmentId.HammerFreeze_Rare,
-        AugmentId.HammerAoeRadius_Common,
-        AugmentId.HammerAoeRadius_Rare,
-        AugmentId.HammerDamageMultiplier_Common,
-        AugmentId.HammerDamageMultiplier_Rare,
-        AugmentId.HammerDamageMultiplier_Extraordinary,
-        AugmentId.HammerBleedUnlock,
-        AugmentId.HammerLifestealUnlock,
-        AugmentId.HammerKnockbackUnlock,
-        AugmentId.HammerMagnetRangeUnlock,
-        AugmentId.HammerGuaranteedCritOnFullChargeUnlock,
-    };
-
     // ── Runtime stats ─────────────────────────────────────────────────────────
 
     [Header("General")]
@@ -258,9 +215,10 @@ public class PlayerAugmentController : MonoBehaviour
         get
         {
             if (mutationAugmentsLongbow) return GemObsidianThreshold;
+            if (unlockDatabase == null) return 0;
             int total = 0;
-            for (int i = 0; i < LongbowGemAugmentIds.Length; i++)
-                total += GetAppliedCount(LongbowGemAugmentIds[i]);
+            foreach (UnlockAugmentDefinition u in unlockDatabase.longbowUnlocks)
+                if (u != null) total += GetAppliedCount(u.id);
             return total;
         }
     }
@@ -282,9 +240,10 @@ public class PlayerAugmentController : MonoBehaviour
         get
         {
             if (mutationAugmentsHammer) return GemObsidianThreshold;
+            if (unlockDatabase == null) return 0;
             int total = 0;
-            for (int i = 0; i < HammerGemAugmentIds.Length; i++)
-                total += GetAppliedCount(HammerGemAugmentIds[i]);
+            foreach (UnlockAugmentDefinition u in unlockDatabase.hammerUnlocks)
+                if (u != null) total += GetAppliedCount(u.id);
             return total;
         }
     }
